@@ -20,11 +20,11 @@ normal = ["workspace-build-acceleration"]
 workspace-build-acceleration = { workspace = true }
 
 # Internal
-enums = { path = "../enums" }
+enums = { workspace = true }
 
 # Serialization
-serde = "1.0.125"
-serde_derive = "1.0.125"
+serde = { workspace = true }
+serde_derive = { workspace = true }
 
 utoipa = { version = "4", features = ["chrono","actix_extras"] }
 
@@ -34,5 +34,5 @@ utoipa = { version = "4", features = ["chrono","actix_extras"] }
 strum = { version = "0.26", features = ["derive"] }
 
 # Test serialization
-serde_json = "1.0.108"
-toml = "0.8.14"
+serde_json = { workspace = true }
+toml = { workspace = true }

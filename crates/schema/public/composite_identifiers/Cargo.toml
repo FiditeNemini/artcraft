@@ -20,8 +20,8 @@ normal = ["workspace-build-acceleration"]
 workspace-build-acceleration = { workspace = true }
 
 # Internal
-enums = { path = "../enums" }
-tokens = { path = "../tokens" }
+enums = { workspace = true }
+tokens = { workspace = true }
 
 
 # Serialization

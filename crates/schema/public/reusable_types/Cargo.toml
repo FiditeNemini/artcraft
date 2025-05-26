@@ -23,16 +23,15 @@ workspace-build-acceleration = { workspace = true }
 # (none)
 
 # External
-chrono = { version = "0.4.22", features = ["serde"] }
+chrono = { workspace = true }
 
 # Serialization
-serde = "1.0.125"
-serde_derive = "1.0.125"
+serde = { workspace = true }
+serde_derive = { workspace = true }
 
 # MySql Database
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 
 [dev-dependencies]
 # Test serialization
-#serde_json = "1.0.64"
-toml = "0.8.14"
+toml = { workspace = true }

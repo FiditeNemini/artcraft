@@ -43,8 +43,8 @@ datetimes = { path = "../../../lib/data/datetimes" }
 easyenv = { path = "../../../lib/easyenv" }
 elasticsearch_schema = { path = "../../../schema/database/elasticsearch_schema" }
 email_sender= { path = "../../../lib/email_sender" }
-enums = { path = "../../../schema/public/enums" }
-enums_public = { path = "../../../schema/public/enums_public" }
+enums = { workspace = true }
+enums_public = { workspace = true }
 errors = { workspace = true }
 filesys = { workspace = true }
 google_sign_in = { path = "../../../lib/api_clients/google_sign_in" }
@@ -80,8 +80,8 @@ billing_component = { path = "../../plugins/billing" }
 user_traits_component = { path = "../../plugins/user_traits_component" }
 
 # External
-anyhow = "1.0.86"
-base64 = "0.22.1"
+anyhow = { workspace = true }
+base64 = { workspace = true }
 chrono = { workspace = true }
 derive_more = "0.99.17"
 dotenv = "0.15.0"
@@ -90,7 +90,7 @@ lexical-sort = "0.3.1"
 log = { workspace = true }
 once_cell = { workspace = true }
 rand = { workspace = true }
-regex = "1.5.4"
+regex = { workspace = true }
 strum_macros = "0.26.4"
 
 #symphonia = { version = "0.5.2", features = ["aac", "alac", "flac", "isomp4", "mkv", "mp3", "ogg", "opus", "vorbis", "wav"] }
@@ -107,7 +107,7 @@ language-tags = "0.3.2" # Parsing single tags richly
 
 # HTTP
 # TODO/NB: This is just for Twitch, but we might need it later.
-reqwest = { version = "0.12.4" }
+reqwest = { workspace = true }
 native-tls = { version = "0.2.8", features = ["vendored"] }
 
 # Runtime
@@ -159,10 +159,10 @@ md-5 = "0.10.6" # gravatar
 sha2 = "0.9.9" # file hashes, inference text hashes, etc.
 
 # Serialization
-serde = "1.0.125"
-serde_derive = "1.0.125"
-serde_json = "1.0.108"
-toml = "0.8.14"
+serde = { workspace = true }
+serde_derive = { workspace = true }
+serde_json = { workspace = true }
+toml = { workspace = true }
 
 # Text processing
 pulldown-cmark = "0.11.0"

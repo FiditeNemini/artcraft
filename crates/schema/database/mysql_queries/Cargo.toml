@@ -31,7 +31,7 @@ tokens = { workspace = true }
 
 # External
 anyhow = { workspace = true }
-chrono = { version = "0.4.22", features = ["serde"] }
+chrono = { workspace = true }
 log = { workspace = true }
 
 # Needed to safety check some queries we can't use escaping for
@@ -42,13 +42,13 @@ regex = { workspace = true }
 serde = { workspace = true }
 serde_derive = { workspace = true }
 serde_json = { workspace = true }
-serial_test = "3.0.0"
 
 # BigNum
 num-traits = "0.2.19"
 
 tokio = { version = "1.38.0", features = ["full"] }
-rand = "0.8"
+rand = { workspace = true }
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono", "bigdecimal" ] }
 
-
+[dev-dependencies]
+serial_test = "3.0.0"

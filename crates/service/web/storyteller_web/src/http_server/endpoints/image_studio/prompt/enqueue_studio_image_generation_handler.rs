@@ -286,7 +286,7 @@ pub async fn enqueue_studio_image_generation_handler(http_request: HttpRequest, 
     debug!("Uploading file {} of {} to Sora...", (i+1), files_to_upload.len());
 
     let sora_upload_response =
-        sora_media_upload_from_file(file_path, CredentialMigrationRef::Legacy(&sora_credentials))
+        sora_media_upload_from_file(file_path, CredentialMigrationRef::Legacy(&sora_credentials), None)
             .await
             .map_err(|err| {
               error!("Failed to upload scene media to Sora: {:?}", err);
@@ -322,6 +322,7 @@ pub async fn enqueue_studio_image_generation_handler(http_request: HttpRequest, 
     image_size: ImageSize::Square,
     sora_media_tokens: sora_media_tokens.clone(),
     credentials: CredentialMigrationRef::Legacy(&sora_credentials),
+    request_timeout: None,
   }).await;
 
   debug!("Sora image gen response: {:?}", response);
@@ -350,7 +351,8 @@ pub async fn enqueue_studio_image_generation_handler(http_request: HttpRequest, 
           num_images: NumImages::One,
           image_size: ImageSize::Square,
           sora_media_tokens: sora_media_tokens.clone(),
-          credentials: CredentialMigrationRef::Legacy(&updated_sora_credentials)
+          credentials: CredentialMigrationRef::Legacy(&updated_sora_credentials),
+          request_timeout: None,
         }).await;
       },
       Err(e) => {
@@ -369,7 +371,8 @@ pub async fn enqueue_studio_image_generation_handler(http_request: HttpRequest, 
               num_images: NumImages::One,
               image_size: ImageSize::Square,
               sora_media_tokens: sora_media_tokens.clone(),
-              credentials: CredentialMigrationRef::Legacy(&updated_sora_credentials)
+              credentials: CredentialMigrationRef::Legacy(&updated_sora_credentials),
+              request_timeout: None,
             }).await;
           },
           Err(e) => {

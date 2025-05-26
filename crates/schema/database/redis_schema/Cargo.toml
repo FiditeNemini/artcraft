@@ -25,12 +25,12 @@ errors = { workspace = true }
 tokens = { workspace = true }
 
 # External
-chrono = { version = "0.4.22", features = ["serde"] }
+chrono = { workspace = true }
 
 # Redis
 r2d2_redis = "0.14.0"
-url = "2.5.1"
-serde = { version = "1.0.203", features = ["derive"] }
+url = { workspace = true }
+serde = { workspace = true }
 
 [dev-dependencies]
 # None yet
