@@ -48,7 +48,7 @@
         "name": "maybe_creator_anonymous_visitor_token: tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken",
         "type_info": {
           "type": "VarString",
-          "flags": "BINARY",
+          "flags": "MULTIPLE_KEY | BINARY",
           "char_set": 224,
           "max_size": 128
         }
