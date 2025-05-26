@@ -84,7 +84,6 @@ anyhow = { workspace = true }
 base64 = { workspace = true }
 chrono = { workspace = true }
 derive_more = "0.99.17"
-dotenv = "0.15.0"
 hostname = "0.4.0"
 lexical-sort = "0.3.1"
 log = { workspace = true }
@@ -92,13 +91,7 @@ once_cell = { workspace = true }
 rand = { workspace = true }
 regex = { workspace = true }
 strum_macros = "0.26.4"
-
-#symphonia = { version = "0.5.2", features = ["aac", "alac", "flac", "isomp4", "mkv", "mp3", "ogg", "opus", "vorbis", "wav"] }
-# Opus support still hasn't landed in Symphonia, so we have to use an older version (~0.5) off-master.
-# Opus is the browser's default (only) recording codec: https://blog.addpipe.com/audio-constraints-getusermedia/
-symphonia = { git = "https://github.com/pdeljanov/Symphonia.git", rev = "e1a70095c4409478c1ded499fb8dd4afa540fb90", features = ["aac", "alac", "flac", "isomp4", "mkv", "mp3", "ogg", "opus", "vorbis", "wav"] }
 time = "0.3.30"
-uuid = { version = "1.8.0", features = ["v4"] }
 url = { workspace = true }
 
 # Language tag parsing
@@ -108,7 +101,6 @@ language-tags = "0.3.2" # Parsing single tags richly
 # HTTP
 # TODO/NB: This is just for Twitch, but we might need it later.
 reqwest = { workspace = true }
-native-tls = { version = "0.2.8", features = ["vendored"] }
 
 # Runtime
 # NB: We switched to Tokio from `async-std` for broader ecosystem support.
@@ -118,8 +110,6 @@ tokio = { version = "1.38.0", features = ["macros"] }
 futures = { version = "0.3.17", features = ["thread-pool"] } # feature for ThreadPool
 futures-util = "0.3.29"
 futures_old_for_limiter = { package = "futures", version = "0.1.29" } # Older version of futures for `limiter` crate
-futures-core = "0.3.29" # NB: For middleware/futures upgrade
-pin-project-lite = "0.2.9" # NB: For middleware/futures upgrade
 
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 
@@ -130,9 +120,6 @@ r2d2_redis = "0.14.0"
 # Elasticsearch
 elasticsearch = "8.5.0-alpha.1"
 
-# In-memory caching
-lru_time_cache = "0.11.11"
-
 # Files
 infer = "0.16.0"
 tempdir = "0.3.7"
@@ -142,12 +129,9 @@ tempdir = "0.3.7"
 rust-s3 = { version = "0.36.0-beta.2" }
 
 actix = { workspace = true }
-actix-cors = { workspace = true }
 actix-http = { workspace = true }
 actix-multipart = { workspace = true }
-actix-rt = { workspace = true }
 actix-service = { workspace = true }
-actix-utils = { workspace = true }
 actix-web = { workspace = true }
 actix-web-actors = { workspace = true }
 actix-web-lab = { workspace = true }
@@ -158,16 +142,12 @@ async-stripe = { version = "0.26.0", default-features = false, features = ["runt
 # Crypto
 magic-crypt = "3.1.13" # encrypting sort IDs for the frontend so we don't leak info
 md-5 = "0.10.6" # gravatar
-sha2 = "0.9.9" # file hashes, inference text hashes, etc.
 
 # Serialization
 serde = { workspace = true }
 serde_derive = { workspace = true }
 serde_json = { workspace = true }
 toml = { workspace = true }
-
-# Text processing
-pulldown-cmark = "0.11.0"
 
 # Async traits
 # NB: note: `async` trait functions are not currently supported

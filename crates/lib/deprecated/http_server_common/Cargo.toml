@@ -23,8 +23,6 @@ workspace-build-acceleration = { workspace = true }
 errors = { workspace = true }
 
 # External
-anyhow = { workspace = true }
-base64 = { workspace = true }
 log = { workspace = true }
 once_cell = { workspace = true }
 regex = "1.5.4"
@@ -35,7 +33,6 @@ actix-web = { workspace = true }
 
 # Language
 language-tags = "0.3.2" # Parsing single tags richly
-#accept-language = "2.0.0" # Parsing many tags poorly
 
 # Serialization
 serde = { workspace = true }
@@ -43,4 +40,4 @@ serde_derive = { workspace = true }
 serde_json = { workspace = true }
 
 [dev-dependencies]
-actix-rt = { workspace = true }
+# (None yet)

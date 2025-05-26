@@ -25,9 +25,7 @@ errors = { workspace = true }
 
 # Actix
 actix-http = { workspace = true }
-actix-rt = { workspace = true }
 actix-service = { workspace = true }
-actix-utils = { workspace = true }
 actix-web = { workspace = true }
 
 # IPv4 and v6 CIDRs (crate has few dependencies)
