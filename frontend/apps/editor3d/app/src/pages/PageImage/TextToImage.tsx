@@ -13,7 +13,7 @@ interface TextToImageProps {
 
 const TextToImage = ({ imageMediaId, imageUrl }: TextToImageProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [selectedModel, setSelectedModel] = useState<string>("Flux Pro Ultra");
+  const [selectedModel, setSelectedModel] = useState<string>("GPT Image 1 (GPT-4o)");
   const [useSystemPrompt, setUseSystemPrompt] = useState(false);
   const [isImageBeingProcessed, setIsImageBeingProcessed] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -29,18 +29,25 @@ const TextToImage = ({ imageMediaId, imageUrl }: TextToImageProps) => {
 
   const modelList: PopoverItem[] = [
     {
+      label: "GPT Image 1 (GPT-4o)",
+      icon: <FontAwesomeIcon icon={faFilm} className="h-4 w-4" />,
+      selected: selectedModel === "GPT Image 1 (GPT-4o)",
+      description: "Slow, ultra instructive model",
+      badges: [{ label: "45 sec.", icon: <FontAwesomeIcon icon={faClock} /> }],
+    },
+    {
       label: "Flux Pro Ultra",
       icon: <FontAwesomeIcon icon={faFilm} className="h-4 w-4" />,
       selected: selectedModel === "Flux Pro Ultra",
       description: "High quality model",
-      badges: [{ label: "2 min.", icon: <FontAwesomeIcon icon={faClock} /> }],
+      badges: [{ label: "15 sec.", icon: <FontAwesomeIcon icon={faClock} /> }],
     },
     {
       label: "Recraft 3",
       icon: <FontAwesomeIcon icon={faFilm} className="h-4 w-4" />,
       selected: selectedModel === "Recraft 3",
       description: "Fast and high-quality model",
-      badges: [{ label: "2 min.", icon: <FontAwesomeIcon icon={faClock} /> }],
+      badges: [{ label: "15 sec.", icon: <FontAwesomeIcon icon={faClock} /> }],
     },
   ];
 

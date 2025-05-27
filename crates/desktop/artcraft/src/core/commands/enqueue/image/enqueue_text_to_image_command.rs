@@ -1,4 +1,7 @@
 use crate::core::commands::command_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus, CommandResult, SerializeMarker};
+use crate::core::commands::enqueue::image::handle_fal::handle_fal;
+use crate::core::commands::enqueue::image::handle_sora::handle_sora;
+use crate::core::commands::enqueue::image::internal_image_error::InternalImageError;
 use crate::core::events::sendable_event_trait::SendableEvent;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
 use crate::core::state::data_dir::trait_data_subdir::DataSubdir;
@@ -8,6 +11,7 @@ use crate::core::utils::save_base64_image_to_temp_dir::save_base64_image_to_temp
 use crate::core::utils::simple_http_download::simple_http_download;
 use crate::core::utils::simple_http_download_to_tempfile::simple_http_download_to_tempfile;
 use crate::services::fal::state::fal_credential_manager::FalCredentialManager;
+use crate::services::fal::state::fal_task_queue::FalTaskQueue;
 use crate::services::sora::events::sora_image_enqueue_failure_event::SoraImageEnqueueFailureEvent;
 use crate::services::sora::events::sora_image_enqueue_success_event::SoraImageEnqueueSuccessEvent;
 use crate::services::sora::state::read_sora_credentials_from_disk::read_sora_credentials_from_disk;
@@ -53,7 +57,6 @@ use storyteller_client::utils::api_host::ApiHost;
 use tauri::{AppHandle, Emitter, Manager, State};
 use tempfile::NamedTempFile;
 use tokens::tokens::media_files::MediaFileToken;
-use crate::services::fal::state::fal_task_queue::FalTaskQueue;
 
 #[derive(Deserialize)]
 pub struct EnqueueTextToImageRequest {
@@ -64,11 +67,13 @@ pub struct EnqueueTextToImageRequest {
   pub model: Option<EnqueueTextToImageModel>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum EnqueueTextToImageModel {
   #[serde(rename = "flux_pro_ultra")]
   FluxProUltra,
+  #[serde(rename = "gpt_image_1")]
+  GptImage1,
   #[serde(rename = "recraft_3")]
   Recraft3,
 }
@@ -100,6 +105,8 @@ pub async fn enqueue_text_to_image_command(
   fal_creds_manager: State<'_, FalCredentialManager>,
   storyteller_creds_manager: State<'_, StorytellerCredentialManager>,
   fal_task_queue: State<'_, FalTaskQueue>,
+  sora_creds_manager: State<'_, SoraCredentialManager>,
+  sora_task_queue: State<'_, SoraTaskQueue>,
 ) -> CommandResult<EnqueueTextToImageSuccessResponse, EnqueueTextToImageErrorType, ()> {
 
   info!("enqueue_text_to_image called");
@@ -110,6 +117,8 @@ pub async fn enqueue_text_to_image_command(
     &fal_creds_manager,
     &storyteller_creds_manager,
     &fal_task_queue,
+    &sora_creds_manager,
+    &sora_task_queue,
   ).await;
 
   match result {
@@ -127,12 +136,12 @@ pub async fn enqueue_text_to_image_command(
       let mut error_message = "A server error occurred. Please try again. If it continues, please tell our staff about the problem.";
 
       match err {
-        InnerError::NoModelSpecified => {
+        InternalImageError::NoModelSpecified => {
           status = CommandErrorStatus::BadRequest;
           error_type = EnqueueTextToImageErrorType::ModelNotSpecified;
           error_message = "No model specified for image generation";
         }
-        InnerError::NeedsFalApiKey => {
+        InternalImageError::NeedsFalApiKey => {
           status = CommandErrorStatus::Unauthorized;
           error_type = EnqueueTextToImageErrorType::NeedsFalApiKey;
           error_message = "You need to set a FAL api key";
@@ -160,46 +169,6 @@ pub async fn enqueue_text_to_image_command(
   }
 }
 
-#[derive(Debug)]
-enum InnerError {
-  NoModelSpecified,
-  NeedsFalApiKey,
-  FalError(FalErrorPlus),
-  AnyhowError(AnyhowError),
-  StorytellerApiError(ApiError),
-  DecodeError(DecodeError),
-  IoError(std::io::Error),
-}
-
-impl From<AnyhowError> for InnerError {
-  fn from(value: AnyhowError) -> Self {
-    Self::AnyhowError(value)
-  }
-}
-
-impl From<FalErrorPlus> for InnerError {
-  fn from(value: FalErrorPlus) -> Self {
-    Self::FalError(value)
-  }
-}
-
-impl From<ApiError> for InnerError {
-  fn from(value: ApiError) -> Self {
-    Self::StorytellerApiError(value)
-  }
-}
-
-impl From<DecodeError> for InnerError {
-  fn from(value: DecodeError) -> Self {
-    Self::DecodeError(value)
-  }
-}
-
-impl From<std::io::Error> for InnerError {
-  fn from(value: std::io::Error) -> Self {
-    Self::IoError(value)
-  }
-}
 
 pub async fn handle_request(
   request: EnqueueTextToImageRequest,
@@ -207,62 +176,21 @@ pub async fn handle_request(
   fal_creds_manager: &FalCredentialManager,
   storyteller_creds_manager: &StorytellerCredentialManager,
   fal_task_queue: &FalTaskQueue,
-) -> Result<(), InnerError> {
+  sora_creds_manager: &SoraCredentialManager,
+  sora_task_queue: &SoraTaskQueue,
+) -> Result<(), InternalImageError> {
 
   match request.model {
     None => {
-      return Err(InnerError::NoModelSpecified);
+      return Err(InternalImageError::NoModelSpecified);
     }
-    Some(_) => {}
-  }
-  
-  let has_credentials = fal_creds_manager
-      .has_apparent_api_token()
-      .unwrap_or(true); // NB: Failures would be lock issues
-
-  if !has_credentials {
-    warn!("No FAL API key found");
-    return Err(InnerError::NeedsFalApiKey);
-  }
-
-  let api_key = fal_creds_manager.get_key_required()?;
-  let prompt = request.prompt.as_deref().unwrap_or("");
-
-  let result = match request.model {
-    None => {
-      return Err(InnerError::NoModelSpecified);
-    }
-    Some(EnqueueTextToImageModel::FluxProUltra) => {
-      info!("enqueue Flux Pro Ultra text-to-image with prompt: {}", prompt);
-      enqueue_flux_pro_ultra_text_to_image(FluxProUltraTextToImageArgs {
-        prompt,
-        api_key: &api_key,
-      }).await
-    }
-    Some(EnqueueTextToImageModel::Recraft3) => {
-      info!("enqueue Recraft v3 text-to-image with prompt: {}", prompt);
-      enqueue_recraft3_text_to_image(Recraft3TextToImageArgs {
-        prompt,
-        api_key: &api_key,
-      }).await
+    Some(EnqueueTextToImageModel::FluxProUltra) | Some(EnqueueTextToImageModel::Recraft3) => {
+      handle_fal(request, fal_creds_manager, fal_task_queue).await?;
+    },
+    Some(EnqueueTextToImageModel::GptImage1) => {
+      handle_sora(request, sora_creds_manager, sora_task_queue).await?;
     }
   };
 
-  match result {
-    Ok(enqueued) => {
-      info!("Successfully enqueued text to image");
-
-      if let Err(err) = fal_task_queue.insert(&enqueued) {
-        error!("Failed to enqueue task: {:?}", err);
-        return Err(InnerError::AnyhowError(anyhow!("Failed to enqueue task: {:?}", err)));
-      }
-    }
-    Err(err) => {
-      error!("Failed to enqueue text to image: {:?}", err);
-      return Err(InnerError::FalError(err));
-    }
-  }
-
   Ok(())
 }
-

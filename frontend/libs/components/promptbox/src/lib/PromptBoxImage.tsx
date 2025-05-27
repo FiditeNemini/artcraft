@@ -268,8 +268,10 @@ export const PromptBoxImage = ({
         return EnqueueTextToImageModel.FluxProUltra;
       case "Recraft 3":
         return EnqueueTextToImageModel.Recraft3;
+      case "GPT Image 1 (GPT-4o)":
+        return EnqueueTextToImageModel.GptImage1;
       default:
-        return EnqueueTextToImageModel.FluxProUltra;
+        return EnqueueTextToImageModel.GptImage1;
     }
   };
 
