@@ -29,3 +29,6 @@ export VITE_ENVIRONMENT_TYPE="production"
 cargo tauri build --config "${config_path}"
 
 echo "Done!"
+
+date "+Finished on %A, %B %e - %H:%M:%S (local timezone)"
+
