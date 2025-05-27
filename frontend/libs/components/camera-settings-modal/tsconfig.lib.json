@@ -62,7 +62,7 @@
       "path": "../popover/tsconfig.lib.json"
     },
     {
-      "path": "../transition-dialogue/tsconfig.lib.json"
+      "path": "../modal/tsconfig.lib.json"
     }
   ]
 }

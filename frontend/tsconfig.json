@@ -73,9 +73,6 @@
       "path": "./libs/components/camera-settings-modal"
     },
     {
-      "path": "./libs/components/transition-dialogue"
-    },
-    {
       "path": "./libs/components/slider-v2"
     },
     {
@@ -95,6 +92,42 @@
     },
     {
       "path": "./libs/components/menu-icon-selector"
+    },
+    {
+      "path": "./libs/components/badge"
+    },
+    {
+      "path": "./libs/components/button-dropdown"
+    },
+    {
+      "path": "./libs/components/button-icon"
+    },
+    {
+      "path": "./libs/components/button-icon-select"
+    },
+    {
+      "path": "./libs/components/button-link"
+    },
+    {
+      "path": "./libs/components/file-uploader"
+    },
+    {
+      "path": "./libs/components/gravatar"
+    },
+    {
+      "path": "./libs/components/loading"
+    },
+    {
+      "path": "./libs/components/list-dropdown"
+    },
+    {
+      "path": "./libs/components/pagination"
+    },
+    {
+      "path": "./libs/components/search"
+    },
+    {
+      "path": "./libs/components/upload-modal"
     }
   ]
 }

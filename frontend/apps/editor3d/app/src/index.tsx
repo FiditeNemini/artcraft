@@ -55,9 +55,7 @@ const GlobalSettingsManager = ({ env }: { env: Record<string, string> }) => {
     pageWidth.value = window.innerWidth;
   }
 
-
   useEffect(() => {
-
     setPage();
     window.addEventListener("resize", setPage);
     return () => {

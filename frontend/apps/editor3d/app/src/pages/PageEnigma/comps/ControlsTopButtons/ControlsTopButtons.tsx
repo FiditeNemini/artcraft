@@ -4,9 +4,9 @@ import { useSignals, useSignalEffect } from "@preact/signals-react/runtime";
 import {
   faCheckSquare,
   faFile,
+  faQuestion,
   faSquare,
 } from "@fortawesome/pro-solid-svg-icons";
-
 import {
   EditorExpandedI,
   EngineContext,
@@ -14,15 +14,9 @@ import {
 import { ToastTypes, getArtStyle } from "~/enums";
 import { scene, signalScene, authentication, addToast } from "~/signals";
 import { outlinerIsShowing } from "~/pages/PageEnigma/signals/outliner/outliner";
-
-import {
-  ButtonDropdown,
-  Input,
-  H4,
-} from "~/components";
-
-import {Button} from "@storyteller/ui-button";
-
+import { ButtonDropdown } from "@storyteller/ui-button-dropdown";
+import { Input } from "@storyteller/ui-input";
+import { Button } from "@storyteller/ui-button";
 import { TestFeaturesButtons } from "./TestFeaturesButtons";
 import { LoadUserScenes } from "./LoadUserScenes";
 import { getCurrentLocationWithoutParams, isNumberString } from "~/utilities";
@@ -40,14 +34,15 @@ import {
 } from "~/pages/PageEnigma/signals";
 import { CameraAspectRatio } from "~/pages/PageEnigma/enums";
 import { twMerge } from "tailwind-merge";
-
+import { Help } from "./Help";
+import { Modal } from "@storyteller/ui-modal";
 
 export const ControlsTopButtons = () => {
   useSignals();
   const params = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-
+  const [helpIsShowing, setHelpIsShowing] = useState(false);
   const editorEngine = useContext(EngineContext);
 
   const [sceneTitleInput, setSceneTitleInput] = useState<string>("");
@@ -191,8 +186,7 @@ export const ControlsTopButtons = () => {
               label: "New scene",
               description: "Ctrl+N",
               onClick: () => {
-                textInput.value = "Untitled New Scene";
-                showWizard.value = "new_scene";
+                setSceneTitleInput("Untitled New Scene");
               },
             },
             {
@@ -216,19 +210,21 @@ export const ControlsTopButtons = () => {
               },
             },
             {
-              disabled:
-                !(scene.value.isModified &&
-                  (scene.value.ownerToken === undefined || scene.value.ownerToken ===
-                    authentication.userInfo.value?.user_token)),
+              disabled: !(
+                scene.value.isModified &&
+                (scene.value.ownerToken === undefined ||
+                  scene.value.ownerToken ===
+                    authentication.userInfo.value?.user_token)
+              ),
               // save scene should be disabled if there are no changes
               label: "Save scene",
               description: "Ctrl+S",
               dialogProps: {
                 title: "Save Scene",
                 content: (
-                  <H4>
+                  <h4>
                     Save scene to <b>{scene.value.title}</b>?
-                  </H4>
+                  </h4>
                 ),
                 confirmButtonProps: {
                   label: "Save",
@@ -295,29 +291,25 @@ export const ControlsTopButtons = () => {
           Outliner
         </Button>
 
-        {/* <ButtonDialogue
-          buttonProps={{
-            variant: "secondary",
-            label: "Help",
-            className: "shadow-xl",
-            icon: faQuestion,
-          }}
-          dialogProps={{
-            className: "max-w-6xl w-auto",
-          }}
-          title={
-            <>
-              Help
-              <span className="text-sm font-medium opacity-60">
-                @%CURRENT_STORYTELLER_GIT_VERSION%
-              </span>
-            </>
-          }
+        <Button
+          icon={faQuestion}
+          variant="secondary"
+          className="shadow-xl"
+          onClick={() => setHelpIsShowing(true)}
         >
-          <Help />
-        </ButtonDialogue> */}
+          Help
+        </Button>
       </div>
       <TestFeaturesButtons debug={false} />
+
+      <Modal
+        isOpen={helpIsShowing}
+        onClose={() => setHelpIsShowing(false)}
+        title="Help"
+        className="h-[500px] max-w-4xl"
+      >
+        <Help />
+      </Modal>
     </div>
   );
 };

@@ -1,0 +1,40 @@
+{
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "../../../apps/editor3d"
+    },
+    {
+      "path": "../modal"
+    },
+    {
+      "path": "../loading"
+    },
+    {
+      "path": "../../common"
+    },
+    {
+      "path": "../file-uploader"
+    },
+    {
+      "path": "../input"
+    },
+    {
+      "path": "../list-dropdown"
+    },
+    {
+      "path": "../button"
+    },
+    {
+      "path": "../../api"
+    },
+    {
+      "path": "./tsconfig.lib.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ],
+  "extends": "../../../tsconfig.base.json"
+}

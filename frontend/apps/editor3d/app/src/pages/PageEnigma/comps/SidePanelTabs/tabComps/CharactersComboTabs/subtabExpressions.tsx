@@ -6,12 +6,11 @@ import {
   MediaFileAnimationType,
 } from "~/enums";
 import {
-  Button,
-  FilterButtons,
-  Pagination,
-  SearchFilter,
   UploadModal,
-} from "~/components";
+} from "@storyteller/ui-upload-modal";
+import { SearchFilter } from "@storyteller/ui-search";
+import { Pagination } from "@storyteller/ui-pagination";
+import { Button, FilterButtons } from "@storyteller/ui-button";
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
 import { isAnyStatusFetching } from "../../utilities";
 import {
@@ -21,6 +20,7 @@ import {
   useSearchUserObjects,
   useFeatureFlags,
 } from "../../hooks";
+import { getFileExtension, getFileName } from "~/utilities";
 
 const filterEngineCategories = [FilterEngineCategories.EXPRESSION];
 
@@ -155,6 +155,8 @@ export const ExpressionTab = () => {
         />
       )}
       <UploadModal
+        getFileName={getFileName}
+        getFileExtension={getFileExtension}
         onClose={() => setOpenUploadModal(false)}
         onSuccess={fetchUserObjects}
         isOpen={openUploadModal}

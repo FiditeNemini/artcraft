@@ -13,7 +13,8 @@ import { AUTH_STATUS } from "~/enums";
 import { authentication, login, logout } from "~/signals";
 import { createRoot } from "react-dom/client";
 
-import { Input, ConfirmationModal } from "~/components";
+import { ConfirmationModal } from "~/components/reusable/ConfirmationModal";
+import { Input } from "@storyteller/ui-input";
 import { Button } from "@storyteller/ui-button";
 
 import "./styles/normalize.css";

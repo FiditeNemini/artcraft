@@ -29,31 +29,49 @@
   },
   "references": [
     {
+      "path": "../../libs/components/pagination"
+    },
+    {
+      "path": "../../libs/components/search"
+    },
+    {
+      "path": "../../libs/components/badge"
+    },
+    {
       "path": "../../libs/components/lightbox-modal"
+    },
+    {
+      "path": "../../libs/components/button-icon"
+    },
+    {
+      "path": "../../libs/components/loading-spinner"
+    },
+    {
+      "path": "../../libs/components/button-icon-select"
     },
     {
       "path": "../../libs/components/tab-selector"
     },
     {
-      "path": "../../libs/components/input"
-    },
-    {
       "path": "../../libs/components/close-button"
     },
     {
-      "path": "../../libs/components/toaster"
+      "path": "../../libs/components/button-dropdown"
     },
     {
       "path": "../../libs/components/login-modal"
     },
     {
-      "path": "../../libs/components/popover"
-    },
-    {
       "path": "../../libs/soundboard"
     },
     {
-      "path": "../../libs/components/button"
+      "path": "../../libs/components/slider-v2"
+    },
+    {
+      "path": "../../libs/components/toaster"
+    },
+    {
+      "path": "../../libs/components/popover"
     },
     {
       "path": "../../libs/components/promptbox"
@@ -80,10 +98,37 @@
       "path": "../../libs/components/gallery-modal"
     },
     {
-      "path": "../../libs/components/label"
+      "path": "../../libs/components/gravatar"
+    },
+    {
+      "path": "../../libs/components/button-link"
+    },
+    {
+      "path": "../../libs/components/select"
+    },
+    {
+      "path": "../../libs/components/upload-modal"
     },
     {
       "path": "../../libs/components/modal"
+    },
+    {
+      "path": "../../libs/components/loading"
+    },
+    {
+      "path": "../../libs/components/file-uploader"
+    },
+    {
+      "path": "../../libs/components/label"
+    },
+    {
+      "path": "../../libs/components/input"
+    },
+    {
+      "path": "../../libs/components/button"
+    },
+    {
+      "path": "../../libs/components/list-dropdown"
     },
     {
       "path": "../../libs/tauri-utils"

@@ -10,13 +10,14 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import {
+  disableHotkeyInput,
+  enableHotkeyInput,
   objectPanel as objectPanelSignals,
   timelineHeight,
 } from "../../signals";
 import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
-import {  H5, InputVector } from "~/components";
-import { Button } from "@storyteller/ui-button"
-
+import { InputVector } from "@storyteller/ui-input";
+import { Button } from "@storyteller/ui-button";
 import { editorState } from "~/pages/PageEnigma/signals/engine";
 import { twMerge } from "tailwind-merge";
 import { EditorStates } from "~/pages/PageEnigma/enums";
@@ -222,7 +223,7 @@ export const ControlPanelSceneObject = () => {
         className={"flex flex-col gap-2 overflow-y-auto"}
       >
         <div className="flex flex-col gap-1">
-          <H5>Color</H5>
+          <h5>Color</h5>
           <input
             className="h-0 w-0 cursor-pointer opacity-0"
             id={colorInputId}
@@ -246,18 +247,20 @@ export const ControlPanelSceneObject = () => {
           ></Button>
         </div>
         <div className="flex flex-col gap-1">
-          <H5>Location</H5>
+          <h5>Location</h5>
           <InputVector
             x={localPosition.x.toString()}
             y={localPosition.y.toString()}
             z={localPosition.z.toString()}
             onChange={handlePositionChange}
             disabled={locked}
+            enableHotkeyInput={enableHotkeyInput}
+            disableHotkeyInput={disableHotkeyInput}
           />
         </div>
 
         <div className="flex flex-col gap-1">
-          <H5>Rotation</H5>
+          <h5>Rotation</h5>
           <InputVector
             x={localRotation.x.toString()}
             y={localRotation.y.toString()}
@@ -265,6 +268,8 @@ export const ControlPanelSceneObject = () => {
             onChange={handleRotationChange}
             increment={1}
             disabled={locked}
+            enableHotkeyInput={enableHotkeyInput}
+            disableHotkeyInput={disableHotkeyInput}
           />
         </div>
 
@@ -278,6 +283,8 @@ export const ControlPanelSceneObject = () => {
             z={localScale.z.toString()}
             onChange={handleScaleChange}
             disabled={locked}
+            enableHotkeyInput={enableHotkeyInput}
+            disableHotkeyInput={disableHotkeyInput}
           />
         </div>
       </Transition>
