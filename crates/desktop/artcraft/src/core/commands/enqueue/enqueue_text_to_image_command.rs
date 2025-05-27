@@ -8,7 +8,6 @@ use crate::core::utils::save_base64_image_to_temp_dir::save_base64_image_to_temp
 use crate::core::utils::simple_http_download::simple_http_download;
 use crate::core::utils::simple_http_download_to_tempfile::simple_http_download_to_tempfile;
 use crate::services::fal::state::fal_credential_manager::FalCredentialManager;
-use crate::services::fal::state::fal_task_queue::FalTaskQueue;
 use crate::services::sora::events::sora_image_enqueue_failure_event::SoraImageEnqueueFailureEvent;
 use crate::services::sora::events::sora_image_enqueue_success_event::SoraImageEnqueueSuccessEvent;
 use crate::services::sora::state::read_sora_credentials_from_disk::read_sora_credentials_from_disk;
@@ -21,7 +20,8 @@ use base64::prelude::BASE64_STANDARD;
 use base64::{DecodeError, Engine};
 use errors::{AnyhowError, AnyhowResult};
 use fal_client::error::fal_error_plus::FalErrorPlus;
-use fal_client::requests::enqueue_hunyuan2_image_to_3d::{enqueue_hunyuan2_image_to_3d, Hunyuan2Args};
+use fal_client::requests::image_gen::enqueue_flux_pro_ultra_text_to_image::{enqueue_flux_pro_ultra_text_to_image, FluxProUltraTextToImageArgs};
+use fal_client::requests::image_gen::enqueue_recraft3_text_to_image::{enqueue_recraft3_text_to_image, Recraft3TextToImageArgs};
 use fal_client::requests::remove_background_rembg::remove_background_rembg;
 use filesys::file_read_bytes::file_read_bytes;
 use image::codecs::png::{CompressionType, FilterType, PngEncoder};
@@ -53,95 +53,117 @@ use storyteller_client::utils::api_host::ApiHost;
 use tauri::{AppHandle, Emitter, Manager, State};
 use tempfile::NamedTempFile;
 use tokens::tokens::media_files::MediaFileToken;
+use crate::services::fal::state::fal_task_queue::FalTaskQueue;
 
 #[derive(Deserialize)]
-pub struct FalHunyuanImageTo3dRequest {
-  /// Image media file; the image to remove the background from.
-  pub image_media_token: Option<MediaFileToken>,
+pub struct EnqueueTextToImageRequest {
+  /// Text prompt for the image generation. Required.
+  pub prompt: Option<String>,
 
-  /// Base64-encoded image
-  pub base64_image: Option<String>,
+  /// The model to use.
+  pub model: Option<EnqueueTextToImageModel>,
 }
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all = "snake_case")]
+pub enum EnqueueTextToImageModel {
+  #[serde(rename = "flux_pro_ultra")]
+  FluxProUltra,
+  #[serde(rename = "recraft_3")]
+  Recraft3,
+}
+
+#[derive(Serialize)]
+pub struct EnqueueTextToImageSuccessResponse {
+}
+
+impl SerializeMarker for EnqueueTextToImageSuccessResponse {}
 
 #[derive(Serialize, Debug)]
 #[serde(rename_all = "snake_case")]
-pub enum HunyuanErrorType {
+pub enum EnqueueTextToImageErrorType {
+  /// Caller didn't specify a model
+  ModelNotSpecified,
   /// Generic server error
   ServerError,
   /// No Fal API key available
   NeedsFalApiKey,
+  /// Fal had an API error
+  FalError,
 }
 
 
 #[tauri::command]
-pub async fn fal_hunyuan_image_to_3d_command(
-  request: FalHunyuanImageTo3dRequest,
+pub async fn enqueue_text_to_image_command(
+  request: EnqueueTextToImageRequest,
   app_data_root: State<'_, AppDataRoot>,
   fal_creds_manager: State<'_, FalCredentialManager>,
   storyteller_creds_manager: State<'_, StorytellerCredentialManager>,
   fal_task_queue: State<'_, FalTaskQueue>,
-) -> CommandResult<(), HunyuanErrorType, ()> {
+) -> CommandResult<EnqueueTextToImageSuccessResponse, EnqueueTextToImageErrorType, ()> {
 
-  info!("fal_hunyuan_image_to_3d_command called; image media token: {:?}", request.image_media_token);
+  info!("enqueue_text_to_image called");
 
-  let has_credentials = fal_creds_manager
-      .has_apparent_api_token()
-      .unwrap_or(true); // NB: Failures would be lock issues
-
-  if !has_credentials {
-    warn!("No API key found");
-    return Err(CommandErrorResponseWrapper {
-      status: CommandErrorStatus::Unauthorized,
-      error_message: Some("You need to set a FAL api key".to_string()),
-      error_type: Some(HunyuanErrorType::NeedsFalApiKey),
-      error_details: None,
-    });
-  }
-
-  let result = image_to_3d(
+  let result = handle_request(
     request,
     &app_data_root,
     &fal_creds_manager,
     &storyteller_creds_manager,
     &fal_task_queue,
   ).await;
-  
-  if let Err(err) = result {
-    error!("error: {:?}", err);
 
-    //let event = SoraImageEnqueueFailureEvent {};
-    //let result = event.send(&app);
-    //if let Err(err) = result {
-    //  error!("Failed to emit event: {:?}", err);
-    //}
+  match result {
+    Err(err) => {
+      error!("error: {:?}", err);
 
-    let mut status = CommandErrorStatus::ServerError;
-    let mut error_type = HunyuanErrorType::ServerError;
-    let mut error_message = "A server error occurred. Please try again. If it continues, please tell our staff about the problem.";
+      //let event = SoraImageEnqueueFailureEvent {};
+      //let result = event.send(&app);
+      //if let Err(err) = result {
+      //  error!("Failed to emit event: {:?}", err);
+      //}
 
-    //match (err) {
-    //  _ => {},
-    //}
+      let mut status = CommandErrorStatus::ServerError;
+      let mut error_type = EnqueueTextToImageErrorType::ServerError;
+      let mut error_message = "A server error occurred. Please try again. If it continues, please tell our staff about the problem.";
 
-    return Err(CommandErrorResponseWrapper {
-      status,
-      error_message: Some(error_message.to_string()),
-      error_type: Some(error_type),
-      error_details: None,
-    })
+      match err {
+        InnerError::NoModelSpecified => {
+          status = CommandErrorStatus::BadRequest;
+          error_type = EnqueueTextToImageErrorType::ModelNotSpecified;
+          error_message = "No model specified for image generation";
+        }
+        InnerError::NeedsFalApiKey => {
+          status = CommandErrorStatus::Unauthorized;
+          error_type = EnqueueTextToImageErrorType::NeedsFalApiKey;
+          error_message = "You need to set a FAL api key";
+        },
+        _ => {}, // Fall-through
+      }
+
+      Err(CommandErrorResponseWrapper {
+        status,
+        error_message: Some(error_message.to_string()),
+        error_type: Some(error_type),
+        error_details: None,
+      })
+    }
+    Ok(result) => {
+      //let event = SoraImageEnqueueSuccessEvent {};
+      //let result = event.send(&app);
+      //if let Err(err) = result {
+      //  error!("Failed to emit event: {:?}", err);
+      //}
+
+      Ok(EnqueueTextToImageSuccessResponse {
+      }.into())
+    }
   }
-  
-  //let event = SoraImageEnqueueSuccessEvent {};
-  //let result = event.send(&app);
-  //if let Err(err) = result {
-  //  error!("Failed to emit event: {:?}", err);
-  //}
-  
-  Ok(().into())
 }
 
 #[derive(Debug)]
 enum InnerError {
+  NoModelSpecified,
+  NeedsFalApiKey,
   FalError(FalErrorPlus),
   AnyhowError(AnyhowError),
   StorytellerApiError(ApiError),
@@ -179,41 +201,68 @@ impl From<std::io::Error> for InnerError {
   }
 }
 
-pub async fn image_to_3d(
-  request: FalHunyuanImageTo3dRequest,
+pub async fn handle_request(
+  request: EnqueueTextToImageRequest,
   app_data_root: &AppDataRoot,
   fal_creds_manager: &FalCredentialManager,
   storyteller_creds_manager: &StorytellerCredentialManager,
   fal_task_queue: &FalTaskQueue,
 ) -> Result<(), InnerError> {
 
-  let api_key = fal_creds_manager.get_key_required()?;
-  let creds = storyteller_creds_manager.get_credentials_required()?;
+  match request.model {
+    None => {
+      return Err(InnerError::NoModelSpecified);
+    }
+    Some(_) => {}
+  }
+  
+  let has_credentials = fal_creds_manager
+      .has_apparent_api_token()
+      .unwrap_or(true); // NB: Failures would be lock issues
 
-  let mut temp_download;
-
-  if let Some(media_token) = request.image_media_token {
-    temp_download = download_media_file_to_temp_dir(&app_data_root, &media_token).await?;
-
-  } else if let Some(base64_bytes) = request.base64_image {
-    temp_download = save_base64_image_to_temp_dir(&app_data_root, base64_bytes).await?;
-  } else {
-    return Err(InnerError::AnyhowError(anyhow!("No image media token or base64 image provided")));
+  if !has_credentials {
+    warn!("No FAL API key found");
+    return Err(InnerError::NeedsFalApiKey);
   }
 
-  info!("Calling FAL image to 3d ...");
+  let api_key = fal_creds_manager.get_key_required()?;
+  let prompt = request.prompt.as_deref().unwrap_or("");
 
-  let filename = temp_download.path().to_path_buf();
+  let result = match request.model {
+    None => {
+      return Err(InnerError::NoModelSpecified);
+    }
+    Some(EnqueueTextToImageModel::FluxProUltra) => {
+      info!("enqueue Flux Pro Ultra text-to-image with prompt: {}", prompt);
+      enqueue_flux_pro_ultra_text_to_image(FluxProUltraTextToImageArgs {
+        prompt,
+        api_key: &api_key,
+      }).await
+    }
+    Some(EnqueueTextToImageModel::Recraft3) => {
+      info!("enqueue Recraft v3 text-to-image with prompt: {}", prompt);
+      enqueue_recraft3_text_to_image(Recraft3TextToImageArgs {
+        prompt,
+        api_key: &api_key,
+      }).await
+    }
+  };
 
-  let enqueued = enqueue_hunyuan2_image_to_3d(Hunyuan2Args {
-    image_path: filename,
-    api_key: &api_key,
-  }).await?;
+  match result {
+    Ok(enqueued) => {
+      info!("Successfully enqueued text to image");
 
-  if let Err(err) = fal_task_queue.insert(&enqueued) {
-    error!("Failed to enqueue task: {:?}", err);
-    return Err(InnerError::AnyhowError(anyhow!("Failed to enqueue task: {:?}", err)));
+      if let Err(err) = fal_task_queue.insert(&enqueued) {
+        error!("Failed to enqueue task: {:?}", err);
+        return Err(InnerError::AnyhowError(anyhow!("Failed to enqueue task: {:?}", err)));
+      }
+    }
+    Err(err) => {
+      error!("Failed to enqueue text to image: {:?}", err);
+      return Err(InnerError::FalError(err));
+    }
   }
 
   Ok(())
 }
+
