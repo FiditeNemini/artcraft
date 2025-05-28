@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 import {
-  faChevronLeft,
   faGear,
   faImages,
   faCube,
@@ -8,12 +7,9 @@ import {
   faPaintbrush,
   faImage,
 } from "@fortawesome/pro-solid-svg-icons";
-import { useLocation, useParams } from "react-router-dom";
 import { Button } from "@storyteller/ui-button";
-// import { ButtonLink } from "@storyteller/ui-button-link";
 import { AuthButtons } from "./AuthButtons";
 import { SceneTitleInput } from "./SceneTitleInput";
-import { getCurrentLocationWithoutParams } from "~/utilities";
 import { Activity } from "~/pages/PageEnigma/comps/GenerateModals/Activity";
 import {
   GalleryModal,
@@ -33,12 +29,6 @@ import { setLogoutStates } from "~/signals/authentication/utilities";
 import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-function isEditorPath(path: string) {
-  if (path === "/") return true;
-  if (path === "/idealenigma/") return true;
-  return false;
-}
-
 interface Props {
   pageName: string;
   appTabIdSignal: Signal<string>;
@@ -46,22 +36,29 @@ interface Props {
   is3DInitSignal: Signal<boolean>;
 }
 
+// This is the tab we start with.
+export const STARTING_APP_TAB_ID = "2D";
+
 const appMenuTabs: MenuIconItem[] = [
   {
     id: "2D",
     label: "2D Canvas",
     icon: <FontAwesomeIcon icon={faPaintbrush} />,
   },
-  { id: "3D", label: "3D Editor", icon: <FontAwesomeIcon icon={faCube} /> },
   {
-    id: "VIDEO",
-    label: "Prompt to Video",
-    icon: <FontAwesomeIcon icon={faFilm} />,
+    id: "3D",
+    label: "3D Editor",
+    icon: <FontAwesomeIcon icon={faCube} />
   },
   {
     id: "IMAGE",
     label: "Prompt to Image",
     icon: <FontAwesomeIcon icon={faImage} />,
+  },
+  {
+    id: "VIDEO",
+    label: "Prompt to Video",
+    icon: <FontAwesomeIcon icon={faFilm} />,
   },
 ];
 
@@ -76,10 +73,6 @@ export const TopBar = ({
 }: Props) => {
   useSignals();
 
-  const currentLocation = getCurrentLocationWithoutParams(
-    useLocation().pathname,
-    useParams(),
-  );
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   const [url, setUrl] = useState<string>("");
@@ -157,11 +150,6 @@ export const TopBar = ({
                 alt="Logo ArtCraft"
               />
             </a>
-            {/* {!isEditorPath(currentLocation) && (
-              <ButtonLink to={"/"} variant="secondary" icon={faChevronLeft}>
-                Back to Editor
-              </ButtonLink>
-            )} */}
             <MenuIconSelector
               menuItems={appMenuTabs}
               activeMenu={appTabIdSignal.value}
