@@ -1,3 +1,5 @@
+use crate::core::commands::response::shorthand::InfallibleResponse;
+use crate::core::commands::response::success_response_wrapper::SerializeMarker;
 use crate::core::state::os_platform::OsPlatform;
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
@@ -12,6 +14,8 @@ pub struct PlatformInfoResponse {
   pub os_platform: DetectedOs,
   pub webview_runtime: WebviewRuntime,
 }
+
+impl SerializeMarker for PlatformInfoResponse {}
 
 #[derive(Copy, Clone, Debug, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -36,7 +40,7 @@ pub enum WebviewRuntime {
 }
 
 #[tauri::command]
-pub fn platform_info_command() -> Result<PlatformInfoResponse, String> {
+pub fn platform_info_command() -> InfallibleResponse<PlatformInfoResponse> {
   info!("platform_info_command called...");
 
   let os_platform = match OsPlatform::maybe_get() {
@@ -55,9 +59,9 @@ pub fn platform_info_command() -> Result<PlatformInfoResponse, String> {
     DetectedOs::Unknown => WebviewRuntime::Unknown,
   };
 
-  Ok(PlatformInfoResponse {
+  PlatformInfoResponse {
     os_platform,
     webview_runtime,
-  })
+  }.into()
 }
 

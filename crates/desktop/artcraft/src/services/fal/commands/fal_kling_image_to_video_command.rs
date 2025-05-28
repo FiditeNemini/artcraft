@@ -1,4 +1,3 @@
-use crate::core::commands::command_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus, CommandResult, SerializeMarker};
 use crate::core::events::sendable_event_trait::SendableEvent;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
 use crate::core::state::data_dir::trait_data_subdir::DataSubdir;
@@ -53,6 +52,8 @@ use storyteller_client::utils::api_host::ApiHost;
 use tauri::{AppHandle, Emitter, Manager, State};
 use tempfile::NamedTempFile;
 use tokens::tokens::media_files::MediaFileToken;
+use crate::core::commands::response::failure_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus};
+use crate::core::commands::response::shorthand::Response;
 
 #[derive(Deserialize)]
 pub struct FalKlingImageToVideoRequest {
@@ -85,7 +86,7 @@ pub async fn fal_kling_image_to_video_command(
   fal_creds_manager: State<'_, FalCredentialManager>,
   storyteller_creds_manager: State<'_, StorytellerCredentialManager>,
   fal_task_queue: State<'_, FalTaskQueue>,
-) -> CommandResult<(), KlingImageToVideoErrorType, ()> {
+) -> Response<(), KlingImageToVideoErrorType, ()> {
 
   info!("fal_kling_image_to_video_command called; image media token: {:?}", request.image_media_token);
 

@@ -1,8 +1,9 @@
-use crate::core::commands::command_response_wrapper::{CommandResult, SerializeMarker};
-use crate::services::fal::state::fal_credential_manager::FalCredentialManager;
+use crate::core::commands::response::shorthand::Response;
+use crate::core::commands::response::success_response_wrapper::SerializeMarker;
 use crate::core::state::app_preferences::app_preferences_manager::AppPreferencesManager;
 use crate::core::state::app_preferences::preferred_download_directory::PreferredDownloadDirectory;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
+use crate::services::fal::state::fal_credential_manager::FalCredentialManager;
 use anyhow::anyhow;
 use errors::AnyhowResult;
 use fal_client::creds::fal_api_key::FalApiKey;
@@ -22,7 +23,7 @@ impl SerializeMarker for GetFalApiKeyResponse {}
 #[tauri::command]
 pub async fn get_fal_api_key_command(
   creds_manager: State<'_, FalCredentialManager>,
-) -> CommandResult<GetFalApiKeyResponse, (), ()> {
+) -> Response<GetFalApiKeyResponse, (), ()> {
 
   let key = get_key(&creds_manager)
       .await

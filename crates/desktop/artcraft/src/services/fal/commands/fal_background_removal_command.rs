@@ -1,4 +1,6 @@
-use crate::core::commands::command_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus, CommandResult, SerializeMarker};
+use crate::core::commands::response::failure_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus};
+use crate::core::commands::response::shorthand::Response;
+use crate::core::commands::response::success_response_wrapper::SerializeMarker;
 use crate::core::events::sendable_event_trait::SendableEvent;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
 use crate::core::state::data_dir::trait_data_subdir::DataSubdir;
@@ -89,7 +91,7 @@ pub async fn fal_background_removal_command(
   app_data_root: State<'_, AppDataRoot>,
   fal_creds_manager: State<'_, FalCredentialManager>,
   storyteller_creds_manager: State<'_, StorytellerCredentialManager>,
-) -> CommandResult<FalBackgroundRemovalSuccessResponse, BackgroundRemovalErrorType, ()> {
+) -> Response<FalBackgroundRemovalSuccessResponse, BackgroundRemovalErrorType, ()> {
   
   info!("fal_background_removal_command called; image media token: {:?}", request.image_media_token);
 

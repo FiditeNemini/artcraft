@@ -1,8 +1,8 @@
-use crate::core::commands::command_response_wrapper::CommandResult;
-use crate::services::fal::state::fal_credential_manager::FalCredentialManager;
+use crate::core::commands::response::shorthand::Response;
 use crate::core::state::app_preferences::app_preferences_manager::AppPreferencesManager;
 use crate::core::state::app_preferences::preferred_download_directory::PreferredDownloadDirectory;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
+use crate::services::fal::state::fal_credential_manager::FalCredentialManager;
 use anyhow::anyhow;
 use errors::AnyhowResult;
 use fal_client::creds::fal_api_key::FalApiKey;
@@ -21,7 +21,7 @@ pub struct SetFalApiKeyRequest{
 pub async fn set_fal_api_key_command(
   request: SetFalApiKeyRequest,
   creds_manager: State<'_, FalCredentialManager>,
-) -> CommandResult<(), (), ()> {
+) -> Response<(), (), ()> {
   info!("update_app_preferences_command called");
 
   set_key(request, &creds_manager)

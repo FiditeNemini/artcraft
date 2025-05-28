@@ -1,4 +1,5 @@
-use crate::core::commands::command_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus, CommandResult};
+use crate::core::commands::response::failure_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus};
+use crate::core::commands::response::shorthand::Response;
 use crate::core::events::sendable_event_trait::SendableEvent;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
 use crate::core::state::data_dir::trait_data_subdir::DataSubdir;
@@ -94,7 +95,7 @@ pub async fn sora_image_remix_command(
   app_data_root: State<'_, AppDataRoot>,
   sora_creds_manager: State<'_, SoraCredentialManager>,
   sora_task_queue: State<'_, SoraTaskQueue>,
-) -> CommandResult<(), SoraImageRemixErrorType, ()> {
+) -> Response<(), SoraImageRemixErrorType, ()> {
   
   info!("image_generation_command called; scene media token: {:?}, additional images: {:?}, full request: {:?}", 
     &request.snapshot_media_token, &request.maybe_additional_images, &request);

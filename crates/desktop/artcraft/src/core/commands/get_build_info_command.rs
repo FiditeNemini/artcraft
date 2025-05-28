@@ -1,4 +1,5 @@
-use crate::core::commands::command_response_wrapper::{CommandResult, InfallibleResponse, SerializeMarker};
+use crate::core::commands::response::shorthand::InfallibleResponse;
+use crate::core::commands::response::success_response_wrapper::SerializeMarker;
 use crate::core::state::os_platform::OsPlatform;
 use crate::services::fal::commands::fal_background_removal_command::FalBackgroundRemovalSuccessResponse;
 use base64::prelude::BASE64_STANDARD;
