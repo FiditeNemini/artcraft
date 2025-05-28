@@ -67,7 +67,7 @@ pub struct TaskResponse {
   pub queue_status_message: Option<String>,
   pub priority: i32,
   pub r#type: String,
-  pub prompt: String,
+  pub prompt: Option<String>,
   pub n_variants: i32,
   pub n_frames: i32,
   pub height: i32,
@@ -243,7 +243,7 @@ pub async fn get_image_gen_status(status_request: &StatusRequest, credentials: &
 
   if status != reqwest::StatusCode::OK {
     // TODO: Handle non-200 status codes, esp. JWT errors and credential errors
-    return Err(SoraError::AnyhowError(anyhow::anyhow!("The status request failed; status = {:?}, message = {:?}", status, response_body)));
+    return Err(SoraError::AnyhowError(anyhow::anyhow!("The physical status request failed; status = {:?}, message = {:?}", status, response_body)));
   }
 
   let maybe_response = serde_json::from_str::<VideoGenStatusResponse>(response_body);

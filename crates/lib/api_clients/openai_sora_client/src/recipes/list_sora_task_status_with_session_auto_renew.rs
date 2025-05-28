@@ -51,9 +51,11 @@ pub async fn list_sora_task_status_with_session_auto_renew(
 
   warn!("Task status polling failed: {:?}", err);
 
+  // TODO(bt,2025-05-28): This should only be done if the credentials were known to be bad
   let new_creds = maybe_refresh_credentials_on_sora_error(&args.credentials, err).await?;
 
-  info!("Retrying image upload with new credentials...");
+  // TODO(bt,2025-05-28): This should only be done if the credentials were actually refreshed.
+  info!("Retrying task polling with new credentials...");
 
   let result = get_image_gen_status(&request, &upgraded_creds).await?;
 

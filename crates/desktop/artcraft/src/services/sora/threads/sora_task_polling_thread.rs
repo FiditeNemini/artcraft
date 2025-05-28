@@ -96,7 +96,10 @@ async fn polling_loop(
     for task in failed_tasks.iter() {
       if sora_task_queue.contains_key(&task.id)? {
         let event = SoraImageGenerationFailedEvent { 
-          prompt: task.prompt.clone(),
+          prompt: task.prompt
+              .as_deref()
+              .map(|s| s.to_string())
+              .unwrap_or_else(||"".to_string()),
         };
         event.send(&app_handle)?;
       }
