@@ -14,8 +14,6 @@ use crate::core::utils::simple_http_download::simple_http_download;
 use crate::core::utils::simple_http_download_to_tempfile::simple_http_download_to_tempfile;
 use crate::services::fal::state::fal_credential_manager::FalCredentialManager;
 use crate::services::fal::state::fal_task_queue::FalTaskQueue;
-use crate::services::sora::events::sora_image_enqueue_failure_event::SoraImageEnqueueFailureEvent;
-use crate::services::sora::events::sora_image_enqueue_success_event::SoraImageEnqueueSuccessEvent;
 use crate::services::sora::state::read_sora_credentials_from_disk::read_sora_credentials_from_disk;
 use crate::services::sora::state::sora_credential_holder::SoraCredentialHolder;
 use crate::services::sora::state::sora_credential_manager::SoraCredentialManager;
@@ -101,6 +99,7 @@ pub enum EnqueueTextToImageErrorType {
 
 #[tauri::command]
 pub async fn enqueue_text_to_image_command(
+  app: AppHandle,
   request: EnqueueTextToImageRequest,
   app_data_root: State<'_, AppDataRoot>,
   fal_creds_manager: State<'_, FalCredentialManager>,
@@ -113,6 +112,7 @@ pub async fn enqueue_text_to_image_command(
   info!("enqueue_text_to_image called");
 
   let result = handle_request(
+    &app,
     request,
     &app_data_root,
     &fal_creds_manager,
@@ -125,12 +125,6 @@ pub async fn enqueue_text_to_image_command(
   match result {
     Err(err) => {
       error!("error: {:?}", err);
-
-      //let event = SoraImageEnqueueFailureEvent {};
-      //let result = event.send(&app);
-      //if let Err(err) = result {
-      //  error!("Failed to emit event: {:?}", err);
-      //}
 
       let mut status = CommandErrorStatus::ServerError;
       let mut error_type = EnqueueTextToImageErrorType::ServerError;
@@ -157,21 +151,15 @@ pub async fn enqueue_text_to_image_command(
         error_details: None,
       })
     }
-    Ok(result) => {
-      //let event = SoraImageEnqueueSuccessEvent {};
-      //let result = event.send(&app);
-      //if let Err(err) = result {
-      //  error!("Failed to emit event: {:?}", err);
-      //}
-
-      Ok(EnqueueTextToImageSuccessResponse {
-      }.into())
+    Ok(()) => {
+      Ok(EnqueueTextToImageSuccessResponse {}.into())
     }
   }
 }
 
 
 pub async fn handle_request(
+  app: &AppHandle,
   request: EnqueueTextToImageRequest,
   app_data_root: &AppDataRoot,
   fal_creds_manager: &FalCredentialManager,
@@ -186,10 +174,10 @@ pub async fn handle_request(
       return Err(InternalImageError::NoModelSpecified);
     }
     Some(EnqueueTextToImageModel::FluxProUltra) | Some(EnqueueTextToImageModel::Recraft3) => {
-      handle_fal(request, fal_creds_manager, fal_task_queue).await?;
+      handle_fal(&app, request, fal_creds_manager, fal_task_queue).await?;
     },
     Some(EnqueueTextToImageModel::GptImage1) => {
-      handle_sora(request, sora_creds_manager, sora_task_queue).await?;
+      handle_sora(&app, request, sora_creds_manager, sora_task_queue).await?;
     }
   };
 

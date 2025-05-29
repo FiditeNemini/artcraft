@@ -21,8 +21,10 @@ import {
   showPrecisionSelector,
 } from "./signals/precisionSelectorMenu";
 import { InstallSounds } from "~/pages/PageEnigma/InstallSounds";
-import { useImageGenerationFailureEvent } from "./TauriEvents/useImageGenerationFailureEvent";
-import { useImageGenerationSuccessEvent } from "./TauriEvents/useImageGenerationSuccessEvent";
+import { useGenerationEnqueueFailureEvent } from "./TauriEvents/generations/useGenerationEnqueueFailureEvent";
+import { useGenerationEnqueueSuccessEvent } from "./TauriEvents/generations/useGenerationEnqueueSuccessEvent";
+import { useGenerationFailedEvent } from "./TauriEvents/generations/useGenerationFailedEvent";
+import { useGenerationCompleteEvent } from "./TauriEvents/generations/useGenerationCompleteEvent";
 import { PageEditor } from "~/pages/PageEnigma/PageEditor";
 import { GalleryDragComponent } from "@storyteller/ui-gallery-modal";
 import { LoadingDots } from "@storyteller/ui-loading";
@@ -91,8 +93,10 @@ export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
     });
   });
 
-  useImageGenerationSuccessEvent();
-  useImageGenerationFailureEvent();
+  useGenerationEnqueueSuccessEvent();
+  useGenerationEnqueueFailureEvent();
+  useGenerationCompleteEvent();
+  useGenerationFailedEvent();
 
   useEffect(() => {
     console.log("installing event listeners");

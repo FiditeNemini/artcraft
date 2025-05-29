@@ -1,6 +1,10 @@
 use crate::core::commands::response::failure_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus};
 use crate::core::commands::response::shorthand::Response;
 use crate::core::commands::response::success_response_wrapper::SerializeMarker;
+use crate::core::events::basic_sendable_event_trait::BasicSendableEvent;
+use crate::core::events::generation_events::common::{GenerationAction, GenerationServiceProvider};
+use crate::core::events::generation_events::generation_enqueue_failure_event::GenerationEnqueueFailureEvent;
+use crate::core::events::generation_events::generation_enqueue_success_event::GenerationEnqueueSuccessEvent;
 use crate::core::events::sendable_event_trait::SendableEvent;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
 use crate::core::state::data_dir::trait_data_subdir::DataSubdir;
@@ -10,8 +14,6 @@ use crate::core::utils::save_base64_image_to_temp_dir::save_base64_image_to_temp
 use crate::core::utils::simple_http_download::simple_http_download;
 use crate::core::utils::simple_http_download_to_tempfile::simple_http_download_to_tempfile;
 use crate::services::fal::state::fal_credential_manager::FalCredentialManager;
-use crate::services::sora::events::sora_image_enqueue_failure_event::SoraImageEnqueueFailureEvent;
-use crate::services::sora::events::sora_image_enqueue_success_event::SoraImageEnqueueSuccessEvent;
 use crate::services::sora::state::read_sora_credentials_from_disk::read_sora_credentials_from_disk;
 use crate::services::sora::state::sora_credential_holder::SoraCredentialHolder;
 use crate::services::sora::state::sora_credential_manager::SoraCredentialManager;
@@ -87,6 +89,7 @@ pub enum BackgroundRemovalErrorType {
 
 #[tauri::command]
 pub async fn fal_background_removal_command(
+  app: AppHandle,
   request: FalBackgroundRemovalRequest,
   app_data_root: State<'_, AppDataRoot>,
   fal_creds_manager: State<'_, FalCredentialManager>,
@@ -109,6 +112,16 @@ pub async fn fal_background_removal_command(
     });
   }
 
+  let event = GenerationEnqueueSuccessEvent {
+    action: GenerationAction::RemoveBackground,
+    service: GenerationServiceProvider::Fal,
+    model: None,
+  };
+
+  if let Err(err) = event.send(&app) {
+    error!("Failed to emit event: {:?}", err); // Fail open.
+  }
+
   let result = remove_background(
     request, 
     &app_data_root, 
@@ -120,20 +133,21 @@ pub async fn fal_background_removal_command(
     Err(err) => {
       error!("error: {:?}", err);
 
-      //let event = SoraImageEnqueueFailureEvent {};
-      //let result = event.send(&app);
-      //if let Err(err) = result {
-      //  error!("Failed to emit event: {:?}", err);
-      //}
-      
+      let event = GenerationEnqueueFailureEvent {
+        action: GenerationAction::RemoveBackground,
+        service: GenerationServiceProvider::Fal,
+        model: None,
+        reason: None,
+      };
+
+      if let Err(err) = event.send(&app) {
+        error!("Failed to emit event: {:?}", err); // Fail open.
+      }
+
       let mut status = CommandErrorStatus::ServerError;
       let mut error_type = BackgroundRemovalErrorType::ServerError;
       let mut error_message = "A server error occurred. Please try again. If it continues, please tell our staff about the problem.";
       
-      //match (err) {
-      //  _ => {},
-      //}
-
       Err(CommandErrorResponseWrapper {
         status,
         error_message: Some(error_message.to_string()),
@@ -142,12 +156,6 @@ pub async fn fal_background_removal_command(
       })
     }
     Ok(result) => {
-      //let event = SoraImageEnqueueSuccessEvent {};
-      //let result = event.send(&app);
-      //if let Err(err) = result {
-      //  error!("Failed to emit event: {:?}", err);
-      //}
-
       Ok(FalBackgroundRemovalSuccessResponse {
         media_token: result.0.media_file.token,
         cdn_url: result.0.media_file.media_links.cdn_url,
@@ -256,4 +264,3 @@ pub async fn remove_background(
 
   Ok((response, base64_bytes))
 }
-

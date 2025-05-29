@@ -1,12 +1,14 @@
 use crate::core::commands::response::failure_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus};
 use crate::core::commands::response::shorthand::Response;
+use crate::core::events::basic_sendable_event_trait::BasicSendableEvent;
+use crate::core::events::generation_events::common::{GenerationAction, GenerationServiceProvider};
+use crate::core::events::generation_events::generation_enqueue_failure_event::GenerationEnqueueFailureEvent;
+use crate::core::events::generation_events::generation_enqueue_success_event::GenerationEnqueueSuccessEvent;
 use crate::core::events::sendable_event_trait::SendableEvent;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
 use crate::core::state::data_dir::trait_data_subdir::DataSubdir;
 use crate::core::utils::get_url_file_extension::get_url_file_extension;
 use crate::core::utils::simple_http_download::simple_http_download;
-use crate::services::sora::events::sora_image_enqueue_failure_event::SoraImageEnqueueFailureEvent;
-use crate::services::sora::events::sora_image_enqueue_success_event::SoraImageEnqueueSuccessEvent;
 use crate::services::sora::state::read_sora_credentials_from_disk::read_sora_credentials_from_disk;
 use crate::services::sora::state::sora_credential_holder::SoraCredentialHolder;
 use crate::services::sora::state::sora_credential_manager::SoraCredentialManager;
@@ -108,9 +110,23 @@ pub async fn sora_image_remix_command(
   
   if !has_credentials {
     warn!("No apparently completed credentials found");
+
+    let error_message = "You need to log into Sora to continue. See the settings menu.";
+
+    let event = GenerationEnqueueFailureEvent {
+      action: GenerationAction::GenerateImage,
+      service: GenerationServiceProvider::Sora,
+      model: None,
+      reason: Some(error_message.to_string()),
+    };
+
+    if let Err(err) = event.send(&app) {
+      error!("Failed to emit event: {:?}", err); // Fail open.
+    }
+
     return Err(CommandErrorResponseWrapper {
       status: CommandErrorStatus::Unauthorized,
-      error_message: Some("You need to log into Sora to continue. See the settings menu.".to_string()),
+      error_message: Some(error_message.to_string()),
       error_type: Some(SoraImageRemixErrorType::SoraLoginRequired),
       error_details: None,
     });
@@ -120,36 +136,40 @@ pub async fn sora_image_remix_command(
   
   match result {
     Err(err) => {
-      error!("error: {:?}", err);
+      error!("Sora image remix error: {:?}", err);
 
-      let event = SoraImageEnqueueFailureEvent {};
-      let result = event.send(&app);
-
-      if let Err(err) = result {
-        error!("Failed to emit event: {:?}", err);
-      }
-      
       let mut status = CommandErrorStatus::ServerError;
       let mut error_type = SoraImageRemixErrorType::ServerError;
-      let mut error_message = "A server error occurred. Please try again. If it continues, please tell our staff about the problem.";
-      
+      let mut error_message = "An error occurred. Please try again. If it continues, please tell our staff about the problem.";
+
       match (err) {
         InnerError::SoraError(SoraError::TooManyConcurrentTasks) => {
           error_type = SoraImageRemixErrorType::TooManyConcurrentTasks;
           status = CommandErrorStatus::ServerError;
-          error_message = "You already have work in progress. Please wait for it to finish.";
+          error_message = "You have too many Sora image generation tasks running. Please wait a moment.";
         },
         InnerError::SoraError(SoraError::SoraUsernameNotYetCreated) => {
           error_type = SoraImageRemixErrorType::SoraUsernameNotYetCreated;
           status = CommandErrorStatus::BadRequest;
-          error_message = "You need to create a username on Sora.com to continue.";
+          error_message = "Your Sora username is not yet created. Please visit the Sora.com website to create it first.";
         },
         InnerError::SoraError(SoraError::BadGateway(_) | SoraError::CloudFlareTimeout(_)) => {
           error_type = SoraImageRemixErrorType::SoraIsHavingProblems;
           status = CommandErrorStatus::ServerError;
-          error_message = "Sora is having problems. Please wait a moment and then retry.";
+          error_message = "Sora is having problems. Please try again later.";
         }
         _ => {},
+      }
+
+      let event = GenerationEnqueueFailureEvent {
+        action: GenerationAction::GenerateImage,
+        service: GenerationServiceProvider::Sora,
+        model: None,
+        reason: Some(error_message.to_string()),
+      };
+
+      if let Err(err) = event.send(&app) {
+        error!("Failed to emit event: {:?}", err); // Fail open.
       }
 
       Err(CommandErrorResponseWrapper {
@@ -160,11 +180,14 @@ pub async fn sora_image_remix_command(
       })
     }
     Ok(_) => {
-      let event = SoraImageEnqueueSuccessEvent {};
-      let result = event.send(&app);
+      let event = GenerationEnqueueSuccessEvent {
+        action: GenerationAction::GenerateImage,
+        service: GenerationServiceProvider::Sora,
+        model: None,
+      };
 
-      if let Err(err) = result {
-        error!("Failed to emit event: {:?}", err);
+      if let Err(err) = event.send(&app) {
+        error!("Failed to emit event: {:?}", err); // Fail open.
       }
 
       Ok(().into())
