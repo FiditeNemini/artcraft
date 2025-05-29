@@ -77,15 +77,15 @@ pub struct TaskResponse {
   pub inpaint_items: Option<Vec<InpaintItem>>,
   pub preset_id: Option<String>,
   pub caption: Option<String>,
-  pub actions: Option<serde_json::Value>,
-  pub interpolation: Option<serde_json::Value>,
-  pub sdedit: Option<serde_json::Value>,
-  pub remix_config: Option<serde_json::Value>,
+  //pub actions: Option<serde_json::Value>,
+  //pub interpolation: Option<serde_json::Value>,
+  //pub sdedit: Option<serde_json::Value>,
+  //pub remix_config: Option<serde_json::Value>,
   pub quality: Option<String>,
   pub generations: Vec<Generation>,
   pub num_unsafe_generations: i32,
   pub title: String,
-  pub moderation_result: ModerationResult,
+  //pub moderation_result: ModerationResult,
   pub failure_reason: Option<String>,
   pub needs_user_review: bool,
 }
@@ -108,7 +108,7 @@ pub struct Generation {
   pub is_featured: Option<bool>,
   pub has_feedback: Option<bool>,
   pub like_count: Option<i32>,
-  pub cloudflare_metadata: Option<serde_json::Value>,
+  //pub cloudflare_metadata: Option<serde_json::Value>,
   pub cf_thumbnail_url: Option<String>,
   pub encodings: Encodings,
   pub width: i32,
@@ -118,14 +118,14 @@ pub struct Generation {
   pub title: String,
   pub actions: Option<serde_json::Value>,
   pub inpaint_items: Option<Vec<InpaintItem>>,
-  pub interpolation: Option<serde_json::Value>,
-  pub sdedit: Option<serde_json::Value>,
+  //pub interpolation: Option<serde_json::Value>,
+  //pub sdedit: Option<serde_json::Value>,
   pub operation: String,
   pub model: Option<String>,
   pub preset_id: Option<String>,
-  pub user: User,
-  pub moderation_result: ModerationResult,
-  pub paragen_status: Option<serde_json::Value>,
+  //pub user: User,
+  //pub moderation_result: ModerationResult,
+  //pub paragen_status: Option<serde_json::Value>,
   pub task_type: String,
   pub remix_config: Option<serde_json::Value>,
   pub quality: Option<String>,
@@ -159,12 +159,12 @@ pub struct Thumbnail {
   pub size: Option<i32>,
 }
 
-#[derive(Deserialize, Clone, Debug)]
-#[serde(rename_all = "snake_case")]
-pub struct User {
-  pub id: String,
-  pub username: String,
-}
+//#[derive(Deserialize, Clone, Debug)]
+//#[serde(rename_all = "snake_case")]
+//pub struct User {
+//  pub id: String,
+//  pub username: String,
+//}
 
 #[derive(Deserialize, Clone, Debug)]
 #[serde(rename_all = "snake_case")]
@@ -178,15 +178,15 @@ pub struct InpaintItem {
   pub source_start_frame: i32,
 }
 
-#[derive(Deserialize, Clone, Debug)]
-#[serde(rename_all = "snake_case")]
-pub struct ModerationResult {
-  pub r#type: String,
-  pub results_by_frame_index: serde_json::Value,
-  pub code: Option<String>,
-  pub is_output_rejection: bool,
-  pub task_id: TaskId,
-}
+//#[derive(Deserialize, Clone, Debug)]
+//#[serde(rename_all = "snake_case")]
+//pub struct ModerationResult {
+//  pub r#type: String,
+//  pub results_by_frame_index: serde_json::Value,
+//  pub code: Option<String>,
+//  pub is_output_rejection: bool,
+//  pub task_id: TaskId,
+//}
 
 pub struct StatusRequest {
   pub limit: Option<u32>,
