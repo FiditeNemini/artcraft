@@ -48,7 +48,7 @@ const appMenuTabs: MenuIconItem[] = [
   {
     id: "3D",
     label: "3D Editor",
-    icon: <FontAwesomeIcon icon={faCube} />
+    icon: <FontAwesomeIcon icon={faCube} />,
   },
   {
     id: "IMAGE",
@@ -57,7 +57,7 @@ const appMenuTabs: MenuIconItem[] = [
   },
   {
     id: "VIDEO",
-    label: "Prompt to Video",
+    label: "Image to Video",
     icon: <FontAwesomeIcon icon={faFilm} />,
   },
 ];
