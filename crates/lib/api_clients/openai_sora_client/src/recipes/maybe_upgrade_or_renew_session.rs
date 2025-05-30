@@ -1,7 +1,7 @@
 use crate::creds::sora_credential_set::SoraCredentialSet;
 use crate::creds::sora_jwt_bearer_token::SoraJwtBearerToken;
 use crate::creds::sora_sentinel::SoraSentinel;
-use crate::requests::bearer::generate::generate_bearer_with_cookie;
+use crate::requests::bearer::generate_bearer_with_cookie::generate_bearer_with_cookie;
 use crate::requests::sentinel_refresh::generate::token::generate_token;
 use chrono::{DateTime, TimeDelta, Utc};
 use errors::AnyhowResult;
@@ -34,8 +34,6 @@ pub async fn maybe_upgrade_or_renew_session(sora_credentials: &mut SoraCredentia
 
   if refresh_jwt {
     let cookies = sora_credentials.cookies.as_str();
-
-    info!("Generating new JWT bearer token...");
     let token = generate_bearer_with_cookie(cookies).await?;
 
     info!("Parsing JWT bearer token.");

@@ -1,1 +1,1 @@
-pub mod generate;
+pub mod generate_bearer_with_cookie;

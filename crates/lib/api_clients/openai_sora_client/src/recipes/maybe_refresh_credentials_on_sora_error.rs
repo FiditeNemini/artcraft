@@ -1,6 +1,6 @@
 use crate::creds::sora_credential_set::SoraCredentialSet;
 use crate::creds::sora_jwt_bearer_token::SoraJwtBearerToken;
-use crate::requests::bearer::generate::generate_bearer_with_cookie;
+use crate::requests::bearer::generate_bearer_with_cookie::generate_bearer_with_cookie;
 use crate::sora_error::SoraError;
 use anyhow::anyhow;
 use log::{error, info, warn};

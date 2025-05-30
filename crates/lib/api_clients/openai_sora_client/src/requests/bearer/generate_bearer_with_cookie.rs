@@ -1,5 +1,7 @@
+use crate::requests::image_gen::SoraImageGenError;
 use crate::sora_error::SoraError;
 use crate::utils::classify_general_http_error::classify_general_http_error;
+use crate::utils::classify_general_http_status_code_and_body::classify_general_http_status_code_and_body;
 use errors::AnyhowResult;
 use log::{debug, error, info};
 use reqwest::Client;
@@ -34,6 +36,8 @@ pub async fn generate_bearer_with_cookie(cookie: &str) -> Result<String, SoraErr
       .gzip(true)
       .build()?;
 
+  info!("Generating new JWT bearer token from session cookies... (cookie payload length: {})", cookie.len());
+
   let response = client.get(SORA_BEARER_GENERATE_URL)
       .header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0")
       .header("Accept", "*/*")
@@ -43,20 +47,25 @@ pub async fn generate_bearer_with_cookie(cookie: &str) -> Result<String, SoraErr
       .send()
       .await?;
 
-  if !response.status().is_success() {
-    error!("Failed to generate bearer token: {}", response.status());
-    let error = classify_general_http_error(response).await;
+  let status = response.status();
+
+  let response_body = &response.text().await
+      .map_err(|err| {
+        error!("Error reading body while attempting to generate bearer token: {:?}", err);
+        SoraError::ReqwestError(err)
+      })?;
+  
+  if !status.is_success() {
+    error!("Failed to generate bearer token with session cookies: {} ; body = {}", status, response_body);
+    let error = classify_general_http_status_code_and_body(status, &response_body).await;
     return Err(error);
   }
   
   debug!("Bearer token generation response was 200.");
-
-  let response_body = response.text().await?;
-  
   debug!("Auth Response: {}", response_body);
   
-  if &response_body == "null" {
-    error!("Failed to generate bearer token. Response was `null`.");  
+  if response_body == "null" {
+    error!("Failed to generate bearer token. Response was the string `null`.");  
     return Err(SoraError::FailedToGenerateBearer)  
   }
   
