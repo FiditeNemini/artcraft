@@ -497,7 +497,7 @@ export const AssetModal = () => {
           <div className="absolute left-0 top-0 z-[50] h-[46px] w-full cursor-move" />
         </Modal.DragHandle>
         <div className="grid h-full grid-cols-12 gap-3">
-          <div className="relative col-span-3 flex h-full flex-col p-3 pt-2 after:absolute after:right-0 after:top-0 after:h-full after:w-px after:bg-gray-200 after:dark:bg-white/10">
+          <div className="relative col-span-3 flex h-full flex-col p-3 pt-2 after:absolute after:right-0 after:top-0 after:h-full after:w-px after:bg-gray-200 after:bg-white/10">
             <div className="flex items-center justify-between gap-2.5 py-0.5">
               <h2 className="text-[18px] font-semibold opacity-80">
                 3D Assets

@@ -22,7 +22,11 @@ interface SettingsModalProps {
 //type SettingsSection = "misc" | "audio" | "accounts" | "video" | "image";
 type SettingsSection = "general" | "accounts" | "alerts" | "about";
 
-export const SettingsModal = ({ isOpen, onClose, globalAccountLogoutCallback }: SettingsModalProps) => {
+export const SettingsModal = ({
+  isOpen,
+  onClose,
+  globalAccountLogoutCallback,
+}: SettingsModalProps) => {
   const [selectedSection, setSelectedSection] =
     useState<SettingsSection>("general");
 
@@ -30,7 +34,7 @@ export const SettingsModal = ({ isOpen, onClose, globalAccountLogoutCallback }: 
     { id: "general" as const, label: "General", icon: faCog },
     { id: "accounts" as const, label: "Accounts", icon: faUser },
     { id: "alerts" as const, label: "Alerts", icon: faVolumeHigh },
-    { id: "about" as const, label: "About", icon: faCircleInfo},
+    { id: "about" as const, label: "About", icon: faCircleInfo },
     //{ id: "video" as const, label: "Video", icon: faVideo },
     //{ id: "image" as const, label: "Image", icon: faImage },
   ];
@@ -42,7 +46,11 @@ export const SettingsModal = ({ isOpen, onClose, globalAccountLogoutCallback }: 
       case "general":
         return <MiscSettingsPane />;
       case "accounts":
-        return <AccountSettingsPane globalAccountLogoutCallback={globalAccountLogoutCallback} />;
+        return (
+          <AccountSettingsPane
+            globalAccountLogoutCallback={globalAccountLogoutCallback}
+          />
+        );
       case "about":
         return <AboutSettingsPane />;
     }
@@ -57,7 +65,7 @@ export const SettingsModal = ({ isOpen, onClose, globalAccountLogoutCallback }: 
     >
       <div className="h-[560px]">
         <div className="grid h-full grid-cols-12 gap-3">
-          <div className="relative col-span-4 p-3 pt-2 after:absolute after:right-0 after:top-0 after:h-full after:w-px after:bg-gray-200 after:dark:bg-white/10">
+          <div className="relative col-span-4 p-3 pt-2 after:absolute after:right-0 after:top-0 after:h-full after:w-px after:bg-gray-200 after:bg-white/10">
             <div className="flex items-center justify-between gap-2.5 py-0.5">
               <h2 className="text-[18px] font-semibold opacity-80">Settings</h2>
             </div>
