@@ -1,13 +1,8 @@
 use crate::sora_error::SoraError;
 use reqwest::StatusCode;
 
-/// This assumes the request failed and returned a non-200.
-/// The caller should check.
-pub async fn classify_general_http_status_code_and_body(status: StatusCode, response_body: &str) -> SoraError {
-  let message = response_body.to_string();
-  
-  /*
-  
+/*
+
 Old cookie - 
 
 Message: {
@@ -29,7 +24,13 @@ Message: {
     "code": "token_expired"
   }
 }
-   */
+
+*/
+
+/// Classify the type of error that occurred.
+/// This first assumes the request failed and returned a non-200.
+pub async fn classify_general_http_status_code_and_body(status: StatusCode, response_body: &str) -> SoraError {
+  let message = response_body.to_string();
 
   // TODO: I *think* this is just the bearer token, not the cookie.
   let cookie_expired =
@@ -51,17 +52,26 @@ Message: {
   let status_code = status.as_u16();
   
   match status_code {
+    403 => {
+      if message.contains("challenge-platform") 
+          || message.contains("challenge-error-text") 
+          || message.contains("cType: 'managed'") {
+        return SoraError::CloudFlareChallenge(message);
+      }
+    }
     502 => {
       return SoraError::BadGateway(message);
     }
     504 => {
-      if message.contains("cloudflare") || message.contains("Cloudflare") {
+      if message.contains("cloudflare") 
+          || message.contains("Cloudflare") {
         return SoraError::CloudFlareTimeout(message);
       }
     }
     524 => {
       // NB: 524 is a cloudflare specific gateway timeout error with slightly different semantics than 504.
-      if message.contains("cloudflare") || message.contains("Cloudflare") {
+      if message.contains("cloudflare") 
+          || message.contains("Cloudflare") {
         return SoraError::CloudFlareTimeout(message);
       }
     }
