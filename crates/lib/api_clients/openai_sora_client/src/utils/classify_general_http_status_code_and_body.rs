@@ -55,8 +55,9 @@ pub async fn classify_general_http_status_code_and_body(status: StatusCode, resp
     403 => {
       if message.contains("challenge-platform") 
           || message.contains("challenge-error-text") 
-          || message.contains("cType: 'managed'") {
-        return SoraError::CloudFlareChallenge(message);
+          || message.contains("cType: 'managed'")
+          || message.contains("Just a moment...") {
+        return SoraError::CloudFlareChallenge;
       }
     }
     502 => {

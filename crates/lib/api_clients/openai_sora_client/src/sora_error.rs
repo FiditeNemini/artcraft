@@ -45,7 +45,7 @@ pub enum SoraError {
   
   /// HTTP 403 + Cloudflare Challenge Interstitial
   /// Cloudflare decided to block the request and present a challenge.
-  CloudFlareChallenge(String),
+  CloudFlareChallenge,
   
   /// HTTP 524 (Cloudflare-specific)
   /// Cloudflare formed a TCP connection to Sora, but no payload was delivered before timeout
@@ -98,8 +98,8 @@ impl Display for SoraError {
       Self::BadGateway(message) => {
         write!(f, "Bad Gateway; Sora is likely having issues: {:?}", message)
       }
-      Self::CloudFlareChallenge(message) => {
-        write!(f, "Cloudflare Challenge (403); Cloudflare wants to verify the request: {:?}", message)
+      Self::CloudFlareChallenge => {
+        write!(f, "Cloudflare Challenge (403); Cloudflare wants to verify the request with a CAPTCHA challenge.")
       }
       Self::CloudFlareTimeout(message) => {
         write!(f, "Cloudflare Timeout (524); Sora is likely having issues: {:?}", message)
