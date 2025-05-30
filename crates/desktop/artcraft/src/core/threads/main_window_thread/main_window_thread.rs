@@ -23,6 +23,15 @@ pub async fn main_window_thread(
   let window_pos_slot: CloneSlot<MainWindowPosition> = CloneSlot::empty();
   let app_startup_time = AppStartupTime::new();
 
+  // Emit debugging information to the logs (do not remove this!)
+  info!("git commit id: {:?}", build_metadata::git_commit_id()
+    .unwrap_or_else(|| "unknown"));
+  info!("git commit timestamp: {:?}", build_metadata::git_commit_timestamp()
+    .map(|t| t.to_string())
+    .unwrap_or_else(|| "unknown".to_string()));
+  info!("build timestamp: {:?}", build_metadata::build_timestamp()
+    .to_string());
+
   loop {
     for (window_name, window) in app.windows() {
       if window_name == MAIN_WINDOW_NAME {

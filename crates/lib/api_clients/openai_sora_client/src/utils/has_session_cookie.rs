@@ -54,7 +54,7 @@ pub fn has_session_cookie(cookies_header: &str) -> AnyhowResult<SessionCookiePre
     let cookie_name = cookie.name();
     if cookie_name == SESSION_COOKIE_NAME_NEW {
       return Ok(SessionCookiePresence::Present);
-    } else if cookie_name == SESSION_COOKIE_NAME_NEW {
+    } else if cookie_name == SESSION_COOKIE_NAME_OLD {
       return Ok(SessionCookiePresence::Present);
     } else if !IRRELEVANT_COOKIE_NAMES.contains(cookie_name) {
       unknown_cookie_count += 1;
