@@ -53,6 +53,14 @@ use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats
 use crate::http_server::common_responses::simple_response::SimpleResponse;
 use crate::http_server::common_responses::tag_info::TagInfo;
 use crate::http_server::common_responses::user_details_lite::{UserDefaultAvatarInfo, UserDetailsLight};
+use crate::http_server::deprecated_endpoints::conversion::enqueue_fbx_to_gltf_handler::*;
+use crate::http_server::deprecated_endpoints::engine::create_scene_handler::*;
+use crate::http_server::deprecated_endpoints::workflows::enqueue::enqueue_face_fusion_workflow_handler::*;
+use crate::http_server::deprecated_endpoints::workflows::enqueue::enqueue_live_portrait_workflow_handler::*;
+use crate::http_server::deprecated_endpoints::workflows::enqueue::vst_common::vst_error::*;
+use crate::http_server::deprecated_endpoints::workflows::enqueue::vst_common::vst_request::*;
+use crate::http_server::deprecated_endpoints::workflows::enqueue::vst_common::vst_response::*;
+use crate::http_server::deprecated_endpoints::workflows::enqueue_video_style_transfer_handler::*;
 use crate::http_server::endpoints::analytics::log_browser_session_handler::*;
 use crate::http_server::endpoints::app_state::components::get_permissions::AppStateLegacyPermissionFlags;
 use crate::http_server::endpoints::app_state::components::get_permissions::AppStatePermissions;
@@ -72,11 +80,11 @@ use crate::http_server::endpoints::beta_keys::redeem_beta_key_handler::*;
 use crate::http_server::endpoints::comments::create_comment_handler::*;
 use crate::http_server::endpoints::comments::delete_comment_handler::*;
 use crate::http_server::endpoints::comments::list_comments_handler::*;
-use crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::*;
-use crate::http_server::endpoints::engine::create_scene_handler::*;
 use crate::http_server::endpoints::featured_items::create_featured_item_handler::*;
 use crate::http_server::endpoints::featured_items::delete_featured_item_handler::*;
 use crate::http_server::endpoints::featured_items::get_is_featured_item_handler::*;
+use crate::http_server::endpoints::image_studio::prompt::enqueue_studio_image_generation_handler::*;
+use crate::http_server::endpoints::image_studio::upload::upload_snapshot_media_file_handler::*;
 use crate::http_server::endpoints::inference_job::common_responses::live_portrait::JobDetailsLivePortraitRequest;
 use crate::http_server::endpoints::inference_job::delete::dismiss_finished_session_jobs_handler::*;
 use crate::http_server::endpoints::inference_job::delete::terminate_inference_job_handler::*;
@@ -117,15 +125,13 @@ use crate::http_server::endpoints::media_files::upsert_upload::write_error::Medi
 use crate::http_server::endpoints::media_files::upsert_upload::write_scene_file::write_scene_file_media_file_handler::*;
 use crate::http_server::endpoints::model_download::enqueue_gptsovits_model_download_handler::*;
 use crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::*;
-use crate::http_server::endpoints::studio_gen2::enqueue_studio_gen2_handler::*;
 use crate::http_server::endpoints::prompts::get_prompt_handler::*;
 use crate::http_server::endpoints::service::status_alert_handler::*;
 use crate::http_server::endpoints::stats::get_unified_queue_stats_handler::*;
+use crate::http_server::endpoints::studio_gen2::enqueue_studio_gen2_handler::*;
 use crate::http_server::endpoints::tags::list_tags_for_entity_handler::*;
 use crate::http_server::endpoints::tags::set_tags_for_entity_handler::*;
 use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::*;
-use crate::http_server::endpoints::image_studio::prompt::enqueue_studio_image_generation_handler::*;
-use crate::http_server::endpoints::image_studio::upload::upload_snapshot_media_file_handler::*;
 use crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::*;
 use crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::*;
 use crate::http_server::endpoints::user_bookmarks::delete_user_bookmark_handler::*;
@@ -154,12 +160,6 @@ use crate::http_server::endpoints::weights::list::list_weights_by_user_handler::
 use crate::http_server::endpoints::weights::search::search_model_weights_impl::*;
 use crate::http_server::endpoints::weights::update::set_model_weight_cover_image_handler::*;
 use crate::http_server::endpoints::weights::update::update_weight_handler::*;
-use crate::http_server::endpoints::workflows::enqueue::enqueue_face_fusion_workflow_handler::*;
-use crate::http_server::endpoints::workflows::enqueue::enqueue_live_portrait_workflow_handler::*;
-use crate::http_server::endpoints::workflows::enqueue::vst_common::vst_error::*;
-use crate::http_server::endpoints::workflows::enqueue::vst_common::vst_request::*;
-use crate::http_server::endpoints::workflows::enqueue::vst_common::vst_response::*;
-use crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::*;
 use crate::http_server::web_utils::response_success_helpers::*;
 
 #[derive(OpenApi)]
@@ -167,7 +167,15 @@ use crate::http_server::web_utils::response_success_helpers::*;
   paths(
     billing_component::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_json_handler::stripe_create_checkout_session_json_handler,
     billing_component::users::http_endpoints::list_active_user_subscriptions_handler::list_active_user_subscriptions_handler,
+    crate::http_server::deprecated_endpoints::conversion::enqueue_fbx_to_gltf_handler::enqueue_fbx_to_gltf_handler,
+    crate::http_server::deprecated_endpoints::engine::create_scene_handler::create_scene_handler,
+    crate::http_server::deprecated_endpoints::workflows::enqueue::enqueue_face_fusion_workflow_handler::enqueue_face_fusion_workflow_handler,
+    crate::http_server::deprecated_endpoints::workflows::enqueue::enqueue_live_portrait_workflow_handler::enqueue_live_portrait_workflow_handler,
+    crate::http_server::deprecated_endpoints::workflows::enqueue::enqueue_studio_workflow_handler::enqueue_studio_workflow_handler,
+    crate::http_server::deprecated_endpoints::workflows::enqueue::enqueue_video_style_transfer_workflow_handler::enqueue_video_style_transfer_workflow_handler,
+    crate::http_server::deprecated_endpoints::workflows::enqueue_video_style_transfer_handler::enqueue_video_style_transfer_handler,
     crate::http_server::endpoints::analytics::log_browser_session_handler::log_browser_session_handler,
+    crate::http_server::endpoints::app_state::get_app_state_handler::get_app_state_handler,
     crate::http_server::endpoints::beta_keys::create_beta_keys_handler::create_beta_keys_handler,
     crate::http_server::endpoints::beta_keys::edit_beta_key_distributed_flag_handler::edit_beta_key_distributed_flag_handler,
     crate::http_server::endpoints::beta_keys::edit_beta_key_note_handler::edit_beta_key_note_handler,
@@ -176,15 +184,14 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::comments::create_comment_handler::create_comment_handler,
     crate::http_server::endpoints::comments::delete_comment_handler::delete_comment_handler,
     crate::http_server::endpoints::comments::list_comments_handler::list_comments_handler,
-    crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::enqueue_fbx_to_gltf_handler,
-    crate::http_server::endpoints::engine::create_scene_handler::create_scene_handler,
     crate::http_server::endpoints::featured_items::create_featured_item_handler::create_featured_item_handler,
     crate::http_server::endpoints::featured_items::delete_featured_item_handler::delete_featured_item_handler,
     crate::http_server::endpoints::featured_items::get_is_featured_item_handler::get_is_featured_item_handler,
+    crate::http_server::endpoints::image_studio::prompt::enqueue_studio_image_generation_handler::enqueue_studio_image_generation_handler,
+    crate::http_server::endpoints::image_studio::upload::upload_snapshot_media_file_handler::upload_snapshot_media_file_handler,
     crate::http_server::endpoints::inference_job::delete::dismiss_finished_session_jobs_handler::dismiss_finished_session_jobs_handler,
     crate::http_server::endpoints::inference_job::delete::terminate_inference_job_handler::terminate_inference_job_handler,
     crate::http_server::endpoints::inference_job::get::batch_get_inference_job_status_handler::batch_get_inference_job_status_handler,
-    crate::http_server::endpoints::app_state::get_app_state_handler::get_app_state_handler,
     crate::http_server::endpoints::inference_job::get::get_inference_job_status_handler::get_inference_job_status_handler,
     crate::http_server::endpoints::inference_job::list::list_session_jobs_handler::list_session_jobs_handler,
     crate::http_server::endpoints::media_files::delete::delete_media_file_handler::delete_media_file_handler,
@@ -192,16 +199,13 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::media_files::edit::change_media_file_engine_category_handler::change_media_file_engine_category_handler,
     crate::http_server::endpoints::media_files::edit::change_media_file_visibility_handler::change_media_file_visibility_handler,
     crate::http_server::endpoints::media_files::edit::rename_media_file_handler::rename_media_file_handler,
-    crate::http_server::endpoints::users::edit_username_handler::edit_username_handler,
     crate::http_server::endpoints::media_files::edit::set_media_file_cover_image_handler::set_media_file_cover_image_handler,
     crate::http_server::endpoints::media_files::get::batch_get_media_files_handler::batch_get_media_files_handler,
     crate::http_server::endpoints::media_files::get::get_media_file_handler::get_media_file_handler,
     crate::http_server::endpoints::media_files::list::list_featured_media_files_handler::list_featured_media_files_handler,
     crate::http_server::endpoints::media_files::list::list_media_files_by_batch_token_handler::list_media_files_by_batch_token_handler,
-    crate::http_server::endpoints::users::google_sso::google_sso_handler::google_sso_handler,
     crate::http_server::endpoints::media_files::list::list_media_files_for_user_handler::list_media_files_for_user_handler,
     crate::http_server::endpoints::media_files::list::list_media_files_handler::list_media_files_handler,
-    crate::http_server::endpoints::media_files::upload::upload_studio_shot::upload_studio_shot_media_file_handler::upload_studio_shot_media_file_handler,
     crate::http_server::endpoints::media_files::list::list_pinned_media_files_handler::list_pinned_media_files_handler,
     crate::http_server::endpoints::media_files::search::search_featured_media_files_handler::search_featured_media_files_handler,
     crate::http_server::endpoints::media_files::search::search_session_media_files_handler::search_session_media_files_handler,
@@ -209,14 +213,12 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::upload_engine_asset_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_generic::upload_media_file_handler::upload_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_image_media_file_handler::upload_image_media_file_handler,
-    crate::http_server::endpoints::image_studio::prompt::enqueue_studio_image_generation_handler::enqueue_studio_image_generation_handler,
-    crate::http_server::endpoints::image_studio::upload::upload_snapshot_media_file_handler::upload_snapshot_media_file_handler,
-    crate::http_server::endpoints::studio_gen2::enqueue_studio_gen2_handler::enqueue_studio_gen2_handler,
     crate::http_server::endpoints::media_files::upload::upload_new_engine_asset_media_file_handler::upload_new_engine_asset_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::upload_new_scene_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_pmx::upload_pmx_media_file_handler::upload_pmx_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_saved_scene_media_file_handler::upload_saved_scene_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_scene_snapshot_media_file_handler::upload_scene_snapshot_media_file_handler,
+    crate::http_server::endpoints::media_files::upload::upload_studio_shot::upload_studio_shot_media_file_handler::upload_studio_shot_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_video_new::upload_new_video_media_file_handler::upload_new_video_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_video_old::upload_video_media_file_handler::upload_video_media_file_handler,
     crate::http_server::endpoints::media_files::upsert_upload::write_engine_asset::write_engine_asset_media_file_handler::write_engine_asset_media_file_handler,
@@ -225,8 +227,10 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::edit_user_feature_flags_handler,
     crate::http_server::endpoints::prompts::get_prompt_handler::get_prompt_handler,
     crate::http_server::endpoints::service::status_alert_handler::status_alert_handler,
-    crate::http_server::endpoints::users::create_account_handler::create_account_handler,
     crate::http_server::endpoints::stats::get_unified_queue_stats_handler::get_unified_queue_stats_handler,
+    crate::http_server::endpoints::studio_gen2::enqueue_studio_gen2_handler::enqueue_studio_gen2_handler,
+    crate::http_server::endpoints::tags::list_tags_for_entity_handler::list_tags_for_entity_handler,
+    crate::http_server::endpoints::tags::set_tags_for_entity_handler::set_tags_for_entity_handler,
     crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::enqueue_infer_tts_handler,
     crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::batch_get_user_bookmarks_handler,
     crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::create_user_bookmark_handler,
@@ -236,14 +240,15 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::user_ratings::batch_get_user_rating_handler::batch_get_user_rating_handler,
     crate::http_server::endpoints::user_ratings::get_user_rating_handler::get_user_rating_handler,
     crate::http_server::endpoints::user_ratings::set_user_rating_handler::set_user_rating_handler,
+    crate::http_server::endpoints::users::create_account_handler::create_account_handler,
+    crate::http_server::endpoints::users::edit_username_handler::edit_username_handler,
     crate::http_server::endpoints::users::get_profile_handler::get_profile_handler,
+    crate::http_server::endpoints::users::google_sso::google_sso_handler::google_sso_handler,
     crate::http_server::endpoints::users::login_handler::login_handler,
     crate::http_server::endpoints::users::logout_handler::logout_handler,
-    crate::http_server::endpoints::users::session_token_info_handler::session_token_info_handler,
     crate::http_server::endpoints::users::session_info_handler::session_info_handler,
+    crate::http_server::endpoints::users::session_token_info_handler::session_token_info_handler,
     crate::http_server::endpoints::voice_conversion::enqueue_voice_conversion_inference_handler::enqueue_voice_conversion_inference_handler,
-    crate::http_server::endpoints::tags::list_tags_for_entity_handler::list_tags_for_entity_handler,
-    crate::http_server::endpoints::tags::set_tags_for_entity_handler::set_tags_for_entity_handler,
     crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::enqueue_tts_request,
     crate::http_server::endpoints::voice_designer::voice_datasets::list_datasets_by_user::list_datasets_by_user_handler,
     crate::http_server::endpoints::weights::delete::delete_weight_handler::delete_weight_handler,
@@ -256,11 +261,6 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::weights::search::search_model_weights_http_post_handler::search_model_weights_http_post_handler,
     crate::http_server::endpoints::weights::update::set_model_weight_cover_image_handler::set_model_weight_cover_image_handler,
     crate::http_server::endpoints::weights::update::update_weight_handler::update_weight_handler,
-    crate::http_server::endpoints::workflows::enqueue::enqueue_face_fusion_workflow_handler::enqueue_face_fusion_workflow_handler,
-    crate::http_server::endpoints::workflows::enqueue::enqueue_live_portrait_workflow_handler::enqueue_live_portrait_workflow_handler,
-    crate::http_server::endpoints::workflows::enqueue::enqueue_studio_workflow_handler::enqueue_studio_workflow_handler,
-    crate::http_server::endpoints::workflows::enqueue::enqueue_video_style_transfer_workflow_handler::enqueue_video_style_transfer_workflow_handler,
-    crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::enqueue_video_style_transfer_handler,
   ),
   components(schemas(
     // Tokens
