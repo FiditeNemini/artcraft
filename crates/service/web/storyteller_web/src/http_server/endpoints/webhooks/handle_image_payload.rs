@@ -39,11 +39,11 @@ pub async fn handle_image_payload(
   
   let image_value = payload.get("image")
       .ok_or_else(|| anyhow!("no `image` key in payload"))?;
+
+  info!("Fal Image Payload: {:?}", image_value);
   
   let image: FalWebhookImage = serde_json::from_value(image_value.clone())?;
-  
-  info!("Image payload received: {:?}", image);
-  
+
   let image_url = image.url
       .as_deref()
       .ok_or_else(|| anyhow!("no `url` in image payload"))?;

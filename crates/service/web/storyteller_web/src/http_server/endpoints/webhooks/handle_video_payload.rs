@@ -44,11 +44,9 @@ pub async fn handle_video_payload(
   let video_value = payload.get("video")
       .ok_or_else(|| anyhow!("no `image` key in payload"))?;
 
-  info!("Video: {:?}", video_value);
+  info!("Fal Video Payload: {:?}", video_value);
   
   let video: FalWebhookVideo = serde_json::from_value(video_value.clone())?;
-  
-  info!("Video payload received: {:?}", video);
   
   let video_url = video.url
       .as_deref()

@@ -142,6 +142,8 @@ pub async fn fal_webhook_handler(
   if let Some(payload_obj) = payload.as_object() {
     if payload_obj.contains_key("image") {
       handle_image_payload(payload_obj, &job, &server_state).await?;
+    } else if payload_obj.contains_key("video") {
+      handle_video_payload(payload_obj, &job, &server_state).await?;
     }
     if payload_obj.contains_key("video") {
       handle_video_payload(payload_obj, &job, &server_state).await?;
