@@ -32,16 +32,13 @@ import { IsDesktopApp } from "@storyteller/tauri-utils";
 import { GalleryItem, GalleryModal } from "@storyteller/ui-gallery-modal";
 import { PromptsApi } from "@storyteller/api";
 import {
-  CommandSuccessStatus,
-  GetAppPreferences,
   SoraImageRemix,
-  SoraImageRemixErrorType,
   SoraImageRemixAspectRatio,
   CheckSoraSession,
   SoraSessionState,
   waitForSoraLogin,
 } from "@storyteller/tauri-api";
-import { SoundRegistry } from "@storyteller/soundboard";
+
 import { showActionReminder } from "@storyteller/ui-action-reminder-modal";
 import { invoke } from "@tauri-apps/api/core";
 
@@ -77,11 +74,9 @@ export const PromptBox2D = ({
 }: PromptBox2DProps) => {
   useSignals();
 
-  console.log("Is this a desktop app?", IsDesktopApp());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [content, setContent] = useState("");
-  const { jobTokens, addJobToken, removeJobToken, clearJobTokens } =
-    useJobContext();
+  const { addJobToken } = useJobContext();
 
   //const { lastRenderedBitmap } = useCanvasSignal();
   const [prompt, setPrompt] = useState("");

@@ -1,0 +1,216 @@
+import React, { useState, useRef } from "react";
+import { PaintSurface } from "./PaintSurface";
+// https://github.com/SaladTechnologies/comfyui-api
+import "./App.css";
+import PromptEditor from "./PromptEditor/PromptEditor";
+import SideToolbar from "./components/ui/SideToolbar";
+// Import the Zustand store
+import { useSceneStore } from "./stores/SceneState";
+import { useUndoRedoHotkeys } from "./hooks/useUndoRedoHotkeys";
+import { useDeleteHotkeys } from "./hooks/useDeleteHotkeys";
+import { useCopyPasteHotkeys } from "./hooks/useCopyPasteHotkeys"; // Import the hook
+import { PopoverItem, PopoverMenu } from "@storyteller/ui-popover";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faClock, faImage } from "@fortawesome/pro-solid-svg-icons";
+import Konva from 'konva';
+
+import { setCanvasRenderBitmap } from "../../signals/canvasRenderBitmap"
+import { captureStageImageBitmap } from "./hooks/useUpdateSnapshot"
+import { useStateSceneLoader } from "./hooks/useStateSceneLoader";
+const PageDraw = () => {
+
+  //useStateSceneLoader();
+
+  // State for canvas dimensions
+  const canvasWidth = React.useRef<number>(1024);
+  const canvasHeight = React.useRef<number>(1024);
+  // Add new state to track if user is selecting
+  const [isSelecting, setIsSelecting] = useState<boolean>(false);
+  const [selectedModel, setSelectedModel] = useState<string>("GPT-4o");
+  // Create refs for stage and image
+  const stageRef = useRef<Konva.Stage>({});
+  const transformerRefs = useRef<{ [key: string]: Konva.Transformer }>({});
+
+  // Use the Zustand store
+  const store = useSceneStore();
+
+  // Pass store actions directly as callbacks
+  useDeleteHotkeys({ onDelete: store.deleteSelectedItems });
+  useUndoRedoHotkeys({ undo: store.undo, redo: store.redo });
+  useCopyPasteHotkeys({
+    onCopy: store.copySelectedItems,
+    onPaste: store.pasteItems,
+  });
+
+  const handleImageUpload = (files: File[]): void => {
+    // Place images at center of viewport with offset for multiple images
+    const centerX = 512; // leftPanelWidth / 2
+    const centerY = 512; // leftPanelHeight / 2
+
+    files.forEach((file, index) => {
+      store.createImageFromFile(
+        centerX + index * 60, // Offset each image
+        centerY + index * 60,
+        file,
+      );
+    });
+  };
+
+  const modelList: PopoverItem[] = [
+    {
+      label: "GPT-4o",
+      icon: <FontAwesomeIcon icon={faImage} className="h-4 w-4" />,
+      selected: selectedModel === "GPT-4o",
+      description: "High quality model",
+      badges: [{ label: "2 min.", icon: <FontAwesomeIcon icon={faClock} /> }],
+    },
+    {
+      label: "FLUX.1 Kontext",
+      icon: <FontAwesomeIcon icon={faImage} className="h-4 w-4" />,
+      selected: selectedModel === "FLUX.1 Kontext",
+      description: "Fast and high-quality model",
+      badges: [{ label: "20 sec.", icon: <FontAwesomeIcon icon={faClock} /> }],
+    },
+  ];
+
+  const handleModelSelect = (item: PopoverItem) => {
+    setSelectedModel(item.label);
+  };
+
+  const onEnqueuedPressed = async () => {
+    // takes snap shot and then a global variable in the engine will invoke the inference.
+    const image = await captureStageImageBitmap(stageRef,transformerRefs)
+    if (!image) {
+      console.error('Failed to capture stage image');
+      return;
+    } else {
+      setCanvasRenderBitmap(image);
+    }
+  }
+
+  return (
+    <>
+      <div
+        className={`preserve-aspect-ratio fixed bottom-0 left-1/2 z-10 -translate-x-1/2 transform ${
+          isSelecting ? "pointer-events-none" : "pointer-events-auto"
+        }`}
+      >
+        <PromptEditor
+          initialPrompt=""
+          onPromptChange={(prompt: string) => {
+            console.log("Prompt changed:", prompt);
+            // Handle prompt changes here
+          }}
+          onRandomize={() => {
+            console.log("Randomize clicked");
+            // Handle randomize action here
+          }}
+          onVary={() => {
+            console.log("Vary clicked");
+            // Handle vary action here
+          }}
+          onAspectRatioChange={(ratio: string) => {
+            console.log("Aspect ratio:", ratio);
+            // Handle aspect ratio changes here
+          }}
+          onEnqueuePressed={onEnqueuedPressed}
+        /> 
+      </div>
+      <SideToolbar
+        className="fixed left-0 top-1/2 z-10 -translate-y-1/2 transform"
+        onSelect={(): void => {
+          store.setActiveTool("select");
+        }}
+        onAddShape={(shape: "rectangle" | "circle" | "triangle"): void => {
+          // Calculate center position based on canvas dimensions
+          const centerX = canvasWidth.current / 3;
+          const centerY = canvasHeight.current / 3;
+          if (shape === "rectangle") {
+            store.createRectangle(centerX, centerY);
+          } else if (shape === "circle") {
+            store.createCircle(centerX, centerY);
+          } else if (shape === "triangle") {
+            store.createTriangle(centerX, centerY);
+          }
+        }}
+        onPaintBrush={(hex: string, size: number): void => {
+          store.setActiveTool("draw");
+          store.setBrushColor(hex);
+          store.setBrushSize(size);
+        }}
+        onEraser={(size: number): void => {
+          store.setActiveTool("eraser");
+          store.setBrushSize(size);
+        }}
+        onCanvasBackground={(hex: string): void => {
+          console.log("Canvas background activated", { color: hex });
+          // Add background change logic here
+          // TODO: minor bug needs to update the preview panel
+          // Debounce also causes issues with real time color change.
+          store.setFillColor(hex);
+        }}
+        onGenerateImage={(): void => {
+          console.log("Generate image activated");
+          // Add image generation logic here
+        }}
+        onUploadImage={(): void => {
+          // Create input element dynamically like in PromptEditor
+          const input = document.createElement("input");
+          input.type = "file";
+          input.accept = "image/*";
+          input.multiple = true; // Allow multiple file selection
+          input.onchange = (e: Event) => {
+            const target = e.target as HTMLInputElement;
+            if (target.files) {
+              const files = Array.from(target.files);
+              const imageFiles = files.filter((file) =>
+                file.type.startsWith("image/"),
+              );
+
+              if (imageFiles.length > 0) {
+                handleImageUpload(imageFiles);
+              }
+            }
+          };
+          input.click();
+        }}
+        onDelete={(): void => {
+          // This onDelete prop for SideToolbar might still be needed for the button
+          store.deleteSelectedItems();
+        }}
+        activeToolId={store.activeTool}
+      />
+      <div className="relative z-0">
+        <PaintSurface
+          nodes={store.nodes}
+          selectedNodeIds={store.selectedNodeIds}
+          onCanvasSizeChange={(width: number, height: number): void => {
+            canvasWidth.current = width;
+            canvasHeight.current = height;
+          }}
+          fillColor={store.fillColor}
+          activeTool={store.activeTool}
+          brushColor={store.brushColor}
+          brushSize={store.brushSize}
+          onSelectionChange={setIsSelecting}
+          stageRef={stageRef}
+          transformerRefs={transformerRefs}
+        />
+      </div>
+      <div className="absolute bottom-6 left-6 z-20 flex items-center gap-2">
+        <PopoverMenu
+          items={modelList}
+          onSelect={handleModelSelect}
+          mode="hoverSelect"
+          panelTitle="Select Model"
+          panelClassName="min-w-[280px]"
+          buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-white/80 hover:text-white"
+          showIconsInList
+          triggerLabel="Model"
+        />
+      </div>
+    </>
+  );
+};
+
+export default PageDraw;

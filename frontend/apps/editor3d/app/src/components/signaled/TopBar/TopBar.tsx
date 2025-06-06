@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import {  useState } from "react";
 import {
   faGear,
   faImages,
@@ -23,21 +23,18 @@ import {
   MenuIconSelector,
   MenuIconItem,
 } from "@storyteller/ui-menu-icon-selector";
-import { Signal, signal } from "@preact/signals-react";
+import {  signal } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
 import { setLogoutStates } from "~/signals/authentication/utilities";
-import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTabStore } from "~/pages/Stores/TabState";
+import { set3DPageMounted } from "~/pages/PageEnigma/Editor/editor";
 interface Props {
   pageName: string;
-  appTabIdSignal: Signal<string>;
-  setAppTabId: (id: string) => void;
-  is3DInitSignal: Signal<boolean>;
 }
 
-// This is the tab we start with.
-export const STARTING_APP_TAB_ID = "2D";
+
 
 const appMenuTabs: MenuIconItem[] = [
   {
@@ -66,64 +63,18 @@ export const topNavMediaId = signal<string>("");
 export const topNavMediaUrl = signal<string>("");
 
 export const TopBar = ({
-  pageName,
-  appTabIdSignal,
-  setAppTabId,
+  pageName
 }: Props) => {
   useSignals();
 
-  const editorEngine = useContext(EngineContext);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-
-  const [url, setUrl] = useState<string>("");
-  const [mediaId, setMediaId] = useState<string>("");
-
-  const engine3D = useContext(EngineContext);
-  const handleTabChange = (tabId: string) => {
-    setAppTabId(tabId);
-  };
-
-  const currentAppTabId = appTabIdSignal.value;
-
-  const handleAddToScene = async (
-    url: string,
-    media_id: string | undefined,
-  ) => {
-    console.log("Items to add to scene", currentAppTabId);
-    console.log("url", url);
-    console.log("media_id", media_id);
-
-    setUrl(url);
-    setMediaId(media_id ?? "");
-
-    if (currentAppTabId === "2D") {
-      console.log("Adding to 2D scene");
-      // from the uploaded image url.
-    } else if (currentAppTabId === "3D") {
-      console.log("Adding to 3D scene");
-      // media id from the image selected from gallery.
-      if (media_id) {
-        engine3D?.activeScene.loadObject(media_id, "image", true);
-      } else {
-        console.warn("No media id provided");
-      }
-    } else if (currentAppTabId === "VIDEO") {
-      console.log("Adding to Video scene");
-      topNavMediaId.value = media_id ?? "";
-      topNavMediaUrl.value = url;
-    } else if (currentAppTabId === "IMAGE") {
-      console.log("Adding to Image scene");
-      topNavMediaId.value = media_id ?? "";
-      topNavMediaUrl.value = url;
-    } else {
-      console.warn(`Unknown tab type: ${currentAppTabId}`);
-    }
-  };
 
   const handleOpenGalleryModal = () => {
     galleryModalVisibleViewMode.value = true;
     galleryModalVisibleDuringDrag.value = true;
   };
+  
+  const tabStore = useTabStore();
 
   return (
     <>
@@ -143,21 +94,31 @@ export const TopBar = ({
             </a>
             <MenuIconSelector
               menuItems={appMenuTabs}
-              activeMenu={appTabIdSignal.value}
+              activeMenu={tabStore.activeTabId}
               disabled={false}
-              onMenuChange={handleTabChange}
+              onMenuChange={(tabId) => {
+                // Disable 3d engine to prevent memory leak.
+                if (tabId === "3D") {
+                  set3DPageMounted(true);
+                } else {
+                  set3DPageMounted(false);
+                }
+                useTabStore
+                  .getState()
+                  .setActiveTab(tabId);
+              }}
               className="w-fit"
             />
           </div>
 
           <div className="flex items-center justify-center gap-2 font-medium">
-            {currentAppTabId === "3D" ? (
+            {tabStore.activeTabId === "3D" ? (
               <SceneTitleInput pageName={pageName} />
             ) : (
               <h1>
-                {currentAppTabId === "2D"
+                {tabStore.activeTabId === "2D"
                   ? "Canvas"
-                  : currentAppTabId === "VIDEO"
+                  : tabStore.activeTabId === "VIDEO"
                     ? "Generate Video"
                     : "Generate Image"}
               </h1>
@@ -200,7 +161,6 @@ export const TopBar = ({
       <GalleryModal
         mode="view"
         onDownloadClicked={downloadFileFromUrl}
-        onAddToSceneClicked={handleAddToScene}
       />
     </>
   );

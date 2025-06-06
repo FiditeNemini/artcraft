@@ -31,14 +31,8 @@ import { PopoverItem } from "@storyteller/ui-popover";
 import { LoadingDots } from "@storyteller/ui-loading";
 import { OnboardingHelper } from "./comps/OnboardingHelper";
 import { FocalLengthDisplay } from "./comps/FocalLengthDisplay/FocalLengthDisplay";
-import {
-  appTabId,
-  is3DEditorInitialized,
-  set3DPageMounted,
-  setAppTabId,
-} from "~/signals/appTab";
-import { KonvaCanvasContainer } from "../Page2d/KonvaCanvasContainer";
-import { KonvaRootComponent } from "../Page2d/KonvaRootComponent";
+
+
 import {
   addCamera,
   cameras,
@@ -53,10 +47,7 @@ import { EngineContext } from "./contexts/EngineContext";
 import Queue, { QueueNames } from "./Queue";
 import { toEngineActions } from "./Queue/toEngineActions";
 import { UnionedDataTypes } from "./Queue/Queue";
-import { LoginModal } from "@storyteller/ui-login-modal";
-import { DomLevels } from "./signals/hotkeys";
-import { AUTH_STATUS } from "../../enums/authentication";
-import { authentication } from "../../signals/authentication/authentication";
+
 import {
   topNavMediaId,
   topNavMediaUrl,
@@ -82,9 +73,14 @@ import {
   // useModelSelectorStore,
 } from "@storyteller/ui-model-selector";
 
+import PageDraw from "../PageDraw/PageDraw";
+import { useTabStore } from "../Stores/TabState";
+
+
 export const PageEditor = () => {
   useSignals();
 
+  const tabStore = useTabStore();
   const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
   };
@@ -268,13 +264,13 @@ export const PageEditor = () => {
       data: newRatio,
     });
   };
-
+  // MOVE THIS don't throw this in here
   // Image drop from gallery/library modal logic
   useEffect(() => {
     let handler: unknown;
-
     // 3D Drag and Drop Logic
-    if (appTabId.value === "3D") {
+   
+    if (tabStore.activeTabId === "3D") {
       handler = onImageDrop(
         (item: GalleryItem, position: { x: number; y: number }) => {
           console.log("3D Drop debug (event):", {
@@ -332,7 +328,7 @@ export const PageEditor = () => {
       );
 
       // 2D Drag and Drop Logic
-    } else if (appTabId.value === "2D") {
+    } else if (tabStore.activeTabId === "2D") {
       handler = onImageDrop(
         (item: GalleryItem, position: { x: number; y: number }) => {
           // ...2D drop logic... - TODO FOR MICHAEL
@@ -346,34 +342,18 @@ export const PageEditor = () => {
       if (handler) removeImageDropListener(handler as any);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appTabId.value, editorEngine]);
+  }, [tabStore.activeTabId, editorEngine]);
 
-  const display3d = appTabId.value === "3D";
-  const display2d = appTabId.value === "2D";
-  const displayVideo = appTabId.value === "VIDEO";
-  const displayImage = appTabId.value === "IMAGE";
 
-  const is3DInit = is3DEditorInitialized.value;
-  const currentAppTabId = appTabId.value;
-  useEffect(() => {
-    if (currentAppTabId !== "3D") {
-      set3DPageMounted(false);
-      return;
-    }
-
-    set3DPageMounted(true);
-  }, [currentAppTabId, editorEngine, is3DInit]);
 
   return (
     <div className="w-screen">
       <TopBar
         pageName="Edit Scene"
-        appTabIdSignal={appTabId}
-        setAppTabId={setAppTabId}
-        is3DInitSignal={is3DEditorInitialized}
+      
       />
-      {display3d && (
-        <>
+      {tabStore.activeTabId == "3D" && (
+        <div>
           <OnboardingHelper />
 
           <div
@@ -481,16 +461,14 @@ export const PageEditor = () => {
               </div>
             </div>
           </div>
-        </>
+        </div>
       )}
-
-      {display2d && (
-        <KonvaCanvasContainer>
-          <KonvaRootComponent className="h-full w-full" />
-        </KonvaCanvasContainer>
+      {tabStore.activeTabId == "2D" && (
+        <div>
+          <PageDraw />
+        </div>
       )}
-
-      {displayVideo && (
+      {tabStore.activeTabId == "IMAGE" && (
         <div>
           <ImageToVideo
             imageMediaId={topNavMediaId.value}
@@ -498,8 +476,7 @@ export const PageEditor = () => {
           />
         </div>
       )}
-
-      {displayImage && (
+      {tabStore.activeTabId == "VIDEO" && (
         <div>
           <TextToImage
             imageMediaId={topNavMediaId.value}
@@ -508,7 +485,7 @@ export const PageEditor = () => {
         </div>
       )}
 
-      <LoginModal
+      {/*<LoginModal
         onClose={() => {}}
         videoSrc2D="/resources/videos/artcraft-canvas-demo.mp4"
         videoSrc3D="/resources/videos/artcraft-3d-demo.mp4"
@@ -524,7 +501,7 @@ export const PageEditor = () => {
           authentication.status.value = AUTH_STATUS.LOGGED_IN;
           authentication.userInfo.value = userInfo;
         }}
-      />
+      /> */}
     </div>
   );
-};
+}; 
