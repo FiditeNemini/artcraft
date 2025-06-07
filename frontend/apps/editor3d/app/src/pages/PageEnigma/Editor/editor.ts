@@ -50,27 +50,35 @@ import { SceneManager } from "./scene_manager_api";
 import { CustomOutlinePass } from "./CustomOutlinePass.js";
 import FindSurfaces from "./FindSurfaces.js";
 
-
 import Stats from "three/examples/jsm/libs/stats.module.js";
 import { CharacterAnimationEngine } from "./Engines/CharacterAnimationEngine";
 import { cameras, selectedCameraId } from "~/pages/PageEnigma/signals/camera";
-
 
 export type EditorInitializeConfig = {
   sceneToken: string;
   editorCanvasEl: HTMLCanvasElement;
   camViewCanvasEl: HTMLCanvasElement;
   sceneContainerEl: HTMLDivElement;
+  cacheJsonString?: string;
 };
 
-// ONLY USED IN THIS CLASS 
+// ONLY USED IN THIS CLASS
+// Need this one to ensure the canvas is inflated and non-zero sized
 const is3DPageMounted = signal(false);
 export const set3DPageMounted = (isMounted: boolean) => {
   is3DPageMounted.value = isMounted;
-}
+};
+
+// Need this one to know when the engine has initialized (but not necessarily loaded saves)
 export const is3DEditorInitialized = signal(false);
 export const setIs3DEditorInitialized = (isInitialized: boolean) => {
   is3DEditorInitialized.value = isInitialized;
+};
+
+// Need this one to know when the engine is done loading stuff into the scene for display
+export const is3DSceneLoaded = signal(false);
+export const setIs3DSceneLoaded = (isLoaded: boolean) => {
+  is3DSceneLoaded.value = isLoaded;
 };
 
 class Editor {
@@ -333,9 +341,7 @@ class Editor {
 
     // set image type at this stage
 
-
     this.renderIndex = 0;
-
   }
 
   // Add helper method to convert focal length to FOV
@@ -400,7 +406,7 @@ class Editor {
   }
   updateSceneContainer(newContainer: HTMLDivElement) {
     this.container = newContainer;
-    this.containerResizeObserver?.disconnect()
+    this.containerResizeObserver?.disconnect();
     this.containerResizeObserver?.observe(this.container);
   }
   engineCanvasMayReset() {
@@ -462,6 +468,7 @@ class Editor {
     editorCanvasEl,
     camViewCanvasEl,
     sceneContainerEl,
+    cacheJsonString: cacheJson = "",
   }: EditorInitializeConfig) {
     if (!this.can_initialize) {
       console.log("Reinitializing 3D editor");
@@ -662,8 +669,15 @@ class Editor {
     // Attach freecam state controller
     this.mouseOverEventHandler = this.mouseOverEventHandler.bind(this);
 
-    if (!this.utils.isEmpty(sceneToken)) {
-      this.loadScene(sceneToken);
+    const onloadCallback = () => {
+      console.log("Setting Scene is loaded");
+      setIs3DSceneLoaded(true);
+    };
+
+    if (!this.utils.isEmpty(cacheJson)) {
+      this.loadCache(cacheJson).then(onloadCallback);
+    } else if (!this.utils.isEmpty(sceneToken)) {
+      this.loadScene(sceneToken).then(onloadCallback);
     } else {
       signalScene({
         title: "Untitled New Scene",
@@ -671,6 +685,7 @@ class Editor {
         ownerToken: authentication.userInfo.value?.user_token,
         isModified: false,
       });
+      onloadCallback();
     }
 
     this._configurePostProcessingRaw();
@@ -917,6 +932,10 @@ class Editor {
     }
   }
 
+  public async loadCache(cacheJson: string) {
+    await this.save_manager.loadCache(cacheJson);
+  }
+
   public async loadScene(scene_media_token: string) {
     await this.save_manager.loadScene(scene_media_token);
 
@@ -977,6 +996,20 @@ class Editor {
     return await this.save_manager.saveScene({
       sceneTitle: sceneTitle,
       sceneToken: sceneToken,
+      sceneGenerationMetadata: sceneGenerationMetadata,
+    });
+  }
+
+  public cacheScene({
+    sceneTitle,
+    sceneToken,
+    sceneGenerationMetadata,
+  }: {
+    sceneTitle: string;
+    sceneToken: string;
+    sceneGenerationMetadata: SceneGenereationMetaData;
+  }) {
+    return this.save_manager.getSceneJson({
       sceneGenerationMetadata: sceneGenerationMetadata,
     });
   }
@@ -1183,10 +1216,10 @@ class Editor {
             : this.render_camera_aspect_ratio === meraAspectRatio.VERTICAL_9_16
               ? 576
               : this.render_camera_aspect_ratio ===
-                meraAspectRatio.HORIZONTAL_3_2
+                  meraAspectRatio.HORIZONTAL_3_2
                 ? 900
                 : this.render_camera_aspect_ratio ===
-                  meraAspectRatio.VERTICAL_2_3
+                    meraAspectRatio.VERTICAL_2_3
                   ? 600
                   : 1000;
         const height =
@@ -1195,10 +1228,10 @@ class Editor {
             : this.render_camera_aspect_ratio === meraAspectRatio.VERTICAL_9_16
               ? 1024
               : this.render_camera_aspect_ratio ===
-                meraAspectRatio.HORIZONTAL_3_2
+                  meraAspectRatio.HORIZONTAL_3_2
                 ? 600
                 : this.render_camera_aspect_ratio ===
-                  meraAspectRatio.VERTICAL_2_3
+                    meraAspectRatio.VERTICAL_2_3
                   ? 900
                   : 1000;
 
@@ -1260,7 +1293,6 @@ class Editor {
           // TODO BUG with the main loop,that sends multiple zip requests.
           console.log(`COLLECTING COLOR FRAMES COUNTED: ${this.renderIndex}`);
           await this.engineFrameBuffers.collectColorFrames(this.renderIndex);
-
 
           this.renderIndex = 0;
           console.time("Stop Playback And Upload Video Time");
@@ -1467,11 +1499,20 @@ class Editor {
   }
 
   unmountEngine() {
+    setIs3DSceneLoaded(false);
     this.stopRenderLoop();
     this.sceneManager?.detachEventListeners();
     this.disableFreeCamControls();
     this.cameraViewControls?.detachEventListeners();
+
+    // Fix: dispose 3D contexts
+    this.renderer?.dispose();
+    this.composer?.dispose();
+    this.render_composer?.dispose();
+    this.rawRenderer?.dispose();
+
     this.isMounted = false;
+    setIs3DEditorInitialized(false);
     console.log("3D Editor Engine unmounted");
   }
 
