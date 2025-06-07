@@ -1,9 +1,10 @@
+use crate::core::commands::enqueue::image::handle_fal::handle_fal;
+use crate::core::commands::enqueue::image::handle_sora::handle_sora;
+use crate::core::commands::enqueue::object::handle_object_fal::handle_object_fal;
+use crate::core::commands::enqueue::object::internal_object_error::InternalObjectError;
 use crate::core::commands::response::failure_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus};
 use crate::core::commands::response::shorthand::Response;
-use crate::core::events::basic_sendable_event_trait::BasicSendableEvent;
-use crate::core::events::generation_events::common::{GenerationAction, GenerationServiceProvider};
-use crate::core::events::generation_events::generation_enqueue_failure_event::GenerationEnqueueFailureEvent;
-use crate::core::events::generation_events::generation_enqueue_success_event::GenerationEnqueueSuccessEvent;
+use crate::core::commands::response::success_response_wrapper::SerializeMarker;
 use crate::core::events::sendable_event_trait::SendableEvent;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
 use crate::core::state::data_dir::trait_data_subdir::DataSubdir;
@@ -24,7 +25,8 @@ use base64::prelude::BASE64_STANDARD;
 use base64::{DecodeError, Engine};
 use errors::{AnyhowError, AnyhowResult};
 use fal_client::error::fal_error_plus::FalErrorPlus;
-use fal_client::requests::queue::enqueue_hunyuan2_image_to_3d::{enqueue_hunyuan2_image_to_3d, Hunyuan2Args};
+use fal_client::requests::queue::image_gen::enqueue_flux_pro_ultra_text_to_image::{enqueue_flux_pro_ultra_text_to_image, FluxProUltraTextToImageArgs};
+use fal_client::requests::queue::image_gen::enqueue_recraft3_text_to_image::{enqueue_recraft3_text_to_image, Recraft3TextToImageArgs};
 use filesys::file_read_bytes::file_read_bytes;
 use image::codecs::png::{CompressionType, FilterType, PngEncoder};
 use image::{DynamicImage, EncodableLayout, ImageReader};
@@ -55,171 +57,122 @@ use storyteller_client::utils::api_host::ApiHost;
 use tauri::{AppHandle, Emitter, Manager, State};
 use tempfile::NamedTempFile;
 use tokens::tokens::media_files::MediaFileToken;
+use crate::core::commands::enqueue::object::handle_object_artcraft::handle_object_artcraft;
 
 #[derive(Deserialize)]
-pub struct FalHunyuanImageTo3dRequest {
+pub struct EnqueueImageTo3dObjectRequest {
   /// Image media file; the image to remove the background from.
+  /// TODO: In the future we may support base64 images, URLs, or file paths here.
   pub image_media_token: Option<MediaFileToken>,
-
-  /// Base64-encoded image
-  pub base64_image: Option<String>,
+  
+  /// The model to use.
+  pub model: Option<EnqueueImageTo3dObjectModel>,
 }
+
+#[derive(Deserialize, Debug, Copy, Clone)]
+#[serde(rename_all = "snake_case")]
+pub enum EnqueueImageTo3dObjectModel {
+  #[serde(rename = "hunyuan_3d_2")]
+  Hunyuan3d2,
+}
+
+#[derive(Serialize)]
+pub struct EnqueueImageTo3dObjectSuccessResponse {
+}
+
+impl SerializeMarker for EnqueueImageTo3dObjectSuccessResponse {}
 
 #[derive(Serialize, Debug)]
 #[serde(rename_all = "snake_case")]
-pub enum HunyuanErrorType {
+pub enum EnqueueImageTo3dObjectErrorType {
+  /// Caller didn't specify a model
+  ModelNotSpecified,
   /// Generic server error
   ServerError,
   /// No Fal API key available
   NeedsFalApiKey,
+  /// Fal had an API error
+  FalError,
+  /// Needs to be logged into Artcraft
+  NeedsStorytellerCredentials,
 }
 
-
 #[tauri::command]
-pub async fn fal_hunyuan_image_to_3d_command(
+pub async fn enqueue_image_to_3d_object_command(
   app: AppHandle,
-  request: FalHunyuanImageTo3dRequest,
+  request: EnqueueImageTo3dObjectRequest,
   app_data_root: State<'_, AppDataRoot>,
   fal_creds_manager: State<'_, FalCredentialManager>,
-  storyteller_creds_manager: State<'_, StorytellerCredentialManager>,
   fal_task_queue: State<'_, FalTaskQueue>,
-) -> Response<(), HunyuanErrorType, ()> {
+  storyteller_creds_manager: State<'_, StorytellerCredentialManager>,
+  sora_task_queue: State<'_, SoraTaskQueue>,
+) -> Response<EnqueueImageTo3dObjectSuccessResponse, EnqueueImageTo3dObjectErrorType, ()> {
 
-  info!("fal_hunyuan_image_to_3d_command called; image media token: {:?}", request.image_media_token);
+  info!("enqueue_image_to_3d_object_command called");
 
-  let has_credentials = fal_creds_manager
-      .has_apparent_api_token()
-      .unwrap_or(true); // NB: Failures would be lock issues
-
-  if !has_credentials {
-    warn!("No API key found");
-    return Err(CommandErrorResponseWrapper {
-      status: CommandErrorStatus::Unauthorized,
-      error_message: Some("You need to set a FAL api key".to_string()),
-      error_type: Some(HunyuanErrorType::NeedsFalApiKey),
-      error_details: None,
-    });
-  }
-
-  let result = image_to_3d(
+  let result = handle_request(
+    &app,
     request,
     &app_data_root,
     &fal_creds_manager,
     &storyteller_creds_manager,
     &fal_task_queue,
   ).await;
-  
-  if let Err(err) = result {
-    error!("error: {:?}", err);
 
-    let event = GenerationEnqueueFailureEvent {
-      action: GenerationAction::ImageTo3d,
-      service: GenerationServiceProvider::Fal,
-      model: None,
-      reason: None,
-    };
+  match result {
+    Err(err) => {
+      error!("error: {:?}", err);
 
-    if let Err(err) = event.send(&app) {
-      error!("Failed to emit event: {:?}", err); // Fail open.
+      let mut status = CommandErrorStatus::ServerError;
+      let mut error_type = EnqueueImageTo3dObjectErrorType::ServerError;
+      let mut error_message = "A server error occurred. Please try again. If it continues, please tell our staff about the problem.";
+
+      match err {
+        InternalObjectError::NoModelSpecified => {
+          status = CommandErrorStatus::BadRequest;
+          error_type = EnqueueImageTo3dObjectErrorType::ModelNotSpecified;
+          error_message = "No model specified for image generation";
+        }
+        InternalObjectError::NeedsFalApiKey => {
+          status = CommandErrorStatus::Unauthorized;
+          error_type = EnqueueImageTo3dObjectErrorType::NeedsFalApiKey;
+          error_message = "You need to set a FAL api key";
+        },
+        InternalObjectError::NeedsStorytellerCredentials => {
+          status = CommandErrorStatus::Unauthorized;
+          error_type = EnqueueImageTo3dObjectErrorType::NeedsStorytellerCredentials;
+          error_message = "You need to be logged into Artcraft.";
+        }
+        _ => {}, // Fall-through
+      }
+
+      Err(CommandErrorResponseWrapper {
+        status,
+        error_message: Some(error_message.to_string()),
+        error_type: Some(error_type),
+        error_details: None,
+      })
     }
-
-    let mut status = CommandErrorStatus::ServerError;
-    let mut error_type = HunyuanErrorType::ServerError;
-    let mut error_message = "A server error occurred. Please try again. If it continues, please tell our staff about the problem.";
-
-    return Err(CommandErrorResponseWrapper {
-      status,
-      error_message: Some(error_message.to_string()),
-      error_type: Some(error_type),
-      error_details: None,
-    })
-  }
-
-  let event = GenerationEnqueueSuccessEvent {
-    action: GenerationAction::ImageTo3d,
-    service: GenerationServiceProvider::Fal,
-    model: None,
-  };
-
-  if let Err(err) = event.send(&app) {
-    error!("Failed to emit event: {:?}", err); // Fail open.
-  }
-
-  Ok(().into())
-}
-
-#[derive(Debug)]
-enum InnerError {
-  FalError(FalErrorPlus),
-  AnyhowError(AnyhowError),
-  StorytellerApiError(ApiError),
-  DecodeError(DecodeError),
-  IoError(std::io::Error),
-}
-
-impl From<AnyhowError> for InnerError {
-  fn from(value: AnyhowError) -> Self {
-    Self::AnyhowError(value)
+    Ok(()) => {
+      Ok(EnqueueImageTo3dObjectSuccessResponse {}.into())
+    }
   }
 }
 
-impl From<FalErrorPlus> for InnerError {
-  fn from(value: FalErrorPlus) -> Self {
-    Self::FalError(value)
-  }
-}
 
-impl From<ApiError> for InnerError {
-  fn from(value: ApiError) -> Self {
-    Self::StorytellerApiError(value)
-  }
-}
-
-impl From<DecodeError> for InnerError {
-  fn from(value: DecodeError) -> Self {
-    Self::DecodeError(value)
-  }
-}
-
-impl From<std::io::Error> for InnerError {
-  fn from(value: std::io::Error) -> Self {
-    Self::IoError(value)
-  }
-}
-
-pub async fn image_to_3d(
-  request: FalHunyuanImageTo3dRequest,
+pub async fn handle_request(
+  app: &AppHandle,
+  request: EnqueueImageTo3dObjectRequest,
   app_data_root: &AppDataRoot,
   fal_creds_manager: &FalCredentialManager,
   storyteller_creds_manager: &StorytellerCredentialManager,
   fal_task_queue: &FalTaskQueue,
-) -> Result<(), InnerError> {
+) -> Result<(), InternalObjectError> {
 
-  let api_key = fal_creds_manager.get_key_required()?;
-
-  let mut temp_download;
-
-  if let Some(media_token) = request.image_media_token {
-    temp_download = download_media_file_to_temp_dir(&app_data_root, &media_token).await?;
-
-  } else if let Some(base64_bytes) = request.base64_image {
-    temp_download = save_base64_image_to_temp_dir(&app_data_root, base64_bytes).await?;
+  if fal_creds_manager.has_apparent_api_token()? {
+    handle_object_fal(&app, app_data_root, request, fal_creds_manager, fal_task_queue).await?;
   } else {
-    return Err(InnerError::AnyhowError(anyhow!("No image media token or base64 image provided")));
-  }
-
-  info!("Calling FAL image to 3d ...");
-
-  let filename = temp_download.path().to_path_buf();
-
-  let enqueued = enqueue_hunyuan2_image_to_3d(Hunyuan2Args {
-    image_path: filename,
-    api_key: &api_key,
-  }).await?;
-
-  if let Err(err) = fal_task_queue.insert(&enqueued) {
-    error!("Failed to enqueue task: {:?}", err);
-    return Err(InnerError::AnyhowError(anyhow!("Failed to enqueue task: {:?}", err)));
+    handle_object_artcraft(request, &app, app_data_root, storyteller_creds_manager).await?;
   }
 
   Ok(())
