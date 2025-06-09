@@ -13,6 +13,8 @@ import {
   faSparkles,
   faFileImport,
   faFileExport,
+  faUndo,
+  faRedo
 } from "@fortawesome/pro-solid-svg-icons";
 import "../../App.css";
 import { HsvaColorPicker, HsvaColor } from "react-colorful";
@@ -40,7 +42,7 @@ function useDebounced<T extends (...args: A) => void, A extends unknown[]>(
 export interface SideToolbarProps {
   onSelect: () => void;
   onAddShape: (shape: "rectangle" | "circle" | "triangle") => void;
-  onPaintBrush: (hex: string, size: number) => void;
+  onPaintBrush: (hex: string, size: number,opacity: number) => void;
   onEraser: (size: number) => void;
   onCanvasBackground: (hex: string) => void;
   onGenerateImage: () => void;
@@ -72,6 +74,7 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
     v: 100,
     a: 1,
   });
+
   const [bgHsva, setBgHsva] = useState<HsvaColor>({
     h: 0,
     s: 100,
@@ -81,9 +84,11 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
 
   /* debounced parent calls */
   const sendPaint = useDebounced<
-    (hex: string, size: number) => void,
-    [string, number]
-  >(onPaintBrush, 75);
+    (hex: string, size: number, opacity: number) => void,
+    [string, number, number]
+  >(onPaintBrush, 75, 1);
+
+
   const sendBg = useDebounced<(hex: string) => void, [string]>(
     onCanvasBackground,
     75,
@@ -117,7 +122,8 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
   const BrushPopout = makePicker(
     brushHsva,
     setBrushHsva,
-    (hex) => sendPaint(hex, brushSize),
+    (hex) => sendPaint(hex, brushSize, brushHsva.a),
+    
     <>
       <div className="relative">
         <p className="mb-2 text-sm font-medium text-white">Brush Size</p>
@@ -125,7 +131,7 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
           value={brushSize}
           onChange={(size) => {
             setBrushSize(size);
-            sendPaint(hsvaToHex(brushHsva), size);
+            sendPaint(hsvaToHex(brushHsva), size, brushHsva.a);
           }}
           min={1}
           max={64}
@@ -179,14 +185,14 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
         </div>
       ),
     },
-    {
-      id: "generate",
-      label: "Generate Image",
-      icon: <FontAwesomeIcon icon={faSparkles} className="h-5 w-5" />,
-      onClick: () => {
-        onGenerateImage();
-      },
-    },
+    // {
+    //   id: "generate",
+    //   label: "Generate Image",
+    //   icon: <FontAwesomeIcon icon={faSparkles} className="h-5 w-5" />,
+    //   onClick: () => {
+    //     onGenerateImage();
+    //   },
+    // },
     {
       id: "upload",
       label: "Upload Image",
@@ -206,7 +212,7 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
         />
       ),
       onClick: () => {
-        sendPaint(hsvaToHex(brushHsva), brushSize);
+        sendPaint(hsvaToHex(brushHsva), brushSize, brushHsva.a);
       },
       popout: BrushPopout,
     },
@@ -251,35 +257,51 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
       popout: BgPopout,
     },
     {
-      id: "save-scene",
-      label: "Save Scene",
-      icon: <FontAwesomeIcon icon={faFileExport} className="h-5 w-5" />,
+      id: "undo",
+      label: "Undo",
+      icon: <FontAwesomeIcon icon={faUndo} className="h-5 w-5" />,
       onClick: () => {
-        store.saveSceneToFile();
+        store.undo(); // Assuming store has an undo method
       },
     },
     {
-      id: "load-scene",
-      label: "Load Scene",
-      icon: <FontAwesomeIcon icon={faFileImport} className="h-5 w-5" />,
+      id: "redo",
+      label: "Redo",
+      icon: <FontAwesomeIcon icon={faRedo} className="h-5 w-5" />,
       onClick: () => {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = ".json";
-        input.onchange = async (e: Event) => {
-          const target = e.target as HTMLInputElement;
-          if (target.files && target.files[0]) {
-            const success = await store.loadSceneFromFile(target.files[0]);
-            if (success) {
-              console.log("Scene loaded successfully");
-            } else {
-              console.error("Failed to load scene");
-            }
-          }
-        };
-        input.click();
+        store.redo(); // Assuming store has a redo method
       },
     },
+    // {
+    //   id: "save-scene",
+    //   label: "Save Scene",
+    //   icon: <FontAwesomeIcon icon={faFileExport} className="h-5 w-5" />,
+    //   onClick: () => {
+    //     store.saveSceneToFile();
+    //   },
+    // },
+    // {
+    //   id: "load-scene",
+    //   label: "Load Scene",
+    //   icon: <FontAwesomeIcon icon={faFileImport} className="h-5 w-5" />,
+    //   onClick: () => {
+    //     const input = document.createElement("input");
+    //     input.type = "file";
+    //     input.accept = ".json";
+    //     input.onchange = async (e: Event) => {
+    //       const target = e.target as HTMLInputElement;
+    //       if (target.files && target.files[0]) {
+    //         const success = await store.loadSceneFromFile(target.files[0]);
+    //         if (success) {
+    //           console.log("Scene loaded successfully");
+    //         } else {
+    //           console.error("Failed to load scene");
+    //         }
+    //       }
+    //     };
+    //     input.click();
+    //   },
+    // },
   ];
 
   /* ------------------------------------------------ render ---------- */
