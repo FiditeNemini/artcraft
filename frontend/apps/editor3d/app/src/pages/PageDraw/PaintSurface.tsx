@@ -774,6 +774,7 @@ export const PaintSurface = ({
             rotation={lineNode.rotation || 0}
             offsetX={lineNode.offsetX || 0}
             offsetY={lineNode.offsetY || 0}
+            zIndex={lineNode.zIndex}
           />
           {renderTransformer()}
         </React.Fragment>
@@ -791,12 +792,13 @@ export const PaintSurface = ({
             height={node.height}
             fill={node.fill}
             stroke={node.stroke}
-            strokeWidth={node.strokeWidth}
+            strokeWidth={0}
             rotation={node.rotation || 0}
             scaleX={node.scaleX || 1}
             scaleY={node.scaleY || 1}
             offsetX={node.offsetX || 0}
             offsetY={node.offsetY || 0}
+            zIndex={node.zIndex}
             draggable={draggableIfToolsNotActive(activeTool, node.draggable)}
             onMouseDown={(e) => handleNodeMouseDown(e, node.id)}
             onTap={(e) => handleNodeMouseDown(e, node.id)}
@@ -822,12 +824,13 @@ export const PaintSurface = ({
             height={node.height}
             fill={node.fill}
             stroke={node.stroke}
-            strokeWidth={node.strokeWidth}
+            strokeWidth={0}
             rotation={node.rotation || 0}
             scaleX={node.scaleX || 1}
             scaleY={node.scaleY || 1}
             offsetX={node.offsetX || 0}
             offsetY={node.offsetY || 0}
+            zIndex={node.zIndex}
             draggable={draggableIfToolsNotActive(activeTool, node.draggable)}
             onMouseDown={(e) => handleNodeMouseDown(e, node.id)}
             onTap={(e) => handleNodeMouseDown(e, node.id)}
@@ -853,12 +856,13 @@ export const PaintSurface = ({
             radius={Math.min(node.width, node.height) / 2}
             fill={node.fill}
             stroke={node.stroke}
-            strokeWidth={node.strokeWidth}
+            strokeWidth={0}
             rotation={node.rotation || 0}
             scaleX={node.scaleX || 1}
             scaleY={node.scaleY || 1}
             offsetX={node.offsetX || 0}
             offsetY={node.offsetY || 0}
+            zIndex={node.zIndex}
             draggable={draggableIfToolsNotActive(activeTool, node.draggable)}
             onMouseDown={(e) => handleNodeMouseDown(e, node.id)}
             onTap={(e) => handleNodeMouseDown(e, node.id)}
@@ -892,6 +896,7 @@ export const PaintSurface = ({
               offsetX={node.offsetX || 0}
               offsetY={node.offsetY || 0}
               listening={false}
+              zIndex={node.zIndex}
             />
           )}
           <Image
@@ -999,7 +1004,12 @@ export const PaintSurface = ({
               />
 
               {/* Render all nodes including line nodes */}
-              {[...nodes, ...store.lineNodes].map((node) => renderNode(node))}
+              {[...nodes, ...store.lineNodes]
+                .sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0))
+                .map((node, index) => {
+                // console.log(`Node ${index}:`, node);
+                return renderNode(node);
+              })}
 
               {/* Render selection rectangle */}
               {selectionRect && (

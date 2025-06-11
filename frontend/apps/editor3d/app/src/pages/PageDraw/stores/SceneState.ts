@@ -17,6 +17,7 @@ export type LineNode = {
   scaleY?: number;
   offsetX?: number;
   offsetY?: number;
+  zIndex: number;
 };
 
 export type ActiveTool = 'select' | 'draw' | 'eraser' | 'backgroundColor' | 'shape';
@@ -103,6 +104,12 @@ interface SceneState {
   // Add these two properties
   serializeSceneToString: () => Promise<string>;
   loadSceneFromString: (jsonString: string) => boolean;
+
+  // New functions
+  bringToFront: (nodeIds: string[]) => void;
+  sendToBack: (nodeIds: string[]) => void;
+  bringForward: (nodeIds: string[]) => void;
+  sendBackward: (nodeIds: string[]) => void;
 }
 
 const generateId = (): string => {
@@ -111,6 +118,22 @@ const generateId = (): string => {
 
 // Add a flag to prevent saving state during restoration
 let isRestoring = false;
+
+// Add this helper function at the top of the store (before create<SceneState>)
+const getNextZIndex = (nodes: Node[], lineNodes: LineNode[]): number => {
+  const allZIndices = [
+    ...nodes.map((n, index) => {
+      //console.log(`Node: ${JSON.stringify(n)}, Index: ${index}`);
+      return n.zIndex || 0;
+    }),
+    ...lineNodes.map((n, index) => {
+      //console.log(`LineNode: ${JSON.stringify(n)}, Index: ${index}`);
+      return n.zIndex || 0;
+    })
+  ];
+
+  return allZIndices.length > 0 ? Math.max(...allZIndices) + 1 : 0;
+};
 
 export const useSceneStore = create<SceneState>((set, get) => ({
   // Initial state
@@ -135,8 +158,17 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   // Actions
   addNode: (node: Node) => {
     set((state) => {
-      const newNodes = [...state.nodes, node];
-      return { nodes: newNodes };
+      const nextZ = getNextZIndex(state.nodes, state.lineNodes);
+      console.log(`NextZ for node ID ${node.id}: ${nextZ}`);
+      const newNode = new Node({
+        ...node,
+        zIndex: nextZ
+      });
+      // console.log("New Node with ID:", newNode.id);
+      let nodes =  [...state.nodes, newNode]
+      console.log("Nodes after update")
+      console.log(nodes)
+      return { nodes: nodes };
     });
     get().saveState();
   },
@@ -161,9 +193,17 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   
   updateNode: (id: string, updates: Partial<Node>, shouldSaveState: boolean = true) => {
     set((state) => {
+   
       const newNodes = state.nodes.map(node => {
+        let newZIndex = updates.zIndex !== undefined ? updates.zIndex : node.zIndex 
+        
+
         if (node.id === id) {
-          return new Node({ ...node, ...updates });
+          return new Node({ 
+            ...node, 
+            ...updates,
+            zIndex: newZIndex
+          });
         }
         return node;
       });
@@ -451,8 +491,13 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   // Add new line node actions
   addLineNode: (lineNode: LineNode) => {
     set((state) => {
-      const newLineNodes = [...state.lineNodes, lineNode];
-      return { lineNodes: newLineNodes };
+      const nextZ = getNextZIndex(state.nodes, state.lineNodes);
+
+      const newLineNode = {
+        ...lineNode,
+        zIndex: nextZ
+      };
+      return { lineNodes: [...state.lineNodes, newLineNode] };
     });
     get().saveState();
   },
@@ -479,7 +524,11 @@ export const useSceneStore = create<SceneState>((set, get) => ({
     set((state) => {
       const newLineNodes = state.lineNodes.map(node => {
         if (node.id === id) {
-          return { ...node, ...updates };
+          return { 
+            ...node, 
+            ...updates,
+            zIndex: updates.zIndex !== undefined ? updates.zIndex : node.zIndex 
+          };
         }
         return node;
       });
@@ -585,11 +634,11 @@ export const useSceneStore = create<SceneState>((set, get) => ({
     // Load the image asynchronously
     node.setImage(source).then(() => {
       // Update the node in the store after image loads
-      console.log('Image loaded for node:', node.id);
-      get().updateNode(node.id, node, false);
+      get().addNode(node);
+      //get().updateNode(node.id, node, false);
     }).catch((error)=>console.error('Error loading image:', error));
     
-    get().addNode(node);
+    
   },
 
   // Action for deleting selected items
@@ -888,5 +937,198 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   },
   loadSceneFromString: (jsonString: string): boolean => {
     return get().importSceneFromJson(jsonString);
-  }
+  },
+
+  // New functions
+  bringToFront: (nodeIds: string[]) => {
+    set(state => {
+      // Get highest zIndex from all nodes and line nodes
+      const allZIndices = [
+        ...state.nodes.map(n => n.zIndex || 0),
+        ...state.lineNodes.map(n => n.zIndex || 0)
+      ];
+      const maxZ = Math.max(...allZIndices, 0) + 1;
+
+      return {
+        nodes: state.nodes.map(node => 
+          nodeIds.includes(node.id) 
+            ? new Node({ ...node, zIndex: maxZ })
+            : node
+        ),
+        lineNodes: state.lineNodes.map(node =>
+          nodeIds.includes(node.id)
+            ? { ...node, zIndex: maxZ }
+            : node
+        )
+      };
+    });
+    get().saveState();
+  },
+
+  sendToBack: (nodeIds: string[]) => {
+    set(state => {
+      // Get lowest zIndex from all nodes and line nodes
+      const allZIndices = [
+        ...state.nodes.map(n => n.zIndex || 0),
+        ...state.lineNodes.map(n => n.zIndex || 0)
+      ];
+      const minZ = Math.min(...allZIndices, 0) - 1;
+
+      return {
+        nodes: state.nodes.map(node =>
+          nodeIds.includes(node.id)
+            ? new Node({ ...node, zIndex: minZ })
+            : node
+        ),
+        lineNodes: state.lineNodes.map(node =>
+          nodeIds.includes(node.id)
+            ? { ...node, zIndex: minZ }
+            : node
+        )
+      };
+    });
+    get().saveState();
+  },
+
+  bringForward: (nodeIds: string[]) => {
+    set(state => {
+      // Combine all items with their current zIndex
+      const allItems = [
+        ...state.nodes.map(n => ({ id: n.id, z: Math.max(0, n.zIndex || 0), selected: nodeIds.includes(n.id) })),
+        ...state.lineNodes.map(n => ({ id: n.id, z: Math.max(0, n.zIndex || 0), selected: nodeIds.includes(n.id) }))
+      ].sort((a, b) => a.z - b.z);
+
+      // Find the highest z-index among selected items
+      const selectedItems = allItems.filter(item => item.selected);
+      if (selectedItems.length === 0) return state;
+      
+      const highestSelectedZ = Math.max(...selectedItems.map(item => item.z));
+
+      // Find the closest item above our selection
+      const nextItem = allItems.find(item => !item.selected && item.z > highestSelectedZ);
+
+      // If no item above, swap with the highest non-selected item
+      if (!nextItem) {
+        const highestNonSelected = allItems.filter(item => !item.selected)
+                                         .sort((a, b) => b.z - a.z)[0];
+        if (!highestNonSelected) return state;
+
+        // Swap positions
+        return {
+          nodes: state.nodes.map(node => {
+            if (nodeIds.includes(node.id)) {
+              return new Node({ ...node, zIndex: highestNonSelected.z });
+            }
+            if (node.id === highestNonSelected.id) {
+              return new Node({ ...node, zIndex: highestSelectedZ });
+            }
+            return node;
+          }),
+          lineNodes: state.lineNodes.map(node => {
+            if (nodeIds.includes(node.id)) {
+              return { ...node, zIndex: highestNonSelected.z };
+            }
+            if (node.id === highestNonSelected.id) {
+              return { ...node, zIndex: highestSelectedZ };
+            }
+            return node;
+          })
+        };
+      }
+
+      const newZ = nextItem.z;
+      return {
+        nodes: state.nodes.map(node => {
+          if (nodeIds.includes(node.id)) {
+            return new Node({ ...node, zIndex: newZ });
+          }
+          if (node.id === nextItem.id) {
+            return new Node({ ...node, zIndex: highestSelectedZ });
+          }
+          return node;
+        }),
+        lineNodes: state.lineNodes.map(node => {
+          if (nodeIds.includes(node.id)) {
+            return { ...node, zIndex: newZ };
+          }
+          if (node.id === nextItem.id) {
+            return { ...node, zIndex: highestSelectedZ };
+          }
+          return node;
+        })
+      };
+    });
+    get().saveState();
+  },
+
+  sendBackward: (nodeIds: string[]) => {
+    set(state => {
+      // Combine all items with their current zIndex
+      const allItems = [
+        ...state.nodes.map(n => ({ id: n.id, z: Math.max(0, n.zIndex || 0), selected: nodeIds.includes(n.id) })),
+        ...state.lineNodes.map(n => ({ id: n.id, z: Math.max(0, n.zIndex || 0), selected: nodeIds.includes(n.id) }))
+      ].sort((a, b) => b.z - a.z);
+
+      // Find the lowest z-index among selected items
+      const selectedItems = allItems.filter(item => item.selected);
+      if (selectedItems.length === 0) return state;
+
+      const lowestSelectedZ = Math.min(...selectedItems.map(item => item.z));
+
+      // Find the closest item below our selection
+      const nextItem = allItems.find(item => !item.selected && item.z < lowestSelectedZ);
+
+      // If no item below, swap with the lowest non-selected item
+      if (!nextItem) {
+        const lowestNonSelected = allItems.filter(item => !item.selected)
+                                        .sort((a, b) => a.z - b.z)[0];
+        if (!lowestNonSelected) return state;
+
+        // Swap positions
+        return {
+          nodes: state.nodes.map(node => {
+            if (nodeIds.includes(node.id)) {
+              return new Node({ ...node, zIndex: lowestNonSelected.z });
+            }
+            if (node.id === lowestNonSelected.id) {
+              return new Node({ ...node, zIndex: lowestSelectedZ });
+            }
+            return node;
+          }),
+          lineNodes: state.lineNodes.map(node => {
+            if (nodeIds.includes(node.id)) {
+              return { ...node, zIndex: lowestNonSelected.z };
+            }
+            if (node.id === lowestNonSelected.id) {
+              return { ...node, zIndex: lowestSelectedZ };
+            }
+            return node;
+          })
+        };
+      }
+
+      const newZ = nextItem.z;
+      return {
+        nodes: state.nodes.map(node => {
+          if (nodeIds.includes(node.id)) {
+            return new Node({ ...node, zIndex: newZ });
+          }
+          if (node.id === nextItem.id) {
+            return new Node({ ...node, zIndex: lowestSelectedZ });
+          }
+          return node;
+        }),
+        lineNodes: state.lineNodes.map(node => {
+          if (nodeIds.includes(node.id)) {
+            return { ...node, zIndex: newZ };
+          }
+          if (node.id === nextItem.id) {
+            return { ...node, zIndex: lowestSelectedZ };
+          }
+          return node;
+        })
+      };
+    });
+    get().saveState();
+  },
 }));

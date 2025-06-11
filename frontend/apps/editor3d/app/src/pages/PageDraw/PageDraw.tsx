@@ -14,8 +14,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock, faImage } from "@fortawesome/pro-solid-svg-icons";
 import Konva from "konva"; // just for types
 
-import { setCanvasRenderBitmap } from "../../signals/canvasRenderBitmap";
-import { captureStageImageBitmap } from "./hooks/useUpdateSnapshot";
+import { setCanvasRenderBitmap } from "../../signals/canvasRenderBitmap"
+import { captureStageImageBitmap } from "./hooks/useUpdateSnapshot"
 import { ContextMenuContainer } from "./components/ui/ContextMenu";
 const PageDraw = () => {
   //useStateSceneLoader();
@@ -271,23 +271,58 @@ const PageDraw = () => {
         activeToolId={store.activeTool}
       />
       <div className="relative z-0">
-        <ContextMenuContainer>
-          <PaintSurface
-            nodes={store.nodes}
-            selectedNodeIds={store.selectedNodeIds}
-            onCanvasSizeChange={(width: number, height: number): void => {
-              canvasWidth.current = width;
-              canvasHeight.current = height;
-            }}
-            fillColor={store.fillColor}
-            activeTool={store.activeTool}
-            brushColor={store.brushColor}
-            brushSize={store.brushSize}
-            onSelectionChange={setIsSelecting}
-            stageRef={stageRef}
-            transformerRefs={transformerRefs}
-          />
-        </ContextMenuContainer>
+      <ContextMenuContainer 
+        onAction={(e, action) => {
+
+          if (action === "contextMenu") {
+            const hasSelection = store.selectedNodeIds.length > 0;
+            if (hasSelection) {
+              console.log("An item is selected.");
+              // You can add additional actions here based on the selection
+              return true 
+            } else {
+              console.log("No item is selected.");
+              return false
+            }
+          }
+
+        }} 
+        onMenuAction={(action) => {
+        
+          switch (action) {
+            case 'BRING_TO_FRONT':
+              store.bringToFront(store.selectedNodeIds);
+              break;
+            case 'BRING_FORWARD':
+              store.bringForward(store.selectedNodeIds);
+              break;
+            case 'SEND_BACKWARD':
+              store.sendBackward(store.selectedNodeIds);
+              break;
+            case 'SEND_TO_BACK':
+              store.sendToBack(store.selectedNodeIds);
+              break;
+            default:
+              // No action needed for unhandled cases
+          }
+        }}
+      >
+        <PaintSurface
+          nodes={store.nodes}
+          selectedNodeIds={store.selectedNodeIds}
+          onCanvasSizeChange={(width: number, height: number): void => {
+            canvasWidth.current = width;
+            canvasHeight.current = height;
+          }}
+          fillColor={store.fillColor}
+          activeTool={store.activeTool}
+          brushColor={store.brushColor}
+          brushSize={store.brushSize}
+          onSelectionChange={setIsSelecting}
+          stageRef={stageRef}
+          transformerRefs={transformerRefs}
+        />
+          </ContextMenuContainer>
       </div>
       <div className="absolute bottom-6 left-6 z-20 flex items-center gap-2">
         <PopoverMenu
