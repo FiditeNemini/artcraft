@@ -67,8 +67,9 @@ interface ContextMenuContainerProps {
   children: React.ReactNode;
   items?: MenuItem[];
   onAction?: (e: React.MouseEvent, actionName: string) => boolean | void;
-  onMenuAction?: (action: string) => void;  // New prop for menu item actions
+  onMenuAction?: (action: string) => void;
   className?: string;
+  isLocked?: boolean;
 }
 
 export const ContextMenuContainer: React.FC<ContextMenuContainerProps> = ({ 
@@ -76,10 +77,26 @@ export const ContextMenuContainer: React.FC<ContextMenuContainerProps> = ({
   items = defaultMenuItems,
   onAction,
   onMenuAction,
-  className = ''
+  className = '',
+  isLocked = false
 }) => {
   const [showMenu, setShowMenu] = React.useState(false);
   const [position, setPosition] = React.useState<MenuPosition>({ x: 0, y: 0 });
+
+  const filteredItems = React.useMemo(() => {
+    if (isLocked) {
+      return [
+        {
+          icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" strokeWidth="2" strokeLinecap="round"/>
+          </svg>,
+          label: 'Unlock',
+          action: 'LOCK'
+        }
+      ];
+    }
+    return items;
+  }, [isLocked, items]);
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -111,7 +128,7 @@ export const ContextMenuContainer: React.FC<ContextMenuContainerProps> = ({
       {children}
       {showMenu && (
         <ContextMenu
-          items={items}
+          items={filteredItems}
           onAction={handleMenuAction}
           position={position}
           onClose={() => setShowMenu(false)}
@@ -173,6 +190,25 @@ const defaultMenuItems: MenuItem[] = [
     </svg>,
     label: 'Duplicate',
     action: 'DUPLICATE'
+  },
+  {
+    icon: (
+      <svg
+        className="w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path
+          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0V4a1 1 0 011-1h4a1 1 0 011 1v3"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+    label: 'Delete',
+    action: 'DELETE'
   },
 ];
 
