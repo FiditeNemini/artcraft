@@ -1,3 +1,4 @@
+use crate::core::artcraft_error::ArtcraftError;
 use crate::core::commands::response::failure_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus};
 use crate::core::commands::response::shorthand::Response;
 use crate::core::commands::response::success_response_wrapper::SerializeMarker;
@@ -49,6 +50,7 @@ use std::path::PathBuf;
 use std::time::Duration;
 use storyteller_client::error::api_error::ApiError;
 use storyteller_client::error::api_error::ApiError::InternalServerError;
+use storyteller_client::error::storyteller_error::StorytellerError;
 use storyteller_client::media_files::get_media_file::{get_media_file, GetMediaFileSuccessResponse};
 use storyteller_client::media_files::upload_image_media_file_from_file::upload_image_media_file_from_file;
 use storyteller_client::utils::api_host::ApiHost;
@@ -176,9 +178,10 @@ pub async fn fal_background_removal_command(
 enum InnerError {
   FalError(FalErrorPlus),
   AnyhowError(AnyhowError),
-  StorytellerApiError(ApiError),
+  StorytellerError(StorytellerError),
   DecodeError(DecodeError),
   IoError(std::io::Error),
+  ArtcraftError(ArtcraftError),
 }
 
 impl From<AnyhowError> for InnerError {
@@ -193,9 +196,9 @@ impl From<FalErrorPlus> for InnerError {
   }
 }
 
-impl From<ApiError> for InnerError {
-  fn from(value: ApiError) -> Self {
-    Self::StorytellerApiError(value)
+impl From<StorytellerError> for InnerError {
+  fn from(value: StorytellerError) -> Self {
+    Self::StorytellerError(value)
   }
 }
 
@@ -208,6 +211,17 @@ impl From<DecodeError> for InnerError {
 impl From<std::io::Error> for InnerError {
   fn from(value: std::io::Error) -> Self {
     Self::IoError(value)
+  }
+}
+
+impl From<ArtcraftError> for InnerError {
+  fn from(value: ArtcraftError) -> Self {
+    match value {
+      ArtcraftError::AnyhowError(e) => Self::AnyhowError(e),
+      ArtcraftError::DecodeError(e) => Self::DecodeError(e),
+      ArtcraftError::IoError(e) => Self::IoError(e),
+      _ => Self::ArtcraftError(value),
+    }
   }
 }
 
@@ -224,9 +238,11 @@ pub async fn remove_background(
   let mut temp_download;
   
   if let Some(media_token) = request.image_media_token {
+    info!("From media token: {:?}", &media_token);
     temp_download = download_media_file_to_temp_dir(&app_data_root, &media_token).await?;
     
   } else if let Some(base64_bytes) = request.base64_image {
+    info!("From base64 bytes...");
     temp_download = save_base64_image_to_temp_dir(&app_data_root, base64_bytes).await?;
   } else {
     return Err(InnerError::AnyhowError(anyhow!("No image media token or base64 image provided")));
@@ -237,6 +253,8 @@ pub async fn remove_background(
   let filename = temp_download.path().to_path_buf();
   
   let result = remove_background_rembg(filename, &api_key).await?;
+  
+  info!("Unpacking FAL result...");
 
   let extension_with_dot = get_url_file_extension(&result.image_url)
       .map(|ext| format!(".{}", ext))
