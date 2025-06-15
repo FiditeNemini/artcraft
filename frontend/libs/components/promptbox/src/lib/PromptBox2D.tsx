@@ -629,6 +629,7 @@ export const PromptBox2D = ({
         maxSelections={4}
         onUseSelected={handleGalleryImages}
         onDownloadClicked={downloadFileFromUrl}
+        forceFilter="image"
       />
     </>
   );

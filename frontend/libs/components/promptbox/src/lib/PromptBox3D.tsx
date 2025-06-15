@@ -58,7 +58,7 @@ import {
   SoraSessionState,
   waitForSoraLogin,
 } from "@storyteller/tauri-api";
-import { showActionReminder } from "libs/components/action-reminder-modal/src/lib/action-reminder-modal-signals";
+import { showActionReminder } from "@storyteller/ui-action-reminder-modal";
 
 interface ReferenceImage {
   id: string;
@@ -825,6 +825,7 @@ export const PromptBox3D = ({
         maxSelections={4}
         onUseSelected={handleGalleryImages}
         onDownloadClicked={downloadFileFromUrl}
+        forceFilter="image"
       />
     </>
   );
