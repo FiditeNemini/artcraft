@@ -1,0 +1,1 @@
+pub mod generate_flux_pro_11_ultra_text_to_image;

@@ -1,5 +1,4 @@
-use crate::core::commands::enqueue::image::handle_fal::handle_fal;
-use crate::core::commands::enqueue::image::handle_sora::handle_sora;
+use crate::core::commands::enqueue::object::handle_object_artcraft::handle_object_artcraft;
 use crate::core::commands::enqueue::object::handle_object_fal::handle_object_fal;
 use crate::core::commands::enqueue::object::internal_object_error::InternalObjectError;
 use crate::core::commands::response::failure_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus};
@@ -25,7 +24,7 @@ use base64::prelude::BASE64_STANDARD;
 use base64::{DecodeError, Engine};
 use errors::{AnyhowError, AnyhowResult};
 use fal_client::error::fal_error_plus::FalErrorPlus;
-use fal_client::requests::queue::image_gen::enqueue_flux_pro_ultra_text_to_image::{enqueue_flux_pro_ultra_text_to_image, FluxProUltraTextToImageArgs};
+use fal_client::requests::queue::image_gen::enqueue_flux_pro_11_ultra_text_to_image::{enqueue_flux_pro_11_ultra_text_to_image, FluxPro11UltraTextToImageArgs};
 use fal_client::requests::queue::image_gen::enqueue_recraft3_text_to_image::{enqueue_recraft3_text_to_image, Recraft3TextToImageArgs};
 use filesys::file_read_bytes::file_read_bytes;
 use image::codecs::png::{CompressionType, FilterType, PngEncoder};
@@ -57,7 +56,6 @@ use storyteller_client::utils::api_host::ApiHost;
 use tauri::{AppHandle, Emitter, Manager, State};
 use tempfile::NamedTempFile;
 use tokens::tokens::media_files::MediaFileToken;
-use crate::core::commands::enqueue::object::handle_object_artcraft::handle_object_artcraft;
 
 #[derive(Deserialize)]
 pub struct EnqueueImageTo3dObjectRequest {

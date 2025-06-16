@@ -12,12 +12,12 @@ use crate::services::sora::state::sora_task_queue::SoraTaskQueue;
 use crate::services::storyteller::state::storyteller_credential_manager::StorytellerCredentialManager;
 use anyhow::anyhow;
 use fal_client::creds::fal_api_key::FalApiKey;
-use fal_client::requests::queue::image_gen::enqueue_flux_pro_ultra_text_to_image::{enqueue_flux_pro_ultra_text_to_image, FluxProUltraTextToImageArgs};
+use fal_client::requests::queue::image_gen::enqueue_flux_pro_11_ultra_text_to_image::{enqueue_flux_pro_11_ultra_text_to_image, FluxPro11UltraTextToImageArgs};
 use fal_client::requests::queue::image_gen::enqueue_recraft3_text_to_image::{enqueue_recraft3_text_to_image, Recraft3TextToImageArgs};
 use log::{error, info, warn};
 use tauri::AppHandle;
 
-pub async fn handle_fal(
+pub async fn handle_image_fal(
   app: &AppHandle,
   request: EnqueueTextToImageRequest,
   fal_creds_manager: &FalCredentialManager,
@@ -56,7 +56,7 @@ pub async fn handle_fal(
     }
     Some(EnqueueTextToImageModel::FluxProUltra) => {
       info!("enqueue Flux Pro Ultra text-to-image with prompt: {}", prompt);
-      enqueue_flux_pro_ultra_text_to_image(FluxProUltraTextToImageArgs {
+      enqueue_flux_pro_11_ultra_text_to_image(FluxPro11UltraTextToImageArgs {
         prompt,
         api_key: &api_key,
       }).await

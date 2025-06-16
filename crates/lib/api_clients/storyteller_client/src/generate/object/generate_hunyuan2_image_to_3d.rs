@@ -9,7 +9,6 @@ use artcraft_api_defs::generate::object::generate_hunyuan_2_image_to_3d::{Genera
 use log::{debug, info};
 use reqwest::Client;
 
-/// Upload an image media file from a file.
 pub async fn generate_hunyuan2_image_to_3d(
   api_host: &ApiHost,
   maybe_creds: Option<&StorytellerCredentialSet>,

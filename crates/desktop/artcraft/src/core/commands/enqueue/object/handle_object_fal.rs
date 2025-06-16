@@ -16,7 +16,7 @@ use crate::services::storyteller::state::storyteller_credential_manager::Storyte
 use anyhow::anyhow;
 use fal_client::creds::fal_api_key::FalApiKey;
 use fal_client::requests::queue::enqueue_hunyuan2_image_to_3d::{enqueue_hunyuan2_image_to_3d, Hunyuan2Args};
-use fal_client::requests::queue::image_gen::enqueue_flux_pro_ultra_text_to_image::{enqueue_flux_pro_ultra_text_to_image, FluxProUltraTextToImageArgs};
+use fal_client::requests::queue::image_gen::enqueue_flux_pro_11_ultra_text_to_image::{enqueue_flux_pro_11_ultra_text_to_image, FluxPro11UltraTextToImageArgs};
 use fal_client::requests::queue::image_gen::enqueue_recraft3_text_to_image::{enqueue_recraft3_text_to_image, Recraft3TextToImageArgs};
 use log::{error, info, warn};
 use tauri::AppHandle;
@@ -34,7 +34,7 @@ pub async fn handle_object_fal(
     None => {
       error!("No FAL API key is set. Can't perform action.");
       let event =
-          GenerationEnqueueFailureEvent::no_fal_api_key(GenerationAction::GenerateImage);
+          GenerationEnqueueFailureEvent::no_fal_api_key(GenerationAction::ImageTo3d);
 
       if let Err(err) = event.send(&app) {
         error!("Failed to emit event: {:?}", err); // Fail open.
