@@ -3,10 +3,10 @@ use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use utoipa::ToSchema;
 
-pub const GENERATE_KLING_1_6_PRO_IMAGE_TO_VIDEO_URL_PATH: &str = "/v1/generate/video/kling_1.6_pro_image_to_video";
+pub const GENERATE_SEEDANCE_1_0_LITE_IMAGE_TO_VIDEO_URL_PATH: &str = "/v1/generate/video/seedance_1.0_lite_image_to_video";
 
 #[derive(Serialize, Deserialize, ToSchema)]
-pub struct GenerateKling16ProImageToVideoRequest {
+pub struct GenerateSeedance10LiteImageToVideoRequest {
   /// Idempotency token to prevent duplicate requests.
   pub uuid_idempotency_token: String,
   
@@ -18,32 +18,28 @@ pub struct GenerateKling16ProImageToVideoRequest {
   pub prompt: Option<String>,
   
   /// Optional: aspect ratio of the generated video.
-  pub aspect_ratio: Option<GenerateKling16ProAspectRatio>,
+  pub resolution: Option<GenerateSeedance10LiteResolution>,
 
   /// Optional: aspect ratio of the generated video.
-  pub duration: Option<GenerateKling16ProDuration>,
+  pub duration: Option<GenerateSeedance10LiteDuration>,
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
-pub enum GenerateKling16ProAspectRatio {
-  /// 16:9 aspect ratio
-  WideSixteenNine,
-  /// 9:16 aspect ratio
-  TallNineSixteen,
-  /// 1:1 aspect ratio
-  Square,
+pub enum GenerateSeedance10LiteResolution {
+  FourEightyP,
+  SevenTwentyP,
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
-pub enum GenerateKling16ProDuration {
+pub enum GenerateSeedance10LiteDuration {
   FiveSeconds,
   TenSeconds,
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
-pub struct GenerateKling16ProImageToVideoResponse {
+pub struct GenerateSeedance10LiteImageToVideoResponse {
   pub success: bool,
   pub inference_job_token: InferenceJobToken,
 }

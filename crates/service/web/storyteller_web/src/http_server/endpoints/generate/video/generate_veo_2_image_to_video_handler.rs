@@ -16,11 +16,16 @@ use actix_web::http::StatusCode;
 use actix_web::web::Json;
 use actix_web::web::Path;
 use actix_web::{web, HttpRequest, HttpResponse};
-use artcraft_api_defs::generate::image::remove_image_background::RemoveImageBackgroundRequest;
-use artcraft_api_defs::generate::image::remove_image_background::RemoveImageBackgroundResponse;
+use artcraft_api_defs::generate::video::generate_veo_2_image_to_video::GenerateVeo2AspectRatio;
+use artcraft_api_defs::generate::video::generate_veo_2_image_to_video::GenerateVeo2Duration;
+use artcraft_api_defs::generate::video::generate_veo_2_image_to_video::GenerateVeo2ImageToVideoRequest;
+use artcraft_api_defs::generate::video::generate_veo_2_image_to_video::GenerateVeo2ImageToVideoResponse;
 use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::common::visibility::Visibility;
-use fal_client::requests::webhook::image::remove_background_rembg_webhook::{remove_background_rembg_webhook, RemoveBackgroundRembgWebhookArgs};
+use fal_client::requests::webhook::video::enqueue_veo_2_image_to_video_webhook::enqueue_veo_2_image_to_video_webhook;
+use fal_client::requests::webhook::video::enqueue_veo_2_image_to_video_webhook::Veo2Args;
+use fal_client::requests::webhook::video::enqueue_veo_2_image_to_video_webhook::Veo2AspectRatio;
+use fal_client::requests::webhook::video::enqueue_veo_2_image_to_video_webhook::Veo2Duration;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use idempotency::uuid::generate_random_uuid;
@@ -33,23 +38,23 @@ use mysql_queries::queries::media_files::get::get_media_file::{get_media_file, M
 use tokens::tokens::media_files::MediaFileToken;
 use utoipa::ToSchema;
 
-/// Background removal
+/// Veo 2 Image to Video
 #[utoipa::path(
   post,
-  tag = "Generate Images",
-  path = "/v1/generate/image/remove_background",
+  tag = "Generate Videos",
+  path = "/v1/generate/video/veo_2_image_to_video",
   responses(
-    (status = 200, description = "Success", body = RemoveImageBackgroundResponse),
+    (status = 200, description = "Success", body = GenerateVeo2ImageToVideoResponse),
   ),
   params(
-    ("request" = RemoveImageBackgroundRequest, description = "Payload for Request"),
+    ("request" = GenerateVeo2ImageToVideoRequest, description = "Payload for Request"),
   )
 )]
-pub async fn remove_image_background_handler(
+pub async fn generate_veo_2_image_to_video_handler(
   http_request: HttpRequest,
-  request: Json<RemoveImageBackgroundRequest>,
+  request: Json<GenerateVeo2ImageToVideoRequest>,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<Json<RemoveImageBackgroundResponse>, CommonWebError> {
+) -> Result<Json<GenerateVeo2ImageToVideoResponse>, CommonWebError> {
   let maybe_user_session = server_state
       .session_checker
       .maybe_get_user_session(&http_request, &server_state.mysql_pool)
@@ -129,16 +134,40 @@ pub async fn remove_image_background_handler(
   
   info!("Fal webhook URL: {}", server_state.fal.webhook_url);
   
-  let args = RemoveBackgroundRembgWebhookArgs {
+  let prompt = request.prompt
+      .as_deref()
+      .map(|prompt| prompt.trim())
+      .unwrap_or_else(|| "");
+  
+  let aspect_ratio = match &request.aspect_ratio {
+    Some(GenerateVeo2AspectRatio::Auto) => Veo2AspectRatio::Auto,
+    Some(GenerateVeo2AspectRatio::AutoPreferPortrait) => Veo2AspectRatio::AutoPreferPortrait,
+    Some(GenerateVeo2AspectRatio::WideSixteenNine) => Veo2AspectRatio::WideSixteenNine,
+    Some(GenerateVeo2AspectRatio::TallNineSixteen) => Veo2AspectRatio::TallNineSixteen,
+    None => Veo2AspectRatio::WideSixteenNine, // Default to 16:9
+  };
+  
+  let duration = match &request.duration {
+    Some(GenerateVeo2Duration::FiveSeconds) => Veo2Duration::FiveSeconds,
+    Some(GenerateVeo2Duration::SixSeconds) => Veo2Duration::SixSeconds,
+    Some(GenerateVeo2Duration::SevenSeconds) => Veo2Duration::SevenSeconds,
+    Some(GenerateVeo2Duration::EightSeconds) => Veo2Duration::EightSeconds,
+    None => Veo2Duration::FiveSeconds, 
+  };
+  
+  let args = Veo2Args {
     image_url: media_links.cdn_url,
     webhook_url: &server_state.fal.webhook_url,
+    duration,
+    prompt,
+    aspect_ratio,
     api_key: &server_state.fal.api_key,
   };
 
-  let fal_result = remove_background_rembg_webhook(args)
+  let fal_result = enqueue_veo_2_image_to_video_webhook(args)
       .await
       .map_err(|err| {
-        warn!("Error calling remove_background_rembg_webhook: {:?}", err);
+        warn!("Error calling enqueue_veo_2_image_to_video_webhook: {:?}", err);
         CommonWebError::ServerError
       })?;
 
@@ -155,7 +184,7 @@ pub async fn remove_image_background_handler(
   let db_result = insert_generic_inference_job_for_fal_queue(InsertGenericInferenceForFalArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
     maybe_external_third_party_id: &external_job_id,
-    fal_category: FalCategory::BackgroundRemoval,
+    fal_category: FalCategory::VideoGeneration,
     maybe_inference_args: None,
     maybe_creator_user_token: maybe_user_session.as_ref().map(|s| &s.user_token),
     maybe_avt_token: maybe_avt_token.as_ref(),
@@ -172,7 +201,7 @@ pub async fn remove_image_background_handler(
     }
   };
 
-  Ok(Json(RemoveImageBackgroundResponse {
+  Ok(Json(GenerateVeo2ImageToVideoResponse {
     success: true,
     inference_job_token: job_token,
   }))

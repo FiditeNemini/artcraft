@@ -3,10 +3,10 @@ use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use utoipa::ToSchema;
 
-pub const GENERATE_KLING_1_6_PRO_IMAGE_TO_VIDEO_URL_PATH: &str = "/v1/generate/video/kling_1.6_pro_image_to_video";
+pub const GENERATE_VEO_2_IMAGE_TO_VIDEO_URL_PATH: &str = "/v1/generate/video/veo_2_image_to_video";
 
 #[derive(Serialize, Deserialize, ToSchema)]
-pub struct GenerateKling16ProImageToVideoRequest {
+pub struct GenerateVeo2ImageToVideoRequest {
   /// Idempotency token to prevent duplicate requests.
   pub uuid_idempotency_token: String,
   
@@ -18,32 +18,32 @@ pub struct GenerateKling16ProImageToVideoRequest {
   pub prompt: Option<String>,
   
   /// Optional: aspect ratio of the generated video.
-  pub aspect_ratio: Option<GenerateKling16ProAspectRatio>,
+  pub aspect_ratio: Option<GenerateVeo2AspectRatio>,
 
   /// Optional: aspect ratio of the generated video.
-  pub duration: Option<GenerateKling16ProDuration>,
+  pub duration: Option<GenerateVeo2Duration>,
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
-pub enum GenerateKling16ProAspectRatio {
-  /// 16:9 aspect ratio
-  WideSixteenNine,
-  /// 9:16 aspect ratio
-  TallNineSixteen,
-  /// 1:1 aspect ratio
-  Square,
+pub enum GenerateVeo2AspectRatio {
+  Auto,
+  AutoPreferPortrait,
+  WideSixteenNine, // 16:9
+  TallNineSixteen, // 9:16
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
-pub enum GenerateKling16ProDuration {
+pub enum GenerateVeo2Duration {
   FiveSeconds,
-  TenSeconds,
+  SixSeconds,
+  SevenSeconds,
+  EightSeconds,
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
-pub struct GenerateKling16ProImageToVideoResponse {
+pub struct GenerateVeo2ImageToVideoResponse {
   pub success: bool,
   pub inference_job_token: InferenceJobToken,
 }

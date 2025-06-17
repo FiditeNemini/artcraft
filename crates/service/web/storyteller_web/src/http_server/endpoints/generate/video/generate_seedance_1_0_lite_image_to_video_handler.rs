@@ -16,11 +16,15 @@ use actix_web::http::StatusCode;
 use actix_web::web::Json;
 use actix_web::web::Path;
 use actix_web::{web, HttpRequest, HttpResponse};
-use artcraft_api_defs::generate::image::remove_image_background::RemoveImageBackgroundRequest;
-use artcraft_api_defs::generate::image::remove_image_background::RemoveImageBackgroundResponse;
+use artcraft_api_defs::generate::video::generate_seedance_1_0_lite_image_to_video::GenerateSeedance10LiteDuration;
+use artcraft_api_defs::generate::video::generate_seedance_1_0_lite_image_to_video::GenerateSeedance10LiteImageToVideoRequest;
+use artcraft_api_defs::generate::video::generate_seedance_1_0_lite_image_to_video::GenerateSeedance10LiteImageToVideoResponse;
+use artcraft_api_defs::generate::video::generate_seedance_1_0_lite_image_to_video::GenerateSeedance10LiteResolution;
 use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::common::visibility::Visibility;
-use fal_client::requests::webhook::image::remove_background_rembg_webhook::{remove_background_rembg_webhook, RemoveBackgroundRembgWebhookArgs};
+use fal_client::requests::webhook::video::enqueue_seedance_1_lite_image_to_video_webhook::enqueue_seedance_1_lite_image_to_video_webhook;
+use fal_client::requests::webhook::video::enqueue_seedance_1_lite_image_to_video_webhook::Seedance1LiteDuration;
+use fal_client::requests::webhook::video::enqueue_seedance_1_lite_image_to_video_webhook::{Seedance1LiteArgs, Seedance1LiteResolution};
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use idempotency::uuid::generate_random_uuid;
@@ -33,23 +37,23 @@ use mysql_queries::queries::media_files::get::get_media_file::{get_media_file, M
 use tokens::tokens::media_files::MediaFileToken;
 use utoipa::ToSchema;
 
-/// Background removal
+/// Seedance 1.0 Lite Image to Video
 #[utoipa::path(
   post,
-  tag = "Generate Images",
-  path = "/v1/generate/image/remove_background",
+  tag = "Generate Videos",
+  path = "/v1/generate/video/seedance_1.0_lite_image_to_video",
   responses(
-    (status = 200, description = "Success", body = RemoveImageBackgroundResponse),
+    (status = 200, description = "Success", body = GenerateSeedance10LiteImageToVideoResponse),
   ),
   params(
-    ("request" = RemoveImageBackgroundRequest, description = "Payload for Request"),
+    ("request" = GenerateSeedance10LiteImageToVideoRequest, description = "Payload for Request"),
   )
 )]
-pub async fn remove_image_background_handler(
+pub async fn generate_seedance_1_0_lite_image_to_video_handler(
   http_request: HttpRequest,
-  request: Json<RemoveImageBackgroundRequest>,
+  request: Json<GenerateSeedance10LiteImageToVideoRequest>,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<Json<RemoveImageBackgroundResponse>, CommonWebError> {
+) -> Result<Json<GenerateSeedance10LiteImageToVideoResponse>, CommonWebError> {
   let maybe_user_session = server_state
       .session_checker
       .maybe_get_user_session(&http_request, &server_state.mysql_pool)
@@ -129,16 +133,38 @@ pub async fn remove_image_background_handler(
   
   info!("Fal webhook URL: {}", server_state.fal.webhook_url);
   
-  let args = RemoveBackgroundRembgWebhookArgs {
+  let prompt = request.prompt
+      .as_deref()
+      .map(|prompt| prompt.trim())
+      .unwrap_or_else(|| "");
+  
+  let resolution = match &request.resolution {
+    Some(GenerateSeedance10LiteResolution::FourEightyP) => Seedance1LiteResolution::FourEightyP,
+    Some(GenerateSeedance10LiteResolution::SevenTwentyP) => Seedance1LiteResolution::SevenTwentyP,
+    None => Seedance1LiteResolution::SevenTwentyP,
+  };
+  
+  let duration = match &request.duration {
+    Some(GenerateSeedance10LiteDuration::FiveSeconds) => Seedance1LiteDuration::FiveSeconds,
+    Some(GenerateSeedance10LiteDuration::TenSeconds) => Seedance1LiteDuration::TenSeconds,
+    None => Seedance1LiteDuration::FiveSeconds, 
+  };
+  
+  let args = Seedance1LiteArgs {
     image_url: media_links.cdn_url,
     webhook_url: &server_state.fal.webhook_url,
     api_key: &server_state.fal.api_key,
+    duration,
+    resolution,
+    prompt,
+    camera_fixed: false, // TODO: Parameterize
+    seed: None, // TODO: Parameterize
   };
 
-  let fal_result = remove_background_rembg_webhook(args)
+  let fal_result = enqueue_seedance_1_lite_image_to_video_webhook(args)
       .await
       .map_err(|err| {
-        warn!("Error calling remove_background_rembg_webhook: {:?}", err);
+        warn!("Error calling enqueue_seedance_1_lite_image_to_video_webhook: {:?}", err);
         CommonWebError::ServerError
       })?;
 
@@ -155,7 +181,7 @@ pub async fn remove_image_background_handler(
   let db_result = insert_generic_inference_job_for_fal_queue(InsertGenericInferenceForFalArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
     maybe_external_third_party_id: &external_job_id,
-    fal_category: FalCategory::BackgroundRemoval,
+    fal_category: FalCategory::VideoGeneration,
     maybe_inference_args: None,
     maybe_creator_user_token: maybe_user_session.as_ref().map(|s| &s.user_token),
     maybe_avt_token: maybe_avt_token.as_ref(),
@@ -172,7 +198,7 @@ pub async fn remove_image_background_handler(
     }
   };
 
-  Ok(Json(RemoveImageBackgroundResponse {
+  Ok(Json(GenerateSeedance10LiteImageToVideoResponse {
     success: true,
     inference_job_token: job_token,
   }))

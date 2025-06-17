@@ -2,6 +2,7 @@ use std::fmt;
 use std::sync::Arc;
 
 use crate::http_server::common_requests::media_file_token_path_info::MediaFileTokenPathInfo;
+use crate::http_server::common_responses::common_web_error::CommonWebError;
 use crate::http_server::common_responses::media::media_links::MediaLinks;
 use crate::http_server::deprecated_endpoints::engine::create_scene_handler::CreateSceneError;
 use crate::http_server::endpoints::media_files::helpers::get_media_domain::get_media_domain;
@@ -15,12 +16,12 @@ use actix_web::http::StatusCode;
 use actix_web::web::Json;
 use actix_web::web::Path;
 use actix_web::{web, HttpRequest, HttpResponse};
-use artcraft_api_defs::generate::object::generate_hunyuan_2_image_to_3d::GenerateHunyuan2ImageTo3dRequest;
-use artcraft_api_defs::generate::object::generate_hunyuan_2_image_to_3d::GenerateHunyuan2ImageTo3dResponse;
+use artcraft_api_defs::generate::object::generate_hunyuan_21_image_to_3d::GenerateHunyuan21ImageTo3dRequest;
+use artcraft_api_defs::generate::object::generate_hunyuan_21_image_to_3d::GenerateHunyuan21ImageTo3dResponse;
 use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::common::visibility::Visibility;
-use fal_client::requests::webhook::object::enqueue_hunyuan_3d_2_image_to_3d_webhook::enqueue_hunyuan_3d_2_image_to_3d_webhook;
-use fal_client::requests::webhook::object::enqueue_hunyuan_3d_2_image_to_3d_webhook::Hunyuan3d2Args;
+use fal_client::requests::webhook::object::enqueue_hunyuan_3d_21_image_to_3d_webhook::enqueue_hunyuan_3d_2_1_image_to_3d_webhook;
+use fal_client::requests::webhook::object::enqueue_hunyuan_3d_21_image_to_3d_webhook::Hunyuan3d21Args;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use idempotency::uuid::generate_random_uuid;
@@ -33,68 +34,30 @@ use mysql_queries::queries::media_files::get::get_media_file::{get_media_file, M
 use tokens::tokens::media_files::MediaFileToken;
 use utoipa::ToSchema;
 
-// =============== Error Response ===============
-
-
-#[derive(Debug, Serialize, ToSchema)]
-pub enum GenerateHunyuan2ImageTo3dError {
-  BadInput(String),
-  NotFound,
-  NotAuthorized,
-  ServerError,
-}
-
-impl ResponseError for GenerateHunyuan2ImageTo3dError {
-  fn status_code(&self) -> StatusCode {
-    match *self {
-      GenerateHunyuan2ImageTo3dError::BadInput(_) => StatusCode::BAD_REQUEST,
-      GenerateHunyuan2ImageTo3dError::NotFound => StatusCode::NOT_FOUND,
-      GenerateHunyuan2ImageTo3dError::NotAuthorized => StatusCode::UNAUTHORIZED,
-      GenerateHunyuan2ImageTo3dError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
-    }
-  }
-
-  fn error_response(&self) -> HttpResponse {
-    serialize_as_json_error(self)
-  }
-}
-
-// NB: Not using derive_more::Display since Clion doesn't understand it.
-impl fmt::Display for GenerateHunyuan2ImageTo3dError {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    write!(f, "{:?}", self)
-  }
-}
-
-// =============== Handler ===============
-
-/// Background removal
+/// Hunyuan 2.1 Image to 3D
 #[utoipa::path(
   post,
   tag = "Generate Objects",
-  path = "/v1/generate/object/hunyuan_2_image_to_3d",
+  path = "/v1/generate/object/hunyuan_2.1_image_to_3d",
   responses(
-    (status = 200, description = "Success", body = GenerateHunyuan2ImageTo3dResponse),
-    (status = 400, description = "Bad input", body = GenerateHunyuan2ImageTo3dError),
-    (status = 401, description = "Not authorized", body = GenerateHunyuan2ImageTo3dError),
-    (status = 500, description = "Server error", body = GenerateHunyuan2ImageTo3dError),
+    (status = 200, description = "Success", body = GenerateHunyuan21ImageTo3dResponse),
   ),
   params(
-    ("request" = GenerateHunyuan2ImageTo3dRequest, description = "Payload for Request"),
+    ("request" = GenerateHunyuan21ImageTo3dRequest, description = "Payload for Request"),
   )
 )]
-pub async fn generate_hunyuan_2_image_to_3d_handler(
+pub async fn generate_hunyuan_21_image_to_3d_handler(
   http_request: HttpRequest,
-  request: Json<GenerateHunyuan2ImageTo3dRequest>,
+  request: Json<GenerateHunyuan21ImageTo3dRequest>,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<Json<GenerateHunyuan2ImageTo3dResponse>, GenerateHunyuan2ImageTo3dError> {
+) -> Result<Json<GenerateHunyuan21ImageTo3dResponse>, CommonWebError> {
   let maybe_user_session = server_state
       .session_checker
       .maybe_get_user_session(&http_request, &server_state.mysql_pool)
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
-        GenerateHunyuan2ImageTo3dError::ServerError
+        CommonWebError::ServerError
       })?;
 
   let maybe_avt_token = server_state
@@ -107,7 +70,7 @@ pub async fn generate_hunyuan_2_image_to_3d_handler(
   //  Some(session) => session,
   //  None => {
   //    warn!("not logged in");
-  //    return Err(GenerateHunyuan2ImageTo3dError::NotAuthorized);
+  //    return Err(CommonWebError::NotAuthorized);
   //  }
   //};
 
@@ -115,19 +78,19 @@ pub async fn generate_hunyuan_2_image_to_3d_handler(
     Some(token) => token,
     None => {
       warn!("No media file token provided");
-      return Err(GenerateHunyuan2ImageTo3dError::BadInput("No media file token provided".to_string()));
+      return Err(CommonWebError::BadInputWithSimpleMessage("No media file token provided".to_string()));
     }
   };
   
   if let Err(reason) = validate_idempotency_token_format(&request.uuid_idempotency_token) {
-    return Err(GenerateHunyuan2ImageTo3dError::BadInput(reason));
+    return Err(CommonWebError::BadInputWithSimpleMessage(reason));
   }
 
   insert_idempotency_token(&request.uuid_idempotency_token, &server_state.mysql_pool)
       .await
       .map_err(|err| {
         error!("Error inserting idempotency token: {:?}", err);
-        GenerateHunyuan2ImageTo3dError::BadInput("invalid idempotency token".to_string())
+        CommonWebError::BadInputWithSimpleMessage("invalid idempotency token".to_string())
       })?;
   const IS_MOD : bool = false;
   
@@ -141,16 +104,16 @@ pub async fn generate_hunyuan_2_image_to_3d_handler(
     Ok(Some(media_file)) => media_file,
     Ok(None) => {
       warn!("MediaFile not found: {:?}", media_file_token);
-      return Err(GenerateHunyuan2ImageTo3dError::NotFound);
+      return Err(CommonWebError::NotFound);
     },
     Err(err) => {
       warn!("Error looking up media_file: {:?}", err);
-      return Err(GenerateHunyuan2ImageTo3dError::ServerError);
+      return Err(CommonWebError::ServerError);
     }
   };
 
   if !media_file.media_type.is_jpg_or_png_or_legacy_image() {
-    return Err(GenerateHunyuan2ImageTo3dError::BadInput("Media file must be a JPG or PNG image".to_string()));
+    return Err(CommonWebError::BadInputWithSimpleMessage("Media file must be a JPG or PNG image".to_string()));
   }
   
   let media_domain = get_media_domain(&http_request);
@@ -167,23 +130,23 @@ pub async fn generate_hunyuan_2_image_to_3d_handler(
   
   info!("Fal webhook URL: {}", server_state.fal.webhook_url);
   
-  let args = Hunyuan3d2Args {
+  let args = Hunyuan3d21Args {
     image_url: media_links.cdn_url,
     webhook_url: &server_state.fal.webhook_url,
     api_key: &server_state.fal.api_key,
   };
 
-  let fal_result = enqueue_hunyuan_3d_2_image_to_3d_webhook(args)
+  let fal_result = enqueue_hunyuan_3d_2_1_image_to_3d_webhook(args)
       .await
       .map_err(|err| {
-        warn!("Error calling enqueue_hunyuan2_image_to_3d_webhook: {:?}", err);
-        GenerateHunyuan2ImageTo3dError::ServerError
+        warn!("Error calling enqueue_hunyuan_3d_2_1_image_to_3d_webhook: {:?}", err);
+        CommonWebError::ServerError
       })?;
 
   let external_job_id = fal_result.request_id
       .ok_or_else(|| {
         warn!("Fal request_id is None");
-        GenerateHunyuan2ImageTo3dError::ServerError
+        CommonWebError::ServerError
       })?;
   
   info!("Fal request_id: {}", external_job_id);
@@ -206,11 +169,11 @@ pub async fn generate_hunyuan_2_image_to_3d_handler(
     Ok(token) => token,
     Err(err) => {
       warn!("Error inserting generic inference job for FAL queue: {:?}", err);
-      return Err(GenerateHunyuan2ImageTo3dError::ServerError);
+      return Err(CommonWebError::ServerError);
     }
   };
 
-  Ok(Json(GenerateHunyuan2ImageTo3dResponse {
+  Ok(Json(GenerateHunyuan21ImageTo3dResponse {
     success: true,
     inference_job_token: job_token,
   }))

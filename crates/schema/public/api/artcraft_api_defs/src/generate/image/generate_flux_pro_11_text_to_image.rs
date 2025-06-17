@@ -2,10 +2,10 @@ use serde_derive::{Deserialize, Serialize};
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use utoipa::ToSchema;
 
-pub const GENERATE_FLUX_PRO_11_ULTRA_TEXT_TO_IMAGE_PATH: &str = "/v1/generate/image/flux_pro_1.1_ultra_text_to_image";
+pub const GENERATE_FLUX_PRO_11_TEXT_TO_IMAGE_PATH: &str = "/v1/generate/image/flux_pro_1.1_text_to_image";
 
 #[derive(Serialize, Deserialize, ToSchema)]
-pub struct GenerateFluxPro11UltraTextToImageRequest {
+pub struct GenerateFluxPro11TextToImageRequest {
   /// Idempotency token to prevent duplicate requests.
   pub uuid_idempotency_token: String,
 
@@ -13,15 +13,15 @@ pub struct GenerateFluxPro11UltraTextToImageRequest {
   pub prompt: Option<String>,
 
   /// Aspect ratio of the output images.
-  pub aspect_ratio: Option<GenerateFluxPro11UltraTextToImageAspectRatio>,
+  pub aspect_ratio: Option<GenerateFluxPro11TextToImageAspectRatio>,
 
   /// Number of images to generate. Default is one.
-  pub num_images: Option<GenerateFluxPro11UltraTextToImageNumImages>,
+  pub num_images: Option<GenerateFluxPro11TextToImageNumImages>,
 }
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
-pub enum GenerateFluxPro11UltraTextToImageAspectRatio {
+pub enum GenerateFluxPro11TextToImageAspectRatio {
   Square, // 1:1
   LandscapeFourByThree, // 4:3
   LandscapeSixteenByNine, // 16:9
@@ -32,7 +32,7 @@ pub enum GenerateFluxPro11UltraTextToImageAspectRatio {
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
-pub enum GenerateFluxPro11UltraTextToImageNumImages {
+pub enum GenerateFluxPro11TextToImageNumImages {
   One, // Default
   Two,
   Three,
@@ -40,7 +40,7 @@ pub enum GenerateFluxPro11UltraTextToImageNumImages {
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
-pub struct GenerateFluxPro11UltraTextToImageResponse {
+pub struct GenerateFluxPro11TextToImageResponse {
   pub success: bool,
   pub inference_job_token: InferenceJobToken,
 }

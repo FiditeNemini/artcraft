@@ -16,11 +16,12 @@ use actix_web::http::StatusCode;
 use actix_web::web::Json;
 use actix_web::web::Path;
 use actix_web::{web, HttpRequest, HttpResponse};
-use artcraft_api_defs::generate::image::remove_image_background::RemoveImageBackgroundRequest;
-use artcraft_api_defs::generate::image::remove_image_background::RemoveImageBackgroundResponse;
+use artcraft_api_defs::generate::image::generate_flux_pro_11_ultra_text_to_image::GenerateFluxPro11UltraTextToImageResponse;
+use artcraft_api_defs::generate::image::generate_flux_pro_11_ultra_text_to_image::{GenerateFluxPro11UltraTextToImageAspectRatio, GenerateFluxPro11UltraTextToImageNumImages, GenerateFluxPro11UltraTextToImageRequest};
 use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::common::visibility::Visibility;
-use fal_client::requests::webhook::image::remove_background_rembg_webhook::{remove_background_rembg_webhook, RemoveBackgroundRembgWebhookArgs};
+use fal_client::requests::webhook::image::enqueue_flux_pro_11_ultra_text_to_image_webhook::FluxPro11UltraArgs;
+use fal_client::requests::webhook::image::enqueue_flux_pro_11_ultra_text_to_image_webhook::{enqueue_flux_pro_11_ultra_text_to_image_webhook, FluxPro11UltraAspectRatio, FluxPro11UltraNumImages};
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use idempotency::uuid::generate_random_uuid;
@@ -33,23 +34,24 @@ use mysql_queries::queries::media_files::get::get_media_file::{get_media_file, M
 use tokens::tokens::media_files::MediaFileToken;
 use utoipa::ToSchema;
 
-/// Background removal
+
+/// Flux Pro 1.1 Ultra
 #[utoipa::path(
   post,
   tag = "Generate Images",
-  path = "/v1/generate/image/remove_background",
+  path = "/v1/generate/image/flux_pro_1.1_ultra_text_to_image",
   responses(
-    (status = 200, description = "Success", body = RemoveImageBackgroundResponse),
+    (status = 200, description = "Success", body = GenerateFluxPro11UltraTextToImageResponse),
   ),
   params(
-    ("request" = RemoveImageBackgroundRequest, description = "Payload for Request"),
+    ("request" = GenerateFluxPro11UltraTextToImageRequest, description = "Payload for Request"),
   )
 )]
-pub async fn remove_image_background_handler(
+pub async fn generate_flux_pro_11_ultra_text_to_image_handler(
   http_request: HttpRequest,
-  request: Json<RemoveImageBackgroundRequest>,
+  request: Json<GenerateFluxPro11UltraTextToImageRequest>,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<Json<RemoveImageBackgroundResponse>, CommonWebError> {
+) -> Result<Json<GenerateFluxPro11UltraTextToImageResponse>, CommonWebError> {
   let maybe_user_session = server_state
       .session_checker
       .maybe_get_user_session(&http_request, &server_state.mysql_pool)
@@ -69,18 +71,10 @@ pub async fn remove_image_background_handler(
   //  Some(session) => session,
   //  None => {
   //    warn!("not logged in");
-  //    return Err(RemoveImageBackgroundError::NotAuthorized);
+  //    return Err(GenerateFluxProUltraTextToImageError::NotAuthorized);
   //  }
   //};
 
-  let media_file_token = match &request.media_file_token {
-    Some(token) => token,
-    None => {
-      warn!("No media file token provided");
-      return Err(CommonWebError::BadInputWithSimpleMessage("No media file token provided".to_string()));
-    }
-  };
-  
   if let Err(reason) = validate_idempotency_token_format(&request.uuid_idempotency_token) {
     return Err(CommonWebError::BadInputWithSimpleMessage(reason));
   }
@@ -91,54 +85,40 @@ pub async fn remove_image_background_handler(
         error!("Error inserting idempotency token: {:?}", err);
         CommonWebError::BadInputWithSimpleMessage("invalid idempotency token".to_string())
       })?;
+  
   const IS_MOD : bool = false;
-  
-  let media_file_lookup_result = get_media_file(
-    media_file_token,
-    IS_MOD,
-    &server_state.mysql_pool,
-  ).await;
-
-  let media_file = match media_file_lookup_result {
-    Ok(Some(media_file)) => media_file,
-    Ok(None) => {
-      warn!("MediaFile not found: {:?}", media_file_token);
-      return Err(CommonWebError::NotFound);
-    },
-    Err(err) => {
-      warn!("Error looking up media_file: {:?}", err);
-      return Err(CommonWebError::ServerError);
-    }
-  };
-
-  if !media_file.media_type.is_jpg_or_png_or_legacy_image() {
-    return Err(CommonWebError::BadInputWithSimpleMessage("Media file must be a JPG or PNG image".to_string()));
-  }
-  
-  let media_domain = get_media_domain(&http_request);
-  
-  let bucket_path = MediaFileBucketPath::from_object_hash(
-    &media_file.public_bucket_directory_hash,
-    media_file.maybe_public_bucket_prefix.as_deref(),
-    media_file.maybe_public_bucket_extension.as_deref());
-  
-  let media_links = MediaLinks::from_media_path_and_env(
-    media_domain, 
-    server_state.server_environment, 
-    &bucket_path);
   
   info!("Fal webhook URL: {}", server_state.fal.webhook_url);
   
-  let args = RemoveBackgroundRembgWebhookArgs {
-    image_url: media_links.cdn_url,
-    webhook_url: &server_state.fal.webhook_url,
-    api_key: &server_state.fal.api_key,
+  let aspect_ratio = match request.aspect_ratio {
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::Square) => FluxPro11UltraAspectRatio::Square,
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::LandscapeFourByThree) => FluxPro11UltraAspectRatio::LandscapeFourByThree,
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::LandscapeSixteenByNine) => FluxPro11UltraAspectRatio::LandscapeSixteenByNine,
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::PortraitThreeByFour) => FluxPro11UltraAspectRatio::PortraitThreeByFour,
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::PortraitNineBySixteen) => FluxPro11UltraAspectRatio::PortraitNineBySixteen,
+    None => FluxPro11UltraAspectRatio::LandscapeSixteenByNine, // Default
+  };
+  
+  let num_images = match request.num_images {
+    Some(GenerateFluxPro11UltraTextToImageNumImages::One) => FluxPro11UltraNumImages::One,
+    Some(GenerateFluxPro11UltraTextToImageNumImages::Two) => FluxPro11UltraNumImages::Two,
+    Some(GenerateFluxPro11UltraTextToImageNumImages::Three) => FluxPro11UltraNumImages::Three,
+    Some(GenerateFluxPro11UltraTextToImageNumImages::Four) => FluxPro11UltraNumImages::Four,
+    None => FluxPro11UltraNumImages::One, // Default
   };
 
-  let fal_result = remove_background_rembg_webhook(args)
+  let args = FluxPro11UltraArgs {
+    prompt: request.prompt.as_deref().unwrap_or(""),
+    webhook_url: &server_state.fal.webhook_url,
+    api_key: &server_state.fal.api_key,
+    aspect_ratio,
+    num_images,
+  };
+
+  let fal_result = enqueue_flux_pro_11_ultra_text_to_image_webhook(args)
       .await
       .map_err(|err| {
-        warn!("Error calling remove_background_rembg_webhook: {:?}", err);
+        warn!("Error calling enqueue_flux_pro_ultra_text_to_image_webhook: {:?}", err);
         CommonWebError::ServerError
       })?;
 
@@ -155,7 +135,7 @@ pub async fn remove_image_background_handler(
   let db_result = insert_generic_inference_job_for_fal_queue(InsertGenericInferenceForFalArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
     maybe_external_third_party_id: &external_job_id,
-    fal_category: FalCategory::BackgroundRemoval,
+    fal_category: FalCategory::ImageGeneration,
     maybe_inference_args: None,
     maybe_creator_user_token: maybe_user_session.as_ref().map(|s| &s.user_token),
     maybe_avt_token: maybe_avt_token.as_ref(),
@@ -172,7 +152,7 @@ pub async fn remove_image_background_handler(
     }
   };
 
-  Ok(Json(RemoveImageBackgroundResponse {
+  Ok(Json(GenerateFluxPro11UltraTextToImageResponse {
     success: true,
     inference_job_token: job_token,
   }))

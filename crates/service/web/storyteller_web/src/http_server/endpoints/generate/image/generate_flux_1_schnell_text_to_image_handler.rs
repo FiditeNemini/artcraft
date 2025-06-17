@@ -2,6 +2,7 @@ use std::fmt;
 use std::sync::Arc;
 
 use crate::http_server::common_requests::media_file_token_path_info::MediaFileTokenPathInfo;
+use crate::http_server::common_responses::common_web_error::CommonWebError;
 use crate::http_server::common_responses::media::media_links::MediaLinks;
 use crate::http_server::deprecated_endpoints::engine::create_scene_handler::CreateSceneError;
 use crate::http_server::endpoints::media_files::helpers::get_media_domain::get_media_domain;
@@ -15,12 +16,11 @@ use actix_web::http::StatusCode;
 use actix_web::web::Json;
 use actix_web::web::Path;
 use actix_web::{web, HttpRequest, HttpResponse};
-use artcraft_api_defs::generate::image::generate_flux_pro_11_ultra_text_to_image::GenerateFluxPro11UltraTextToImageRequest;
-use artcraft_api_defs::generate::image::generate_flux_pro_11_ultra_text_to_image::GenerateFluxPro11UltraTextToImageResponse;
+use artcraft_api_defs::generate::image::generate_flux_1_schnell_text_to_image::{GenerateFlux1SchnellTextToImageAspectRatio, GenerateFlux1SchnellTextToImageNumImages, GenerateFlux1SchnellTextToImageRequest, GenerateFlux1SchnellTextToImageResponse};
 use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::common::visibility::Visibility;
-use fal_client::requests::webhook::image::enqueue_flux_pro_11_ultra_text_to_image_webhook::enqueue_flux_pro_11_ultra_text_to_image_webhook;
-use fal_client::requests::webhook::image::enqueue_flux_pro_11_ultra_text_to_image_webhook::FluxPro11UltraArgs;
+use fal_client::requests::webhook::image::enqueue_flux_1_schnell_text_to_image_webhook::enqueue_flux_1_schnell_text_to_image_webhook;
+use fal_client::requests::webhook::image::enqueue_flux_1_schnell_text_to_image_webhook::{Flux1SchnellArgs, Flux1SchnellAspectRatio, Flux1SchnellNumImages};
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use idempotency::uuid::generate_random_uuid;
@@ -33,68 +33,30 @@ use mysql_queries::queries::media_files::get::get_media_file::{get_media_file, M
 use tokens::tokens::media_files::MediaFileToken;
 use utoipa::ToSchema;
 
-// =============== Error Response ===============
-
-
-#[derive(Debug, Serialize, ToSchema)]
-pub enum GenerateFluxProUltraTextToImageError {
-  BadInput(String),
-  NotFound,
-  NotAuthorized,
-  ServerError,
-}
-
-impl ResponseError for GenerateFluxProUltraTextToImageError {
-  fn status_code(&self) -> StatusCode {
-    match *self {
-      GenerateFluxProUltraTextToImageError::BadInput(_) => StatusCode::BAD_REQUEST,
-      GenerateFluxProUltraTextToImageError::NotFound => StatusCode::NOT_FOUND,
-      GenerateFluxProUltraTextToImageError::NotAuthorized => StatusCode::UNAUTHORIZED,
-      GenerateFluxProUltraTextToImageError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
-    }
-  }
-
-  fn error_response(&self) -> HttpResponse {
-    serialize_as_json_error(self)
-  }
-}
-
-// NB: Not using derive_more::Display since Clion doesn't understand it.
-impl fmt::Display for GenerateFluxProUltraTextToImageError {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    write!(f, "{:?}", self)
-  }
-}
-
-// =============== Handler ===============
-
-/// Flux pro ultra text to image
+/// Flux 1 Schnell text to image
 #[utoipa::path(
   post,
   tag = "Generate Images",
-  path = "/v1/generate/image/flux_pro_1.1_ultra_text_to_image",
+  path = "/v1/generate/image/flux_1_schnell_text_to_image",
   responses(
-    (status = 200, description = "Success", body = GenerateFluxProUltraTextToImageResponse),
-    (status = 400, description = "Bad input", body = GenerateFluxProUltraTextToImageError),
-    (status = 401, description = "Not authorized", body = GenerateFluxProUltraTextToImageError),
-    (status = 500, description = "Server error", body = GenerateFluxProUltraTextToImageError),
+    (status = 200, description = "Success", body = GenerateFlux1SchnellTextToImageResponse),
   ),
   params(
-    ("request" = GenerateFluxProUltraTextToImageRequest, description = "Payload for Request"),
+    ("request" = GenerateFlux1SchnellTextToImageRequest, description = "Payload for Request"),
   )
 )]
-pub async fn generate_flux_pro_11_ultra_text_to_image_handler(
+pub async fn generate_flux_1_schnell_text_to_image_handler(
   http_request: HttpRequest,
-  request: Json<GenerateFluxPro11UltraTextToImageRequest>,
+  request: Json<GenerateFlux1SchnellTextToImageRequest>,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<Json<GenerateFluxPro11UltraTextToImageResponse>, GenerateFluxProUltraTextToImageError> {
+) -> Result<Json<GenerateFlux1SchnellTextToImageResponse>, CommonWebError> {
   let maybe_user_session = server_state
       .session_checker
       .maybe_get_user_session(&http_request, &server_state.mysql_pool)
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
-        GenerateFluxProUltraTextToImageError::ServerError
+        CommonWebError::ServerError
       })?;
 
   let maybe_avt_token = server_state
@@ -107,45 +69,66 @@ pub async fn generate_flux_pro_11_ultra_text_to_image_handler(
   //  Some(session) => session,
   //  None => {
   //    warn!("not logged in");
-  //    return Err(GenerateFluxProUltraTextToImageError::NotAuthorized);
+  //    return Err(CommonWebError::NotAuthorized);
   //  }
   //};
 
   if let Err(reason) = validate_idempotency_token_format(&request.uuid_idempotency_token) {
-    return Err(GenerateFluxProUltraTextToImageError::BadInput(reason));
+    return Err(CommonWebError::BadInputWithSimpleMessage(reason));
   }
 
   insert_idempotency_token(&request.uuid_idempotency_token, &server_state.mysql_pool)
       .await
       .map_err(|err| {
         error!("Error inserting idempotency token: {:?}", err);
-        GenerateFluxProUltraTextToImageError::BadInput("invalid idempotency token".to_string())
+        CommonWebError::BadInputWithSimpleMessage("repeated idempotency token".to_string())
       })?;
-  const IS_MOD : bool = false;
   
+  const IS_MOD : bool = false;
+
   info!("Fal webhook URL: {}", server_state.fal.webhook_url);
   
-  let args = FluxPro11UltraArgs {
+  let aspect_ratio = match request.aspect_ratio {
+    Some(GenerateFlux1SchnellTextToImageAspectRatio::Square) => Flux1SchnellAspectRatio::Square,
+    Some(GenerateFlux1SchnellTextToImageAspectRatio::SquareHd) => Flux1SchnellAspectRatio::SquareHd,
+    Some(GenerateFlux1SchnellTextToImageAspectRatio::LandscapeFourByThree) => Flux1SchnellAspectRatio::LandscapeFourByThree,
+    Some(GenerateFlux1SchnellTextToImageAspectRatio::LandscapeSixteenByNine) => Flux1SchnellAspectRatio::LandscapeSixteenByNine,
+    Some(GenerateFlux1SchnellTextToImageAspectRatio::PortraitThreeByFour) => Flux1SchnellAspectRatio::PortraitThreeByFour,
+    Some(GenerateFlux1SchnellTextToImageAspectRatio::PortraitNineBySixteen) => Flux1SchnellAspectRatio::PortraitNineBySixteen,
+    None => Flux1SchnellAspectRatio::LandscapeSixteenByNine, // Default
+  };
+  
+  let num_images = match request.num_images {
+    Some(GenerateFlux1SchnellTextToImageNumImages::One) => Flux1SchnellNumImages::One,
+    Some(GenerateFlux1SchnellTextToImageNumImages::Two) => Flux1SchnellNumImages::Two,
+    Some(GenerateFlux1SchnellTextToImageNumImages::Three) => Flux1SchnellNumImages::Three,
+    Some(GenerateFlux1SchnellTextToImageNumImages::Four) => Flux1SchnellNumImages::Four,
+    None => Flux1SchnellNumImages::One, // Default
+  };
+
+  let args = Flux1SchnellArgs {
     prompt: request.prompt.as_deref().unwrap_or(""),
     webhook_url: &server_state.fal.webhook_url,
     api_key: &server_state.fal.api_key,
+    aspect_ratio,
+    num_images,
   };
 
-  let fal_result = enqueue_flux_pro_11_ultra_text_to_image_webhook(args)
+  let fal_result = enqueue_flux_1_schnell_text_to_image_webhook(args)
       .await
       .map_err(|err| {
-        warn!("Error calling enqueue_flux_pro_ultra_text_to_image_webhook: {:?}", err);
-        GenerateFluxProUltraTextToImageError::ServerError
+        warn!("Error calling enqueue_flux_1_schnell_text_to_image_webhook: {:?}", err);
+        CommonWebError::ServerError
       })?;
 
   let external_job_id = fal_result.request_id
       .ok_or_else(|| {
         warn!("Fal request_id is None");
-        GenerateFluxProUltraTextToImageError::ServerError
+        CommonWebError::ServerError
       })?;
-  
+
   info!("Fal request_id: {}", external_job_id);
-  
+
   let ip_address = get_request_ip(&http_request);
 
   let db_result = insert_generic_inference_job_for_fal_queue(InsertGenericInferenceForFalArgs {
@@ -164,11 +147,11 @@ pub async fn generate_flux_pro_11_ultra_text_to_image_handler(
     Ok(token) => token,
     Err(err) => {
       warn!("Error inserting generic inference job for FAL queue: {:?}", err);
-      return Err(GenerateFluxProUltraTextToImageError::ServerError);
+      return Err(CommonWebError::ServerError);
     }
   };
 
-  Ok(Json(GenerateFluxPro11UltraTextToImageResponse {
+  Ok(Json(GenerateFlux1SchnellTextToImageResponse {
     success: true,
     inference_job_token: job_token,
   }))
