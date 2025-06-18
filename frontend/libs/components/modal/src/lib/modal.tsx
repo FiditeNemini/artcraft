@@ -18,6 +18,49 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { DomLevels } from "@storyteller/common";
 
+// ---------------------------------------------------------------------------
+// GLOBAL inert / aria-hidden stripper – applies once per page load
+// Overrides the inert attribute set by Headless UI to allow background interaction / stacked modals
+// ---------------------------------------------------------------------------
+declare global {
+  interface Window {
+    __inertStripperInstalled?: boolean;
+  }
+}
+
+if (!window.__inertStripperInstalled) {
+  window.__inertStripperInstalled = true;
+
+  const strip = (el: Element) => {
+    if (el.hasAttribute("inert")) el.removeAttribute("inert");
+    // @ts-ignore – some browsers expose .inert as a property
+    if ((el as any).inert) (el as any).inert = false;
+    if (el.getAttribute("aria-hidden") === "true")
+      el.removeAttribute("aria-hidden");
+  };
+
+  // 1. Clean anything that already exists
+  document.querySelectorAll("[inert]").forEach(strip);
+
+  // 2. Keep document clean forever
+  const inertObserver = new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      if (m.type === "attributes" && m.attributeName === "inert") {
+        strip(m.target as Element);
+      }
+    }
+  });
+
+  inertObserver.observe(document.documentElement, {
+    attributes: true,
+    subtree: true,
+    attributeFilter: ["inert"],
+  });
+}
+
+// Simple global z-index tracker for stacked modals
+let modalZCounter = 70;
+
 const DialogBackdrop = ({
   className,
   onClose,
@@ -120,8 +163,8 @@ export const Modal = ({
   titleIcon,
   onTitleIconClick,
   onClose,
-  disableHotkeyInput = () => {},
   enableHotkeyInput = () => {},
+  disableHotkeyInput = () => {},
   className,
   backdropClassName,
   width,
@@ -130,6 +173,7 @@ export const Modal = ({
   titleIconClassName,
   showClose = true,
   draggable = false,
+  resizable = false,
   initialPosition,
   closeOnOutsideClick = true,
   allowBackgroundInteraction = false,
@@ -148,6 +192,7 @@ export const Modal = ({
   childPadding?: boolean;
   showClose?: boolean;
   draggable?: boolean;
+  resizable?: boolean;
   disableHotkeyInput?: (level: number) => void;
   enableHotkeyInput?: (level: number) => void;
   /**
@@ -172,11 +217,13 @@ export const Modal = ({
     null
   );
   const [dragging, setDragging] = useState(false);
+  const [resizing, setResizing] = useState(false);
   const dragStart = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const mouseStart = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const modalRef = useRef<HTMLDivElement>(null);
   const positionRef = useRef<{ x: number; y: number } | null>(null);
   const lastPositionRef = useRef<{ x: number; y: number } | null>(null);
+  const [zIndex, setZIndex] = useState<number>(() => ++modalZCounter);
 
   // Expanded state
   const [expanded, setExpanded] = useState(false);
@@ -197,7 +244,7 @@ export const Modal = ({
         modalRef.current.style.top = "0px";
         modalRef.current.style.margin = "0";
         modalRef.current.style.position = "fixed";
-        modalRef.current.style.zIndex = "70";
+        modalRef.current.style.zIndex = String(zIndex);
       }
     } else {
       // Restore last non-expanded position
@@ -210,12 +257,12 @@ export const Modal = ({
           modalRef.current.style.top = lastNonExpandedPosition.current.y + "px";
           modalRef.current.style.margin = "0";
           modalRef.current.style.position = "fixed";
-          modalRef.current.style.zIndex = "70";
+          modalRef.current.style.zIndex = String(zIndex);
         }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expanded]);
+  }, [expanded, zIndex]);
   const toggleExpanded = () => setExpanded((v) => !v);
 
   // Reset position when modal is closed or opened
@@ -237,7 +284,7 @@ export const Modal = ({
           modalRef.current.style.top = lastPositionRef.current.y + "px";
           modalRef.current.style.margin = "0";
           modalRef.current.style.position = "fixed";
-          modalRef.current.style.zIndex = "70";
+          modalRef.current.style.zIndex = String(zIndex);
         }
       } else if (initialPosition) {
         setPosition({ ...initialPosition });
@@ -247,11 +294,11 @@ export const Modal = ({
           modalRef.current.style.top = initialPosition.y + "px";
           modalRef.current.style.margin = "0";
           modalRef.current.style.position = "fixed";
-          modalRef.current.style.zIndex = "70";
+          modalRef.current.style.zIndex = String(zIndex);
         }
       }
     }
-  }, [isOpen]);
+  }, [isOpen, zIndex]);
 
   // Handle mouse move and up events
   useEffect(() => {
@@ -284,7 +331,7 @@ export const Modal = ({
             modalRef.current.style.top = positionRef.current.y + "px";
             modalRef.current.style.margin = "0";
             modalRef.current.style.position = "fixed";
-            modalRef.current.style.zIndex = "70";
+            modalRef.current.style.zIndex = String(zIndex);
           }
         });
       }
@@ -301,20 +348,24 @@ export const Modal = ({
       window.removeEventListener("mouseup", handleMouseUp);
       if (animationFrame) cancelAnimationFrame(animationFrame);
     };
-  }, [dragging]);
+  }, [dragging, zIndex]);
 
   // Center modal if not being dragged
   const getModalStyle = (): React.CSSProperties => {
     if (!draggable || !position) {
       // If allowBackgroundInteraction, set pointerEvents: 'auto' for modal
-      return allowBackgroundInteraction ? { pointerEvents: "auto" } : {};
+      return {
+        ...(size ? { width: size.width, height: size.height } : {}),
+        ...(allowBackgroundInteraction ? { pointerEvents: "auto" } : {}),
+      };
     }
     return {
       position: "fixed",
       left: position.x,
       top: position.y,
       margin: 0,
-      zIndex: 70,
+      zIndex,
+      ...(size ? { width: size.width, height: size.height } : {}),
       ...(allowBackgroundInteraction ? { pointerEvents: "auto" } : {}),
     };
   };
@@ -352,7 +403,7 @@ export const Modal = ({
         modalRef.current.style.top = y + "px";
         modalRef.current.style.margin = "0";
         modalRef.current.style.position = "fixed";
-        modalRef.current.style.zIndex = "70";
+        modalRef.current.style.zIndex = String(zIndex);
       }
     }
   };
@@ -407,12 +458,301 @@ export const Modal = ({
       : children;
   }
 
+  /**
+   * ------------------ RESIZING LOGIC --------------------
+   */
+  const resizeDirRef = useRef<string | null>(null);
+  const resizeStart = useRef<{
+    mouseX: number;
+    mouseY: number;
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+  } | null>(null);
+
+  const handleResizeStart = (e: React.MouseEvent, dir: string) => {
+    if (!modalRef.current) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (expanded) return; // don't allow resize when expanded
+    const rect = modalRef.current.getBoundingClientRect();
+    resizeDirRef.current = dir;
+    resizeStart.current = {
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      width: rect.width,
+      height: rect.height,
+      x: rect.left,
+      y: rect.top,
+    };
+    setResizing(true);
+  };
+
+  // Handle resizing mouse move / up
+  useEffect(() => {
+    if (!resizing) return;
+    let animationFrame: number | null = null;
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!modalRef.current || !resizeStart.current || !resizeDirRef.current)
+        return;
+      const dx = e.clientX - resizeStart.current.mouseX;
+      const dy = e.clientY - resizeStart.current.mouseY;
+
+      let newWidth = resizeStart.current.width;
+      let newHeight = resizeStart.current.height;
+      let newX = resizeStart.current.x;
+      let newY = resizeStart.current.y;
+
+      const dir = resizeDirRef.current;
+
+      const minWidth = 320;
+      const minHeight = 240;
+
+      if (dir.includes("right")) {
+        newWidth = resizeStart.current.width + dx;
+      }
+      if (dir.includes("left")) {
+        newWidth = resizeStart.current.width - dx;
+        newX = resizeStart.current.x + dx;
+      }
+      if (dir.includes("bottom")) {
+        newHeight = resizeStart.current.height + dy;
+      }
+      if (dir.includes("top")) {
+        newHeight = resizeStart.current.height - dy;
+        newY = resizeStart.current.y + dy;
+      }
+
+      newWidth = Math.max(minWidth, newWidth);
+      newHeight = Math.max(minHeight, newHeight);
+
+      positionRef.current = { x: newX, y: newY };
+      sizeRef.current = { width: newWidth, height: newHeight };
+
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      animationFrame = requestAnimationFrame(() => {
+        if (modalRef.current && positionRef.current) {
+          modalRef.current.style.width = newWidth + "px";
+          modalRef.current.style.height = newHeight + "px";
+          modalRef.current.style.left = positionRef.current.x + "px";
+          modalRef.current.style.top = positionRef.current.y + "px";
+          modalRef.current.style.margin = "0";
+          modalRef.current.style.position = "fixed";
+          modalRef.current.style.zIndex = String(zIndex);
+        }
+      });
+    };
+
+    const handleMouseUp = () => {
+      setResizing(false);
+      if (positionRef.current) setPosition({ ...positionRef.current });
+      if (sizeRef.current) setSize({ ...sizeRef.current });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+    };
+  }, [resizing, zIndex]);
+
+  // Render resize handles if resizable and not expanded
+  const renderResizeHandles = () => {
+    if (!resizable || expanded) return null;
+    const baseClass = "absolute z-[75] bg-transparent select-none";
+    const handleSize = 5; // px
+    const sideThickness = 2; // for edge handles
+    const handles = [
+      { dir: "top", className: `top-0 left-0 w-full h-${sideThickness}` },
+      { dir: "bottom", className: `bottom-0 left-0 w-full h-${sideThickness}` },
+      { dir: "left", className: `left-0 top-0 h-full w-${sideThickness}` },
+      { dir: "right", className: `right-0 top-0 h-full w-${sideThickness}` },
+      {
+        dir: "top-left",
+        className: `top-0 left-0 w-${handleSize} h-${handleSize}`,
+      },
+      {
+        dir: "top-right",
+        className: `top-0 right-0 w-${handleSize} h-${handleSize}`,
+      },
+      {
+        dir: "bottom-left",
+        className: `bottom-0 left-0 w-${handleSize} h-${handleSize}`,
+      },
+      {
+        dir: "bottom-right",
+        className: `bottom-0 right-0 w-${handleSize} h-${handleSize}`,
+      },
+    ];
+
+    const cursorMap: Record<string, string> = {
+      top: "n-resize",
+      bottom: "s-resize",
+      left: "w-resize",
+      right: "e-resize",
+      "top-left": "nw-resize",
+      "top-right": "ne-resize",
+      "bottom-left": "sw-resize",
+      "bottom-right": "se-resize",
+    };
+
+    return handles.map((h) => (
+      <div
+        key={h.dir}
+        className={`${baseClass} ${h.className}`}
+        style={{ cursor: cursorMap[h.dir] }}
+        onMouseDown={(e) => handleResizeStart(e, h.dir)}
+      />
+    ));
+  };
+
+  // Size (width & height) state for resizable modal
+  const [size, setSize] = useState<{ width: number; height: number } | null>(
+    null
+  );
+  const sizeRef = useRef<{ width: number; height: number } | null>(null);
+  const lastSizeRef = useRef<{ width: number; height: number } | null>(null);
+
+  // Capture initial size on first open
+  useEffect(() => {
+    if (isOpen && !size && modalRef.current) {
+      const { width, height } = modalRef.current.getBoundingClientRect();
+      setSize({ width, height });
+      sizeRef.current = { width, height };
+    }
+  }, [isOpen, size]);
+
+  // Persist size across close / reopen
+  useEffect(() => {
+    if (!isOpen) {
+      if (sizeRef.current) lastSizeRef.current = { ...sizeRef.current };
+    } else {
+      if (lastSizeRef.current && modalRef.current) {
+        const { width, height } = lastSizeRef.current;
+        modalRef.current.style.width = width + "px";
+        modalRef.current.style.height = height + "px";
+        setSize({ width, height });
+        sizeRef.current = { width, height };
+      }
+    }
+  }, [isOpen]);
+
+  // Bring to front when user interacts with modal (mouse down anywhere inside)
+  useEffect(() => {
+    const handleBringToFront = () => {
+      if (modalRef.current) {
+        if (zIndex < modalZCounter) {
+          modalZCounter += 1;
+          setZIndex(modalZCounter);
+          modalRef.current.style.zIndex = String(modalZCounter);
+        }
+      }
+    };
+
+    const node = modalRef.current;
+    if (node) {
+      node.addEventListener("mousedown", handleBringToFront);
+    }
+    return () => {
+      if (node) node.removeEventListener("mousedown", handleBringToFront);
+    };
+  }, [zIndex]);
+
+  // If background interaction is allowed, ensure this modal (and its ancestors)
+  // never get the "inert" attribute Headless-UI uses to lock background dialogs.
+  useEffect(() => {
+    if (!allowBackgroundInteraction) return;
+    const node = modalRef.current as HTMLElement | null;
+    if (!node) return;
+
+    const stripInert = (el: HTMLElement | null) => {
+      if (!el) return;
+      if (el.hasAttribute("inert")) el.removeAttribute("inert");
+      // Also clear the property for browsers implementing it as mutable prop
+      // @ts-ignore
+      if ((el as any).inert) (el as any).inert = false;
+      if (el.getAttribute("aria-hidden") === "true") {
+        el.removeAttribute("aria-hidden");
+      }
+    };
+
+    // Remove inert from this modal and all its ancestors (Headless UI sets it on the modal container)
+    let cur: HTMLElement | null = node;
+    while (cur) {
+      stripInert(cur);
+      cur = cur.parentElement as HTMLElement | null;
+    }
+
+    // MutationObserver to keep stripping inert from THIS modal element if reapplied
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((m) => {
+        if (
+          m.type === "attributes" &&
+          m.attributeName === "inert" &&
+          m.target instanceof HTMLElement
+        ) {
+          const target = m.target as HTMLElement;
+          // Only touch if the target is this modal or one of its ancestors
+          if (target === node || node.contains(target)) {
+            stripInert(target);
+          }
+        }
+      });
+    });
+    observer.observe(node, {
+      attributes: true,
+      subtree: false,
+      attributeFilter: ["inert"],
+    });
+
+    // Additionally, Headless UI adds inert to previous portal containers that are
+    // siblings of the one just created. We strip inert from ANY portal container
+    // so long as background interaction is requested.
+    const stripInertFromPortals = () => {
+      const portals = document.querySelectorAll(
+        "[data-headlessui-portal][inert]"
+      );
+      portals.forEach((el) => el.removeAttribute("inert"));
+    };
+
+    stripInertFromPortals();
+
+    const globalObserver = new MutationObserver((mutList) => {
+      mutList.forEach((m) => {
+        if (
+          m.type === "attributes" &&
+          m.attributeName === "inert" &&
+          (m.target as HTMLElement).hasAttribute("inert")
+        ) {
+          const target = m.target as HTMLElement;
+          if (target.hasAttribute("data-headlessui-portal")) {
+            stripInert(target as HTMLElement);
+          }
+        }
+      });
+    });
+    globalObserver.observe(document.body, {
+      attributes: true,
+      subtree: true,
+      attributeFilter: ["inert"],
+    });
+
+    return () => {
+      observer.disconnect();
+      globalObserver.disconnect();
+    };
+  }, [allowBackgroundInteraction]);
+
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog
         as="div"
         className="relative z-[70]"
-        onClose={onClose}
+        onClose={closeOnOutsideClick ? onClose : () => null}
         static={allowBackgroundInteraction}
       >
         <div
@@ -424,7 +764,10 @@ export const Modal = ({
           {/* Backdrop always rendered first in stacking context */}
           {!allowBackgroundInteraction && (
             <DialogBackdrop
-              className={backdropClassName}
+              className={twMerge(
+                allowBackgroundInteraction ? "pointer-events-none" : "",
+                backdropClassName
+              )}
               onClose={onClose}
               closeOnOutsideClick={closeOnOutsideClick}
               disableHotkeyInput={disableHotkeyInput}
@@ -438,7 +781,14 @@ export const Modal = ({
             />
           )}
           <ModalExpandContext.Provider value={{ expanded, toggleExpanded }}>
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
+            <div
+              className="flex min-h-full items-center justify-center p-4 text-center"
+              style={
+                allowBackgroundInteraction
+                  ? { pointerEvents: "none" }
+                  : undefined
+              }
+            >
               <TransitionChild
                 as="div"
                 enter="ease-out duration-200"
@@ -451,7 +801,9 @@ export const Modal = ({
                   "w-full max-w-lg transform rounded-xl relative border border-ui-panel-border bg-[#2C2C2C] text-left align-middle shadow-2xl z-[70]",
                   childPadding && !expanded ? "p-4" : "",
                   className,
-                  dragging && !expanded ? "!transition-none" : "transition-all",
+                  (dragging || resizing) && !expanded
+                    ? "!transition-none"
+                    : "transition-all",
                   expanded &&
                     "w-screen h-screen max-w-screen max-h-screen rounded-none"
                 )}
@@ -495,9 +847,11 @@ export const Modal = ({
                     </DialogTitle>
                   )}
                   <div className={`h-full`.trim()}>{enhancedChildren}</div>
+                  {/* resize handles inside panel so clicks don't count as outside */}
+                  {renderResizeHandles()}
                 </DialogPanel>
                 {showClose && (
-                  <div className="absolute top-0 right-0 p-2.5">
+                  <div className="absolute top-0 right-0 m-2.5 z-[80]">
                     <CloseButton onClick={onClose} />
                   </div>
                 )}
