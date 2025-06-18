@@ -69,6 +69,14 @@ export const ArtCraftSignUp = ({
     }
   };
 
+  const handleInputFocus = () => {
+
+  };
+
+  const handleInputBlur = () => {
+
+  };
+
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <h2 className="text-3xl font-bold mb-3 text-center">
@@ -88,6 +96,8 @@ export const ArtCraftSignUp = ({
               placeholder="Username"
               required
               autoComplete="off"
+              onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
             />
             <Input
               label="Email"
@@ -98,6 +108,8 @@ export const ArtCraftSignUp = ({
               required={isSignUp}
               style={isSignUp ? {} : { display: "none" }}
               autoComplete="off"
+              onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
             />
           </>
         ) : (
@@ -108,6 +120,8 @@ export const ArtCraftSignUp = ({
             placeholder="Email or Username"
             required
             autoComplete="off"
+            onFocus={handleInputFocus}
+            onBlur={handleInputBlur}
           />
         )}
 
@@ -119,6 +133,8 @@ export const ArtCraftSignUp = ({
           placeholder="Password"
           required
           autoComplete="off"
+          onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
         />
         {isSignUp && (
           <Input
@@ -129,6 +145,8 @@ export const ArtCraftSignUp = ({
             placeholder="Confirm Password"
             required
             autoComplete="off"
+            onFocus={handleInputFocus}
+            onBlur={handleInputBlur}
           />
         )}
         <button type="submit" className="hidden" />
