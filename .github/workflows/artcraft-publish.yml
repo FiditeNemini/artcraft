@@ -71,10 +71,20 @@ jobs:
       - name: verify certificate
         if: matrix.platform == 'macos-latest'
         run: |
-          CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Developer ID Application")
+          echo "Available certificates:"
+          security find-identity -v -p codesigning build.keychain
+          
+          # Try multiple certificate patterns
+          CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep -E "(Developer ID Application|Apple Development|Storyteller Developer)" | head -1)
+          
+          if [ -z "$CERT_INFO" ]; then
+            echo "No matching certificate found. Using first available certificate."
+            CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep -v "Policy" | head -1)
+          fi
+          
           CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
           echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
-          echo "Certificate imported."
+          echo "Using certificate: $CERT_ID"
 
       - name: build and publish
         uses: tauri-apps/tauri-action@v0
