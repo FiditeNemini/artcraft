@@ -72,8 +72,19 @@ pub struct EnqueueImageToVideoRequest {
 #[derive(Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum EnqueueImageToVideoModel {
+  #[deprecated(note = "Use `kling_1_6_pro` instead")]
   #[serde(rename = "kling1_6")]
   Kling16,
+  #[serde(rename = "kling_1_6_pro")]
+  Kling16Pro,
+  #[serde(rename = "kling_2_1_pro")]
+  Kling21Pro,
+  #[serde(rename = "kling_2_1_master")]
+  Kling21Master,
+  #[serde(rename = "seedance_1_0_lite")]
+  Seedance10Lite,
+  #[serde(rename = "veo_2")]
+  Veo2,
 }
 
 #[derive(Serialize)]
