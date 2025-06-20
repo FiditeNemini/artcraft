@@ -2,9 +2,13 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { AUTH_STATUS } from "~/enums";
 import { authentication } from "~/signals";
 import { Button } from "@storyteller/ui-button";
-import ProfileDropdown from "./ProfileDropdown";
+// import ProfileDropdown from "./ProfileDropdown";
 
-export const AuthButtons = ({ loginSignUpPressed }: { loginSignUpPressed: () => void }) => {
+export const AuthButtons = ({
+  loginSignUpPressed,
+}: {
+  loginSignUpPressed: () => void;
+}) => {
   useSignals();
 
   const { status, userInfo } = authentication;
@@ -13,7 +17,7 @@ export const AuthButtons = ({ loginSignUpPressed }: { loginSignUpPressed: () => 
   console.log(status.value);
   if (status.value === AUTH_STATUS.LOGGED_IN) {
     console.log("SHOWING DROPDOWN");
-    return <ProfileDropdown />;
+    return null;
   } else {
     return (
       <>
@@ -22,7 +26,7 @@ export const AuthButtons = ({ loginSignUpPressed }: { loginSignUpPressed: () => 
           <Button
             className="h-[38px]"
             onClick={() => {
-              loginSignUpPressed()
+              loginSignUpPressed();
             }}
           >
             Login / Sign Up
