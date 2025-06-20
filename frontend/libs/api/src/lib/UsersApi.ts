@@ -198,3 +198,5 @@ export class UsersApi extends ApiManager {
     }
   }
 }
+
+(window as any).UsersApi = new UsersApi();
