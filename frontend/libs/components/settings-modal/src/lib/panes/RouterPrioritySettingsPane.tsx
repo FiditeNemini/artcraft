@@ -17,7 +17,10 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGripVertical } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faGripVertical,
+  faSpinnerThird,
+} from "@fortawesome/pro-solid-svg-icons";
 
 interface RouterItem {
   id: string;
@@ -60,11 +63,7 @@ const SortableItem = ({
       {...listeners}
       className={`
         flex items-center justify-between rounded-lg bg-white/5 p-3 transition-colors duration-200
-        ${
-          isUpdating
-            ? "cursor-wait opacity-60"
-            : "cursor-move hover:bg-white/10"
-        }
+        ${isUpdating ? "opacity-60" : "cursor-move hover:bg-white/10"}
         ${isDragging ? "opacity-50 shadow-lg" : ""}
       `}
     >
@@ -138,14 +137,6 @@ export const RouterPrioritySettingsPane = () => {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-          Model Router Priority
-          {isUpdating && (
-            <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full animate-pulse">
-              Updating...
-            </span>
-          )}
-        </h3>
         <p className="text-sm text-white/70 mb-4">
           Drag and drop to reorder model priority. Higher items will be tried
           first.
@@ -171,6 +162,13 @@ export const RouterPrioritySettingsPane = () => {
           </div>
         </SortableContext>
       </DndContext>
+
+      {isUpdating && (
+        <div className="text-xs rounded-full animate-pulse mt-4 flex items-center gap-2">
+          <FontAwesomeIcon icon={faSpinnerThird} className="animate-spin" />
+          Updating...
+        </div>
+      )}
     </div>
   );
 };
