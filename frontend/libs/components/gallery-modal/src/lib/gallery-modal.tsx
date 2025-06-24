@@ -62,7 +62,7 @@ interface GalleryModalProps {
   onSelectItem?: (id: string) => void;
   maxSelections?: number;
   onUseSelected?: (selectedItems: GalleryItem[]) => void;
-  onDownloadClicked?: (url: string) => Promise<void>;
+  onDownloadClicked?: (url: string, mediaClass?: string) => Promise<void>;
   onAddToSceneClicked?: (
     url: string,
     media_id: string | undefined

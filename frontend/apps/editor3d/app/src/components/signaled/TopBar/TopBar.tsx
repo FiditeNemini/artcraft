@@ -6,8 +6,7 @@ import {
   faFilm,
   faPaintbrush,
   faImage,
-  faDiamond,
-  faGem,
+  // faGem,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "@storyteller/ui-button";
 import { AuthButtons } from "./AuthButtons";
@@ -20,7 +19,7 @@ import {
 } from "@storyteller/ui-gallery-modal";
 import { SettingsModal } from "@storyteller/ui-settings-modal";
 import { Tooltip } from "@storyteller/ui-tooltip";
-import { downloadFileFromUrl } from "@storyteller/api";
+import { downloadFileFromUrl, FilterMediaClasses } from "@storyteller/api";
 import {
   MenuIconSelector,
   MenuIconItem,
@@ -36,7 +35,8 @@ import {
   is3DSceneLoaded,
   set3DPageMounted,
 } from "~/pages/PageEnigma/Editor/editor";
-import { usePricingModalStore } from "@storyteller/ui-pricing-modal";
+// import { usePricingModalStore } from "@storyteller/ui-pricing-modal"; - Uncomment for pricing modal - BFlat
+import toast from "react-hot-toast";
 interface Props {
   pageName: string;
   loginSignUpPressed: () => void;
@@ -94,14 +94,28 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
   const switcherThrottle = useRef(false);
 
   const disableTabSwitcher = () => {
-    return disableSwitcher || (
-      useTabStore.getState().activeTabId === "3D" &&
-      !is3DEditorReady &&
-      !is3DSceneReady
+    return (
+      disableSwitcher ||
+      (useTabStore.getState().activeTabId === "3D" &&
+        !is3DEditorReady &&
+        !is3DSceneReady)
     );
   };
 
-  // const { toggleModal } = usePricingModalStore();
+  const downloadFile = async (url: string, mediaClass?: string) => {
+    try {
+      await downloadFileFromUrl(url);
+      if (mediaClass === FilterMediaClasses.DIMENSIONAL) {
+        toast.success(`Downloaded 3D model`);
+      } else {
+        toast.success(`Downloaded ${mediaClass}`);
+      }
+    } catch (error) {
+      toast.error("Failed to download file");
+    }
+  };
+
+  // const { toggleModal } = usePricingModalStore(); - Uncomment for pricing modal - BFlat
 
   return (
     <>
@@ -165,6 +179,7 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
 
           <div className="flex justify-end gap-3.5">
             <div className="flex gap-2">
+              {/* - Uncomment for pricing modal - BFlat */}
               {/* <Button
                 variant="primary"
                 icon={faGem}
@@ -204,7 +219,7 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
         globalAccountLogoutCallback={() => setLogoutStates()}
       />
 
-      <GalleryModal mode="view" onDownloadClicked={downloadFileFromUrl} />
+      <GalleryModal mode="view" onDownloadClicked={downloadFile} />
     </>
   );
 };
