@@ -177,7 +177,7 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
             )}
           </div>
 
-          <div className="flex justify-end gap-3.5">
+          <div className="flex justify-end gap-3.5 pr-2">
             <div className="flex gap-2">
               {/* - Uncomment for pricing modal - BFlat */}
               {/* <Button
@@ -206,9 +206,7 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
 
               <Activity />
             </div>
-            <div className="flex justify-end gap-2">
-              <AuthButtons loginSignUpPressed={loginSignUpPressed} />
-            </div>
+            <AuthButtons loginSignUpPressed={loginSignUpPressed} />
           </div>
         </nav>
       </header>
