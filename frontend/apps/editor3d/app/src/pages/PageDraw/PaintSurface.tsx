@@ -659,9 +659,10 @@ export const PaintSurface = ({
               "bottom-right",
             ]}
             rotateEnabled={true}
-            keepRatio={false}
+            keepRatio={true}
             centeredScaling={true}
             padding={5}
+            shiftBehavior="inverted"
             ignoreStroke={true}
             onTransformEnd={(e: Konva.KonvaEventObject<Event>) => {
               // Typed event
