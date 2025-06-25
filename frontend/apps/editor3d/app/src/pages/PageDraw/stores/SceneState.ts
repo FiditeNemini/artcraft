@@ -625,7 +625,7 @@ export const useSceneStore = create<SceneState>((set, get) => ({
       const file = new File([blob], filename, { type: blob.type });
       
       // Use existing createImage function
-      get().createImage(x, y, file, width, height);
+      get().createImageFromFile(x, y, file, width, height);
     } catch (error) {
       console.error("Error loading image from URL:", url, error);
     }
