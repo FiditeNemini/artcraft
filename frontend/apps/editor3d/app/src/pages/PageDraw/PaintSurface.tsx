@@ -49,6 +49,9 @@ export const PaintSurface = ({
   stageRef,
   transformerRefs,
 }: MiraiProps) => {
+  // switch off to be preview panel mode.
+  const singlePaneMode = true
+  
   const store = useSceneStore(); // Use store directly
   const imageRef = React.useRef<HTMLImageElement>(null);
   const [snapshotImage, setSnapshotImage] = useState<HTMLImageElement | null>(
@@ -66,7 +69,7 @@ export const PaintSurface = ({
   const [rightPanelHeight, setRightPanelHeight] = useState(1024);
 
   /* 1️⃣ Track SplitPane percent so we can re-measure */
-  const [leftPct, setLeftPct] = useState(50);
+  const [leftPct, setLeftPct] = useState(singlePaneMode ? 100:50);
   const [isDrawing, setIsDrawing] = useState(false);
   const [lastPoint, setLastPoint] = useState<{ x: number; y: number } | null>(
     null,
@@ -131,17 +134,17 @@ export const PaintSurface = ({
     y: number;
   }): { x: number; y: number } => {
     return {
-      x: Math.max(0, Math.min(point.x, leftPanelWidth)),
-      y: Math.max(0, Math.min(point.y, leftPanelHeight)),
+      x: Math.max(0, Math.min(point.x, store.getAspectRatioDimensions().width)), //leftPanelWidth)),
+      y: Math.max(0, Math.min(point.y, store.getAspectRatioDimensions().height))//leftPanelHeight)),
     };
   };
 
   const isWithinLeftPanel = (point: { x: number; y: number }): boolean => {
     return (
       point.x >= 0 &&
-      point.x <= leftPanelWidth &&
+      point.x <= store.getAspectRatioDimensions().width && //leftPanelWidth &&
       point.y >= 0 &&
-      point.y <= leftPanelHeight
+      point.y <= store.getAspectRatioDimensions().height // leftPanelHeight
     );
   };
 
@@ -194,7 +197,8 @@ export const PaintSurface = ({
         stroke: activeTool === "draw" ? brushColor : fillColor || "#ffffff",
         strokeWidth: brushSize / stage.scaleX(),
         draggable: true,
-        opacity: opacity
+        opacity: opacity,
+        locked: false,
       };
       store.selectNode(null);
       store.addLineNode(newLineNode, false);  // Don't save state when starting line
@@ -976,10 +980,11 @@ export const PaintSurface = ({
     }
   }, [selectedNodeIds]);
 
+
   return (
     <SplitPane
-      singlePaneMode={true}
-      initialPercent={50}
+      singlePaneMode={singlePaneMode}
+      initialPercent={singlePaneMode?100 : 50}
       onChange={setLeftPct}
       left={
         <div className="flex h-full w-full items-center justify-center overflow-hidden">
@@ -990,7 +995,7 @@ export const PaintSurface = ({
             scaleX={1} // Initial scale, controlled by wheel/zoom
             scaleY={1} // Initial scale, controlled by wheel/zoom
             style={{
-              display: "block",
+              // display: "block",
               background: "transparent", // Or use fillColor if stage background is desired directly
             }}
             x={stagePosition.x} // Set the x position
@@ -1007,14 +1012,14 @@ export const PaintSurface = ({
             <Layer
               ref={leftPanelRef}
               clipFunc={(ctx) => {
-                ctx.rect(0, 0, leftPanelWidth, leftPanelHeight);
+                ctx.rect(0, 0, store.getAspectRatioDimensions().width, store.getAspectRatioDimensions().height); // leftPanelWidth, leftPanelHeight);
               }}
             >
               <Rect
                 x={0}
                 y={0}
-                width={leftPanelWidth}
-                height={leftPanelHeight}
+                width={store.getAspectRatioDimensions().width}
+                height={store.getAspectRatioDimensions().height}
                 fill={fillColor}
                 listening={false}
                 zIndex={-1}
