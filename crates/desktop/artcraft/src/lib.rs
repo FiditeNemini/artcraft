@@ -11,11 +11,14 @@ use crate::core::commands::enqueue::video::enqueue_image_to_video_command::enque
 use crate::core::commands::flip_image::flip_image;
 use crate::core::commands::get_app_info_command::get_app_info_command;
 use crate::core::commands::platform_info_command::platform_info_command;
+use crate::core::commands::providers::get_provider_order_command::get_provider_order_command;
+use crate::core::commands::providers::set_provider_order_command::set_provider_order_command;
 use crate::core::state::app_env_configs::app_env_configs::AppEnvConfigs;
 use crate::core::state::app_preferences::app_preferences_manager::load_app_preferences_or_default;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
 use crate::core::state::main_window_position::MainWindowPosition;
 use crate::core::state::main_window_size::MainWindowSize;
+use crate::core::state::provider_priority::ProviderPriorityStore;
 use crate::core::threads::discord_presence_thread::discord_presence_thread;
 use crate::core::threads::main_window_thread::main_window_thread::main_window_thread;
 use crate::core::utils::webview_unsafe::webview_unsafe_for_app;
@@ -77,6 +80,21 @@ pub fn run() {
   
   let app_env_configs = AppEnvConfigs::load_from_filesystem(&app_data_root)
     .expect("AppEnvConfigs should be loaded from disk");
+  
+  let provider_priority = match ProviderPriorityStore::from_filesystem_configs(&app_data_root) {
+    Ok(Some(priority)) => {
+      println!("Loaded provider priority from disk: {:?}", priority.get_priority());
+      priority
+    }
+    Ok(None) => {
+      println!("No provider priority found on disk, using default.");
+      ProviderPriorityStore::default()
+    }
+    Err(err) => {
+      eprintln!("Failed to read provider priority from disk: {:?}", err);
+      ProviderPriorityStore::default()
+    }
+  };
 
   println!("Initializing backend runtime...");
 
@@ -165,6 +183,7 @@ pub fn run() {
     .manage(app_preferences)
     .manage(fal_creds_manager)
     .manage(fal_task_queue)
+    .manage(provider_priority)
     .manage(sora_creds_manager)
     .manage(sora_task_queue)
     .manage(storyteller_creds_manager_3)
@@ -180,6 +199,8 @@ pub fn run() {
       get_app_info_command,
       get_app_preferences_command,
       get_fal_api_key_command,
+      get_provider_order_command,
+      set_provider_order_command,
       open_sora_login_command,
       platform_info_command,
       set_fal_api_key_command,
