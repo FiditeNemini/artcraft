@@ -10,10 +10,10 @@ normal = ["workspace-build-acceleration"]
 
 [dependencies]
 # Workspace hack (faster compile times)
-workspace-build-acceleration = { version = "0.1", path = "../../../workspace-build-acceleration" }
+workspace-build-acceleration.workspace = true
 
 # External
-easyenv = { path = "../../easyenv" }
-log = "0.4.20"
+easyenv = { path = "../../lib/easyenv" }
+log.workspace = true
 reqwest = "0.12.4"
-serde_json = "1.0.113"
+serde_json.workspace = true

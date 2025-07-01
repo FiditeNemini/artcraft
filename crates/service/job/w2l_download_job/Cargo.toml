@@ -16,30 +16,29 @@ path = "src/main.rs"
 normal = ["workspace-build-acceleration"]
 
 [dependencies]
+# Workspace hack (faster compile times)
+workspace-build-acceleration.workspace = true
 
 # Internal
 bucket_paths = { path = "../../../lib/bucket_paths" }
-cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
+cloud_storage = { path = "../../../api_clients/cloud_storage" }
 config = { path = "../../../lib/deprecated/config" }
 easyenv = { path = "../../../lib/easyenv" }
-errors = { path = "../../../lib/errors" }
-filesys = { path = "../../../lib/files/filesys" }
-google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }
+errors.workspace = true
+filesys.workspace = true
+google_drive_common = { path = "../../../api_clients/google_drive_common" }
 hashing = { path = "../../../lib/files/hashing" }
 jobs_common = { path = "../../../lib/jobs_common" }
 mysql_queries = { path = "../../../schema/database/mysql_queries" }
 
-# Workspace hack (faster compile times)
-workspace-build-acceleration = { version = "0.1", path = "../../../workspace-build-acceleration" }
-
 # External
-anyhow = "1.0.86"
-chrono = { version = "0.4.22", features = ["serde"] }
+anyhow.workspace = true
+chrono.workspace = true
 dotenv = "0.15.0"
 hostname = "0.4.0"
-log = "0.4.14"
+log.workspace = true
 subprocess = "0.2.9"
-tempdir = "0.3.7"
+tempdir.workspace = true
 
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 
@@ -48,13 +47,13 @@ r2d2_redis = "0.14.0"
 
 # Runtime
 # NB: We switched to Tokio from `async-std` for broader ecosystem support.
-tokio = { version = "1.38.0", features = ["macros"] }
+tokio.workspace = true
 
 # NB: Hyper is just for HTTP client use in jobs. I'd use Actix client, but I need tokio runtime
 # NB: Furthermore, the Tokio runtime is old, so I have to use an older Hyper.
 hyper = { version = "1.3.1" }
 
 # Serialization
-serde = "1.0.125"
-serde_derive = "1.0.125"
-serde_json = "1.0.108"
+serde.workspace = true
+serde_derive.workspace = true
+serde_json.workspace = true

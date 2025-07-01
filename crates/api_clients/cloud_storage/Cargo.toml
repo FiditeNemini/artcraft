@@ -1,0 +1,42 @@
+[package]
+name = "cloud_storage"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "cloud_storage"
+path = "src/lib.rs"
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["workspace-build-acceleration"]
+
+[dependencies]
+# Workspace hack (faster compile times)
+workspace-build-acceleration.workspace = true
+
+# Internal
+bucket_paths = { path = "../../lib/bucket_paths" }
+crockford.workspace = true
+easyenv = { path = "../../lib/easyenv" }
+errors.workspace = true
+filesys.workspace = true
+hashing = { path = "../../lib/files/hashing" }
+mimetypes.workspace = true
+storyteller_root = { path = "../../lib/storyteller_root" }
+
+# External
+anyhow.workspace = true
+log.workspace = true
+env_logger = "0.11.3"
+async-trait = "0.1.75"
+# The "never-encode-slash" feature seems to have been removed:
+# https://github.com/durch/rust-s3/pull/254
+rust-s3 = { version = "0.36.0-beta.2" }
+
+# Runtime
+tokio.workspace = true

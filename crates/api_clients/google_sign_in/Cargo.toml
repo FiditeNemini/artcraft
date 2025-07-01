@@ -8,20 +8,20 @@ authors = [
 ]
 publish = false
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["workspace-build-acceleration"]
+
 [lib]
 # NB: Public "google_sign_in" crate does not exist, so we're fine to use this internally.
 name = "google_sign_in"
 path = "src/lib.rs"
 
-[package.metadata.cargo-udeps.ignore]
-normal = ["workspace-build-acceleration"]
-
 [dependencies]
 # Workspace hack (faster compile times)
-workspace-build-acceleration = { version = "0.1", path = "../../../workspace-build-acceleration" }
+workspace-build-acceleration.workspace = true
 
 # Internal
-errors = { path = "../../errors" }
+errors.workspace = true
 
 # External
 
@@ -29,13 +29,13 @@ errors = { path = "../../errors" }
 jwt-simple = { version = "0.12.10" , default-features=false, features=["pure-rust"] }
 base64 = "0.13"
 
-reqwest = "0.12.7"
+reqwest.workspace = true
 
 # Serialization
-serde = "1.0.125"
-serde_derive = "1.0.125"
-serde_json = "1.0.108"
+serde.workspace = true
+serde_derive.workspace = true
+serde_json.workspace = true
 
 [dev-dependencies]
-testing = { path = "../../testing" }
+testing = { path = "../../lib/testing" }
 coarsetime = "0.1.34" # To set the clock for testing

@@ -2765,7 +2765,7 @@ dependencies = [
  "log",
  "mimetypes",
  "mysql_queries",
- "rand 0.8.5",
+ "rand 0.9.1",
  "sqlx",
  "storyteller_root",
  "tokens",

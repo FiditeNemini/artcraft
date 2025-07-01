@@ -8,6 +8,9 @@ authors = [
 ]
 publish = false
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["workspace-build-acceleration"]
+
 # [lints.rust]
 # unused_imports = "forbid"
 
@@ -17,33 +20,33 @@ path = "src/lib.rs"
 
 [dependencies]
 # Workspace hack (faster compile times)
-workspace-build-acceleration = { workspace =  true }
+workspace-build-acceleration.workspace = true
 
 # Internal
-artcraft_api_defs = { workspace = true }
-enums = { workspace = true }
-enums_public = { workspace = true }
-errors = { workspace = true }
-idempotency = { workspace = true }
-tokens = { workspace = true }
-mimetypes = { workspace = true }
+artcraft_api_defs.workspace = true
+enums.workspace = true
+enums_public.workspace = true
+errors.workspace = true
+idempotency.workspace = true
+tokens.workspace = true
+mimetypes.workspace = true
 
 # External
-anyhow = { workspace = true }
-chrono = { workspace = true }
-cookie = { workspace = true }
-log = { workspace = true }
+anyhow.workspace = true
+chrono.workspace = true
+cookie.workspace = true
+log.workspace = true
 reqwest = { workspace = true, features = ["multipart", "gzip"] }
-url = { workspace = true }
+url.workspace = true
 
 # Serialization
-serde = { workspace = true }
-serde_derive = { workspace = true }
-serde_json = { workspace = true }
+serde.workspace = true
+serde_derive.workspace = true
+serde_json.workspace = true
 
 # HTTP
 backoff = { version = "0.4.0", features = ["futures"] }
 uuid = { version = "1.8.0", features = ["v4"] } # Exponential backoff retry
 
 [dev-dependencies]
-tokio = { version = "1.38.0", features = ["macros"] }
+tokio.workspace = true

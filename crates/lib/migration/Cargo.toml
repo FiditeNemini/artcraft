@@ -17,32 +17,32 @@ path = "src/lib.rs"
 normal = ["workspace-build-acceleration"]
 
 [dependencies]
+# Workspace hack (faster compile times)
+workspace-build-acceleration.workspace = true
+
 # Internal
 bucket_paths = { path = "../../lib/bucket_paths" }
-cloud_storage = { path = "../../lib/api_clients/cloud_storage" }
-enums = { path = "../../schema/public/enums" }
-errors = { path = "../../lib/errors" }
+cloud_storage.workspace = true
+enums.workspace = true
+errors.workspace = true
 jobs_common = { path = "../../lib/jobs_common" }
 mysql_queries = { path = "../../schema/database/mysql_queries" }
-tokens = { path = "../../schema/public/tokens" }
+tokens.workspace = true
 
 # External
-anyhow = "1.0.86"
-chrono = { version = "0.4.22", features = ["serde"] }
-once_cell = "1.18.0"
+anyhow.workspace = true
+chrono.workspace = true
+once_cell.workspace = true
 
 # Serialization
-serde = "1.0.125"
-serde_derive = "1.0.125"
-serde_json = "1.0.108"
-toml = "0.8.14"
+serde.workspace = true
+serde_derive.workspace = true
+serde_json.workspace = true
+toml.workspace = true
 
 # Runtime + Clients
 tokio = { version = "1.38.0", features = ["full"] }
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
-
-# Workspace hack (faster compile times)
-workspace-build-acceleration = { version = "0.1", path = "../../workspace-build-acceleration" }
 
 [dev-dependencies]
 # None yet

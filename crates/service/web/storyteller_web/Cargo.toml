@@ -29,15 +29,15 @@ path = "src/api_doc_cli.rs"
 
 [dependencies]
 # cargo-hakari workspace hack (faster compile times)
-workspace-build-acceleration = { workspace = true }
+workspace-build-acceleration.workspace = true
 
 # Internal
 actix_cors_configs = { path = "../../../lib/actix_cors_configs" }
 actix_helpers = { path = "../../../lib/actix_helpers" }
-artcraft_api_defs = { workspace = true }
+artcraft_api_defs.workspace = true
 bootstrap = { path = "../../../lib/bootstrap" }
 bucket_paths = { path = "../../../lib/bucket_paths" }
-cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
+cloud_storage.workspace = true
 collections = { path = "../../../lib/data/collections" }
 composite_identifiers = { path = "../../../schema/public/composite_identifiers" }
 config = { path = "../../../lib/deprecated/config" }
@@ -47,23 +47,23 @@ datetimes = { path = "../../../lib/data/datetimes" }
 easyenv = { path = "../../../lib/easyenv" }
 elasticsearch_schema = { path = "../../../schema/database/elasticsearch_schema" }
 email_sender= { path = "../../../lib/email_sender" }
-enums = { workspace = true }
-enums_public = { workspace = true }
-errors = { workspace = true }
-fal_client = { workspace = true }
-filesys = { workspace = true }
-google_sign_in = { path = "../../../lib/api_clients/google_sign_in" }
+enums.workspace = true
+enums_public.workspace = true
+errors.workspace = true
+fal_client.workspace = true
+filesys.workspace = true
+google_sign_in = { path = "../../../api_clients/google_sign_in" }
 hashing = { path = "../../../lib/files/hashing" }
 http_server_common = { path = "../../../lib/deprecated/http_server_common" }
 idempotency = { path = "../../../lib/idempotency" }
-images = { workspace = true }
+images.workspace = true
 markdown = { path = "../../../lib/markdown" }
 media = { path = "../../../lib/files/media" }
 memory_caching = { path = "../../../lib/caching/memory_caching" }
 migration = { path = "../../../lib/migration" }
-mimetypes = { workspace = true }
+mimetypes.workspace = true
 mysql_queries = { path = "../../../schema/database/mysql_queries" }
-openai_sora_client = { path = "../../../lib/api_clients/openai_sora_client" }
+openai_sora_client = { path = "../../../api_clients/openai_sora_client" }
 password = { path = "../../../lib/password" }
 primitives = { path = "../../../lib/data/primitives" }
 prompt_engineering = { path = "../../../lib/machine_learning/prompt_engineering" }
@@ -72,9 +72,9 @@ redis_common = { path = "../../../schema/database/redis_common" }
 redis_schema = { path = "../../../schema/database/redis_schema" }
 reusable_types = { path = "../../../schema/public/reusable_types" }
 server_environment = { path = "../../../lib/server_environment" }
-shared_service_components = { workspace = true }
-thumbnail_generator = { path = "../../../lib/api_clients/thumbnail_generator" }
-tokens = { workspace = true }
+shared_service_components.workspace = true
+thumbnail_generator = { path = "../../../api_clients/thumbnail_generator" }
+tokens.workspace = true
 tts_common = { path = "../../../lib/tts_common" }
 url_config = { path = "../../../lib/url_config" }
 user_input_common = { path = "../../../lib/user_input_common" }
@@ -85,19 +85,19 @@ billing_component = { path = "../../plugins/billing" }
 user_traits_component = { path = "../../plugins/user_traits_component" }
 
 # External
-anyhow = { workspace = true }
-base64 = { workspace = true }
-chrono = { workspace = true }
+anyhow.workspace = true
+base64.workspace = true
+chrono.workspace = true
 derive_more = "0.99.17"
 hostname = "0.4.0"
 lexical-sort = "0.3.1"
-log = { workspace = true }
-once_cell = { workspace = true }
-rand = { workspace = true }
-regex = { workspace = true }
+log.workspace = true
+once_cell.workspace = true
+rand.workspace = true
+regex.workspace = true
 strum_macros = "0.26.4"
 time = "0.3.30"
-url = { workspace = true }
+url.workspace = true
 
 # Language tag parsing
 # TODO: Move to language support crate
@@ -105,11 +105,10 @@ language-tags = "0.3.2" # Parsing single tags richly
 
 # HTTP
 # TODO/NB: This is just for Twitch, but we might need it later.
-reqwest = { workspace = true }
+reqwest.workspace = true
 
 # Runtime
-# NB: We switched to Tokio from `async-std` for broader ecosystem support.
-tokio = { version = "1.38.0", features = ["macros"] }
+tokio.workspace = true
 
 # Futures
 futures = { version = "0.3.17", features = ["thread-pool"] } # feature for ThreadPool
@@ -127,21 +126,21 @@ elasticsearch = "8.5.0-alpha.1"
 
 # Files
 infer = "0.16.0"
-bytes = { workspace = true }
-tempdir = { workspace = true }
-tempfile = { workspace = true }
+bytes.workspace = true
+tempdir.workspace = true
+tempfile.workspace = true
 
 # The "never-encode-slash" feature seems to have been removed:
 # https://github.com/durch/rust-s3/pull/254
 rust-s3 = { version = "0.36.0-beta.2" }
 
-actix = { workspace = true }
-actix-http = { workspace = true }
-actix-multipart = { workspace = true }
-actix-service = { workspace = true }
-actix-web = { workspace = true }
-actix-web-actors = { workspace = true }
-actix-web-lab = { workspace = true }
+actix.workspace = true
+actix-http.workspace = true
+actix-multipart.workspace = true
+actix-service.workspace = true
+actix-web.workspace = true
+actix-web-actors.workspace = true
+actix-web-lab.workspace = true
 
 # Money
 async-stripe = { version = "0.26.0", default-features = false, features = ["runtime-tokio-hyper", "connect", "billing", "checkout", "webhook-events"] }
@@ -151,10 +150,10 @@ magic-crypt = "3.1.13" # encrypting sort IDs for the frontend so we don't leak i
 md-5 = "0.10.6" # gravatar
 
 # Serialization
-serde = { workspace = true }
-serde_derive = { workspace = true }
-serde_json = { workspace = true }
-toml = { workspace = true }
+serde.workspace = true
+serde_derive.workspace = true
+serde_json.workspace = true
+toml.workspace = true
 
 # Async traits
 # NB: note: `async` trait functions are not currently supported
@@ -179,4 +178,4 @@ testing = { path = "../../../lib/testing" }
 # Testing/Dev Deps: External
 speculoos = "0.11.0" # Fluent assertions
 strum = { version = "0.26", features = ["derive"] }
-tempfile = "3.10.1" # For testing
+tempfile.workspace = true

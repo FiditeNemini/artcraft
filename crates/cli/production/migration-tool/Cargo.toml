@@ -17,35 +17,35 @@ normal = ["workspace-build-acceleration"]
 
 [dependencies]
 # Workspace hack (faster compile times)
-workspace-build-acceleration = { workspace = true }
+workspace-build-acceleration.workspace = true
 
 # Internal
 bucket_paths = { path = "../../../lib/bucket_paths" }
-cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
+cloud_storage.workspace = true
 config = { path = "../../../lib/deprecated/config" }
 easyenv = { path = "../../../lib/easyenv" }
-enums = { path = "../../../schema/public/enums" }
-errors = { path = "../../../lib/errors" }
-filesys = { path = "../../../lib/files/filesys" }
+enums.workspace = true
+errors.workspace = true
+filesys.workspace = true
 hashing = { path = "../../../lib/files/hashing" }
 mysql_queries = { path = "../../../schema/database/mysql_queries" }
 storyteller_root = { path = "../../../lib/storyteller_root" }
-tokens = { path = "../../../schema/public/tokens" }
+tokens.workspace = true
 
 # External
 clap = "4.4.8"
-log = "0.4.14"
+log.workspace = true
 strum = { version = "0.26", features = ["derive"] }
-tempdir = "0.3.7"
+tempdir.workspace = true
 
 # Async + clients
-tokio = { version = "1.38.0", features = ["macros"] }
+tokio.workspace = true
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 
 # Serialization
-serde = "1.0.125"
-serde_derive = "1.0.125"
-serde_json = "1.0.108"
+serde.workspace = true
+serde_derive.workspace = true
+serde_json.workspace = true
 
 [dev-dependencies]
 # None yet

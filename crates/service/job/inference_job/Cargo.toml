@@ -17,52 +17,52 @@ normal = ["workspace-build-acceleration"]
 
 [dependencies]
 # cargo-hakari workspace hack (faster compile times)
-workspace-build-acceleration = { workspace = true }
+workspace-build-acceleration.workspace = true
 
 # Internal
 actix_helpers = { path = "../../../lib/actix_helpers" }
 bootstrap = { path = "../../../lib/bootstrap" }
 bucket_paths = { path = "../../../lib/bucket_paths" }
-cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
+cloud_storage.workspace = true
 collections = { path = "../../../lib/data/collections" }
 composite_identifiers = { path = "../../../schema/public/composite_identifiers" }
 concurrency = { path = "../../../lib/concurrency" }
 config = { path = "../../../lib/deprecated/config" }
-crockford = { path = "../../../lib/data/crockford" }
+crockford.workspace = true
 easyenv = { path = "../../../lib/easyenv" }
-enums = { path = "../../../schema/public/enums" }
-errors = { workspace = true }
-filesys = { workspace = true }
-google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }
+enums.workspace = true
+errors.workspace = true
+filesys.workspace = true
+google_drive_common = { path = "../../../api_clients/google_drive_common" }
 hashing = { path = "../../../lib/files/hashing" }
-images = { path = "../../../lib/files/images" }
+images.workspace = true
 jobs_common = { path = "../../../lib/jobs_common" }
 media = { path = "../../../lib/files/media" }
 memory_caching = { path = "../../../lib/caching/memory_caching" }
 migration = { path = "../../../lib/migration" }
 mimetypes = { path = "../../../lib/files/mimetypes" }
 mysql_queries = { path = "../../../schema/database/mysql_queries" }
-openai_sora_client = { path = "../../../lib/api_clients/openai_sora_client" }
-primitives = { path = "../../../lib/data/primitives" }
+openai_sora_client = { path = "../../../api_clients/openai_sora_client" }
+primitives.workspace = true
 redis_common = { path = "../../../schema/database/redis_common" }
 redis_schema = { path = "../../../schema/database/redis_schema" }
 shared_service_components = { workspace = true }
 subprocess_common = { path = "../../../lib/subprocess_common" }
-thumbnail_generator = { path = "../../../lib/api_clients/thumbnail_generator"}
-tokens = { path = "../../../schema/public/tokens" }
+thumbnail_generator = { path = "../../../api_clients/thumbnail_generator"}
+tokens.workspace = true
 tts_common = { path = "../../../lib/tts_common" }
 videos = { path = "../../../lib/files/videos" }
 
 # External
-anyhow = { workspace = true }
-chrono = { workspace = true }
+anyhow.workspace = true
+chrono.workspace = true
 dotenv = "0.15.0"
 hostname = "0.4.0"
 lfu = "0.2.5"
-log = { workspace = true }
-once_cell = { workspace = true }
+log.workspace = true
+once_cell.workspace = true
 subprocess = "0.2.9"
-tempdir = "0.3.7"
+tempdir.workspace = true
 
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 
@@ -79,12 +79,12 @@ tokio-stream = "0.1.16"
 reqwest = { version = "0.12.4", features = ["blocking"] }
 
 # HTTP Server
-actix-web = { workspace = true }
+actix-web.workspace = true
 
 # Serialization
-serde = { workspace = true }
-serde_derive = { workspace = true }
-serde_json = { workspace = true }
+serde.workspace = true
+serde_derive.workspace = true
+serde_json.workspace = true
 
 # Async traits
 # NB: note: `async` trait functions are not currently supported
