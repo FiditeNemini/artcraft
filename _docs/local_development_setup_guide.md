@@ -1,5 +1,5 @@
-FakeYou Development Setup (bare metal)
-======================================
+Local Development Setup Guide (for bare metal)
+==============================================
 
 This document describes how to run the FakeYou infrastructure on your development 
 machine's bare metal (no containers).

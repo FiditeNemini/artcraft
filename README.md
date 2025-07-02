@@ -1,7 +1,7 @@
 storyteller-rust
 ================
 
-Our Rust monorepo, which serves both our API surface area and our downloadable client applications.
+Our Artcraft monorepo, which serves our desktop application, backend infrastructure, and more.
 
 ```
                  ."-,.__
@@ -45,5 +45,6 @@ Our Rust monorepo, which serves both our API surface area and our downloadable c
                  / ,"'"\,'               `/  `-.|" 
 ```
 
-- [documentation](./_develop/docs)
-- [tools, misc](./_develop)
+- [developer documentation](./_docs)
+- [server API reference](https://storyteller-docs.netlify.app/)
+- [tools, scripts, misc](./script)
