@@ -6,6 +6,7 @@ use tauri::Manager;
 use crate::core::commands::app_preferences::get_app_preferences_command::get_app_preferences_command;
 use crate::core::commands::app_preferences::update_app_preference_command::update_app_preferences_command;
 use crate::core::commands::enqueue::image::enqueue_text_to_image_command::enqueue_text_to_image_command;
+use crate::core::commands::enqueue::image_edit::enqueue_contextual_edit_image_command::enqueue_contextual_edit_image_command;
 use crate::core::commands::enqueue::object::enqueue_image_to_3d_object_command::enqueue_image_to_3d_object_command;
 use crate::core::commands::enqueue::video::enqueue_image_to_video_command::enqueue_image_to_video_command;
 use crate::core::commands::flip_image::flip_image;
@@ -81,6 +82,8 @@ pub fn run() {
   let app_env_configs = AppEnvConfigs::load_from_filesystem(&app_data_root)
     .expect("AppEnvConfigs should be loaded from disk");
   
+  let app_env_configs_2 = app_env_configs.clone();
+  
   let provider_priority = match ProviderPriorityStore::from_filesystem_configs(&app_data_root) {
     Ok(Some(priority)) => {
       println!("Loaded provider priority from disk: {:?}", priority.get_priority());
@@ -134,6 +137,7 @@ pub fn run() {
       let app_3 = app.clone();
       let app_4 = app.clone();
       let app_5 = app.clone();
+      let app_env_configs_3 = app_env_configs_2.clone();
       let app_data_root_3 = app_data_root_2.clone();
       let app_data_root_4 = app_data_root_2.clone();
       let app_data_root_5 = app_data_root_2.clone();
@@ -172,9 +176,9 @@ pub fn run() {
       }
 
       tauri::async_runtime::spawn(main_window_thread(app_3, app_data_root_3, storyteller_creds_manager_2));
-      tauri::async_runtime::spawn(sora_task_polling_thread(app_4, app_data_root_4, sora_creds_manager_3, storyteller_creds_manager_3, sora_task_queue_2));
+      tauri::async_runtime::spawn(sora_task_polling_thread(app_4, app_env_configs_2, app_data_root_4, sora_creds_manager_3, storyteller_creds_manager_3, sora_task_queue_2));
       tauri::async_runtime::spawn(discord_presence_thread());
-      tauri::async_runtime::spawn(fal_task_polling_thread(app_5, app_data_root_5, fal_creds_manager_3, storyteller_creds_manager_4, fal_task_queue_3));
+      tauri::async_runtime::spawn(fal_task_polling_thread(app_5, app_env_configs_3, app_data_root_5, fal_creds_manager_3, fal_task_queue_3, storyteller_creds_manager_4));
 
       Ok(())
     })
@@ -189,6 +193,7 @@ pub fn run() {
     .manage(storyteller_creds_manager_3)
     .invoke_handler(tauri::generate_handler![
       check_sora_session_command,
+      enqueue_contextual_edit_image_command,
       enqueue_image_to_3d_object_command,
       enqueue_image_to_video_command,
       enqueue_text_to_image_command,
@@ -200,10 +205,10 @@ pub fn run() {
       get_app_preferences_command,
       get_fal_api_key_command,
       get_provider_order_command,
-      set_provider_order_command,
       open_sora_login_command,
       platform_info_command,
       set_fal_api_key_command,
+      set_provider_order_command,
       sora_image_generation_command,
       sora_image_remix_command,
       sora_logout_command,
