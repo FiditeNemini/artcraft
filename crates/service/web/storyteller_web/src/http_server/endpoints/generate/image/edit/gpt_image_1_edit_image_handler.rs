@@ -92,8 +92,10 @@ pub async fn gpt_image_1_edit_image_handler(
   };
   
   if media_files.len() != tokens.len() {
-    warn!("Wrong number of media files returned for tokens");
-    return Err(CommonWebError::BadInputWithSimpleMessage("Not all media files could be found.".to_string()));
+    warn!("Wrong number of media files returned for tokens: {} found for {} tokens", media_files.len(), tokens.len());
+    return Err(CommonWebError::BadInputWithSimpleMessage(
+      format!("Not all media files could be found. Media files found: {}, tokens provided: {}",
+        media_files.len(), tokens.len())));
   }
 
   let media_domain = get_media_domain(&http_request);

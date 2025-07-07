@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
-use sqlx::{Acquire, FromRow, MySql, MySqlConnection, MySqlPool, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
+use sqlx::{Acquire, FromRow, MySql, MySqlPool, QueryBuilder, Row};
 
 use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
 use enums::by_table::media_files::media_file_class::MediaFileClass;
@@ -9,6 +9,7 @@ use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCat
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
+use enums::common::visibility::Visibility;
 use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
@@ -64,6 +65,8 @@ pub struct MediaFilesByTokensRecord {
   pub maybe_file_cover_image_public_bucket_hash: Option<String>,
   pub maybe_file_cover_image_public_bucket_prefix: Option<String>,
   pub maybe_file_cover_image_public_bucket_extension: Option<String>,
+  
+  pub creator_set_visibility: Visibility,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -146,6 +149,8 @@ async fn get_raw_media_files_by_tokens(
           media_file_cover_image.public_bucket_directory_hash as maybe_file_cover_image_public_bucket_hash,
           media_file_cover_image.maybe_public_bucket_prefix as maybe_file_cover_image_public_bucket_prefix,
           media_file_cover_image.maybe_public_bucket_extension as maybe_file_cover_image_public_bucket_extension,
+          
+          m.creator_set_visibility,
 
           m.created_at,
           m.updated_at
@@ -163,8 +168,7 @@ async fn get_raw_media_files_by_tokens(
       LEFT OUTER JOIN prompts
           ON prompts.token = m.maybe_prompt_token
       WHERE
-          m.creator_set_visibility = "public"
-          AND m.token IN (
+          m.token IN (
       "#,
     )
 
@@ -212,6 +216,8 @@ async fn get_raw_media_files_by_tokens(
           media_file_cover_image.maybe_public_bucket_prefix as maybe_file_cover_image_public_bucket_prefix,
           media_file_cover_image.maybe_public_bucket_extension as maybe_file_cover_image_public_bucket_extension,
 
+          m.creator_set_visibility,
+
           m.created_at,
           m.updated_at
 
@@ -228,8 +234,7 @@ async fn get_raw_media_files_by_tokens(
       LEFT OUTER JOIN prompts
           ON prompts.token = m.maybe_prompt_token
       WHERE
-          m.creator_set_visibility = "public"
-          AND m.user_deleted_at IS NULL
+          m.user_deleted_at IS NULL
           AND m.mod_deleted_at IS NULL
           AND m.token IN (
       "#
@@ -318,6 +323,8 @@ fn map_to_media_files(dataset:Vec<RawMediaFileJoinUser>) -> Vec<MediaFilesByToke
           maybe_file_cover_image_public_bucket_prefix: media_file.maybe_file_cover_image_public_bucket_prefix,
           maybe_file_cover_image_public_bucket_extension: media_file.maybe_file_cover_image_public_bucket_extension,
 
+          creator_set_visibility: media_file.creator_set_visibility,
+          
           created_at: media_file.created_at,
           updated_at: media_file.updated_at,
         }
@@ -368,6 +375,8 @@ fn map_to_media_files(dataset:Vec<RawMediaFileJoinUser>) -> Vec<MediaFilesByToke
     pub maybe_file_cover_image_public_bucket_hash: Option<String>,
     pub maybe_file_cover_image_public_bucket_prefix: Option<String>,
     pub maybe_file_cover_image_public_bucket_extension: Option<String>,
+    
+    pub creator_set_visibility: Visibility,
 
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -418,6 +427,7 @@ impl FromRow<'_, MySqlRow> for RawMediaFileJoinUser {
       maybe_file_cover_image_public_bucket_hash: row.try_get("maybe_file_cover_image_public_bucket_hash")?,
       maybe_file_cover_image_public_bucket_prefix: row.try_get("maybe_file_cover_image_public_bucket_prefix")?,
       maybe_file_cover_image_public_bucket_extension: row.try_get("maybe_file_cover_image_public_bucket_extension")?,
+      creator_set_visibility: Visibility::try_from_mysql_row(row, "creator_set_visibility")?,
       created_at: row.try_get("created_at")?,
       updated_at: row.try_get("updated_at")?,
     })
