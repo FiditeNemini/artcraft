@@ -91,7 +91,13 @@ export const persistLogin = async () => {
   getUserInfoAndSubcriptions();
 };
 
+// NB: Only for SyncStorytellerApiConfig.
+export const forceGetUserInfoAndSubcriptions = async () => {
+  getUserInfoAndSubcriptions();
+};
+
 async function getUserInfoAndSubcriptions() {
+  console.log('getUserInfoAndSubcriptions()')
   updateAuthStatus(AUTH_STATUS.GET_USER_INFO);
   const usersApi = new UsersApi();
   const sessionResponse = await usersApi.GetSession();
