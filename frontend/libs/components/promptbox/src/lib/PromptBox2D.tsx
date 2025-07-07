@@ -21,6 +21,7 @@ import {
   faPlus,
   faUpload,
   faImages,
+  faExpandWide,
 } from "@fortawesome/pro-solid-svg-icons";
 import {
   faRectangleVertical,
@@ -44,6 +45,8 @@ import {
 import { showActionReminder } from "@storyteller/ui-action-reminder-modal";
 import { invoke } from "@tauri-apps/api/core";
 
+export type AspectRatio = "1:1" | "3:2" | "2:3";
+
 interface ReferenceImage {
   id: string;
   url: string;
@@ -66,6 +69,7 @@ interface PromptBox2DProps {
   useJobContext: () => JobContextType;
   onEnqueuePressed?: () => void | Promise<void>;
   onAspectRatioChange?: (ratio: AspectRatio) => void;
+  onFitPressed?: () => void | Promise<void>;
 }
 
 export const PromptBox2D = ({
@@ -75,6 +79,7 @@ export const PromptBox2D = ({
   useJobContext,
   onEnqueuePressed,
   onAspectRatioChange,
+  onFitPressed,
 }: PromptBox2DProps) => {
   useSignals();
 
@@ -124,7 +129,7 @@ export const PromptBox2D = ({
   });
 
   const handleAspectRatioSelect = (selectedItem: PopoverItem) => {
-    onAspectRatioChange?.(selectedItem.label);
+    onAspectRatioChange?.(selectedItem.label as AspectRatio);
     setAspectRatioList((prev) =>
       prev.map((item) => ({
         ...item,
@@ -612,6 +617,22 @@ export const PromptBox2D = ({
                   onClick={() => setUseSystemPrompt(!useSystemPrompt)}
                 />
               </Tooltip>
+              {onFitPressed && (
+                <Tooltip
+                  content={"Fit canvas to screen"}
+                  position="top"
+                  className="z-50"
+                  delay={200}
+                >
+                  <Button
+                    variant="secondary"
+                    className="h-9 w-9"
+                    onClick={onFitPressed}
+                  >
+                    <FontAwesomeIcon icon={faExpandWide} className="h-4 w-4" />
+                  </Button>
+                </Tooltip>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <Button
