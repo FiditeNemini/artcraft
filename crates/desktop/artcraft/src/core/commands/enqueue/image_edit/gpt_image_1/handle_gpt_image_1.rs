@@ -11,6 +11,7 @@ use crate::services::fal::state::fal_task_queue::FalTaskQueue;
 use crate::services::sora::state::sora_credential_manager::SoraCredentialManager;
 use crate::services::sora::state::sora_task_queue::SoraTaskQueue;
 use crate::services::storyteller::state::storyteller_credential_manager::StorytellerCredentialManager;
+use log::info;
 use tauri::AppHandle;
 
 pub async fn handle_gpt_image_1(
@@ -30,6 +31,8 @@ pub async fn handle_gpt_image_1(
   
   // TODO: Check if providers are available before proceeding.
 
+  info!("Providers by priority: {:?}", priority);
+
   for provider in priority.iter() {
     match provider {
       Provider::Fal => {
@@ -39,6 +42,7 @@ pub async fn handle_gpt_image_1(
         // the API nicer to deal with, but the user needs an additional key.
       }
       Provider::Artcraft => {
+        info!("Dispatching gpt-image-1 via Artcraft...");
         return handle_gpt_image_1_artcraft(
           request, 
           app,
@@ -48,6 +52,7 @@ pub async fn handle_gpt_image_1(
         ).await;
       }
       Provider::Sora => {
+        info!("Dispatching gpt-image-1 via Sora...");
         return handle_gpt_image_1_sora(
           request, 
           app,

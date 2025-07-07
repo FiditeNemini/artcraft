@@ -47,7 +47,7 @@ use tokens::tokens::media_files::MediaFileToken;
 pub struct EnqueueContextualEditImageCommand {
   /// The model to use.
   pub model: Option<ContextualImageEditModel>,
-  
+
   /// Images to use for the image edit.
   /// The first image is typically a 2D canvas or 3D stage, but doesn't have to be.
   /// There must be at least one image.
@@ -61,7 +61,7 @@ pub struct EnqueueContextualEditImageCommand {
 
   /// Number of images to generate.
   pub image_count: Option<u32>,
-  
+
   /// Aspect ratio.
   pub aspect_ratio: Option<EditImageSize>,
 
@@ -98,10 +98,10 @@ pub enum EnqueueContextualEditImageErrorType {
 
   /// Generic bad request error
   BadRequest,
-  
+
   /// Generic server error
   ServerError,
-  
+
   /// The user is sending too many requests
   TooManyConcurrentTasks,
   /// User is not logged into Sora!
@@ -131,8 +131,8 @@ pub async fn enqueue_contextual_edit_image_command(
   sora_creds_manager: State<'_, SoraCredentialManager>,
   sora_task_queue: State<'_, SoraTaskQueue>,
 ) -> ResponseOrErrorType<EnqueueContextualEditImageSuccessResponse, EnqueueContextualEditImageErrorType> {
-  
-  info!("enqueue_contextual_edit_image_command called; image media tokens : {:?}, full request: {:?}", 
+
+  info!("enqueue_contextual_edit_image_command called; image media tokens : {:?}, full request: {:?}",
     &request.image_media_tokens, &request);
 
   let result = handle_request(
@@ -147,11 +147,11 @@ pub async fn enqueue_contextual_edit_image_command(
     &sora_creds_manager,
     &sora_task_queue,
   ).await;
-  
+
   match result {
     Err(err) => {
       error!("Error enqueuing contextual edit image: {:?}", err);
-      
+
       // TODO: Derive from err. Make service provider optional.
       let event = GenerationEnqueueFailureEvent {
         action: GenerationAction::GenerateImage,

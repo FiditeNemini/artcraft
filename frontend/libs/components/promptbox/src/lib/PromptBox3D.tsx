@@ -51,6 +51,8 @@ import { Signal } from "@preact/signals-react";
 import {
   CheckSoraSession,
   CommandSuccessStatus,
+  EnqueueContextualEditImage,
+  EnqueueContextualEditImageModel,
   GetAppPreferences,
   SoraImageRemix,
   SoraImageRemixAspectRatio,
@@ -409,13 +411,14 @@ export const PromptBox3D = ({
   const handleTauriEnqueue = async () => {
     if (!prompt.trim()) return;
 
-    // Check if the Sora session is valid
-    const soraSession = await CheckSoraSession();
-    if (soraSession.state !== SoraSessionState.Valid) {
-      setIsEnqueueing(false);
-      await handleSoraLoginReminder();
-      return;
-    }
+    // NB(bt): This needs to move to an error handler.
+    // // Check if the Sora session is valid
+    // const soraSession = await CheckSoraSession();
+    // if (soraSession.state !== SoraSessionState.Valid) {
+    //   setIsEnqueueing(false);
+    //   await handleSoraLoginReminder();
+    //   return;
+    // }
 
     setIsEnqueueing(true);
 
@@ -445,15 +448,30 @@ export const PromptBox3D = ({
 
         const aspectRatio = getCurrentSoraRemixAspectRatio();
 
-        const generateResponse = await SoraImageRemix({
-          snapshot_media_token: snapshotResult.data!,
+        //const generateResponse = await SoraImageRemix({
+        //  snapshot_media_token: snapshotResult.data!,
+        //  disable_system_prompt: !useSystemPrompt,
+        //  prompt: prompt,
+        //  maybe_additional_images: referenceImages.map(
+        //    (image) => image.mediaToken
+        //  ),
+        //  maybe_number_of_samples: 1,
+        //  aspect_ratio: aspectRatio,
+        //});
+
+        // TODO: Add context tokens
+        //  maybe_additional_images: referenceImages.map((image) => image.mediaToken),
+        const imageMediaTokens = [
+          snapshotResult.data!
+        ]; 
+
+        const generateResponse = await EnqueueContextualEditImage({
+          model: EnqueueContextualEditImageModel.GptImage1,
+          image_media_tokens: imageMediaTokens,
           disable_system_prompt: !useSystemPrompt,
           prompt: prompt,
-          maybe_additional_images: referenceImages.map(
-            (image) => image.mediaToken
-          ),
-          maybe_number_of_samples: 1,
-          aspect_ratio: aspectRatio,
+          image_count: 1,
+          //aspect_ratio: aspectRatio,
         });
 
         console.log("generateResponse", generateResponse);
