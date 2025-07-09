@@ -14,6 +14,7 @@ import {
   faCircle,
   faSquare,
   faTriangle,
+  faDroplet,
 } from "@fortawesome/pro-regular-svg-icons";
 import "../../App.css";
 import { HsvaColorPicker, HsvaColor } from "react-colorful";
@@ -62,6 +63,7 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
   className = "",
 }) => {
   /* ------------------------------------------------ state ---------- */
+  const store = useSceneStore();
   const [open, setOpen] = useState<string | null>(null);
 
   const [brushSize, setBrushSize] = useState(16);
@@ -79,6 +81,52 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
     a: 1,
   });
 
+  // Get selected nodes for shape color picker
+  const selectedNodes =
+    store.selectedNodeIds.length > 0
+      ? store.nodes.filter((node) => store.selectedNodeIds.includes(node.id))
+      : [];
+
+  // Get first selected node for color preview (when multiple selected, show first one's color)
+  const firstSelectedNode = selectedNodes.length > 0 ? selectedNodes[0] : null;
+
+  // State for shape color picker
+  const [shapeHsva, setShapeHsva] = useState<HsvaColor>({
+    h: 240, // Blue hue
+    s: 100, // Full saturation
+    v: 70, // Medium brightness blue
+    a: 1,
+  });
+
+  // Update shape color picker when selection changes or store's shapeColor changes
+  React.useEffect(() => {
+    // Use selected node's color if available, otherwise use store's default shapeColor
+    const colorToUse = firstSelectedNode?.fill || store.shapeColor;
+
+    if (colorToUse && colorToUse.startsWith("#")) {
+      // Convert hex to HSVA (simplified - might want to change to proper converter later)
+      const hex = colorToUse;
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+
+      // Convert RGB to HSV (simplified)
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      const v = max / 255;
+      const s = max === 0 ? 0 : (max - min) / max;
+
+      let h = 0;
+      if (max !== min) {
+        if (max === r) h = (60 * ((g - b) / (max - min)) + 360) % 360;
+        else if (max === g) h = (60 * ((b - r) / (max - min)) + 120) % 360;
+        else h = (60 * ((r - g) / (max - min)) + 240) % 360;
+      }
+
+      setShapeHsva({ h, s: s * 100, v: v * 100, a: 1 });
+    }
+  }, [firstSelectedNode?.fill, store.shapeColor]);
+
   /* debounced parent calls */
   const sendPaint = useDebounced<
     (hex: string, size: number, opacity: number) => void,
@@ -87,6 +135,24 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
 
   const sendBg = useDebounced<(hex: string) => void, [string]>(
     onCanvasBackground,
+    75,
+  );
+
+  // Debounced shape color update - now updates ALL selected nodes AND store's shapeColor
+  const sendShapeColor = useDebounced<(hex: string) => void, [string]>(
+    (hex: string) => {
+      // Update the store's default shape color for future shapes
+      store.setShapeColor(hex);
+
+      // Update all selected nodes
+      selectedNodes.forEach((node) => {
+        store.updateNode(node.id, { fill: hex }, false); // Don't save state for each individual update
+      });
+      // Save state once after all updates
+      if (selectedNodes.length > 0) {
+        store.saveState();
+      }
+    },
     75,
   );
 
@@ -138,9 +204,11 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
 
   const BgPopout = makePicker(bgHsva, setBgHsva, sendBg);
 
+  // Shape color popout
+  const ShapePopout = makePicker(shapeHsva, setShapeHsva, sendShapeColor);
+
   /* ------------------------------------------------ tools ---------- */
 
-  const store = useSceneStore(); // Use store directly
   const tools = [
     {
       id: "select",
@@ -215,10 +283,19 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
       id: "background",
       label: "Canvas Background",
       icon: (
-        <span
-          className="inline-block h-5 w-5 rounded-full border-2 border-white"
-          style={{ backgroundColor: hsvaToHex(bgHsva) }}
-        />
+        <div className="relative inline-flex h-5 w-5 items-center justify-center">
+          <span
+            className="absolute h-5 w-5 rounded-full border-2 border-white"
+            style={{ backgroundColor: hsvaToHex(bgHsva) }}
+          />
+          <FontAwesomeIcon
+            icon={faDroplet}
+            className="relative h-2 w-2 text-white drop-shadow-sm"
+            style={{
+              filter: "drop-shadow(0 0 1px rgba(0,0,0,0.8))",
+            }}
+          />
+        </div>
       ),
       popout: BgPopout,
     },
@@ -248,6 +325,32 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
     <aside
       className={`glass ml-4 flex flex-col items-center gap-3 rounded-xl p-1.5 shadow-lg ${className}`}
     >
+      {/* Shape Color Picker - appears above toolbar when shape is selected */}
+      {selectedNodes.length > 0 && (
+        <div className="glass absolute -top-14 left-1/2 -translate-x-1/2 rounded-xl border-2 border-primary/50 shadow-lg">
+          <div className="relative">
+            <button
+              className="flex h-10 w-10 items-center justify-center rounded-lg border-2 border-transparent text-white transition-colors hover:bg-white/10"
+              onMouseEnter={() => setOpen("shape-color")}
+            >
+              <span
+                className="inline-block h-5 w-5 rounded-full border-2 border-white"
+                style={{ backgroundColor: firstSelectedNode?.fill }}
+              />
+            </button>
+
+            {open === "shape-color" && (
+              <div
+                onMouseLeave={() => setOpen(null)}
+                className="absolute left-14 top-1/2 -translate-y-1/2 rounded-xl border border-[#404040] bg-[#303030] transition-all duration-200 ease-in-out"
+              >
+                {ShapePopout}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {tools.map((tool) => {
         if (tool.type === "separator") {
           return <div key={tool.id} className="my-1 h-px w-8 bg-white/15" />;
@@ -291,37 +394,127 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
 
         return (
           <div key={id} className="relative">
-            <Tooltip
-              content={label}
-              position="right"
-              closeOnClick={true}
-              className="ms-1 rounded-md px-3 py-1"
-              delay={100}
-            >
-              {popout ? (
-                <button
-                  onClick={() => {
-                    onClick?.();
-                    setOpen(open === id ? null : id);
-                  }}
-                  className={`${baseBtn} ${btnStyle}`}
-                >
-                  {displayIcon}
-                </button>
-              ) : (
-                <button
-                  onClick={() => {
-                    onClick?.();
-                  }}
-                  className={`${baseBtn} ${btnStyle}`}
-                >
-                  {displayIcon}
-                </button>
-              )}
-            </Tooltip>
+            {/* Hide tooltip for brush tool when active and popover is open */}
+            {!(id === "draw" && active && open === id) && (
+              <Tooltip
+                content={label}
+                position="right"
+                closeOnClick={true}
+                className="ms-1 rounded-md px-3 py-1"
+                delay={100}
+              >
+                {popout ? (
+                  <button
+                    onClick={() => {
+                      onClick?.();
+                      // For brush tool, don't toggle popout on click when active - only show on hover
+                      if (id !== "draw" || !active) {
+                        setOpen(open === id ? null : id);
+                      }
+                    }}
+                    onMouseEnter={() => {
+                      // Show popover on hover for active brush tool
+                      if (id === "draw" && active) {
+                        setOpen(id);
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      // Don't immediately hide popover for active brush tool - let popover handle it
+                      if (id === "draw" && active) {
+                        // Add a small delay to allow moving to popover
+                        setTimeout(() => {
+                          // Only close if mouse is not over the popover
+                          const popoverElement = document.querySelector(
+                            `[data-popover="${id}"]`,
+                          );
+                          if (
+                            !popoverElement ||
+                            !popoverElement.matches(":hover")
+                          ) {
+                            setOpen(null);
+                          }
+                        }, 200);
+                      }
+                    }}
+                    className={`${baseBtn} ${btnStyle}`}
+                  >
+                    {displayIcon}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      onClick?.();
+                    }}
+                    className={`${baseBtn} ${btnStyle}`}
+                  >
+                    {displayIcon}
+                  </button>
+                )}
+              </Tooltip>
+            )}
+
+            {/* Render button without tooltip when brush is active and popover is open */}
+            {id === "draw" && active && open === id && (
+              <>
+                {popout ? (
+                  <button
+                    onClick={() => {
+                      onClick?.();
+                      // For brush tool, don't toggle popout on click when active - only show on hover
+                      if (id !== "draw" || !active) {
+                        setOpen(open === id ? null : id);
+                      }
+                    }}
+                    onMouseEnter={() => {
+                      // Show popover on hover for active brush tool
+                      if (id === "draw" && active) {
+                        setOpen(id);
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      // Don't immediately hide popover for active brush tool - let popover handle it
+                      if (id === "draw" && active) {
+                        // Add a small delay to allow moving to popover
+                        setTimeout(() => {
+                          // Only close if mouse is not over the popover
+                          const popoverElement = document.querySelector(
+                            `[data-popover="${id}"]`,
+                          );
+                          if (
+                            !popoverElement ||
+                            !popoverElement.matches(":hover")
+                          ) {
+                            setOpen(null);
+                          }
+                        }, 100);
+                      }
+                    }}
+                    className={`${baseBtn} ${btnStyle}`}
+                  >
+                    {displayIcon}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      onClick?.();
+                    }}
+                    className={`${baseBtn} ${btnStyle}`}
+                  >
+                    {displayIcon}
+                  </button>
+                )}
+              </>
+            )}
 
             {open === id && popout && (
               <div
+                data-popover={id}
+                onMouseEnter={() => {
+                  // Keep popover open when mouse enters
+                  if (id === "draw" && active) {
+                    setOpen(id);
+                  }
+                }}
                 onMouseLeave={() => {
                   setOpen(null);
                 }}

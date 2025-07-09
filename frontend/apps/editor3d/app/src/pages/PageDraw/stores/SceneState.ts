@@ -74,6 +74,8 @@ interface SceneState {
   fillColor: string;
   // Currently selected shape when shape tool is active
   currentShape: "rectangle" | "circle" | "triangle" | null;
+  // Default color for new shapes
+  shapeColor: string;
 
   // Cursor state
   cursorPosition: { x: number; y: number } | null;
@@ -175,6 +177,7 @@ interface SceneState {
 
   // Shape tool actions
   setCurrentShape: (shape: "rectangle" | "circle" | "triangle") => void;
+  setShapeColor: (color: string) => void;
 
   // Cursor actions
   setCursorPosition: (position: { x: number; y: number } | null) => void;
@@ -255,6 +258,8 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   fillColor: "white",
   // Shape tool initial state
   currentShape: null,
+  // Default color for new shapes
+  shapeColor: "#4d79b3",
 
   // Cursor initial state
   cursorPosition: null,
@@ -403,8 +408,9 @@ export const useSceneStore = create<SceneState>((set, get) => ({
     y: number,
     width = 100,
     height = 100,
-    fill = "#e0e0e0",
+    fill?: string,
   ) => {
+    const finalFill = fill || get().shapeColor;
     const node = new Node({
       id: generateId(),
       type: "rectangle",
@@ -412,7 +418,7 @@ export const useSceneStore = create<SceneState>((set, get) => ({
       y,
       width,
       height,
-      fill,
+      fill: finalFill,
       stroke: "#444",
       strokeWidth: 2,
       draggable: true,
@@ -421,7 +427,8 @@ export const useSceneStore = create<SceneState>((set, get) => ({
     get().setActiveTool("select"); // Switch to select tool after creating
   },
 
-  createCircle: (x: number, y: number, radius = 50, fill = "#f0f0f0") => {
+  createCircle: (x: number, y: number, radius = 50, fill?: string) => {
+    const finalFill = fill || get().shapeColor;
     const node = new Node({
       id: generateId(),
       type: "circle",
@@ -429,7 +436,7 @@ export const useSceneStore = create<SceneState>((set, get) => ({
       y,
       width: radius * 2,
       height: radius * 2,
-      fill,
+      fill: finalFill,
       stroke: "#333",
       strokeWidth: 2,
       draggable: true,
@@ -443,8 +450,9 @@ export const useSceneStore = create<SceneState>((set, get) => ({
     y: number,
     width = 100,
     height = 100,
-    fill = "#d0d0d0",
+    fill?: string,
   ) => {
+    const finalFill = fill || get().shapeColor;
     const node = new Node({
       id: generateId(),
       type: "triangle",
@@ -452,7 +460,7 @@ export const useSceneStore = create<SceneState>((set, get) => ({
       y,
       width,
       height,
-      fill,
+      fill: finalFill,
       stroke: "#555",
       strokeWidth: 2,
       draggable: true,
@@ -983,6 +991,7 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   // Shape tool actions
   setCurrentShape: (shape: "rectangle" | "circle" | "triangle") =>
     set({ currentShape: shape }),
+  setShapeColor: (color: string) => set({ shapeColor: color }),
 
   // Cursor actions
   setCursorPosition: (position: { x: number; y: number } | null) =>

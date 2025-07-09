@@ -306,7 +306,7 @@ export const PaintSurface = ({
         y: stagePoint.y,
         width: 1,
         height: 1,
-        fill: "#e0e0e0",
+        fill: store.shapeColor, // Use current shape color from store
         stroke: "#444",
         strokeWidth: 2,
         draggable: true,

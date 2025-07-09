@@ -332,9 +332,7 @@ export const PromptBox2D = ({
     const generateResponse = await EnqueueContextualEditImage({
       model: EnqueueContextualEditImageModel.GptImage1,
       scene_image_media_token: snapshotMediaToken.data!,
-      image_media_tokens: referenceImages.map(
-        (image) => image.mediaToken
-      ),
+      image_media_tokens: referenceImages.map((image) => image.mediaToken),
       disable_system_prompt: !useSystemPrompt,
       prompt: prompt,
       image_count: 1,
@@ -623,10 +621,11 @@ export const PromptBox2D = ({
                 >
                   <Button
                     variant="secondary"
-                    className="h-9 w-9"
+                    className="h-9"
                     onClick={onFitPressed}
                   >
                     <FontAwesomeIcon icon={faFrame} className="h-4 w-4" />
+                    Fit
                   </Button>
                 </Tooltip>
               )}
