@@ -2,17 +2,19 @@ import React, { useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMousePointer,
-  faShapes,
   faTrash,
   faEyeDropper,
   faImage,
-  faSquare,
-  faCircle,
   faUndo,
   faRedo,
   faPaintBrush,
-  faTriangle,
 } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faShapes,
+  faCircle,
+  faSquare,
+  faTriangle,
+} from "@fortawesome/pro-regular-svg-icons";
 import "../../App.css";
 import { HsvaColorPicker, HsvaColor } from "react-colorful";
 import { hsvaToHex } from "@uiw/color-convert";
