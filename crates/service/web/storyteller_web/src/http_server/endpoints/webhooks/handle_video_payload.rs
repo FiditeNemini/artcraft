@@ -107,7 +107,7 @@ pub async fn handle_video_payload(
       .maybe_creator_anonymous_visitor(job.maybe_creator_anonymous_visitor_token.as_ref())
       .creator_ip_address(&job.creator_ip_address)
       .public_bucket_directory_hash(&public_upload_path)
-      .media_file_class(MediaFileClass::Image)
+      .media_file_class(MediaFileClass::Video)
       .media_file_type(media_file_type)
       .media_file_origin_category(MediaFileOriginCategory::Inference)
       //.media_file_origin_product_category(MediaFileOriginProductCategory::Unknown)
