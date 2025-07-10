@@ -5,22 +5,17 @@ import {
   Rect,
   Ellipse,
   Circle,
-  Text,
   Line,
   Image,
   RegularPolygon,
   Transformer,
 } from "react-konva";
-import Konva from "konva"; // Import Konva namespace for types
-
-import { LineNode } from "./stores/SceneState";
-import { Node, NodeType } from "./Node";
+import Konva from "konva";
+import { LineNode, useSceneStore } from "./stores/SceneState";
+import { Node } from "./Node";
 import { useStageSnapshot } from "./hooks/useUpdateSnapshot";
-// https://github.com/SaladTechnologies/comfyui-api
 import "./App.css";
 import SplitPane from "./components/ui/SplitPane";
-
-import { useSceneStore } from "./stores/SceneState";
 import { useRightPanelLayoutManagement } from "./hooks/useRightPanelLayoutManagement";
 import { useStageCentering } from "./hooks/useCenteredStage";
 import { useGlobalMouseUp } from "./hooks/useGlobalMouseUp";
@@ -50,38 +45,29 @@ export const PaintSurface = ({
   stageRef,
   transformerRefs,
 }: MiraiProps) => {
-  // switch off to be preview panel mode.
   const singlePaneMode = true;
 
-  const store = useSceneStore(); // Use store directly
-  const imageRef = React.useRef<HTMLImageElement>(null);
-  const [snapshotImage, setSnapshotImage] = useState<HTMLImageElement | null>(
-    null,
-  );
+  const store = useSceneStore();
+  const imageRef = React.useRef<Konva.Image>(null);
   const leftPanelRef = React.useRef<Konva.Layer>(null);
   const rightContainerRef = React.useRef<HTMLDivElement>(null);
   const cursorLayerRef = React.useRef<Konva.Layer>(null);
   const cursorShapeRef = React.useRef<Konva.Circle>(null);
 
-  // Add container ref and dimensions state
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [containerDimensions, setContainerDimensions] = useState({
     width: window.innerWidth,
     height: window.innerHeight - 56,
   });
 
-  // Layout 683 by 1024
-  const [leftPanelWidth, setLeftPanelWidth] = useState(1024);
-  const [leftPanelHeight, setLeftPanelHeight] = useState(1024);
-  const [rightPanelWidth, setRightPanelWidth] = useState(1024);
-  const [rightPanelHeight, setRightPanelHeight] = useState(1024);
+  const leftPanelWidth = 1024;
+  const leftPanelHeight = 1024;
+  const rightPanelWidth = 1024;
+  const rightPanelHeight = 1024;
 
-  /* 1️⃣ Track SplitPane percent so we can re-measure */
   const [leftPct, setLeftPct] = useState(singlePaneMode ? 100 : 50);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [lastPoint, setLastPoint] = useState<{ x: number; y: number } | null>(
-    null,
-  );
+  const [, setLastPoint] = useState<{ x: number; y: number } | null>(null);
 
   const selectionRectRef = React.useRef<Konva.Rect>(null);
   const [selectionRect, setSelectionRect] = useState<{
@@ -92,13 +78,9 @@ export const PaintSurface = ({
   } | null>(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  // Add a ref to track if we're currently selecting
   const isSelectingRef = React.useRef(false);
-
-  // Add state to track the current line being drawn
   const [currentLineId, setCurrentLineId] = useState<string | null>(null);
 
-  /* ---------- shape drawing state ---------- */
   const [isDrawingShape, setIsDrawingShape] = useState(false);
   const [currentShapeId, setCurrentShapeId] = useState<string | null>(null);
   const [shapeStartPoint, setShapeStartPoint] = useState<{
@@ -112,7 +94,6 @@ export const PaintSurface = ({
     height: number;
   } | null>(null);
 
-  // Add useLayoutEffect to measure container dimensions
   useLayoutEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
@@ -124,20 +105,17 @@ export const PaintSurface = ({
       }
     };
 
-    // Initial measurement
     updateDimensions();
 
-    // Add resize observer for responsive updates
     const resizeObserver = new ResizeObserver(updateDimensions);
     if (containerRef.current) {
       resizeObserver.observe(containerRef.current);
     }
 
-    // Cleanup
     return () => {
       resizeObserver.disconnect();
     };
-  }, [leftPct]); // Re-run when split pane percentage changes
+  }, [leftPct]);
 
   const stagePosition = useStageCentering(
     stageRef,
@@ -149,16 +127,9 @@ export const PaintSurface = ({
   const NATURAL_WIDTH = rightPanelWidth;
   const NATURAL_HEIGHT = rightPanelHeight;
 
-  // transform variables
   const multiSelectTransformerRef = React.useRef<Konva.Transformer>(null);
 
-  // better to double buffer and use a queue and submit to a queue
-  // useStageSnapshot(
-  //   stageRef,
-  //   imageRef,
-  //   isSelectingRef,
-  //   transformerRefs
-  // );
+  useStageSnapshot(stageRef, imageRef, isSelectingRef, transformerRefs);
 
   const previewScale = useRightPanelLayoutManagement(
     rightContainerRef,
@@ -184,24 +155,23 @@ export const PaintSurface = ({
     y: number;
   }): { x: number; y: number } => {
     return {
-      x: Math.max(0, Math.min(point.x, store.getAspectRatioDimensions().width)), //leftPanelWidth)),
+      x: Math.max(0, Math.min(point.x, store.getAspectRatioDimensions().width)),
       y: Math.max(
         0,
         Math.min(point.y, store.getAspectRatioDimensions().height),
-      ), //leftPanelHeight)),
+      ),
     };
   };
 
   const isWithinLeftPanel = (point: { x: number; y: number }): boolean => {
     return (
       point.x >= 0 &&
-      point.x <= store.getAspectRatioDimensions().width && //leftPanelWidth &&
+      point.x <= store.getAspectRatioDimensions().width &&
       point.y >= 0 &&
-      point.y <= store.getAspectRatioDimensions().height // leftPanelHeight
+      point.y <= store.getAspectRatioDimensions().height
     );
   };
 
-  // Helper function to determine if nodes should be draggable
   const draggableIfToolsNotActive = (
     activeTool: string,
     nodeDraggable: boolean,
@@ -214,10 +184,7 @@ export const PaintSurface = ({
     );
   };
 
-  // Combined mouse handlers
-  const handleStageMouseDown = (
-    e: Konva.KonvaEventObject<MouseEvent | TouchEvent>,
-  ) => {
+  const handleStageMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
     const stage = stageRef.current;
     if (!stage) return;
     const point = stage.getPointerPosition();
@@ -228,25 +195,34 @@ export const PaintSurface = ({
       y: (point.y - stage.y()) / stage.scaleY(),
     };
 
-    // Only set isDragging if the point is outside the panel bounds first mouse button
-    if (!isWithinLeftPanel(stagePoint)) {
+    // Check if the target is a transformer or its children (handles)
+    const isTransformerTarget =
+      e.target.getClassName() === "Transformer" ||
+      e.target.getParent()?.getClassName() === "Transformer" ||
+      e.target.name()?.includes("_anchor") ||
+      e.target.name()?.includes("rotater");
+
+    if (!isWithinLeftPanel(stagePoint) && !isTransformerTarget) {
       setIsDragging(true);
       return;
     }
 
-    // Dragging and panning the stage given the middle mouse.
-    if (e.evt.button === 1 || e.evt.button === 2) {
-      setIsDragging(true);
+    if (
+      "button" in e.evt &&
+      ((e.evt as MouseEvent).button === 1 || (e.evt as MouseEvent).button === 2)
+    ) {
+      if (!isTransformerTarget) {
+        setIsDragging(true);
+      }
       return;
     }
 
-    // Handle drawing tools - only start if within bounds
     if (
       (activeTool === "draw" || activeTool === "eraser") &&
       isWithinLeftPanel(stagePoint)
     ) {
       const lineId = `line-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      let opacity = activeTool === "draw" ? store.brushOpacity : 1;
+      const opacity = activeTool === "draw" ? store.brushOpacity : 1;
 
       const newLineNode: LineNode = {
         id: lineId,
@@ -257,16 +233,16 @@ export const PaintSurface = ({
         draggable: true,
         opacity: opacity,
         locked: false,
+        zIndex: store.lineNodes.length,
       };
       store.selectNode(null);
-      store.addLineNode(newLineNode, false); // Don't save state when starting line
+      store.addLineNode(newLineNode, false);
       setCurrentLineId(lineId);
       setIsDrawing(true);
       setLastPoint(stagePoint);
       return;
     }
 
-    // Handle selection rectangle
     if (activeTool === "select" && e.target === e.target.getStage()) {
       const stage = stageRef.current;
       if (!stage) return;
@@ -278,7 +254,6 @@ export const PaintSurface = ({
         y: (point.y - stage.y()) / stage.scaleY(),
       };
 
-      // Clamp the starting point to left panel bounds
       const clampedPoint = clampToLeftPanel(stagePoint);
 
       setIsSelecting(true);
@@ -292,7 +267,6 @@ export const PaintSurface = ({
       });
     }
 
-    // Handle shape drawing tool
     if (
       activeTool === "shape" &&
       store.currentShape &&
@@ -306,7 +280,7 @@ export const PaintSurface = ({
         y: stagePoint.y,
         width: 1,
         height: 1,
-        fill: store.shapeColor, // Use current shape color from store
+        fill: store.shapeColor,
         stroke: "#444",
         strokeWidth: 2,
         draggable: true,
@@ -340,13 +314,10 @@ export const PaintSurface = ({
     }
   };
 
-  const handleStageMouseMove = (
-    e: Konva.KonvaEventObject<MouseEvent | TouchEvent>,
-  ) => {
+  const handleStageMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
     const stage = stageRef.current;
     if (!stage) return;
 
-    // Get pointer position and check if it's within canvas bounds
     const pointer = stage.getPointerPosition();
     if (pointer) {
       const stagePoint = {
@@ -356,9 +327,8 @@ export const PaintSurface = ({
 
       const isWithinCanvas = isWithinLeftPanel(stagePoint);
 
-      // Update cursor based on position and tool
       if (activeTool === "draw" || activeTool === "eraser") {
-        if (isWithinCanvas) {
+        if (isWithinCanvas || isDrawing) {
           stage.container().style.cursor = "none";
           store.setCursorPosition(pointer);
           store.setCursorVisible(true);
@@ -383,25 +353,28 @@ export const PaintSurface = ({
       }
     }
 
-    // Only handle panning if we're actually dragging
     if (isDragging) {
       const currentStage = e.target.getStage();
       if (!currentStage) return;
 
-      // Update cursor to grabbing while dragging
       currentStage.container().style.cursor = "grabbing";
 
-      // Use a multiplier to make middle mouse dragging more responsive
-      const dragSensitivity = 3.0; // Much higher sensitivity for faster dragging
-      const newPos = {
-        x: currentStage.x() + e.evt.movementX * dragSensitivity,
-        y: currentStage.y() + e.evt.movementY * dragSensitivity,
-      };
+      const dragSensitivity = 3.0;
+      let newPos = { x: currentStage.x(), y: currentStage.y() };
+      if ("movementX" in e.evt && "movementY" in e.evt) {
+        newPos = {
+          x:
+            currentStage.x() +
+            (e.evt as MouseEvent).movementX * dragSensitivity,
+          y:
+            currentStage.y() +
+            (e.evt as MouseEvent).movementY * dragSensitivity,
+        };
+      }
       currentStage.position(newPos);
       return;
     }
 
-    // Handle drawing - only add points if within bounds
     if (
       isDrawing &&
       currentLineId &&
@@ -415,28 +388,21 @@ export const PaintSurface = ({
         y: (point.y - stage.y()) / stage.scaleY(),
       };
 
-      if (isWithinLeftPanel(stagePoint)) {
-        const currentLine = store.lineNodes.find(
-          (line) => line.id === currentLineId,
-        );
-        if (currentLine) {
-          const updatedPoints = [
-            ...currentLine.points,
-            stagePoint.x,
-            stagePoint.y,
-          ];
-          store.updateLineNode(currentLineId, { points: updatedPoints }, false); // Don't save state while drawing
-        }
-        setLastPoint(stagePoint);
-      } else {
-        // Stop drawing when going out of bounds
-        setIsDrawing(false);
-        setCurrentLineId(null);
-        setLastPoint(null);
+      // Continue drawing regardless of canvas boundaries
+      const currentLine = store.lineNodes.find(
+        (line) => line.id === currentLineId,
+      );
+      if (currentLine) {
+        const updatedPoints = [
+          ...currentLine.points,
+          stagePoint.x,
+          stagePoint.y,
+        ];
+        store.updateLineNode(currentLineId, { points: updatedPoints }, false);
       }
+      setLastPoint(stagePoint);
     }
 
-    // Handle shape resizing during drawing
     if (isDrawingShape && currentShapeId && shapeStartPoint) {
       const point = stage.getPointerPosition();
       if (!point) return;
@@ -446,16 +412,13 @@ export const PaintSurface = ({
         y: (point.y - stage.y()) / stage.scaleY(),
       };
 
-      // Clamp within bounds
       const clamped = clampToLeftPanel(stagePoint);
 
       const start = shapeStartPoint;
 
-      // Deltas
       let dx = clamped.x - start.x;
       let dy = clamped.y - start.y;
 
-      // If Shift key is held, constrain to proportional (square / circle / equilateral triangle)
       const shiftHeld = (e.evt as MouseEvent).shiftKey;
       const keepSquare = shiftHeld;
       if (keepSquare) {
@@ -464,9 +427,9 @@ export const PaintSurface = ({
         dy = dy < 0 ? -side : side;
       }
 
-      // Compute top-left corner & positive width/height
-      let newX = dx < 0 ? start.x + dx : start.x;
-      let newY = dy < 0 ? start.y + dy : start.y;
+      const newX = dx < 0 ? start.x + dx : start.x;
+      const newY = dy < 0 ? start.y + dy : start.y;
+
       const newWidth = Math.abs(dx);
       const newHeight = Math.abs(dy);
 
@@ -482,7 +445,6 @@ export const PaintSurface = ({
       setShapePreview({ x: newX, y: newY, width: newWidth, height: newHeight });
     }
 
-    // Handle selection rectangle - Update directly through Konva
     if (isSelecting && selectionRectRef.current) {
       const point = stage.getPointerPosition();
       if (!point) return;
@@ -491,10 +453,8 @@ export const PaintSurface = ({
         y: (point.y - stage.y()) / stage.scaleY(),
       };
 
-      // Clamp the current point to left panel bounds
       const clampedPoint = clampToLeftPanel(stagePoint);
 
-      // Update the rectangle directly through Konva without React state
       if (selectionRect) {
         selectionRectRef.current.setAttrs({
           x: Math.min(selectionRect.startX, clampedPoint.x),
@@ -504,11 +464,9 @@ export const PaintSurface = ({
         });
       }
 
-      // Only update React state for the end points (needed for selection logic)
       setSelectionRect((prev) =>
         prev
           ? {
-              // Ensure prev is not null
               ...prev,
               endX: clampedPoint.x,
               endY: clampedPoint.y,
@@ -520,27 +478,23 @@ export const PaintSurface = ({
 
   const handleStageMouseUp = () => {
     if (isDrawing) {
-      store.saveState(); // Save state only when the stroke is complete
+      store.saveState();
     }
 
     if (isDrawingShape && currentShapeId) {
       store.saveState();
-      // Automatically return to select tool after shape creation and select the new node
       store.setActiveTool("select");
       store.selectNode(currentShapeId);
     }
 
     if (isSelecting && selectionRect) {
-      // Calculate the bounds of the selection rectangle
       const left = Math.min(selectionRect.startX, selectionRect.endX);
       const right = Math.max(selectionRect.startX, selectionRect.endX);
       const top = Math.min(selectionRect.startY, selectionRect.endY);
       const bottom = Math.max(selectionRect.startY, selectionRect.endY);
 
-      // Find all nodes that intersect with the selection rectangle
       const selectedIds: string[] = [];
 
-      // Check regular nodes
       nodes.forEach((node) => {
         if (
           node.x + node.width >= left &&
@@ -552,12 +506,9 @@ export const PaintSurface = ({
         }
       });
 
-      // Check line nodes
       store.lineNodes.forEach((node) => {
-        // Check if any point of the line is within the selection rectangle
         const isInSelection = node.points.some((point, index) => {
           if (index % 2 === 0) {
-            // x coordinate
             const x = point;
             const y = node.points[index + 1];
             return x >= left && x <= right && y >= top && y <= bottom;
@@ -570,7 +521,6 @@ export const PaintSurface = ({
         }
       });
 
-      // Select all found nodes
       if (selectedIds.length > 0) {
         store.selectNode(selectedIds[0], true);
         selectedIds.slice(1).forEach((id) => {
@@ -579,10 +529,9 @@ export const PaintSurface = ({
       }
     }
 
-    // Always reset all states
     setIsDragging(false);
     setIsDrawing(false);
-    setCurrentLineId(null); // Clear the current line ID
+    setCurrentLineId(null);
     setIsSelecting(false);
     isSelectingRef.current = false;
     onSelectionChange?.(false);
@@ -594,13 +543,11 @@ export const PaintSurface = ({
     setShapePreview(null);
   };
 
-  // State for tracking pinch gestures
   const [lastPinchDistance, setLastPinchDistance] = useState<number | null>(
     null,
   );
   const [isPinching, setIsPinching] = useState(false);
 
-  // Helper function to get distance between two touch points
   const getTouchDistance = (touches: TouchList) => {
     if (touches.length < 2) return 0;
     const touch1 = touches[0];
@@ -611,7 +558,6 @@ export const PaintSurface = ({
     );
   };
 
-  // Helper function to get center point between two touches
   const getTouchCenter = (touches: TouchList) => {
     if (touches.length < 2) return null;
     const touch1 = touches[0];
@@ -635,39 +581,30 @@ export const PaintSurface = ({
       y: (pointer.y - stage.y()) / oldScale,
     };
 
-    // Detect if this is a pinch gesture (ctrlKey is set on Mac trackpad pinch)
     const isPinchGesture = e.evt.ctrlKey;
     const deltaY = e.evt.deltaY;
     const absDelta = Math.abs(deltaY);
 
-    // Detect Mac trackpad vs mouse wheel more precisely
     const isMac = navigator.userAgent.includes("Mac");
 
-    // Track-pad scroll on Mac: pixel-based (deltaMode===0) and very small deltas (|delta|≤10)
     const isMacTrackpadScroll =
       isMac && !isPinchGesture && e.evt.deltaMode === 0 && absDelta <= 10;
 
     let zoomFactor;
 
     if (isPinchGesture) {
-      // Mac trackpad pinch gesture – fast & smooth
       const pinchSensitivity = 0.2;
-      zoomFactor = 1 + deltaY * pinchSensitivity * -0.01; // invert
+      zoomFactor = 1 + deltaY * pinchSensitivity * -0.01;
     } else if (isMacTrackpadScroll) {
-      // Block two-finger scroll on Mac track-pads – no zoom
       return;
     } else {
-      // Mouse wheel on any platform → smooth exponential scale
-      const mouseSensitivity = 0.0005; // reduced sensitivity for slower zoom
+      const mouseSensitivity = 0.0005;
       zoomFactor = Math.exp(-deltaY * mouseSensitivity);
     }
 
-    // Apply zoom limits
     const newScale = Math.max(0.1, Math.min(10, oldScale * zoomFactor));
 
-    // Only apply zoom if within limits
     if (newScale !== oldScale) {
-      // Calculate new position for zoom-to-cursor
       const newPos = {
         x: pointer.x - mousePointTo.x * newScale,
         y: pointer.y - mousePointTo.y * newScale,
@@ -678,7 +615,6 @@ export const PaintSurface = ({
     }
   };
 
-  // Handle touch events for proper pinch-to-zoom on mobile/trackpad
   const handleTouchStart = (e: Konva.KonvaEventObject<TouchEvent>) => {
     const touches = e.evt.touches;
     if (touches.length === 2) {
@@ -702,17 +638,14 @@ export const PaintSurface = ({
       const oldScale = stage.scaleX();
       const scaleChange = currentDistance / lastPinchDistance;
 
-      // Apply smooth scaling with limits
       const newScale = Math.max(0.1, Math.min(10, oldScale * scaleChange));
 
       if (newScale !== oldScale) {
-        // Get stage coordinates for the center point
         const stageCenter = {
           x: (center.x - stage.x()) / oldScale,
           y: (center.y - stage.y()) / oldScale,
         };
 
-        // Calculate new position to zoom toward the center of the pinch
         const newPos = {
           x: center.x - stageCenter.x * newScale,
           y: center.y - stageCenter.y * newScale,
@@ -734,19 +667,14 @@ export const PaintSurface = ({
     }
   };
 
-  // Add click handler for the stage to clear selection
   const handleStageClick = (
     e: Konva.KonvaEventObject<MouseEvent | TouchEvent>,
   ) => {
-    // Only clear selection if clicking directly on the stage
     if (e.target === e.target.getStage()) {
       store.selectNode(null);
     }
   };
 
-  // End Node Callbacks
-
-  // Add hover handlers
   const handleNodeMouseEnter = (e: Konva.KonvaEventObject<MouseEvent>) => {
     if (activeTool === "select") {
       const container = e.target.getStage()?.container();
@@ -766,8 +694,7 @@ export const PaintSurface = ({
     container.style.cursor = defaultCursor;
   };
 
-  // Add stage hover handlers
-  const handleStageMouseEnter = (e: Konva.KonvaEventObject<MouseEvent>) => {
+  const handleStageMouseEnter = () => {
     const stage = stageRef.current;
     if (!stage) {
       console.error("Stage reference is not available");
@@ -787,7 +714,7 @@ export const PaintSurface = ({
     }
   };
 
-  const handleStageMouseLeave = (e: Konva.KonvaEventObject<MouseEvent>) => {
+  const handleStageMouseLeave = () => {
     const stage = stageRef.current;
     if (stage) {
       stage.container().style.cursor = "default";
@@ -796,7 +723,6 @@ export const PaintSurface = ({
     store.setCursorPosition(null);
   };
 
-  // Update cursor appearance
   useLayoutEffect(() => {
     const cursorNode = cursorShapeRef.current;
     const cursorLayer = cursorLayerRef.current;
@@ -808,7 +734,6 @@ export const PaintSurface = ({
       store.cursorPosition &&
       (activeTool === "draw" || activeTool === "eraser")
     ) {
-      // Counteract stage transforms to position cursor in screen space
       const stageX = stage.x();
       const stageY = stage.y();
       const scaleX = stage.scaleX();
@@ -836,6 +761,7 @@ export const PaintSurface = ({
       cursorNode.visible(false);
     }
     cursorLayer.batchDraw();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     store.cursorVisible,
     store.cursorPosition,
@@ -845,12 +771,10 @@ export const PaintSurface = ({
   ]);
 
   const renderNode = (node: Node | LineNode) => {
-    // Node Callbacks
     const handleNodeMouseDown = (
-      e: Konva.KonvaEventObject<MouseEvent | TouchEvent>,
+      e: Konva.KonvaEventObject<MouseEvent>,
       nodeId: string,
     ) => {
-      // Don't select nodes when draw, erase, or shape tools are active
       if (
         activeTool === "draw" ||
         activeTool === "eraser" ||
@@ -859,31 +783,27 @@ export const PaintSurface = ({
         return;
       }
 
-      // allow selection
-      if (e.evt.button === 2) {
+      if ("button" in e.evt && (e.evt as MouseEvent).button === 2) {
         const node = store.nodes.find((n) => n.id === nodeId);
         const lineNode = store.lineNodes.find((n) => n.id === nodeId);
         const isLocked = (node?.locked || lineNode?.locked) ?? false;
 
-        // If locked, only allow selection for context menu
         if (isLocked) {
           store.selectNode(nodeId);
           return;
         }
       }
 
-      // Don't select locked nodes
-      const node =
-        nodes.find((n) => n.id === nodeId) ||
-        store.lineNodes.find((n) => n.id === nodeId);
-      if (node?.locked) {
+      const draggedNode =
+        (nodes.find((n) => n.id === nodeId) as Node | LineNode | undefined) ||
+        store.lineNodes.find((ln) => ln.id === nodeId);
+      if (draggedNode?.locked) {
         return;
       }
 
-      // Check if Ctrl/Cmd key is pressed
-      const isMultiSelect = e.evt.ctrlKey || e.evt.metaKey;
+      const isMultiSelect =
+        (e.evt as MouseEvent).ctrlKey || (e.evt as MouseEvent).metaKey;
 
-      // If clicking directly on the stage, clear selection
       if (e.target === e.target.getStage()) {
         store.selectNode(null);
         return;
@@ -906,8 +826,8 @@ export const PaintSurface = ({
       let newX = targetNode.x();
       let newY = targetNode.y();
       const draggedNode =
-        nodes.find((n) => n.id === nodeId) ||
-        (store.lineNodes as any).find((n: any) => n.id === nodeId);
+        (nodes.find((n) => n.id === nodeId) as Node | LineNode | undefined) ||
+        store.lineNodes.find((ln) => ln.id === nodeId);
       if (draggedNode && draggedNode.type === "circle") {
         newX = targetNode.x() - draggedNode.width / 2;
         newY = targetNode.y() - draggedNode.height / 2;
@@ -924,19 +844,17 @@ export const PaintSurface = ({
         lastY?: number;
       };
 
-      // Calculate the movement delta
       const dx = targetNode.x() - (targetNode.lastX || targetNode.x());
       const dy = targetNode.y() - (targetNode.lastY || targetNode.y());
 
-      // Update the last position
       targetNode.lastX = targetNode.x();
       targetNode.lastY = targetNode.y();
 
       let newXMove = targetNode.x();
       let newYMove = targetNode.y();
       const movingNode =
-        nodes.find((n) => n.id === nodeId) ||
-        (store.lineNodes as any).find((n: any) => n.id === nodeId);
+        (nodes.find((n) => n.id === nodeId) as Node | LineNode | undefined) ||
+        store.lineNodes.find((ln) => ln.id === nodeId);
       if (movingNode && movingNode.type === "circle") {
         newXMove = targetNode.x() - movingNode.width / 2;
         newYMove = targetNode.y() - movingNode.height / 2;
@@ -958,8 +876,8 @@ export const PaintSurface = ({
       let endX = targetNode.x();
       let endY = targetNode.y();
       const endNode =
-        nodes.find((n) => n.id === nodeId) ||
-        (store.lineNodes as any).find((n: any) => n.id === nodeId);
+        (nodes.find((n) => n.id === nodeId) as Node | LineNode | undefined) ||
+        store.lineNodes.find((ln) => ln.id === nodeId);
       if (endNode && endNode.type === "circle") {
         endX = targetNode.x() - endNode.width / 2;
         endY = targetNode.y() - endNode.height / 2;
@@ -968,100 +886,6 @@ export const PaintSurface = ({
     };
 
     const isSelected = selectedNodeIds.includes(node.id);
-
-    const renderTransformer = () => {
-      if (isSelected) {
-        return (
-          <Transformer
-            ref={(ref: Konva.Transformer | null) => {
-              // Added type for ref
-              if (ref) {
-                transformerRefs.current[node.id] = ref;
-              }
-            }}
-            boundBoxFunc={(oldBox, newBox) => {
-              const minSize = 5;
-              const maxSize = Math.max(leftPanelWidth, leftPanelHeight);
-
-              if (
-                newBox.width < minSize ||
-                newBox.height < minSize ||
-                newBox.width > maxSize ||
-                newBox.height > maxSize
-              ) {
-                return oldBox;
-              }
-              return newBox;
-            }}
-            enabledAnchors={[
-              "top-left",
-              "top-center",
-              "top-right",
-              "middle-right",
-              "middle-left",
-              "bottom-left",
-              "bottom-center",
-              "bottom-right",
-            ]}
-            rotateEnabled={true}
-            keepRatio={true}
-            centeredScaling={true}
-            padding={5}
-            shiftBehavior="inverted"
-            ignoreStroke={true}
-            onTransformEnd={(e: Konva.KonvaEventObject<Event>) => {
-              // Typed event
-              const konvaNode = e.target;
-              const nodeId = konvaNode.id();
-
-              // Get all transformation values including anchor points
-              const finalRotation = konvaNode.rotation();
-              const finalScaleX = konvaNode.scaleX();
-              const finalScaleY = konvaNode.scaleY();
-              const finalX = konvaNode.x();
-              const finalY = konvaNode.y();
-              const finalOffsetX = konvaNode.offsetX();
-              const finalOffsetY = konvaNode.offsetY();
-
-              const isLineNode = store.lineNodes.find((ln) => ln.id === nodeId);
-
-              // Save all transformation values to the store
-              if (isLineNode) {
-                store.updateLineNode(
-                  nodeId,
-                  {
-                    x: finalX,
-                    y: finalY,
-                    rotation: finalRotation,
-                    scaleX: finalScaleX,
-                    scaleY: finalScaleY,
-                    offsetX: finalOffsetX,
-                    offsetY: finalOffsetY,
-                  },
-                  true,
-                );
-              } else {
-                store.updateNode(
-                  nodeId,
-                  {
-                    x: finalX,
-                    y: finalY,
-                    rotation: finalRotation,
-                    scaleX: finalScaleX,
-                    scaleY: finalScaleY,
-                    offsetX: finalOffsetX,
-                    offsetY: finalOffsetY,
-                  },
-                  true,
-                ); // Assuming shouldSaveState is true for regular nodes
-              }
-            }}
-          />
-        );
-      }
-      return null;
-    };
-
     const listeningEnabled = activeTool !== "shape";
 
     if (node.type === "line") {
@@ -1069,8 +893,9 @@ export const PaintSurface = ({
 
       const handleLineDragStart = (
         e: Konva.KonvaEventObject<DragEvent>,
-        nodeId: string,
+        _nodeId: string,
       ) => {
+        void _nodeId;
         const targetNode = e.target as Konva.Node & {
           lastX?: number;
           lastY?: number;
@@ -1080,197 +905,202 @@ export const PaintSurface = ({
       };
       const handleLineDragMove = (
         e: Konva.KonvaEventObject<DragEvent>,
-        nodeId: string,
+        _nodeId: string,
       ) => {
+        void _nodeId;
         const targetNode = e.target as Konva.Node & {
           lastX?: number;
           lastY?: number;
         };
-        targetNode.lastX = targetNode.x(); // This doesn't seem to be used for lines to calculate dx/dy
-        targetNode.lastY = targetNode.y(); // but is set for consistency or future use
+        targetNode.lastX = targetNode.x();
+        targetNode.lastY = targetNode.y();
       };
       const handleLineDragEnd = (
         e: Konva.KonvaEventObject<DragEvent>,
         nodeId: string,
       ) => {
-        // Move the line node in the store
         const targetNode = e.target as Konva.Node;
         const finalX = targetNode.x();
         const finalY = targetNode.y();
-        const finalOffsetX = targetNode.offsetX(); // Konva might adjust offsetX/Y
+        const finalOffsetX = targetNode.offsetX();
         const finalOffsetY = targetNode.offsetY();
 
-        // Update the line node in the store with its final position and transformation
-        store.updateLineNode(nodeId, {
-          x: finalX,
-          y: finalY,
-          offsetX: finalOffsetX,
-          offsetY: finalOffsetY,
-        });
+        store.updateLineNode(
+          nodeId,
+          {
+            x: finalX,
+            y: finalY,
+            offsetX: finalOffsetX,
+            offsetY: finalOffsetY,
+          },
+          true,
+        );
       };
 
       return (
-        <React.Fragment key={lineNode.id}>
-          <Line
-            id={lineNode.id}
-            points={lineNode.points}
-            stroke={lineNode.stroke}
-            opacity={lineNode.opacity ?? 1} // Use the line node's opacity or default to 1
-            strokeWidth={
-              isSelected
-                ? (lineNode.strokeWidth || 0) + 2
-                : lineNode.strokeWidth
-            }
-            tension={0.5}
-            lineCap="round"
-            lineJoin="round"
-            onMouseDown={(e) => handleNodeMouseDown(e, lineNode.id)}
-            onTap={(e) => handleNodeMouseDown(e, lineNode.id)}
-            onMouseEnter={handleNodeMouseEnter}
-            onMouseLeave={handleNodeMouseLeave}
-            draggable={draggableIfToolsNotActive(
-              activeTool,
-              lineNode.draggable && lineNode.locked == false,
-            )}
-            onDragMove={(e) => handleLineDragMove(e, lineNode.id)}
-            onDragStart={(e) => handleLineDragStart(e, lineNode.id)}
-            onDragEnd={(e) => handleLineDragEnd(e, lineNode.id)}
-            x={lineNode.x || 0}
-            y={lineNode.y || 0}
-            scaleX={lineNode.scaleX || 1}
-            scaleY={lineNode.scaleY || 1}
-            rotation={lineNode.rotation || 0}
-            offsetX={lineNode.offsetX || 0}
-            offsetY={lineNode.offsetY || 0}
-            zIndex={lineNode.zIndex}
-            listening={listeningEnabled}
-          />
-          {renderTransformer()}
-        </React.Fragment>
+        <Line
+          key={lineNode.id}
+          id={lineNode.id}
+          points={lineNode.points}
+          stroke={lineNode.stroke}
+          opacity={lineNode.opacity ?? 1}
+          strokeWidth={
+            isSelected ? (lineNode.strokeWidth || 0) + 2 : lineNode.strokeWidth
+          }
+          tension={0.5}
+          lineCap="round"
+          lineJoin="round"
+          onMouseDown={(e) => handleNodeMouseDown(e, lineNode.id)}
+          onTap={(e) =>
+            handleNodeMouseDown(
+              e as Konva.KonvaEventObject<MouseEvent>,
+              lineNode.id,
+            )
+          }
+          onMouseEnter={handleNodeMouseEnter}
+          onMouseLeave={handleNodeMouseLeave}
+          draggable={draggableIfToolsNotActive(
+            activeTool,
+            lineNode.draggable && lineNode.locked == false,
+          )}
+          onDragMove={(e) => handleLineDragMove(e, lineNode.id)}
+          onDragStart={(e) => handleLineDragStart(e, lineNode.id)}
+          onDragEnd={(e) => handleLineDragEnd(e, lineNode.id)}
+          x={lineNode.x || 0}
+          y={lineNode.y || 0}
+          scaleX={lineNode.scaleX || 1}
+          scaleY={lineNode.scaleY || 1}
+          rotation={lineNode.rotation || 0}
+          offsetX={lineNode.offsetX || 0}
+          offsetY={lineNode.offsetY || 0}
+          zIndex={lineNode.zIndex}
+          listening={listeningEnabled}
+        />
       );
     }
 
     if (node.type === "circle") {
       return (
-        <React.Fragment key={node.id}>
-          <Ellipse
-            id={node.id}
-            x={node.x + node.width / 2}
-            y={node.y + node.height / 2}
-            radiusX={node.width / 2}
-            radiusY={node.height / 2}
-            fill={node.fill}
-            stroke={node.stroke}
-            strokeWidth={0}
-            rotation={node.rotation || 0}
-            scaleX={node.scaleX || 1}
-            scaleY={node.scaleY || 1}
-            offsetX={node.offsetX || 0}
-            offsetY={node.offsetY || 0}
-            zIndex={node.zIndex}
-            draggable={draggableIfToolsNotActive(
-              activeTool,
-              node.draggable && node.locked == false,
-            )}
-            onMouseDown={(e) => handleNodeMouseDown(e, node.id)}
-            onTap={(e) => handleNodeMouseDown(e, node.id)}
-            onMouseEnter={handleNodeMouseEnter}
-            onMouseLeave={handleNodeMouseLeave}
-            onDragMove={(e) => handleNodeDragMove(e, node.id)}
-            onDragStart={(e) => handleNodeDragStart(e, node.id)}
-            onDragEnd={(e) => handleNodeDragEnd(e, node.id)}
-            listening={listeningEnabled}
-          />
-          {renderTransformer()}
-        </React.Fragment>
+        <Ellipse
+          key={node.id}
+          id={node.id}
+          x={node.x + node.width / 2}
+          y={node.y + node.height / 2}
+          radiusX={node.width / 2}
+          radiusY={node.height / 2}
+          fill={node.fill}
+          stroke={node.stroke}
+          strokeWidth={0}
+          rotation={node.rotation || 0}
+          scaleX={node.scaleX || 1}
+          scaleY={node.scaleY || 1}
+          offsetX={node.offsetX || 0}
+          offsetY={node.offsetY || 0}
+          zIndex={node.zIndex}
+          draggable={draggableIfToolsNotActive(
+            activeTool,
+            node.draggable && node.locked == false,
+          )}
+          onMouseDown={(e) => handleNodeMouseDown(e, node.id)}
+          onTap={(e) =>
+            handleNodeMouseDown(
+              e as Konva.KonvaEventObject<MouseEvent>,
+              node.id,
+            )
+          }
+          onMouseEnter={handleNodeMouseEnter}
+          onMouseLeave={handleNodeMouseLeave}
+          onDragMove={(e) => handleNodeDragMove(e, node.id)}
+          onDragStart={(e) => handleNodeDragStart(e, node.id)}
+          onDragEnd={(e) => handleNodeDragEnd(e, node.id)}
+          listening={listeningEnabled}
+        />
       );
     }
 
     if (node.type === "rectangle") {
       return (
-        <React.Fragment key={node.id}>
-          <Rect
-            id={node.id}
-            x={node.x}
-            y={node.y}
-            width={node.width}
-            height={node.height}
-            fill={node.fill}
-            stroke={node.stroke}
-            strokeWidth={0}
-            rotation={node.rotation || 0}
-            scaleX={node.scaleX || 1}
-            scaleY={node.scaleY || 1}
-            offsetX={node.offsetX || 0}
-            offsetY={node.offsetY || 0}
-            zIndex={node.zIndex}
-            draggable={draggableIfToolsNotActive(
-              activeTool,
-              node.draggable && node.locked == false,
-            )}
-            onMouseDown={(e) => handleNodeMouseDown(e, node.id)}
-            onTap={(e) => handleNodeMouseDown(e, node.id)}
-            onMouseEnter={handleNodeMouseEnter}
-            onMouseLeave={handleNodeMouseLeave}
-            onDragMove={(e) => handleNodeDragMove(e, node.id)}
-            onDragStart={(e) => handleNodeDragStart(e, node.id)}
-            onDragEnd={(e) => handleNodeDragEnd(e, node.id)}
-            listening={listeningEnabled}
-          />
-          {renderTransformer()}
-        </React.Fragment>
+        <Rect
+          key={node.id}
+          id={node.id}
+          x={node.x}
+          y={node.y}
+          width={node.width}
+          height={node.height}
+          fill={node.fill}
+          stroke={node.stroke}
+          strokeWidth={0}
+          rotation={node.rotation || 0}
+          scaleX={node.scaleX || 1}
+          scaleY={node.scaleY || 1}
+          offsetX={node.offsetX || 0}
+          offsetY={node.offsetY || 0}
+          zIndex={node.zIndex}
+          draggable={draggableIfToolsNotActive(
+            activeTool,
+            node.draggable && node.locked == false,
+          )}
+          onMouseDown={(e) => handleNodeMouseDown(e, node.id)}
+          onTap={(e) =>
+            handleNodeMouseDown(
+              e as Konva.KonvaEventObject<MouseEvent>,
+              node.id,
+            )
+          }
+          onMouseEnter={handleNodeMouseEnter}
+          onMouseLeave={handleNodeMouseLeave}
+          onDragMove={(e) => handleNodeDragMove(e, node.id)}
+          onDragStart={(e) => handleNodeDragStart(e, node.id)}
+          onDragEnd={(e) => handleNodeDragEnd(e, node.id)}
+          listening={listeningEnabled}
+        />
       );
     }
 
     if (node.type === "triangle") {
-      const points = [
-        0,
-        node.height, // bottom-left
-        node.width / 2,
-        0, // top-center
-        node.width,
-        node.height, // bottom-right
-      ];
+      const radius = Math.max(node.width, node.height) / 2;
 
       return (
-        <React.Fragment key={node.id}>
-          <Line
-            id={node.id}
-            x={node.x}
-            y={node.y}
-            points={points}
-            closed
-            fill={node.fill}
-            stroke={node.stroke}
-            strokeWidth={0}
-            rotation={node.rotation || 0}
-            scaleX={node.scaleX || 1}
-            scaleY={node.scaleY || 1}
-            offsetX={node.offsetX || 0}
-            offsetY={node.offsetY || 0}
-            zIndex={node.zIndex}
-            draggable={draggableIfToolsNotActive(
-              activeTool,
-              node.draggable && node.locked == false,
-            )}
-            onMouseDown={(e) => handleNodeMouseDown(e, node.id)}
-            onTap={(e) => handleNodeMouseDown(e, node.id)}
-            onMouseEnter={handleNodeMouseEnter}
-            onMouseLeave={handleNodeMouseLeave}
-            onDragMove={(e) => handleNodeDragMove(e, node.id)}
-            onDragStart={(e) => handleNodeDragStart(e, node.id)}
-            onDragEnd={(e) => handleNodeDragEnd(e, node.id)}
-            listening={listeningEnabled}
-          />
-          {renderTransformer()}
-        </React.Fragment>
+        <RegularPolygon
+          key={node.id}
+          id={node.id}
+          x={node.x + node.width / 2}
+          y={node.y + node.height / 2}
+          sides={3}
+          radius={radius}
+          fill={node.fill}
+          stroke={node.stroke}
+          strokeWidth={0}
+          rotation={node.rotation || 0}
+          scaleX={node.scaleX || 1}
+          scaleY={node.scaleY || 1}
+          offsetX={node.offsetX || 0}
+          offsetY={node.offsetY || 0}
+          zIndex={node.zIndex}
+          draggable={draggableIfToolsNotActive(
+            activeTool,
+            node.draggable && node.locked == false,
+          )}
+          onMouseDown={(e) => handleNodeMouseDown(e, node.id)}
+          onTap={(e) =>
+            handleNodeMouseDown(
+              e as Konva.KonvaEventObject<MouseEvent>,
+              node.id,
+            )
+          }
+          onMouseEnter={handleNodeMouseEnter}
+          onMouseLeave={handleNodeMouseLeave}
+          onDragMove={(e) => handleNodeDragMove(e, node.id)}
+          onDragStart={(e) => handleNodeDragStart(e, node.id)}
+          onDragEnd={(e) => handleNodeDragEnd(e, node.id)}
+          listening={listeningEnabled}
+        />
       );
     }
 
     if (node.type === "image") {
       return (
         <React.Fragment key={node.id}>
-          {/* Render background rectangle if backgroundColor is set */}
           {node.backgroundColor && node.backgroundColor !== "transparent" && (
             <Rect
               x={node.x}
@@ -1306,7 +1136,12 @@ export const PaintSurface = ({
               node.draggable && node.locked == false,
             )}
             onMouseDown={(e) => handleNodeMouseDown(e, node.id)}
-            onTap={(e) => handleNodeMouseDown(e, node.id)}
+            onTap={(e) =>
+              handleNodeMouseDown(
+                e as Konva.KonvaEventObject<MouseEvent>,
+                node.id,
+              )
+            }
             onMouseEnter={handleNodeMouseEnter}
             onMouseLeave={handleNodeMouseLeave}
             onDragMove={(e) => handleNodeDragMove(e, node.id)}
@@ -1314,7 +1149,6 @@ export const PaintSurface = ({
             onDragEnd={(e) => handleNodeDragEnd(e, node.id)}
             listening={listeningEnabled}
           />
-          {renderTransformer()}
         </React.Fragment>
       );
     }
@@ -1322,18 +1156,103 @@ export const PaintSurface = ({
     return null;
   };
 
-  // TODO refactor this out into zustand? and render the draw ?
+  // Separate function to render transformers on their own layer
+  const renderTransformers = () => {
+    return [...nodes, ...store.lineNodes].map((node) => {
+      const isSelected = selectedNodeIds.includes(node.id);
+      if (!isSelected) return null;
+
+      return (
+        <Transformer
+          key={`transformer-${node.id}`}
+          ref={(ref: Konva.Transformer | null) => {
+            if (ref) {
+              transformerRefs.current[node.id] = ref;
+            }
+          }}
+          boundBoxFunc={(oldBox, newBox) => {
+            const minSize = 5;
+
+            if (newBox.width < minSize || newBox.height < minSize) {
+              return oldBox;
+            }
+            return newBox;
+          }}
+          enabledAnchors={[
+            "top-left",
+            "top-center",
+            "top-right",
+            "middle-right",
+            "middle-left",
+            "bottom-left",
+            "bottom-center",
+            "bottom-right",
+          ]}
+          rotateEnabled={true}
+          keepRatio={true}
+          centeredScaling={true}
+          padding={5}
+          shiftBehavior="inverted"
+          ignoreStroke={true}
+          onTransformEnd={(e: Konva.KonvaEventObject<Event>) => {
+            const konvaNode = e.target;
+            const nodeId = konvaNode.id();
+
+            const finalRotation = konvaNode.rotation();
+            const finalScaleX = konvaNode.scaleX();
+            const finalScaleY = konvaNode.scaleY();
+            const finalX = konvaNode.x();
+            const finalY = konvaNode.y();
+            const finalOffsetX = konvaNode.offsetX();
+            const finalOffsetY = konvaNode.offsetY();
+
+            const isLineNode = store.lineNodes.find((ln) => ln.id === nodeId);
+
+            if (isLineNode) {
+              store.updateLineNode(
+                nodeId,
+                {
+                  x: finalX,
+                  y: finalY,
+                  rotation: finalRotation,
+                  scaleX: finalScaleX,
+                  scaleY: finalScaleY,
+                  offsetX: finalOffsetX,
+                  offsetY: finalOffsetY,
+                },
+                true,
+              );
+            } else {
+              store.updateNode(
+                nodeId,
+                {
+                  x: finalX,
+                  y: finalY,
+                  rotation: finalRotation,
+                  scaleX: finalScaleX,
+                  scaleY: finalScaleY,
+                  offsetX: finalOffsetX,
+                  offsetY: finalOffsetY,
+                },
+                true,
+              );
+            }
+          }}
+        />
+      );
+    });
+  };
+
   useEffect(() => {
     if (!stageRef.current) return;
-    // Update individual transformers
     Object.entries(transformerRefs.current).forEach(([nodeId, transformer]) => {
-      if (!transformer) return; // Transformer might be null if ref was cleared
+      if (!transformer) return;
 
       const isSelected = selectedNodeIds.includes(nodeId);
       transformer.visible(isSelected);
 
       if (isSelected) {
-        const node = stageRef.current!.findOne(`#${nodeId}`); // stageRef.current is checked
+        const node = stageRef.current!.findOne(`#${nodeId}`);
         if (node) {
           transformer.nodes([node]);
           transformer.getLayer()?.batchDraw();
@@ -1341,16 +1260,16 @@ export const PaintSurface = ({
       }
     });
 
-    // Update multi-select transformer
     if (multiSelectTransformerRef.current && selectedNodeIds.length > 1) {
-      const nodes = selectedNodeIds
-        .map((id) => stageRef.current.findOne(`#${id}`))
-        .filter(Boolean);
-      if (nodes.length > 0) {
-        multiSelectTransformerRef.current.nodes(nodes);
+      const nodesToTransform = selectedNodeIds
+        .map((id) => stageRef.current!.findOne<Konva.Node>(`#${id}`))
+        .filter((n): n is Konva.Node => Boolean(n));
+      if (nodesToTransform.length > 0) {
+        multiSelectTransformerRef.current.nodes(nodesToTransform);
         multiSelectTransformerRef.current.getLayer()?.batchDraw();
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedNodeIds]);
 
   return (
@@ -1367,18 +1286,17 @@ export const PaintSurface = ({
             ref={stageRef}
             width={containerDimensions.width * (leftPct / 100)}
             height={containerDimensions.height}
-            scaleX={1} // Initial scale, controlled by wheel/zoom
-            scaleY={1} // Initial scale, controlled by wheel/zoom
+            scaleX={1}
+            scaleY={1}
             style={{
-              // display: "block",
-              background: "transparent", // Or use fillColor if stage background is desired directly
+              background: "transparent",
             }}
-            x={stagePosition.x} // Set the x position
-            y={stagePosition.y} // Set the y position
+            x={stagePosition.x}
+            y={stagePosition.y}
             onWheel={handleStageWheel}
             onMouseDown={handleStageMouseDown}
             onMouseMove={handleStageMouseMove}
-            onMouseUp={handleStageMouseUp} // This global mouse up is likely better from useGlobalMouseUp
+            onMouseUp={handleStageMouseUp}
             onClick={handleStageClick}
             onMouseEnter={handleStageMouseEnter}
             onMouseLeave={handleStageMouseLeave}
@@ -1386,7 +1304,6 @@ export const PaintSurface = ({
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
-            {/* Left Panel */}
             <Layer
               ref={leftPanelRef}
               clipFunc={(ctx) => {
@@ -1395,7 +1312,7 @@ export const PaintSurface = ({
                   0,
                   store.getAspectRatioDimensions().width,
                   store.getAspectRatioDimensions().height,
-                ); // leftPanelWidth, leftPanelHeight);
+                );
               }}
             >
               <Rect
@@ -1408,15 +1325,10 @@ export const PaintSurface = ({
                 zIndex={-1}
               />
 
-              {/* Render all nodes including line nodes */}
               {[...nodes, ...store.lineNodes]
                 .sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0))
-                .map((node, index) => {
-                  // console.log(`Node ${index}:`, node);
-                  return renderNode(node);
-                })}
+                .map((node) => renderNode(node))}
 
-              {/* Render selection rectangle */}
               {selectionRect && (
                 <Rect
                   ref={selectionRectRef}
@@ -1432,7 +1344,6 @@ export const PaintSurface = ({
                 />
               )}
 
-              {/* Shape preview bounding box */}
               {shapePreview && (
                 <Rect
                   x={shapePreview.x}
@@ -1449,6 +1360,10 @@ export const PaintSurface = ({
             <Layer ref={cursorLayerRef} listening={false} draggable={false}>
               <Circle ref={cursorShapeRef} visible={false} />
             </Layer>
+            {/* Separate layer for transformers - no clipping so they remain visible when nodes extend beyond canvas */}
+            <Layer listening={true} zIndex={1000}>
+              {renderTransformers()}
+            </Layer>
           </Stage>
         </div>
       }
@@ -1464,21 +1379,12 @@ export const PaintSurface = ({
             scaleY={previewScale}
             x={0}
             y={0}
-            // style={{
-            //   background: '#f5f5f5',
-            //   border: '1px solid #ddd',
-            //   borderRadius: '8px',
-            // }}
           >
             <Layer>
               <Image
                 ref={imageRef}
-                image={snapshotImage || undefined}
-                x={0}
-                y={0}
-                width={rightPanelWidth}
-                height={rightPanelHeight}
-                fill="white" //"red"
+                image={undefined}
+                fill="white"
                 listening={false}
                 zIndex={-1}
               />
