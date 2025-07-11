@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect, useMemo } from "react";
 import {
   Stage,
   Layer,
@@ -93,6 +93,30 @@ export const PaintSurface = ({
     height: number;
   } | null>(null);
   const [isMiddleMousePressed, setIsMiddleMousePressed] = useState(false);
+
+  const boundingBox = useMemo(() => {
+    if (selectedNodeIds.length < 2 || !stageRef.current) return null;
+
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    selectedNodeIds.forEach((id) => {
+      const konvaNode = stageRef.current!.findOne<Konva.Node>(`#${id}`);
+      if (!konvaNode) return;
+
+      const rect = konvaNode.getClientRect({ relativeTo: stageRef.current });
+      minX = Math.min(minX, rect.x);
+      minY = Math.min(minY, rect.y);
+      maxX = Math.max(maxX, rect.x + rect.width);
+      maxY = Math.max(maxY, rect.y + rect.height);
+    });
+
+    if (minX === Infinity) return null;
+    return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedNodeIds, store.nodes, store.lineNodes, stageRef]);
 
   useLayoutEffect(() => {
     const updateDimensions = () => {
@@ -240,6 +264,8 @@ export const PaintSurface = ({
         opacity: opacity,
         locked: false,
         zIndex: store.lineNodes.length,
+        x: 0,
+        y: 0,
       };
       store.selectNode(null);
       store.addLineNode(newLineNode, false);
@@ -1300,9 +1326,21 @@ export const PaintSurface = ({
             const isLineNode = store.lineNodes.find((ln) => ln.id === nodeId);
 
             if (isLineNode) {
-              store.updateLineNode(nodeId, commonNodeUpdates, true);
+              store.updateLineNode(
+                nodeId,
+                {
+                  x: finalX,
+                  y: finalY,
+                  rotation: finalRotation,
+                  scaleX: finalScaleX,
+                  scaleY: finalScaleY,
+                  offsetX: finalOffsetX,
+                  offsetY: finalOffsetY,
+                },
+                false,
+              );
             } else {
-              store.updateNode(nodeId, commonNodeUpdates, true);
+              store.updateNode(nodeId, { ...commonNodeUpdates }, false);
             }
           }}
         />
@@ -1526,15 +1564,89 @@ export const PaintSurface = ({
                         );
 
                         if (isLineNode) {
-                          // Lines keep their points; we don't change their width/height semantics
-                          store.updateLineNode(nodeId, commonNodeUpdates, true);
+                          store.updateLineNode(
+                            nodeId,
+                            {
+                              x: finalX,
+                              y: finalY,
+                              rotation: finalRotation,
+                              scaleX: finalScaleX,
+                              scaleY: finalScaleY,
+                              offsetX: finalOffsetX,
+                              offsetY: finalOffsetY,
+                            },
+                            false,
+                          );
                         } else {
-                          store.updateNode(nodeId, commonNodeUpdates, true);
+                          store.updateNode(
+                            nodeId,
+                            { ...commonNodeUpdates },
+                            false,
+                          );
                         }
                       }
                     });
                     store.saveState();
                   }}
+                />
+              )}
+              {/* Draggable transparent rect to move the whole selection together */}
+              {selectedNodeIds.length > 1 && boundingBox && (
+                <Rect
+                  x={boundingBox.x}
+                  y={boundingBox.y}
+                  width={boundingBox.width}
+                  height={boundingBox.height}
+                  fill="rgba(0,0,0,0)"
+                  draggable
+                  onDragStart={(e) => {
+                    const tgt = e.target as Konva.Rect & {
+                      lastX?: number;
+                      lastY?: number;
+                    };
+                    tgt.lastX = tgt.x();
+                    tgt.lastY = tgt.y();
+                  }}
+                  onDragMove={(e) => {
+                    const tgt = e.target as Konva.Rect & {
+                      lastX?: number;
+                      lastY?: number;
+                    };
+                    const dx = tgt.x() - (tgt.lastX ?? tgt.x());
+                    const dy = tgt.y() - (tgt.lastY ?? tgt.y());
+
+                    tgt.lastX = tgt.x();
+                    tgt.lastY = tgt.y();
+
+                    selectedNodeIds.forEach((id) => {
+                      const lineNode = store.lineNodes.find(
+                        (ln) => ln.id === id,
+                      );
+                      if (lineNode) {
+                        store.moveLineNode(id, dx, dy);
+                      } else {
+                        const currentNode = store.nodes.find(
+                          (n) => n.id === id,
+                        );
+                        if (currentNode) {
+                          // Move each shape individually without triggering extra multi-select propagation
+                          store.moveNode(
+                            id,
+                            currentNode.x + dx,
+                            currentNode.y + dy,
+                            undefined,
+                            undefined,
+                            false,
+                          );
+                        }
+                      }
+                    });
+                  }}
+                  onDragEnd={() => {
+                    store.saveState();
+                  }}
+                  listening={true}
+                  strokeWidth={0}
                 />
               )}
             </Layer>

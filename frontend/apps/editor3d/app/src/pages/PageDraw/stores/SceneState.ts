@@ -165,7 +165,12 @@ interface SceneState {
     updates: Partial<LineNode>,
     shouldSaveState: boolean,
   ) => void;
-  moveLineNode: (id: string, dx: number, dy: number) => void;
+  moveLineNode: (
+    id: string,
+    dx: number,
+    dy: number,
+    shouldSaveState?: boolean,
+  ) => void;
 
   // Add a specific method for file uploads
   createImageFromFile: (
@@ -683,23 +688,28 @@ export const useSceneStore = create<SceneState>((set, get) => ({
     }
   },
 
-  moveLineNode: (id: string, dx: number, dy: number) => {
+  moveLineNode: (
+    id: string,
+    dx: number,
+    dy: number,
+    shouldSaveState: boolean = false,
+  ) => {
     set((state) => {
       const newLineNodes = state.lineNodes.map((node) => {
         if (node.id === id) {
           return {
             ...node,
-            points: node.points.map((point, index) => {
-              // Even indices are x coordinates, odd are y
-              return index % 2 === 0 ? point + dx : point + dy;
-            }),
+            x: (node.x ?? 0) + dx,
+            y: (node.y ?? 0) + dy,
           };
         }
         return node;
       });
       return { lineNodes: newLineNodes };
     });
-    get().saveState();
+    if (shouldSaveState) {
+      get().saveState();
+    }
   },
 
   // Add a specific method for file uploads
