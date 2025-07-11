@@ -1271,45 +1271,38 @@ export const PaintSurface = ({
             // Find the corresponding node in the store to check its type
             const storeNode = store.nodes.find((n) => n.id === nodeId);
 
-            // For circles, convert from center positioning back to top-left positioning
-            if (storeNode && storeNode.type === "circle") {
-              const width = storeNode.width;
-              const height = storeNode.height;
+            // Calculate new dimensions based on the scale that the Transformer applied
+            const newWidth = konvaNode.width() * finalScaleX;
+            const newHeight = konvaNode.height() * finalScaleY;
 
-              finalX = finalX - width / 2;
-              finalY = finalY - height / 2;
+            // Reset the scale factors so future transforms start from 1
+            konvaNode.scaleX(1);
+            konvaNode.scaleY(1);
+
+            // Circles are rendered from the center, so convert from center-coordinates back to top-left
+            if (storeNode && storeNode.type === "circle") {
+              finalX = finalX - newWidth / 2;
+              finalY = finalY - newHeight / 2;
             }
+
+            const commonNodeUpdates = {
+              x: finalX,
+              y: finalY,
+              width: newWidth,
+              height: newHeight,
+              rotation: finalRotation,
+              scaleX: 1,
+              scaleY: 1,
+              offsetX: finalOffsetX,
+              offsetY: finalOffsetY,
+            };
 
             const isLineNode = store.lineNodes.find((ln) => ln.id === nodeId);
 
             if (isLineNode) {
-              store.updateLineNode(
-                nodeId,
-                {
-                  x: finalX,
-                  y: finalY,
-                  rotation: finalRotation,
-                  scaleX: finalScaleX,
-                  scaleY: finalScaleY,
-                  offsetX: finalOffsetX,
-                  offsetY: finalOffsetY,
-                },
-                true,
-              );
+              store.updateLineNode(nodeId, commonNodeUpdates, true);
             } else {
-              store.updateNode(
-                nodeId,
-                {
-                  x: finalX,
-                  y: finalY,
-                  rotation: finalRotation,
-                  scaleX: finalScaleX,
-                  scaleY: finalScaleY,
-                  offsetX: finalOffsetX,
-                  offsetY: finalOffsetY,
-                },
-                true,
-              );
+              store.updateNode(nodeId, commonNodeUpdates, true);
             }
           }}
         />
@@ -1502,50 +1495,44 @@ export const PaintSurface = ({
                           (n) => n.id === nodeId,
                         );
 
-                        // For circles, convert from center positioning back to top-left positioning
+                        // Calculate new dimensions based on the scale that the Transformer applied
+                        const newWidth = konvaNode.width() * finalScaleX;
+                        const newHeight = konvaNode.height() * finalScaleY;
+
+                        // Reset the scale factors so future transforms start from 1
+                        konvaNode.scaleX(1);
+                        konvaNode.scaleY(1);
+
+                        // Circles are rendered from the center, so convert from center-coordinates back to top-left
                         if (storeNode && storeNode.type === "circle") {
-                          const width = storeNode.width;
-                          const height = storeNode.height;
-                          finalX = finalX - width / 2;
-                          finalY = finalY - height / 2;
+                          finalX = finalX - newWidth / 2;
+                          finalY = finalY - newHeight / 2;
                         }
+
+                        const commonNodeUpdates = {
+                          x: finalX,
+                          y: finalY,
+                          width: newWidth,
+                          height: newHeight,
+                          rotation: finalRotation,
+                          scaleX: 1,
+                          scaleY: 1,
+                          offsetX: finalOffsetX,
+                          offsetY: finalOffsetY,
+                        };
 
                         const isLineNode = store.lineNodes.find(
                           (ln) => ln.id === nodeId,
                         );
 
                         if (isLineNode) {
-                          store.updateLineNode(
-                            nodeId,
-                            {
-                              x: finalX,
-                              y: finalY,
-                              rotation: finalRotation,
-                              scaleX: finalScaleX,
-                              scaleY: finalScaleY,
-                              offsetX: finalOffsetX,
-                              offsetY: finalOffsetY,
-                            },
-                            false, // Don't save state for each node
-                          );
+                          // Lines keep their points; we don't change their width/height semantics
+                          store.updateLineNode(nodeId, commonNodeUpdates, true);
                         } else {
-                          store.updateNode(
-                            nodeId,
-                            {
-                              x: finalX,
-                              y: finalY,
-                              rotation: finalRotation,
-                              scaleX: finalScaleX,
-                              scaleY: finalScaleY,
-                              offsetX: finalOffsetX,
-                              offsetY: finalOffsetY,
-                            },
-                            false, // Don't save state for each node
-                          );
+                          store.updateNode(nodeId, commonNodeUpdates, true);
                         }
                       }
                     });
-                    // Save state once after all updates
                     store.saveState();
                   }}
                 />
