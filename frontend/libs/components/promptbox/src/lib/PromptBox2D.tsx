@@ -29,31 +29,25 @@ import {
   faRectangle,
 } from "@fortawesome/pro-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { IsDesktopApp } from "@storyteller/tauri-utils";
 import { GalleryItem, GalleryModal } from "@storyteller/ui-gallery-modal";
 import { PromptsApi } from "@storyteller/api";
 import {
-  SoraImageRemix,
-  SoraImageRemixAspectRatio,
-  CheckSoraSession,
-  SoraSessionState,
-  waitForSoraLogin,
+  // SoraImageRemix,
+  // SoraImageRemixAspectRatio,
+  // CheckSoraSession,
+  // SoraSessionState,
+  // waitForSoraLogin,
   EnqueueContextualEditImage,
   EnqueueContextualEditImageModel,
   EnqueueContextualEditImageSize,
 } from "@storyteller/tauri-api";
-
-import { showActionReminder } from "@storyteller/ui-action-reminder-modal";
-import { invoke } from "@tauri-apps/api/core";
+// import { showActionReminder } from "@storyteller/ui-action-reminder-modal";
+// import { invoke } from "@tauri-apps/api/core";
+import { usePrompt2DStore, RefImage } from "./promptStore";
 
 export type AspectRatio = "1:1" | "3:2" | "2:3";
-
-interface ReferenceImage {
-  id: string;
-  url: string;
-  file: File;
-  mediaToken: string;
-}
 
 interface PromptBox2DProps {
   uploadImage: ({
@@ -89,30 +83,36 @@ export const PromptBox2D = ({
   const { addJobToken } = useJobContext();
 
   //const { lastRenderedBitmap } = useCanvasSignal();
-  const [prompt, setPrompt] = useState("");
+  const prompt = usePrompt2DStore((s) => s.prompt);
+  const setPrompt = usePrompt2DStore((s) => s.setPrompt);
+  const useSystemPrompt = usePrompt2DStore((s) => s.useSystemPrompt);
+  const setUseSystemPrompt = usePrompt2DStore((s) => s.setUseSystemPrompt);
+  const aspectRatio = usePrompt2DStore((s) => s.aspectRatio);
+  const setAspectRatio = usePrompt2DStore((s) => s.setAspectRatio);
+
   const [isEnqueueing, setIsEnqueueing] = useState(false);
-  const [useSystemPrompt, setUseSystemPrompt] = useState(true);
   const [selectedGalleryImages, setSelectedGalleryImages] = useState<string[]>(
     []
   );
-  const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
+  const referenceImages = usePrompt2DStore((s) => s.referenceImages);
+  const setReferenceImages = usePrompt2DStore((s) => s.setReferenceImages);
   const [uploadingImages, setUploadingImages] = useState<
     { id: string; file: File }[]
   >([]);
   const [aspectRatioList, setAspectRatioList] = useState<PopoverItem[]>([
     {
       label: "3:2",
-      selected: true,
+      selected: aspectRatio === "3:2",
       icon: <FontAwesomeIcon icon={faRectangle} className="h-4 w-4" />,
     },
     {
       label: "2:3",
-      selected: false,
+      selected: aspectRatio === "2:3",
       icon: <FontAwesomeIcon icon={faRectangleVertical} className="h-4 w-4" />,
     },
     {
       label: "1:1",
-      selected: false,
+      selected: aspectRatio === "1:1",
       icon: <FontAwesomeIcon icon={faSquare} className="h-4 w-4" />,
     },
   ]);
@@ -131,6 +131,7 @@ export const PromptBox2D = ({
 
   const handleAspectRatioSelect = (selectedItem: PopoverItem) => {
     onAspectRatioChange?.(selectedItem.label as AspectRatio);
+    setAspectRatio(selectedItem.label as AspectRatio);
     setAspectRatioList((prev) =>
       prev.map((item) => ({
         ...item,
@@ -156,13 +157,13 @@ export const PromptBox2D = ({
             progressCallback: (newState) => {
               console.debug("Upload progress:", newState.data);
               if (newState.status === UploaderStates.success && newState.data) {
-                const referenceImage: ReferenceImage = {
+                const referenceImage: RefImage = {
                   id: Math.random().toString(36).substring(7),
                   url: reader.result as string,
                   file,
                   mediaToken: newState.data || "",
                 };
-                setReferenceImages((prev) => [...prev, referenceImage]);
+                setReferenceImages([...referenceImages, referenceImage]);
                 setUploadingImages((prev) =>
                   prev.filter((img) => img.id !== uploadId)
                 );
@@ -187,7 +188,7 @@ export const PromptBox2D = ({
   };
 
   const handleRemoveReference = (id: string) => {
-    setReferenceImages((prev) => prev.filter((img) => img.id !== id));
+    setReferenceImages(referenceImages.filter((img) => img.id !== id));
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -217,16 +218,17 @@ export const PromptBox2D = ({
   };
 
   const handleGalleryImages = (selectedItems: GalleryItem[]) => {
+    const newRefs = [...referenceImages];
     selectedItems.forEach((item) => {
       if (!item.fullImage) return;
-      const referenceImage: ReferenceImage = {
+      newRefs.push({
         id: Math.random().toString(36).substring(7),
         url: item.fullImage,
         file: new File([], "library-image"),
         mediaToken: item.id,
-      };
-      setReferenceImages((prev) => [...prev, referenceImage]);
+      });
     });
+    setReferenceImages(newRefs);
     setIsGalleryModalOpen(false);
     setSelectedGalleryImages([]);
   };
@@ -257,19 +259,19 @@ export const PromptBox2D = ({
   };
 
   // Helper to show Sora login reminder and wait for login
-  const handleSoraLoginReminder = async () => {
-    return new Promise<void>((resolve) => {
-      showActionReminder({
-        reminderType: "soraLogin",
-        onPrimaryAction: async () => {
-          await invoke("open_sora_login_command");
-          await waitForSoraLogin();
-          toast.success("Logged in to Sora!");
-          resolve();
-        },
-      });
-    });
-  };
+  // const handleSoraLoginReminder = async () => {
+  //   return new Promise<void>((resolve) => {
+  //     showActionReminder({
+  //       reminderType: "soraLogin",
+  //       onPrimaryAction: async () => {
+  //         await invoke("open_sora_login_command");
+  //         await waitForSoraLogin();
+  //         toast.success("Logged in to Sora!");
+  //         resolve();
+  //       },
+  //     });
+  //   });
+  // };
 
   const handleTauriEnqueue = async () => {
     // NB(bt): This needs to move to an error handler.
@@ -428,7 +430,7 @@ export const PromptBox2D = ({
   const getCurrentAspectRatioIcon = () => {
     const selected = aspectRatioList.find((item) => item.selected);
     if (!selected || !selected.icon) return faRectangle;
-    const iconElement = selected.icon as React.ReactElement<any, any>;
+    const iconElement = selected.icon as React.ReactElement<{ icon: IconProp }>;
     return iconElement.props.icon;
   };
 
