@@ -684,6 +684,23 @@ export const Modal = ({
     };
   }, [zIndex]);
 
+  // Block propagation of keyboard events to elements outside the modal so global hot-keys (T / R / G shortcuts in the 3-D editor) don't fire while a modal is open
+  useEffect(() => {
+    if (!isOpen || allowBackgroundInteraction) return;
+
+    const stopKey = (e: KeyboardEvent) => {
+      // Exclude ESC key
+      if (e.key === "Escape" || e.key === "Esc") return;
+      e.stopPropagation();
+    };
+
+    window.addEventListener("keydown", stopKey, true);
+
+    return () => {
+      window.removeEventListener("keydown", stopKey, true);
+    };
+  }, [isOpen, allowBackgroundInteraction]);
+
   // If background interaction is allowed, ensure this modal (and its ancestors)
   // never get the "inert" attribute Headless-UI uses to lock background dialogs.
   useEffect(() => {
