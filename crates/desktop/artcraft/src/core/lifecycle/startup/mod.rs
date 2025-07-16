@@ -1,3 +1,2 @@
-pub mod bootstrap_task_database;
 pub mod handle_tauri_startup;
-mod spawn_storytoller_task_polling_thread;
+mod tasks;

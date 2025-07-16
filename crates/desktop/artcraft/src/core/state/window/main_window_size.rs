@@ -1,11 +1,12 @@
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
-use crate::core::utils::best_window_size_heuristic::best_window_size_heuristic;
-use crate::core::windows::main_window::constants::MAIN_WINDOW_NAME;
+use crate::core::utils::window::get_window_size_heuristic::get_window_size_heuristic;
+use crate::core::windows::main_window::constants::{MAIN_WINDOW_MIN_HEIGHT, MAIN_WINDOW_MIN_WIDTH, MAIN_WINDOW_NAME};
 use errors::AnyhowResult;
 use serde_derive::{Deserialize, Serialize};
 use std::fs::OpenOptions;
 use std::io::Write;
 use tauri::{AppHandle, Manager, PhysicalSize, Window};
+
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 pub struct MainWindowSize {
@@ -26,7 +27,7 @@ impl MainWindowSize {
   }
 
   pub fn from_window(window: &Window) -> AnyhowResult<Self> {
-    let size = best_window_size_heuristic(window)?;
+    let size = get_window_size_heuristic(window)?;
     Ok(Self {
       width: size.width,
       height: size.height,
@@ -43,14 +44,6 @@ impl MainWindowSize {
     Ok(Some(size))
   }
 
-  pub fn apply_to_main_window(&self, app: &AppHandle) -> AnyhowResult<()> {
-    let windows = app.windows();
-    let window = windows.get(MAIN_WINDOW_NAME)
-        .ok_or_else(|| anyhow::anyhow!("Main window not found"))?;
-    window.set_size(PhysicalSize::new(self.width, self.height))?;
-    Ok(())
-  }
-
   pub fn persist_to_filesystem(&self, app_data_root: &AppDataRoot) -> AnyhowResult<()> {
     let filename = app_data_root.get_window_size_config_file();
     let json = serde_json::to_string(self)?;
@@ -62,6 +55,21 @@ impl MainWindowSize {
     file.write_all(json.as_bytes())?;
     file.flush()?;
     Ok(())
+  }
+
+  /// Window size is not wide enough to persist or apply.
+  pub fn is_not_wide_enough(&self) -> bool {
+    self.width < MAIN_WINDOW_MIN_WIDTH
+  }
+
+  /// Window size is not tall enough to persist or apply.
+  pub fn is_not_tall_enough(&self) -> bool {
+    self.height < MAIN_WINDOW_MIN_HEIGHT
+  }
+
+  /// Window size is not big enough (tall or wide) to persist or apply.
+  pub fn is_not_big_enough(&self) -> bool {
+    self.is_not_wide_enough() || self.is_not_tall_enough()
   }
 
   pub fn to_physical_size(&self) -> PhysicalSize<u32> {
