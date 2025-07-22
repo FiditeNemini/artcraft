@@ -5,6 +5,7 @@ import {
   faPlus,
   faUpRightAndDownLeftFromCenter,
   faCube,
+  faImages,
   faArrowUpFromBracket,
 } from "@fortawesome/pro-solid-svg-icons";
 import { ButtonIconSelect } from "@storyteller/ui-button-icon-select";
@@ -33,10 +34,17 @@ import { AssetModal } from "../AssetMenu/AssetModal";
 import { selectedMode } from "../../signals/selectedMode";
 import { useSignals } from "@preact/signals-react/runtime";
 import { outlinerState } from "../../signals/outliner/outliner";
-import { twMerge } from "tailwind-merge";
 // eslint-disable-next-line import/no-unresolved
 import { setLogoutStates } from "~/signals/authentication/utilities";
 import { UploadModal3D } from "../../../../components/reusable/UploadModal3D/UploadModal3D";
+import { PopoverMenu } from "@storyteller/ui-popover";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  galleryModalVisibleViewMode,
+  galleryModalVisibleDuringDrag,
+} from "@storyteller/ui-gallery-modal";
+import { twMerge } from "tailwind-merge";
+import { UploadModalImage } from "../../../../components/reusable/UploadModalImage";
 
 export const Controls3D = () => {
   useSignals();
@@ -45,6 +53,8 @@ export const Controls3D = () => {
   // Action reminder is now handled through signals
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [upload3DIsShowing, setUpload3DIsShowing] = useState(false);
+  const [isAddAssetPopoverOpen, setIsAddAssetPopoverOpen] = useState(false);
+  const [uploadImageIsShowing, setUploadImageIsShowing] = useState(false);
 
   // Track processed 3D models by their media token to prevent duplicates
   const processedModelsRef = useRef<Record<string, boolean>>({});
@@ -53,7 +63,12 @@ export const Controls3D = () => {
     // Check if scene is empty and onboarding helper is not visible
     const checkSceneEmpty = () => {
       const isSceneEmpty =
-        outlinerState.items.value.length === 0 && !assetModalVisible.value;
+        outlinerState.items.value.length === 0 &&
+        !assetModalVisible.value &&
+        !galleryModalVisibleViewMode.value &&
+        !isAddAssetPopoverOpen &&
+        !upload3DIsShowing &&
+        !uploadImageIsShowing;
 
       setShowEmptySceneTooltip(isSceneEmpty);
     };
@@ -68,7 +83,13 @@ export const Controls3D = () => {
       unsubscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [assetModalVisible.value]);
+  }, [
+    assetModalVisible.value,
+    galleryModalVisibleViewMode.value,
+    isAddAssetPopoverOpen,
+    upload3DIsShowing,
+    uploadImageIsShowing,
+  ]);
 
   const handleModeChange = (value: string) => {
     selectedMode.value = value;
@@ -169,8 +190,29 @@ export const Controls3D = () => {
     }
   };
 
-  const handleOpenUpload3DModal = () => {
-    setUpload3DIsShowing(true);
+  // Open global Gallery modal
+  const handleOpenGalleryModal = () => {
+    galleryModalVisibleViewMode.value = true;
+    galleryModalVisibleDuringDrag.value = true;
+  };
+
+  const handleAddAssetAction = (action: string) => {
+    switch (action) {
+      case "presets":
+        handleOpenModal();
+        break;
+      case "library":
+        handleOpenGalleryModal();
+        break;
+      case "upload-3d":
+        setUpload3DIsShowing(true);
+        break;
+      case "upload-image":
+        setUploadImageIsShowing(true);
+        break;
+      default:
+        break;
+    }
   };
 
   const openSettingsModal = () => {
@@ -219,14 +261,14 @@ export const Controls3D = () => {
               <div className="relative">
                 {showEmptySceneTooltip && (
                   <div className="absolute -bottom-14 left-1/2 -translate-x-1/2 transform whitespace-nowrap">
-                    <div className="animate-bounce rounded-lg bg-brand-primary px-4 py-2 text-sm font-medium text-white shadow-lg">
+                    <div className="animate-bounce rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white shadow-lg">
                       Click + to add your first 3D asset!
-                      <div className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 transform bg-brand-primary" />
+                      <div className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 transform bg-primary" />
                     </div>
                   </div>
                 )}
                 <Tooltip
-                  content="Add 3D asset to scene (B)"
+                  content="Add an asset to scene"
                   position="bottom"
                   delay={300}
                   closeOnClick
@@ -234,30 +276,68 @@ export const Controls3D = () => {
                     showEmptySceneTooltip ? "hidden" : "block",
                   )}
                 >
-                  <Button
-                    icon={faPlus}
-                    className={`h-9 w-9 rounded-[10px] text-lg ${
+                  <PopoverMenu
+                    mode="button"
+                    position="bottom"
+                    panelTitle="Add an asset to scene"
+                    onOpenChange={setIsAddAssetPopoverOpen}
+                    items={[
+                      {
+                        label: "ArtCraft Presets (B)",
+                        selected: false,
+                        icon: (
+                          <FontAwesomeIcon icon={faCube} className="h-4 w-4" />
+                        ),
+                        action: "presets",
+                      },
+                      {
+                        label: "My Library",
+                        selected: false,
+                        icon: (
+                          <FontAwesomeIcon
+                            icon={faImages}
+                            className="h-4 w-4"
+                          />
+                        ),
+                        action: "library",
+                        divider: true,
+                      },
+                      {
+                        label: "Upload 3D Model",
+                        selected: false,
+                        icon: (
+                          <FontAwesomeIcon
+                            icon={faArrowUpFromBracket}
+                            className="h-4 w-4"
+                          />
+                        ),
+                        action: "upload-3d",
+                      },
+                      {
+                        label: "Upload Image",
+                        selected: false,
+                        icon: (
+                          <FontAwesomeIcon
+                            icon={faArrowUpFromBracket}
+                            className="h-4 w-4"
+                          />
+                        ),
+                        action: "upload-image",
+                      },
+                    ]}
+                    onPanelAction={handleAddAssetAction}
+                    showIconsInList
+                    buttonClassName={`h-9 w-9 rounded-[10px] text-lg ${
                       showEmptySceneTooltip
-                        ? "border-white/80 bg-brand-primary/90"
-                        : ""
+                        ? "bg-primary/90 hover:bg-primary/70"
+                        : "border-transparent bg-primary/90 hover:bg-primary/70"
                     }`}
-                    onClick={handleOpenModal}
+                    triggerIcon={
+                      <FontAwesomeIcon icon={faPlus} className="text-xl" />
+                    }
                   />
                 </Tooltip>
               </div>
-              <Tooltip
-                content="Upload 3D asset"
-                position="bottom"
-                delay={300}
-                closeOnClick
-              >
-                <Button
-                  icon={faArrowUpFromBracket}
-                  className="text-md h-9 w-9 rounded-[10px] bg-white/15 transition-colors hover:bg-white/25"
-                  variant="secondary"
-                  onClick={handleOpenUpload3DModal}
-                />
-              </Tooltip>
               <Tooltip
                 content="Create 3D model from image"
                 position="bottom"
@@ -298,9 +378,16 @@ export const Controls3D = () => {
         isOpen={upload3DIsShowing}
         onClose={() => setUpload3DIsShowing(false)}
         onSuccess={() => setUpload3DIsShowing(false)}
-        title="Upload 3D Asset"
+        title="Upload a 3D Model"
         titleIcon={faCube}
-        isSelectVisible={true}
+      />
+
+      <UploadModalImage
+        isOpen={uploadImageIsShowing}
+        onClose={() => setUploadImageIsShowing(false)}
+        onSuccess={() => setUploadImageIsShowing(false)}
+        title="Upload an Image"
+        titleIcon={faImages}
       />
     </>
   );

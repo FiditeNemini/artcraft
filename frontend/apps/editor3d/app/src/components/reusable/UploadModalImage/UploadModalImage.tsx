@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { LoadingDots } from "@storyteller/ui-loading";
 import { Modal } from "@storyteller/ui-modal";
 import { UploadAssetError, UploadSuccess } from "@storyteller/ui-upload-modal";
-import { UploadFiles3D } from "./UploadFiles3D";
+import { UploadFilesImage } from "./UploadFilesImage";
 import { initialUploaderState, UploaderState } from "../../../models";
 import {
   FilterEngineCategories,
   UploaderStates,
-  OBJECT_FILE_TYPE,
+  IMAGEPLANE_FILE_TYPE,
 } from "../../../enums";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -21,22 +21,17 @@ interface Props {
   isOpen: boolean;
   title: string;
   titleIcon: IconDefinition;
-  options?: {
-    fileSubtypes?: { [key: string]: string }[];
-    hasLength?: boolean;
-    hasThumbnailUpload?: boolean;
-  };
 }
 
-const objectFileTypes = Object.values(OBJECT_FILE_TYPE);
+const imageFileTypes = Object.values(IMAGEPLANE_FILE_TYPE);
 
-export function UploadModal3D(props: Props) {
-  const { isOpen, onClose, onSuccess, title, titleIcon, options } = props;
+export function UploadModalImage(props: Props) {
+  const { isOpen, onClose, onSuccess, title, titleIcon } = props;
   const [uploaderState, setUploaderState] =
     useState<UploaderState>(initialUploaderState);
 
-  // Category fixed to OBJECT
-  const selectedCategory = FilterEngineCategories.OBJECT;
+  // Category fixed to IMAGE_PLANE
+  const selectedCategory = FilterEngineCategories.IMAGE_PLANE;
 
   const updateUploaderState = (newState: UploaderState) => {
     setUploaderState(newState);
@@ -69,11 +64,9 @@ export function UploadModal3D(props: Props) {
       case UploaderStates.ready:
         return (
           <div className="space-y-4">
-            <UploadFiles3D
+            <UploadFilesImage
               title={title}
-              engineCategory={selectedCategory}
-              fileTypes={objectFileTypes}
-              options={options}
+              fileTypes={imageFileTypes}
               onClose={onClose}
               onUploadProgress={updateUploaderState}
             />
@@ -91,7 +84,7 @@ export function UploadModal3D(props: Props) {
       case UploaderStates.success: {
         return (
           <UploadSuccess
-            title="3D model"
+            title="Image"
             onOk={() => {
               onClose();
               onSuccess(selectedCategory);
