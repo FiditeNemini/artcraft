@@ -171,11 +171,13 @@ pub async fn generate_seedance_1_0_lite_image_to_video_handler(
     maybe_external_third_party_id: &external_job_id,
     fal_category: FalCategory::VideoGeneration,
     maybe_inference_args: None,
+    maybe_prompt_token: None,
     maybe_creator_user_token: maybe_user_session.as_ref().map(|s| &s.user_token),
     maybe_avt_token: maybe_avt_token.as_ref(),
     creator_ip_address: &ip_address,
     creator_set_visibility: Visibility::Public,
-    mysql_pool: &server_state.mysql_pool,
+    mysql_executor: &server_state.mysql_pool,
+    phantom: Default::default(),
   }).await;
 
   let job_token = match db_result {
