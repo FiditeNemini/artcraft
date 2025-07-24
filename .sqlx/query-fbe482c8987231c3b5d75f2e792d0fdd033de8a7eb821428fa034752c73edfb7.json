@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\nSELECT\n    jobs.token as `job_token: tokens::tokens::generic_inference_jobs::InferenceJobToken`,\n\n    jobs.status as `status: enums::common::job_status_plus::JobStatusPlus`,\n    \n    jobs.maybe_external_third_party as `external_third_party: enums::by_table::generic_inference_jobs::inference_job_external_third_party::InferenceJobExternalThirdParty`,\n    jobs.maybe_external_third_party_id as `external_third_party_id`,\n\n    jobs.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n    jobs.maybe_creator_anonymous_visitor_token as `maybe_creator_anonymous_visitor_token: tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken`,\n    jobs.creator_ip_address,\n\n    jobs.created_at,\n    jobs.updated_at\n\nFROM generic_inference_jobs as jobs\n\nWHERE jobs.maybe_external_third_party = ?\nAND jobs.maybe_external_third_party_id = ?\n        ",
+  "query": "\nSELECT\n    jobs.token as `job_token: tokens::tokens::generic_inference_jobs::InferenceJobToken`,\n\n    jobs.status as `status: enums::common::job_status_plus::JobStatusPlus`,\n    \n    jobs.maybe_external_third_party as `external_third_party: enums::by_table::generic_inference_jobs::inference_job_external_third_party::InferenceJobExternalThirdParty`,\n    jobs.maybe_external_third_party_id as `external_third_party_id`,\n\n    jobs.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n    jobs.maybe_creator_anonymous_visitor_token as `maybe_creator_anonymous_visitor_token: tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken`,\n    jobs.creator_ip_address,\n    \n    jobs.maybe_prompt_token as `maybe_prompt_token: tokens::tokens::prompts::PromptToken`,\n\n    jobs.created_at,\n    jobs.updated_at\n\nFROM generic_inference_jobs as jobs\n\nWHERE jobs.maybe_external_third_party = ?\nAND jobs.maybe_external_third_party_id = ?\n        ",
   "describe": {
     "columns": [
       {
@@ -75,6 +75,16 @@
       },
       {
         "ordinal": 7,
+        "name": "maybe_prompt_token: tokens::tokens::prompts::PromptToken",
+        "type_info": {
+          "type": "VarString",
+          "flags": "BINARY",
+          "char_set": 224,
+          "max_size": 128
+        }
+      },
+      {
+        "ordinal": 8,
         "name": "created_at",
         "type_info": {
           "type": "Timestamp",
@@ -84,7 +94,7 @@
         }
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "updated_at",
         "type_info": {
           "type": "Timestamp",
@@ -105,9 +115,10 @@
       true,
       true,
       false,
+      true,
       false,
       false
     ]
   },
-  "hash": "64dfacc1f0552d539f009fea91e902a2fe296c06ad539808596bbf2c8fc9eaa0"
+  "hash": "fbe482c8987231c3b5d75f2e792d0fdd033de8a7eb821428fa034752c73edfb7"
 }
