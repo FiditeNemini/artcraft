@@ -270,7 +270,7 @@ export function LightboxModal({
                 </Button>
               )}
 
-              {downloadUrl &&
+              {/* {downloadUrl &&
                 (onDownloadClicked ? (
                   <Button
                     icon={faDownToLine}
@@ -294,7 +294,20 @@ export function LightboxModal({
                   >
                     <Button icon={faDownToLine}>Download</Button>
                   </a>
-                ))}
+                ))} */}
+
+              {onDownloadClicked && downloadUrl && (
+                <Button
+                  icon={faDownToLine}
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    gtagEvent("download_clicked");
+                    await onDownloadClicked(downloadUrl, mediaClass);
+                  }}
+                >
+                  Download
+                </Button>
+              )}
             </div>
           ) : null}
         </div>

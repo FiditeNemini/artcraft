@@ -40,7 +40,7 @@ interface PopoverMenuProps {
   showIconsInList?: boolean;
   mode?: "default" | "toggle" | "button" | "hoverSelect";
   triggerLabel?: string | ReactNode;
-  children?: ReactNode;
+  children?: ReactNode | ((close: () => void) => ReactNode);
   buttonClassName?: string;
   panelClassName?: string;
   onPanelAction?: (action: string) => void;
@@ -269,7 +269,11 @@ export const PopoverMenu = ({
                     </div>
                   )}
                   {mode === "default" && children ? (
-                    <div className="text-sm text-white">{children}</div>
+                    <div className="text-sm text-white">
+                      {typeof children === "function"
+                        ? children(close)
+                        : children}
+                    </div>
                   ) : mode === "hoverSelect" ? (
                     <div className="flex flex-col gap-0 text-sm text-white">
                       {items.map((item, index) => (

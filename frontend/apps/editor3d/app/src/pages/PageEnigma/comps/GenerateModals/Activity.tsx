@@ -224,39 +224,43 @@ export function Activity() {
           </div>
         }
       >
-        <div className="max-h-[480px] overflow-y-auto">
-          {jobs.length > 0 && (
-            <div>
-              {jobs.map((job) => (
-                <InProgressCard key={job.job_token} job={job} />
-              ))}
-            </div>
-          )}
-
-          {isFirstLoad.current ? (
-            <div className="flex h-48 w-full flex-col justify-center gap-4 p-4 text-center align-middle">
-              <FontAwesomeIcon
-                icon={faSpinnerThird}
-                spin
-                size="2x"
-                className="text-gray-400"
-              />
-              <h3 className="text-gray-300">Retrieving Activities</h3>
-            </div>
-          ) : jobs.length === 0 && completedItems.length === 0 ? (
-            <div className="flex h-48 w-full flex-col justify-center gap-4 p-4 text-center align-middle">
-              <h3 className="text-lg text-gray-300">No activities yet</h3>
-            </div>
-          ) : (
-            <div>
-              <div className="flex flex-col">
-                {completedItems.map((item) => (
-                  <CompletedCard key={item.token} job={item} />
+        {(close) => (
+          <div className="max-h-[480px] overflow-y-auto">
+            {jobs.length > 0 && (
+              <div>
+                {jobs.map((job) => (
+                  <InProgressCard key={job.job_token} job={job} />
                 ))}
               </div>
-            </div>
-          )}
-        </div>
+            )}
+
+            {isFirstLoad.current ? (
+              <div className="flex h-48 w-full flex-col justify-center gap-4 p-4 text-center align-middle">
+                <FontAwesomeIcon
+                  icon={faSpinnerThird}
+                  spin
+                  size="2x"
+                  className="text-gray-400"
+                />
+                <h3 className="text-gray-300">Retrieving Activities</h3>
+              </div>
+            ) : jobs.length === 0 && completedItems.length === 0 ? (
+              <div className="flex h-48 w-full flex-col justify-center gap-4 p-4 text-center align-middle">
+                <h3 className="text-lg text-gray-300">No activities yet</h3>
+              </div>
+            ) : (
+              <div>
+                <div className="flex flex-col">
+                  {completedItems.map((item) => (
+                    <div key={item.token} onClick={close}>
+                      <CompletedCard job={item} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </PopoverMenu>
     </Tooltip>
   );
