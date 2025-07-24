@@ -18,6 +18,9 @@ interface CompletedItem {
   public_bucket_path: string; // TODO: STOP USING THIS.
   maybe_media_links_thumbnail?: string;
   updated_at: string;
+  maybe_result?: {
+    entity_token?: string;
+  };
 }
 
 // {
@@ -144,11 +147,15 @@ export function Activity() {
               job.maybe_result?.maybe_public_bucket_media_path || "",
             maybe_media_links_thumbnail: ((job) => {
               // Try the video thumbnail first, then the regular thumbnail.
-              const maybeVideoThumb = job.maybe_result?.media_links?.maybe_video_previews?.animated;
-              const maybeGenericThumb = (job.maybe_result?.media_links?.maybe_thumbnail_template || "").replace("{WIDTH}", "500");
+              const maybeVideoThumb =
+                job.maybe_result?.media_links?.maybe_video_previews?.animated;
+              const maybeGenericThumb = (
+                job.maybe_result?.media_links?.maybe_thumbnail_template || ""
+              ).replace("{WIDTH}", "500");
               return maybeVideoThumb || maybeGenericThumb;
             })(job),
             updated_at: job.updated_at || new Date().toISOString(),
+            maybe_result: job.maybe_result,
           }));
 
           // Show toast only if not first load

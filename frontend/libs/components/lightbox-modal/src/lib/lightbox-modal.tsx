@@ -9,6 +9,11 @@ import {
 import { LoadingSpinner } from "@storyteller/ui-loading-spinner";
 import React from "react";
 import { gtagEvent } from "@storyteller/google-analytics";
+import { MediaFilesApi, PromptsApi } from "@storyteller/api";
+import { toast } from "@storyteller/ui-toaster";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCopy } from "@fortawesome/pro-solid-svg-icons";
+import { twMerge } from "tailwind-merge";
 
 interface LightboxModalProps {
   isOpen: boolean;
@@ -28,6 +33,7 @@ interface LightboxModalProps {
     media_id: string | undefined
   ) => Promise<void>;
   mediaClass?: string;
+  onPromptCopy?: (prompt: string) => void;
 }
 
 export function LightboxModal({
@@ -53,17 +59,68 @@ export function LightboxModal({
   const imageTagImageUrl = imageUrl ? imageUrl + "?cors=1" : "";
 
   const [mediaLoaded, setMediaLoaded] = React.useState<boolean>(false);
+  const [prompt, setPrompt] = React.useState<string | null>(null);
+  const [promptLoading, setPromptLoading] = React.useState<boolean>(false);
+  const [hasPromptToken, setHasPromptToken] = React.useState<boolean>(false);
+  const [isPromptHovered, setIsPromptHovered] = React.useState<boolean>(false);
 
   // Reset when imageUrl changes
   React.useEffect(() => {
     setMediaLoaded(false);
   }, [imageUrl]);
 
+  // Fetch prompt when mediaId changes
+  React.useEffect(() => {
+    const fetchPrompt = async () => {
+      if (!mediaId) {
+        setPrompt(null);
+        setHasPromptToken(false);
+        return;
+      }
+
+      setPromptLoading(true);
+      try {
+        const mediaFilesApi = new MediaFilesApi();
+        const mediaResponse = await mediaFilesApi.GetMediaFileByToken({
+          mediaFileToken: mediaId,
+        });
+
+        if (mediaResponse.success && mediaResponse.data?.maybe_prompt_token) {
+          setHasPromptToken(true);
+          const promptsApi = new PromptsApi();
+          const promptResponse = await promptsApi.GetPromptsByToken({
+            token: mediaResponse.data.maybe_prompt_token,
+          });
+
+          if (
+            promptResponse.success &&
+            promptResponse.data?.maybe_positive_prompt
+          ) {
+            setPrompt(promptResponse.data.maybe_positive_prompt);
+          } else {
+            setPrompt(null);
+          }
+        } else {
+          setHasPromptToken(false);
+          setPrompt(null);
+        }
+      } catch (error) {
+        console.error("Error fetching prompt:", error);
+        setHasPromptToken(false);
+        setPrompt(null);
+      } finally {
+        setPromptLoading(false);
+      }
+    };
+
+    fetchPrompt();
+  }, [mediaId]);
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      className="rounded-xl bg-[#2C2C2C] h-[80vh] w-[60vw] max-w-screen min-w-[35vw] min-h-[40vh]"
+      className="rounded-xl bg-[#2C2C2C] h-[75vh] w-[60vw] max-w-screen min-w-[35vw] min-h-[40vh]"
       draggable
       allowBackgroundInteraction={true}
       showClose={true}
@@ -115,13 +172,62 @@ export function LightboxModal({
 
         {/* info + actions */}
         <div className="flex h-full flex-col">
-          <div className="flex-1 space-y-4">
-            <div className="text-xl font-medium">
+          <div className="flex-1 space-y-5">
+            {/* <div className="text-xl font-medium">
               {title || "Image Generation"}
-            </div>
+            </div> */}
             {createdAt && (
-              <div className="text-sm text-white/60">
-                Created: {dayjs(createdAt).format("MMM D, YYYY HH:mm:ss")}
+              <div className="space-y-1.5">
+                <div className="text-sm font-medium text-white/90">Created</div>
+                <div className="text-sm text-white/70">
+                  {dayjs(createdAt).format("MMM D, YYYY")} at{" "}
+                  {dayjs(createdAt).format("hh:mm A")}
+                </div>
+              </div>
+            )}
+            {hasPromptToken && (
+              <div className="relative space-y-1.5">
+                <div className="text-sm font-medium text-white/90">Prompt</div>
+                <div
+                  className={twMerge(
+                    "relative text-sm text-white/90 break-words bg-black/20 p-3 rounded-lg cursor-pointer transition-colors duration-100 leading-relaxed",
+                    isPromptHovered && "bg-black/30"
+                  )}
+                  onMouseEnter={() => setIsPromptHovered(true)}
+                  onMouseLeave={() => setIsPromptHovered(false)}
+                  onClick={() => {
+                    if (!prompt) return;
+                    navigator.clipboard.writeText(prompt).catch(() => {});
+                    toast.success("Prompt copied");
+                  }}
+                >
+                  {promptLoading ? (
+                    <div className="flex items-center gap-2">
+                      <LoadingSpinner className="h-4 w-4" />
+                      <span className="text-sm text-white/80">
+                        Loading prompt...
+                      </span>
+                    </div>
+                  ) : (
+                    prompt || (
+                      <span className="text-sm text-white/90">No prompt</span>
+                    )
+                  )}
+                </div>
+
+                {!promptLoading && (
+                  <div
+                    className={twMerge(
+                      "pointer-events-none absolute inset-0 flex items-end justify-end opacity-0 transition-opacity duration-50",
+                      isPromptHovered && "opacity-100"
+                    )}
+                  >
+                    <div className="flex items-center gap-1 text-xs text-white/80 bg-black/80 backdrop-blur-md p-1.5 rounded-tl-lg rounded-br-lg">
+                      <FontAwesomeIcon icon={faCopy} className="h-3 w-3" />
+                      <span>Copy prompt</span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
             {additionalInfo}

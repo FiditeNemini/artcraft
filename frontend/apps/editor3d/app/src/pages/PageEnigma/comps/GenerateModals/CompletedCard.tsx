@@ -11,6 +11,9 @@ interface Props {
     public_bucket_path: string;
     maybe_style_name?: string;
     maybe_media_links_thumbnail?: string;
+    maybe_result?: {
+      entity_token?: string;
+    };
   };
 }
 
@@ -76,6 +79,7 @@ export function CompletedCard({ job }: Props) {
         onImageError={() => setLoadError(true)}
         title={job.maybe_title}
         createdAt={job.updated_at}
+        mediaId={job.maybe_result?.entity_token}
         downloadUrl={downloadLink}
         additionalInfo={
           job.maybe_style_name && (

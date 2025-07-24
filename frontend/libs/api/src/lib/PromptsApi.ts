@@ -1,9 +1,8 @@
-import { ApiManager, ApiResponse } from  "./ApiManager.js";
+import { ApiManager, ApiResponse } from "./ApiManager.js";
 import { Prompts } from "./models/Prompts.js";
 import { FetchProxy as fetch } from "@storyteller/tauri-utils";
 
 export class PromptsApi extends ApiManager {
-  
   public async enqueueImageGeneration({
     disableSystemPrompt,
     prompt,
@@ -48,7 +47,7 @@ export class PromptsApi extends ApiManager {
 
     const result = {
       success: isSuccess,
-      data: isSuccess ? postResponse.inference_job_token : undefined,
+      data: isSuccess ? postResponse.job_token : undefined,
       errorMessage: isSuccess ? undefined : postResponse.BadInput,
     };
 
@@ -57,7 +56,7 @@ export class PromptsApi extends ApiManager {
 
   public async pollJobSession(
     jobToken: string,
-    thumbnailWidth: number = 256,
+    thumbnailWidth = 256
   ): Promise<
     ApiResponse<{
       job_token: string;
@@ -92,7 +91,7 @@ export class PromptsApi extends ApiManager {
     const thumbnail_url =
       response.state.maybe_result?.media_links?.maybe_thumbnail_template?.replace(
         "{WIDTH}",
-        thumbnailWidth.toString(),
+        thumbnailWidth.toString()
       );
 
     const progress_percentage = response.state.status.progress_percentage;
