@@ -289,13 +289,26 @@ pub async fn get_prompt_handler(
     Vec::new()
   });
 
-  let items = items.iter().map(|item| {
+  let items = items.iter().filter_map(|item| {
+    match item.context_semantic_type {
+      PromptContextSemanticType::VidStartFrame => {},
+      PromptContextSemanticType::VidEndFrame => {},
+      PromptContextSemanticType::Imgref => {},
+      PromptContextSemanticType::ImgrefCharacter => {},
+      PromptContextSemanticType::ImgrefStyle => {},
+      PromptContextSemanticType::ImgrefBg => {},
+      _ => {
+        // NB: Only return images. In the future we may add context items for stages, persisted data, etc.
+        return None
+      },
+    }
+
     let bucket_path = MediaFileBucketPath::from_object_hash(
       &item.public_bucket_directory_hash,
       item.maybe_public_bucket_prefix.as_deref(),
       item.maybe_public_bucket_extension.as_deref());
 
-    ImageContextItem {
+    Some(ImageContextItem {
       media_token: item.media_token.clone(),
       semantic: item.context_semantic_type,
       media_links: MediaLinksBuilder::from_media_path_and_env(
@@ -303,7 +316,7 @@ pub async fn get_prompt_handler(
         server_state.server_environment,
         &bucket_path,
       ),
-    }
+    })
   }).collect::<Vec<ImageContextItem>>();
 
   let maybe_context_images = if items.is_empty() {
