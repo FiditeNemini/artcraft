@@ -37,7 +37,7 @@ pub struct GetPromptSuccessResponse {
 }
 
 #[derive(Serialize, ToSchema)]
-pub struct ImageContextItem {
+pub struct GetPromptImageContextItem {
   pub media_token: MediaFileToken,
   pub semantic: PromptContextSemanticType,
   pub media_links: MediaLinks,
@@ -64,7 +64,7 @@ pub struct PromptInfo {
   pub maybe_negative_prompt: Option<String>,
 
   /// Context images (optional)
-  pub maybe_context_images: Option<Vec<ImageContextItem>>,
+  pub maybe_context_images: Option<Vec<GetPromptImageContextItem>>,
 
   /// Scheduled / travel prompt (optional)
   pub maybe_travel_prompt: Option<String>,
@@ -308,7 +308,7 @@ pub async fn get_prompt_handler(
       item.maybe_public_bucket_prefix.as_deref(),
       item.maybe_public_bucket_extension.as_deref());
 
-    Some(ImageContextItem {
+    Some(GetPromptImageContextItem {
       media_token: item.media_token.clone(),
       semantic: item.context_semantic_type,
       media_links: MediaLinksBuilder::from_media_path_and_env(
@@ -317,7 +317,7 @@ pub async fn get_prompt_handler(
         &bucket_path,
       ),
     })
-  }).collect::<Vec<ImageContextItem>>();
+  }).collect::<Vec<GetPromptImageContextItem>>();
 
   let maybe_context_images = if items.is_empty() {
     None
