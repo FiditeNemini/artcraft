@@ -158,10 +158,12 @@ export function Activity() {
             maybe_result: job.maybe_result,
           }));
 
-          // Show toast only if not first load
-          if (!isFirstLoad.current) {
-            showToast(newItems);
-          }
+          // NB(bt,2025-07-28): Don't use eventing from here anymore. 
+          // Tauri is sending direct events we can bind toasts to.
+          // // Show toast only if not first load
+          // if (!isFirstLoad.current) {
+          //   showToast(newItems);
+          // }
 
           // Update state
           setCompletedItems((prev) => {
