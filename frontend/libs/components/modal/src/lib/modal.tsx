@@ -949,9 +949,10 @@ export const Modal = ({
                   {/* resize handles inside panel so clicks don't count as outside */}
                   {renderResizeHandles()}
                 </DialogPanel>
-                {showClose && (
-                  <div className="absolute top-0 right-0 m-2.5 z-[80]">
-                    <CloseButton onClick={onClose} />
+                {(showClose || expandable) && (
+                  <div className="absolute top-0 right-0 m-2.5 z-[80] flex items-center gap-2">
+                    {expandable && <Modal.ExpandButton />}
+                    {showClose && <CloseButton onClick={onClose} />}
                   </div>
                 )}
               </TransitionChild>

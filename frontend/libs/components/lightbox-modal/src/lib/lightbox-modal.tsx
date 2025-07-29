@@ -151,13 +151,14 @@ export function LightboxModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      className="rounded-xl bg-[#2C2C2C] h-[75vh] w-[60vw] max-w-screen min-w-[35vw] min-h-[40vh]"
+      className="rounded-xl bg-[#2C2C2C] h-[75vh] w-[60vw] max-w-screen min-w-[35vw] min-h-[40vh] p-4"
       draggable
       allowBackgroundInteraction={true}
       showClose={true}
       closeOnOutsideClick={false}
       resizable={true}
       backdropClassName="pointer-events-none hidden"
+      expandable={true}
     >
       {/* Invisible drag handle strip at the very top for moving */}
       <Modal.DragHandle>
