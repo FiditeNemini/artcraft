@@ -1329,7 +1329,7 @@ class Editor {
     ) {
       this.composer.render();
       //this.rawRenderer.render(this.activeScene.scene, this.render_camera!);
-      this.render_composer.render();
+      // this.render_composer.render();
     } else if (this.renderer && this.render_camera && !this.rendering) {
       this.renderer.setSize(this.render_width, this.render_height);
       this.renderer.render(this.activeScene.scene, this.render_camera);
