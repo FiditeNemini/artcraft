@@ -2,6 +2,8 @@ use crate::core::commands::enqueue::image::enqueue_text_to_image_command::{Enque
 use crate::core::commands::enqueue::image::internal_image_error::InternalImageError;
 use crate::core::commands::enqueue::image_edit::errors::InternalContextualEditImageError;
 use crate::core::commands::enqueue::image_edit::gpt_image_1::handle_gpt_image_1_edit::handle_gpt_image_1_edit;
+use crate::core::commands::enqueue::image_inpaint::errors::InternalImageInpaintError;
+use crate::core::commands::enqueue::image_inpaint::flux_pro_1_inpaint::handle_flux_pro_1_inpaint::handle_flux_pro_1_inpaint;
 use crate::core::commands::enqueue::task_enqueue_success::TaskEnqueueSuccess;
 use crate::core::commands::response::failure_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus};
 use crate::core::commands::response::shorthand::{Response, ResponseOrErrorType};
@@ -43,65 +45,55 @@ use storyteller_client::media_files::get_media_file::get_media_file;
 use storyteller_client::utils::api_host::ApiHost;
 use tauri::{AppHandle, Manager, State};
 use tokens::tokens::media_files::MediaFileToken;
-use crate::core::commands::enqueue::image_edit::flux_kontext::handle_flux_kontext_edit::handle_flux_kontext_edit;
+
+#[derive(Deserialize, Debug, Copy, Clone)]
+#[serde(rename_all = "snake_case")]
+pub enum ImageInpaintModel {
+  #[serde(rename = "flux_pro_1")]
+  FluxPro1,
+}
 
 #[derive(Deserialize, Debug)]
-pub struct EnqueueContextualEditImageCommand {
+pub struct EnqueueInpaintImageCommand {
+  /// REQUIRED (Option<T> is just for error messages).
   /// The model to use.
-  pub model: Option<ContextualImageEditModel>,
+  pub model: Option<ImageInpaintModel>,
 
+  /// REQUIRED (Option<T> is just for error messages).
   /// Images to use for the image edit.
   /// The first image is typically a 2D canvas or 3D stage, but doesn't have to be.
   /// There must be at least one image.
-  pub image_media_tokens: Option<Vec<MediaFileToken>>,
-  
-  /// If set, this becomes the first image in the image media tokens (pushing back 
-  /// each of the `image_media_tokens` by one).
-  /// This is useful if we want to do prompt engineering.
-  pub scene_image_media_token: Option<MediaFileToken>,
+  pub image_media_token: Option<MediaFileToken>,
 
+  // TODO: Allow for bytes.
+  /// REQUIRED (Option<T> is just for error messages).
+  /// Images to use for the image edit.
+  /// The first image is typically a 2D canvas or 3D stage, but doesn't have to be.
+  /// There must be at least one image.
+  pub mask_media_token: Option<MediaFileToken>,
+
+  /// REQUIRED.
   /// The user's image generation prompt.
   pub prompt: String,
 
-  /// Turn off the system prompt.
-  pub disable_system_prompt: Option<bool>,
-
   /// Number of images to generate.
   pub image_count: Option<u32>,
-
-  /// Aspect ratio.
-  pub aspect_ratio: Option<EditImageSize>,
-
-  /// Image quality.
-  pub image_quality: Option<EditImageQuality>,
-}
-
-#[derive(Deserialize, Debug, Copy, Clone)]
-#[serde(rename_all = "snake_case")]
-pub enum EditImageSize {
-  Auto,
-  Square,
-  Wide,
-  Tall,
-}
-
-#[derive(Deserialize, Debug, Copy, Clone)]
-#[serde(rename_all = "snake_case")]
-pub enum EditImageQuality {
-  Auto,
-  High,
-  Medium,
-  Low,
 }
 
 #[derive(Serialize, Debug)]
 #[serde(rename_all = "snake_case")]
-pub enum EnqueueContextualEditImageErrorType {
+pub enum EnqueueInpaintImageErrorType {
   /// Caller didn't specify a model
   ModelNotSpecified,
 
   /// No model available for image generation
   NoProviderAvailable,
+
+  /// No source image was supplied.
+  NoSourceImageSpecified,
+
+  /// No mask image was supplied.
+  NoMaskImageSpecified,
 
   /// Generic bad request error
   BadRequest,
@@ -120,15 +112,15 @@ pub enum EnqueueContextualEditImageErrorType {
 }
 
 #[derive(Serialize)]
-pub struct EnqueueContextualEditImageSuccessResponse {
+pub struct EnqueueImageInpaintSuccessResponse {
 }
 
-impl SerializeMarker for EnqueueContextualEditImageSuccessResponse {}
+impl SerializeMarker for EnqueueImageInpaintSuccessResponse {}
 
 #[tauri::command]
-pub async fn enqueue_contextual_edit_image_command(
+pub async fn enqueue_image_inpaint_command(
   app: AppHandle,
-  request: EnqueueContextualEditImageCommand,
+  request: EnqueueInpaintImageCommand,
   app_data_root: State<'_, AppDataRoot>,
   app_env_configs: State<'_, AppEnvConfigs>,
   provider_priority_store: State<'_, ProviderPriorityStore>,
@@ -138,10 +130,10 @@ pub async fn enqueue_contextual_edit_image_command(
   fal_task_queue: State<'_, FalTaskQueue>,
   sora_creds_manager: State<'_, SoraCredentialManager>,
   sora_task_queue: State<'_, SoraTaskQueue>,
-) -> ResponseOrErrorType<EnqueueContextualEditImageSuccessResponse, EnqueueContextualEditImageErrorType> {
+) -> ResponseOrErrorType<EnqueueImageInpaintSuccessResponse, EnqueueInpaintImageErrorType> {
 
-  info!("enqueue_contextual_edit_image_command called; image media tokens : {:?}, full request: {:?}",
-    &request.image_media_tokens, &request);
+  info!("enqueue_image_inpaint_command called; full request: {:?}",
+    &request);
 
   let result = handle_request(
     &request,
@@ -159,7 +151,7 @@ pub async fn enqueue_contextual_edit_image_command(
 
   match result {
     Err(err) => {
-      error!("Error enqueuing contextual edit image: {:?}", err);
+      error!("Error enqueuing inpaint image: {:?}", err);
 
       // TODO: Derive from err. Make service provider optional.
       let event = GenerationEnqueueFailureEvent {
@@ -186,13 +178,13 @@ pub async fn enqueue_contextual_edit_image_command(
         error!("Failed to emit event: {:?}", err); // Fail open.
       }
 
-      Ok(EnqueueContextualEditImageSuccessResponse {}.into())
+      Ok(EnqueueImageInpaintSuccessResponse {}.into())
     }
   }
 }
 
 pub async fn handle_request(
-  request: &EnqueueContextualEditImageCommand,
+  request: &EnqueueInpaintImageCommand,
   app: &AppHandle,
   app_data_root: &AppDataRoot,
   app_env_configs: &AppEnvConfigs,
@@ -203,27 +195,13 @@ pub async fn handle_request(
   fal_task_queue: &FalTaskQueue,
   sora_creds_manager: &SoraCredentialManager,
   sora_task_queue: &SoraTaskQueue,
-) -> Result<TaskEnqueueSuccess, InternalContextualEditImageError> {
+) -> Result<TaskEnqueueSuccess, InternalImageInpaintError> {
   let success_event= match request.model {
     None => {
-      return Err(InternalContextualEditImageError::NoModelSpecified)
+      return Err(InternalImageInpaintError::NoModelSpecified)
     }
-    Some(ContextualImageEditModel::FluxProKontextMax) => {
-      handle_flux_kontext_edit(
-        request,
-        app,
-        app_data_root,
-        app_env_configs,
-        provider_priority_store,
-        storyteller_creds_manager,
-        fal_creds_manager,
-        fal_task_queue,
-        sora_creds_manager,
-        sora_task_queue,
-      ).await?
-    }
-    Some(ContextualImageEditModel::GptImage1) => {
-      handle_gpt_image_1_edit(
+    Some(ImageInpaintModel::FluxPro1) => {
+      handle_flux_pro_1_inpaint(
         request,
         app,
         app_data_root,
@@ -237,15 +215,15 @@ pub async fn handle_request(
       ).await?
     }
   };
-  
+
   let result = success_event
       .insert_into_task_database(task_database)
       .await;
-  
+
   if let Err(err) = result {
     error!("Failed to create task in database: {:?}", err);
     // NB: Fail open, but find a way to flag this.
   }
-  
+
   Ok(success_event)
 }
