@@ -19,7 +19,7 @@ import { useRightPanelLayoutManagement } from "./hooks/useRightPanelLayoutManage
 import { useStageCentering } from "./hooks/useCenteredStage";
 import { useGlobalMouseUp } from "./hooks/useGlobalMouseUp";
 
-type MiraiProps = {
+export type MiraiProps = {
   nodes: Node[];
   selectedNodeIds: string[];
   onCanvasSizeChange?: (width: number, height: number) => void;

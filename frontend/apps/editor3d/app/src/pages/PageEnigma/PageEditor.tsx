@@ -77,6 +77,7 @@ import {
 import { LoginModal, useLoginModalStore } from "@storyteller/ui-login-modal";
 import PageDraw from "../PageDraw/PageDraw";
 import { useTabStore } from "../Stores/TabState";
+import PageEdit from "../PageEdit/PageEdit";
 import { IMAGE_MODELS_BY_LABEL } from "@storyteller/model-list";
 import { ModelInfo } from "@storyteller/model-list";
 
@@ -581,6 +582,11 @@ export const PageEditor = () => {
             imageMediaId={topNavMediaId.value}
             imageUrl={topNavMediaUrl.value}
           />
+        </div>
+      )}
+      {tabStore.activeTabId == "EDIT" && (
+        <div>
+          <PageEdit />
         </div>
       )}
     </div>

@@ -19,6 +19,7 @@ export type LineNode = {
   offsetY?: number;
   zIndex: number;
   locked?: boolean; // Add locked property
+  globalCompositeOperation?: string; // Add globalCompositeOperation property
 };
 
 // Add this enum at the top of the file with other types
@@ -30,7 +31,7 @@ export enum AspectRatioType {
 }
 
 // Logic to remove background from image nodes would go here
-const convertFileToBase64 = (file: File): Promise<string> => {
+export const convertFileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -114,6 +115,7 @@ interface SceneState {
     shouldSaveState: boolean,
   ) => void;
   selectNode: (id: string | null, isMultiSelect?: boolean) => void;
+
   moveNode: (
     id: string,
     x: number,
@@ -135,6 +137,7 @@ interface SceneState {
     fill?: string,
   ) => void;
   createCircle: (x: number, y: number, radius?: number, fill?: string) => void;
+
   createTriangle: (
     x: number,
     y: number,
@@ -248,7 +251,7 @@ interface SceneState {
   getAspectRatioDimensions: () => { width: number; height: number };
 }
 
-const generateId = (): string => {
+export const generateId = (): string => {
   return Math.random().toString(36).substring(2, 9);
 };
 
@@ -273,6 +276,7 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   clipboard: [],
   history: [],
   historyIndex: -1,
+
   activeTool: "select",
   brushColor: "#000000",
   brushSize: 5,
@@ -280,6 +284,8 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   fillColor: "white",
   currentShape: null,
   shapeColor: "#4d79b3",
+  
+  // Cursor initial state
   cursorPosition: null,
   cursorVisible: false,
 
@@ -296,6 +302,7 @@ export const useSceneStore = create<SceneState>((set, get) => ({
         zIndex: nextZ,
       });
       // console.log("New Node with ID:", newNode.id);
+
       const nodes = [...state.nodes, newNode];
       // console.log("Nodes after update");
       // console.log(nodes);
@@ -307,6 +314,7 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   removeNode: (id: string, shouldSaveState: boolean = true) => {
     set((state) => {
       // Remove the node
+
       const newNodes = state.nodes.filter((node) => node.id !== id);
 
       // Update selection state
@@ -323,6 +331,7 @@ export const useSceneStore = create<SceneState>((set, get) => ({
       get().saveState();
     }
   },
+
 
   updateNode: (
     id: string,
