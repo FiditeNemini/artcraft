@@ -60,17 +60,16 @@ pub struct EnqueueInpaintImageCommand {
   pub model: Option<ImageInpaintModel>,
 
   /// REQUIRED (Option<T> is just for error messages).
-  /// Images to use for the image edit.
-  /// The first image is typically a 2D canvas or 3D stage, but doesn't have to be.
-  /// There must be at least one image.
+  /// The source image to edit.
   pub image_media_token: Option<MediaFileToken>,
 
-  // TODO: Allow for bytes.
-  /// REQUIRED (Option<T> is just for error messages).
-  /// Images to use for the image edit.
-  /// The first image is typically a 2D canvas or 3D stage, but doesn't have to be.
-  /// There must be at least one image.
-  pub mask_media_token: Option<MediaFileToken>,
+  /// REQUIRED: Supply this *XOR* `mask_image_raw_bytes`.
+  /// The mask to focus the edit (already uploaded).
+  pub mask_image_media_token: Option<MediaFileToken>,
+
+  /// REQUIRED: Supply this *XOR* `mask_image_media_token`.
+  /// The mask to focus the edit (raw bytes).
+  pub mask_image_raw_bytes: Option<Vec<u8>>,
 
   /// REQUIRED.
   /// The user's image generation prompt.
@@ -78,6 +77,9 @@ pub struct EnqueueInpaintImageCommand {
 
   /// Number of images to generate.
   pub image_count: Option<u32>,
+  
+  /// If true, force the dimensions of the source image and mask image to match.
+  pub require_matching_dimensions: Option<bool>,
 }
 
 #[derive(Serialize, Debug)]
@@ -95,20 +97,17 @@ pub enum EnqueueInpaintImageErrorType {
   /// No mask image was supplied.
   NoMaskImageSpecified,
 
+  /// Too many mask images were supplied.
+  MultipleMaskImagesSpecified,
+
+  /// Bad mask image was supplied.
+  BadMaskImage,
+  
   /// Generic bad request error
   BadRequest,
 
   /// Generic server error
   ServerError,
-
-  /// The user is sending too many requests
-  TooManyConcurrentTasks,
-  /// User is not logged into Sora!
-  SoraLoginRequired,
-  /// The user needs to create a Sora account
-  SoraUsernameNotYetCreated,
-  /// The Sora service is having problems. Try again soon.
-  SoraIsHavingProblems,
 }
 
 #[derive(Serialize)]
@@ -132,8 +131,8 @@ pub async fn enqueue_image_inpaint_command(
   sora_task_queue: State<'_, SoraTaskQueue>,
 ) -> ResponseOrErrorType<EnqueueImageInpaintSuccessResponse, EnqueueInpaintImageErrorType> {
 
-  info!("enqueue_image_inpaint_command called; full request: {:?}",
-    &request);
+  info!("enqueue_image_inpaint_command called; model: {:?}, image_media_token: {:?}, prompt: {:?}",
+    &request.model, &request.image_media_token, &request.prompt);
 
   let result = handle_request(
     &request,

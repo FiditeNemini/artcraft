@@ -8,6 +8,8 @@ import Konva from "konva"; // just for types
 
 import { setCanvasRenderBitmap } from "../../signals/canvasRenderBitmap"
 import {
+  EnqueueImageInpaint,
+  EnqueueImageInpaintModel,
   FalBackgroundRemoval,
 } from "@storyteller/tauri-api";
 import { ContextMenuContainer } from "../PageDraw/components/ui/ContextMenu";
@@ -188,7 +190,7 @@ const PageEdit = () => {
   }
 
   // Create a function to use the left layer ref and download the bitmap from it
-  const downloadLeftPanelBitmap = () => {
+  const downloadLeftPanelBitmap = async(): Promise<Uint8Array> => {
     if (!stageRef.current || !leftPanelRef.current || !rectRef.current) {
       console.error("Stage or left panel ref is not available");
       return;
@@ -206,24 +208,63 @@ const PageEdit = () => {
       pixelRatio: 1 / stageRef.current.scaleX(),
     });
 
-    // Using the pixelRatio scaling may result in off-by-one rounding errors,
-    // So we re-fit the image to a canvas of precise size.
-    const fittedCanvas = normalizeCanvas(layerCrop, rect.width(), rect.height());
+    // // Using the pixelRatio scaling may result in off-by-one rounding errors,
+    // // So we re-fit the image to a canvas of precise size.
+    // const fittedCanvas = normalizeCanvas(layerCrop, rect.width(), rect.height());
+    // const downloadCallback = (blob: Blob | null) => {
+    //   if (!blob) {
+    //     console.error("Failed to create blob from canvas");
+    //     return;
+    //   }
+    //   const url = URL.createObjectURL(blob);
+    //   const link = document.createElement("a");
+    //   link.href = url;
+    //   link.download = "artcraft_snapshot.png";
+    //   link.click();
+    //   console.log('downloadCallback', url);
+    // }
+    // fittedCanvas.toBlob(downloadCallback, "image/png", 1.0);
 
-    const downloadCallback = (blob: Blob | null) => {
-      if (!blob) {
-        console.error("Failed to create blob from canvas");
-        return;
+    const normalizeCanvas2 = (canvas: HTMLCanvasElement, width: number, height: number): OffscreenCanvas => {
+      const newCanvas = new OffscreenCanvas(width, height);
+
+      const ctx = newCanvas.getContext("2d");
+      if (!ctx) {
+        throw new Error("Failed to get canvas context");
       }
 
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "artcraft_snapshot.png";
-      link.click();
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(canvas, 0, 0, width, height);
+      return newCanvas;
     }
 
-    fittedCanvas.toBlob(downloadCallback, "image/png", 1.0);
+    const fittedCanvas2 = normalizeCanvas2(layerCrop, rect.width(), rect.height());
+
+    const blob = await fittedCanvas2.convertToBlob({ type: 'image/png' });
+    const arrayBuffer = await blob.arrayBuffer();
+  
+    return new Uint8Array(arrayBuffer);
+
+  };
+
+  const handleGenerate = async (prompt: string) => {
+    const editedImageToken = store.baseImageInfo?.mediaToken;
+
+    if (!editedImageToken) {
+      console.error("Base image is not available");
+      return;
+    }
+
+    // TODO: Call inference API here
+    let arrayBuffer = await downloadLeftPanelBitmap();
+
+    const response = await EnqueueImageInpaint({
+      model: EnqueueImageInpaintModel.FluxPro1,
+      image_media_token: editedImageToken,
+      mask_image_raw_bytes: arrayBuffer,
+      prompt: prompt,
+      image_count: 1,
+    });
   };
 
   // Display image selector on launch, otherwise hide it
@@ -262,7 +303,7 @@ const PageEdit = () => {
         <PromptEditor
           onModeChange={(mode: string) => { store.setActiveTool(mode as ActiveEditTool) }}
           selectedMode={store.activeTool}
-          onGenerateClick={downloadLeftPanelBitmap}
+          onGenerateClick={handleGenerate}
         />
       </div>
       <div className="relative z-0">
