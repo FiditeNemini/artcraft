@@ -40,10 +40,7 @@ import {
   // SoraSessionState,
   // waitForSoraLogin,
   EnqueueContextualEditImage,
-  EnqueueContextualEditImageModel,
   EnqueueContextualEditImageSize,
-  EnqueueImageInpaint,
-  EnqueueImageInpaintModel,
 } from "@storyteller/tauri-api";
 // import { showActionReminder } from "@storyteller/ui-action-reminder-modal";
 // import { invoke } from "@tauri-apps/api/core";
@@ -335,41 +332,6 @@ export const PromptBox2D = ({
     });
 
     console.log("generateResponse", generateResponse);
-
-    // NB: Tanish, this is an example request to inpainting
-    // NB: Tanish, this is an example request to inpainting
-    // NB: Tanish, this is an example request to inpainting
-    // NB: Tanish, this is an example request to inpainting
-
-    const EncodeImageBitmapToArray = async (imageBitmap: ImageBitmap): Promise<Uint8Array> => {
-      const canvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(imageBitmap, 0, 0);
-
-      // Convert canvas to PNG Blob
-      const blob = await canvas.convertToBlob({ type: 'image/png' });
-
-      // Read Blob as ArrayBuffer
-      const arrayBuffer = await blob.arrayBuffer();
-    
-      // Convert to Uint8Array
-      return new Uint8Array(arrayBuffer);
-    }
-
-    const uint8Array = await EncodeImageBitmapToArray(image);
-
-    const generateResponse2 = await EnqueueImageInpaint({
-      model: EnqueueImageInpaintModel.FluxPro1,
-      image_media_token: "m_9y8hy50582mwxpm8hxmh4n4wjeh5cr",
-      mask_image_raw_bytes: uint8Array,
-      prompt: prompt,
-      image_count: 1,
-    });
-
-    // NB: Tanish, end example.
-    // NB: Tanish, end example.
-    // NB: Tanish, end example.
-    // NB: Tanish, end example.
   };
 
   const handleWebEnqueue = async () => {

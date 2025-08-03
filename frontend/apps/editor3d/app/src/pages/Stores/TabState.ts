@@ -3,7 +3,7 @@ import { useSceneStore } from '../PageDraw/stores/SceneState';
 
 export type TabId = '2D' | '3D' | 'VIDEO' | 'IMAGE' | 'EDIT';
 
-const DEFAULT_TAB : TabId = 'EDIT';
+const DEFAULT_TAB : TabId = '2D';
 
 interface TabState {
   // Current active tab

@@ -33,15 +33,50 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
 use uuid::uuid;
 
+pub struct UploadImageBytesArgs<'a> {
+  pub api_host: &'a ApiHost,
+  pub maybe_creds: Option<&'a StorytellerCredentialSet>,
+  
+  // NB: Bytes need to be owned for the request.
+  pub image_bytes: Vec<u8>,
+  pub image_type: ImageType,
+  
+  /// If true, we should hide the image from the user's gallery.
+  pub is_intermediate_system_file: bool,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum ImageType {
+  Png,
+  Jpeg,
+  Gif,
+}
+
+impl ImageType {
+  pub fn mime_type(&self) -> &str {
+    match self {
+      ImageType::Png => "image/png",
+      ImageType::Jpeg => "image/jpeg",
+      ImageType::Gif => "image/gif",
+    }
+  }
+  pub fn file_extension(&self) -> &str {
+    match self {
+      ImageType::Png => "png",
+      ImageType::Jpeg => "jpg",
+      ImageType::Gif => "gif",
+    }
+  }
+}
+
 /// Upload an image media file from a file.
+/// NB: File type is not checked, so caller needs to enforce.
 /// NB: We need owned bytes for the request.
 pub async fn upload_image_media_file_from_bytes(
-  api_host: &ApiHost,
-  maybe_creds: Option<&StorytellerCredentialSet>,
-  bytes: Vec<u8>,
+  args: UploadImageBytesArgs<'_>
 ) -> Result<UploadImageMediaFileSuccessResponse, StorytellerError> {
 
-  let url = get_route(api_host);
+  let url = get_route(args.api_host);
 
   debug!("Requesting {:?}", &url);
 
@@ -50,20 +85,24 @@ pub async fn upload_image_media_file_from_bytes(
       .build()
       .map_err(|err| StorytellerError::Client(ClientError::from(err)))?;
 
-  let part = Part::bytes(bytes)
-      .file_name("image.png")
-      .mime_str("image/png")
+  let part = Part::bytes(args.image_bytes)
+      .file_name(format!("image.{}", args.image_type.file_extension()))
+      .mime_str(args.image_type.mime_type())
       .map_err(|err| StorytellerError::Client(ClientError::from(err)))?;
 
-  let form = Form::new()
+  let mut form = Form::new()
       .text("uuid_idempotency_token", generate_random_uuid())
       .part("file", part);
+  
+  if args.is_intermediate_system_file {
+    form = form.text("is_intermediate_system_file", "true");
+  }
 
   let mut request_builder = client.post(url)
       .header("User-Agent", USER_AGENT)
       .header("Accept", APPLICATION_JSON);
   
-  if let Some(creds) = maybe_creds {
+  if let Some(creds) = args.maybe_creds {
     if let Some(header) = &creds.maybe_as_cookie_header() {
       request_builder = request_builder.header("Cookie", header);
     }

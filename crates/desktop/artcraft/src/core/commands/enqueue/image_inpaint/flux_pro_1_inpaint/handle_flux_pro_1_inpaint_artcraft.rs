@@ -45,7 +45,7 @@ use storyteller_client::generate::image::generate_flux_pro_11_text_to_image::gen
 use storyteller_client::generate::image::generate_flux_pro_11_ultra_text_to_image::generate_flux_pro_11_ultra_text_to_image;
 use storyteller_client::generate::image::inpaint::flux_pro_1_inpaint_image::flux_pro_1_inpaint_image;
 use storyteller_client::media_files::get_media_file::get_media_file;
-use storyteller_client::media_files::upload_image_media_file_from_bytes::upload_image_media_file_from_bytes;
+use storyteller_client::media_files::upload_image_media_file_from_bytes::{upload_image_media_file_from_bytes, ImageType, UploadImageBytesArgs};
 use storyteller_client::media_files::upload_image_media_file_from_file::upload_image_media_file_from_file;
 use tauri::AppHandle;
 use tokens::tokens::media_files::MediaFileToken;
@@ -165,11 +165,13 @@ async fn get_mask(
 
   info!("Uploading image media file from bytes...");
 
-  let result = upload_image_media_file_from_bytes(
-    &app_env_configs.storyteller_host,
-    Some(&storyteller_creds),
-    image_bytes.0
-  ).await
+  let result = upload_image_media_file_from_bytes(UploadImageBytesArgs {
+    api_host: &app_env_configs.storyteller_host,
+    maybe_creds: Some(&storyteller_creds),
+    image_bytes: image_bytes.0,
+    image_type: ImageType::Png,
+    is_intermediate_system_file: true,
+  }).await
       .map_err(|err| {
         error!("Failed to upload image media file: {:?}", err);
         InternalImageInpaintError::StorytellerError(err)
