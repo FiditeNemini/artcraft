@@ -25,6 +25,7 @@ use actix_multipart::form::MultipartFormConfig;
 use actix_web::middleware::{DefaultHeaders, Logger};
 use actix_web::{middleware, web, App, HttpServer};
 use anyhow::anyhow;
+use chrono::Utc;
 use elasticsearch::http::transport::Transport;
 use elasticsearch::Elasticsearch;
 use log::info;
@@ -392,6 +393,8 @@ async fn main() -> AnyhowResult<()> {
 
   let openai_api_key= easyenv::get_env_string_required("OPENAI_API_KEY")?;
 
+  let startup_time = Utc::now();
+
   let server_state = ServerState {
     env_config: EnvConfig {
       num_workers,
@@ -409,6 +412,7 @@ async fn main() -> AnyhowResult<()> {
       client: stripe_client,
     },
     hostname: server_hostname,
+    startup_time,
     server_environment_old: server_environment,
     server_environment: server_environment_typed,
     flags: service_feature_flags,

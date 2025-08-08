@@ -4,7 +4,8 @@ use std::sync::Arc;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpRequest, HttpResponse};
-use chrono::NaiveDateTime;
+use actix_web::web::Json;
+use chrono::{DateTime, NaiveDateTime, Utc};
 use log::error;
 
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
@@ -22,6 +23,8 @@ pub struct HealthCheckResponse {
   pub unhealthy_check_consecutive_count: Option<u64>,
   pub server_build_sha: String,
   pub server_hostname: String,
+  pub startup_time: DateTime<Utc>,
+  pub seconds_since_startup: u64,
 }
 
 
@@ -65,6 +68,11 @@ pub async fn get_health_check_handler(
 
   let is_healthy = health_check_status.is_healthy;
 
+  let now = Utc::now();
+  let seconds_since_startup = now.signed_duration_since(server_state.startup_time)
+      .num_seconds()
+      .unsigned_abs();
+
   let response = HealthCheckResponse {
     success: true,
     is_healthy: health_check_status.is_healthy,
@@ -73,6 +81,8 @@ pub async fn get_health_check_handler(
     unhealthy_check_consecutive_count: health_check_status.unhealthy_check_consecutive_count,
     server_build_sha: server_state.server_info.build_sha.clone(),
     server_hostname: server_state.hostname.clone(),
+    startup_time: server_state.startup_time,
+    seconds_since_startup,
   };
 
   let body = serde_json::to_string(&response)

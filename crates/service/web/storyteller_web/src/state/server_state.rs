@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use elasticsearch::Elasticsearch;
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use sqlx::MySqlPool;
@@ -50,6 +51,9 @@ pub struct ServerState {
   pub stripe: StripeSettings,
 
   pub hostname: String,
+
+  /// When the server starts.
+  pub startup_time: DateTime<Utc>,
 
   #[deprecated(note = "Use `server_environment` instead")]
   /// Knowing if we're in production will allow us to turn off development-only functionalities.
