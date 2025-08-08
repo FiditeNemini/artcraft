@@ -4,6 +4,7 @@ use enums::common::generation_provider::GenerationProvider;
 use enums::tauri::tasks::task_model_type::TaskModelType;
 use enums::tauri::tasks::task_status::TaskStatus;
 use enums::tauri::tasks::task_type::TaskType;
+use enums::tauri::ux::tauri_command_caller::TauriCommandCaller;
 use sqlite_tasks::error::SqliteTasksError;
 use sqlite_tasks::queries::create_task::{create_task, CreateTaskArgs};
 use tokens::tokens::sqlite::tasks::TaskId;
@@ -35,6 +36,22 @@ impl TaskEnqueueSuccess{
   }
   
   pub async fn insert_into_task_database(&self, task_database: &TaskDatabase) -> Result<TaskId, SqliteTasksError> {
+    self.insert_into_task_database_with_frontend_payload(
+      task_database,
+      None,
+      None,
+      None,
+    ).await
+  }
+
+  // TODO: This belongs somewhere else, not as a method of an event struct.
+  pub async fn insert_into_task_database_with_frontend_payload(
+    &self,
+    task_database: &TaskDatabase,
+    frontend_caller: Option<TauriCommandCaller>,
+    frontend_subscriber_id: Option<&str>,
+    frontend_subscriber_payload: Option<&str>,
+  ) -> Result<TaskId, SqliteTasksError> {
     // TODO: Move this mapping elsewhere, or remove the other models.
     let model_type = match self.model {
       None => None,
@@ -63,23 +80,12 @@ impl TaskEnqueueSuccess{
       db: task_database.get_connection(),
       status: TaskStatus::Pending,
       task_type: self.task_type,
-      model_type: model_type,
+      model_type,
       provider: self.provider,
       provider_job_id: self.provider_job_id.as_deref(),
-      frontend_subscriber_id: None,
-      frontend_subscriber_payload: None,
+      frontend_caller,
+      frontend_subscriber_id,
+      frontend_subscriber_payload,
     }).await
   }
-  
-//  pub fn tauri_event_model(&self) -> GenerationModel {
-//    match self.model {
-//      ImageModel::Flux1Dev => GenerationModel::Flux1Dev,
-//      ImageModel::Flux1Schnell => GenerationModel::Flux1Schnell,
-//      ImageModel::FluxPro11 => GenerationModel::FluxPro11,
-//      ImageModel::FluxPro11Ultra => GenerationModel::FluxPro11Ultra,
-//      ImageModel::GptImage1 => GenerationModel::GptImage1,
-//      ImageModel::Recraft3 => GenerationModel::Recraft3,
-//    }
-//  }
-  
 }
