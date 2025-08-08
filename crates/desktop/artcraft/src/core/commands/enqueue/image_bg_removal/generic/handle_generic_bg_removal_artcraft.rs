@@ -39,7 +39,7 @@ use storyteller_client::generate::image::generate_flux_1_schnell_text_to_image::
 use storyteller_client::generate::image::generate_flux_pro_11_text_to_image::generate_flux_pro_11_text_to_image;
 use storyteller_client::generate::image::generate_flux_pro_11_ultra_text_to_image::generate_flux_pro_11_ultra_text_to_image;
 use storyteller_client::generate::image::remove_image_background::remove_image_background;
-use storyteller_client::media_files::upload_image_media_file_from_file::upload_image_media_file_from_file;
+use storyteller_client::media_files::upload_image_media_file_from_file::{upload_image_media_file_from_file, UploadImageFromFileArgs};
 use tauri::AppHandle;
 use tokens::tokens::media_files::MediaFileToken;
 
@@ -123,9 +123,13 @@ async fn upload_image_from_base64_bytes(
 
   info!("Uploading image media file from temp file: {:?}", temp_file.path());
 
-  let result = 
-      upload_image_media_file_from_file(&app_env_configs.storyteller_host, Some(&creds), temp_file)
-          .await
+  let result =
+      upload_image_media_file_from_file(UploadImageFromFileArgs {
+        api_host: &app_env_configs.storyteller_host,
+        maybe_creds: Some(&creds),
+        path: temp_file,
+        is_intermediate_system_file: true, // NB: Probably not essential to keep this.
+      }).await
           .map_err(|err| {
             error!("Failed to upload image media file: {:?}", err);
             InternalBgRemovalError::StorytellerError(err)

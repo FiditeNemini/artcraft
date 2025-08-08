@@ -33,14 +33,24 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
 use uuid::uuid;
 
+pub struct UploadImageFromFileArgs<'a, P: AsRef<Path>> {
+  pub api_host: &'a ApiHost,
+  pub maybe_creds: Option<&'a StorytellerCredentialSet>,
+  
+  // NB: Path needs to be owned for the request.
+  pub path: P,
+
+  /// If true, we should hide the image from the user's gallery.
+  pub is_intermediate_system_file: bool,
+}
+
+
 /// Upload an image media file from a file.
 pub async fn upload_image_media_file_from_file<P: AsRef<Path>>(
-  api_host: &ApiHost,
-  maybe_creds: Option<&StorytellerCredentialSet>,
-  path: P,
+  args: UploadImageFromFileArgs<'_, P>,
 ) -> Result<UploadImageMediaFileSuccessResponse, StorytellerError> {
 
-  let url = get_route(api_host);
+  let url = get_route(args.api_host);
 
   debug!("Requesting {:?}", &url);
 
@@ -51,17 +61,21 @@ pub async fn upload_image_media_file_from_file<P: AsRef<Path>>(
       .build()
       .map_err(|err| StorytellerError::Client(ClientError::from(err)))?;
 
-  let form = Form::new()
+  let mut form = Form::new()
       .text("uuid_idempotency_token", generate_random_uuid())
-      .file("file", path)
+      .file("file", args.path)
       .await
       .map_err(|err| StorytellerError::Client(ClientError::from(err)))?;
+
+  if args.is_intermediate_system_file {
+    form = form.text("is_intermediate_system_file", "true");
+  }
 
   let mut request_builder = client.post(url)
       .header("User-Agent", USER_AGENT)
       .header("Accept", APPLICATION_JSON);
   
-  if let Some(creds) = maybe_creds {
+  if let Some(creds) = args.maybe_creds {
     if let Some(header) = &creds.maybe_as_cookie_header() {
       request_builder = request_builder.header("Cookie", header);
     }

@@ -1,7 +1,7 @@
 use crate::credentials::storyteller_credential_set::StorytellerCredentialSet;
 use crate::error::client_error::ClientError;
 use crate::error::storyteller_error::StorytellerError;
-use crate::media_files::upload_image_media_file_from_file::upload_image_media_file_from_file;
+use crate::media_files::upload_image_media_file_from_file::{upload_image_media_file_from_file, UploadImageFromFileArgs};
 use crate::media_files::upload_new_engine_asset_from_file::upload_new_engine_asset_from_file;
 use crate::media_files::upload_video_media_file_from_file::upload_video_media_file_from_file;
 use crate::utils::api_host::ApiHost;
@@ -49,7 +49,13 @@ pub async fn upload_media_file_from_file<P: AsRef<Path>>(
       }
     }
     Some(FileExtension::Png) | Some(FileExtension::Jpg) | Some(FileExtension::Gif) | Some(FileExtension::Webp) => {
-      match upload_image_media_file_from_file(api_host, maybe_creds, path).await {
+      let result = upload_image_media_file_from_file(UploadImageFromFileArgs {
+        api_host,
+        maybe_creds,
+        path,
+        is_intermediate_system_file: false,
+      }).await;
+      match result {
         Ok(result) => Ok(UploadMediaFileSuccessResponse {
           success: result.success,
           media_file_token: result.media_file_token,

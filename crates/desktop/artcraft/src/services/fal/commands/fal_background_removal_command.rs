@@ -1,4 +1,3 @@
-
 use crate::core::artcraft_error::ArtcraftError;
 use crate::core::commands::response::failure_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus};
 use crate::core::commands::response::shorthand::Response;
@@ -30,7 +29,7 @@ use reqwest::Url;
 use serde_derive::{Deserialize, Serialize};
 use storyteller_client::error::storyteller_error::StorytellerError;
 use storyteller_client::media_files::get_media_file::{get_media_file, GetMediaFileSuccessResponse};
-use storyteller_client::media_files::upload_image_media_file_from_file::upload_image_media_file_from_file;
+use storyteller_client::media_files::upload_image_media_file_from_file::{upload_image_media_file_from_file, UploadImageFromFileArgs};
 use storyteller_client::utils::api_host::ApiHost;
 use tauri::{AppHandle, Manager, State};
 use tokens::tokens::media_files::MediaFileToken;
@@ -257,11 +256,12 @@ pub async fn remove_background(
 
   info!("Uploading image media file...");
 
-  let upload_result = upload_image_media_file_from_file(
-    &app_env_configs.storyteller_host, 
-    Some(&creds), 
-    result_filename,
-  ).await?;
+  let upload_result = upload_image_media_file_from_file(UploadImageFromFileArgs {
+    api_host: &app_env_configs.storyteller_host,
+    maybe_creds: Some(&creds),
+    path: result_filename,
+    is_intermediate_system_file: true, // NB: Probably not essential to keep this.
+  }).await?;
 
   // TODO: Don't re-request to simply build MediaLinks (or CDN URL). Get those from the upload API in one turn.
   info!("Re-requesting media file...");

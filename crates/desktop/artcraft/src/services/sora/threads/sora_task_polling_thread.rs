@@ -17,7 +17,7 @@ use reqwest::Url;
 use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
-use storyteller_client::media_files::upload_image_media_file_from_file::upload_image_media_file_from_file;
+use storyteller_client::media_files::upload_image_media_file_from_file::{upload_image_media_file_from_file, UploadImageFromFileArgs};
 use tauri::AppHandle;
 use tempdir::TempDir;
 
@@ -134,12 +134,14 @@ async fn polling_loop(
         let download_path = download_generation(generation, &app_data_root).await?;
 
         info!("Uploading to backend...");
-        let result = upload_image_media_file_from_file(
-          &app_env_configs.storyteller_host, 
-          Some(&creds), 
-          download_path
-        ).await?;
-        
+
+        let result = upload_image_media_file_from_file(UploadImageFromFileArgs {
+          api_host: &app_env_configs.storyteller_host,
+          maybe_creds: Some(&creds),
+          path: download_path,
+          is_intermediate_system_file: false,
+        }).await?;
+
         info!("Uploaded to API backend: {:?}", result.media_file_token);
 
         let event = GenerationCompleteEvent {
