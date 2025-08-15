@@ -1,11 +1,9 @@
 import { useState } from "react";
-import { Button } from "@storyteller/ui-button";
-import { Input } from "@storyteller/ui-input";
-import { SoraAccountButton } from "./SoraAccountButton";
 import { SoraAccountBlock } from "./SoraAccountBlock";
 import { ArtcraftAccountBlock } from "./ArtcraftAccountBlock";
 import { FalApiKeyBlock } from "./FalApiKeyBlock";
 import { OpenAIApiKeyBlock } from "./OpenAIKeyBlock";
+import { MidjourneyAccountBlock } from "./MidjourneyAccountBlock";
 
 interface AccountInfo {
   username: string;
@@ -58,10 +56,11 @@ export const AccountSettingsPane = ({
         */}
 
         <ArtcraftAccountBlock globalAccountLogoutCallback={globalAccountLogoutCallback}/>
+        <MidjourneyAccountBlock />
         <SoraAccountBlock />
         <FalApiKeyBlock />
-        <OpenAIApiKeyBlock/>
         {/*
+        <OpenAIApiKeyBlock/>
         <hr />
 
         <h2>Coming Soon...</h2>

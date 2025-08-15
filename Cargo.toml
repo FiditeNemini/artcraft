@@ -10,6 +10,7 @@ members = [
   "crates/api_clients/fal_client",
   "crates/api_clients/google_drive_common",
   "crates/api_clients/google_sign_in",
+  "crates/api_clients/midjourney_client",
   "crates/api_clients/openai_sora_client",
   "crates/api_clients/openart_client",
   "crates/api_clients/runwayml_client",
@@ -42,6 +43,7 @@ members = [
   "crates/lib/caching/redis_caching",
   "crates/lib/cloudflare_errors",
   "crates/lib/concurrency",
+  "crates/lib/cookie_store",
   "crates/lib/cookies",
   "crates/lib/data/collections",
   "crates/lib/data/crockford",
@@ -199,7 +201,8 @@ log = "0.4.27"
 once_cell = "1.21.3"
 rand = "0.9.1"
 regex = "1.11.1"
-reqwest = { version = "0.12.15", features = ["json", "cookies"] }
+reqwest = { version = "0.12.22", features = ["json", "cookies"] }
+reqwest-websocket = {  version = "0.5.0" }
 serde = {  version = "1.0.219", features = ["derive"] }
 serde_derive = "1.0.219"
 serde_json = "1.0.140"
@@ -218,6 +221,7 @@ artcraft_api_defs = { path = "crates/schema/public/api/artcraft_api_defs" }
 build_metadata = { path = "crates/lib/build_metadata" }
 cloud_storage = { path = "crates/api_clients/cloud_storage" }
 cloudflare_errors = { path = "crates/lib/cloudflare_errors" }
+cookie_store = { path = "crates/lib/cookie_store" }
 crockford = { path = "crates/lib/data/crockford" }
 enums = { path = "crates/schema/public/enums" }
 enums_public = { path = "crates/schema/public/enums_public" }
@@ -230,6 +234,7 @@ images = { path = "crates/lib/files/images" }
 jwt_light = { path = "crates/lib/jwt_light" }
 memory_caching = { path = "crates/lib/caching/memory_caching" }
 memory_store = { path = "crates/lib/caching/memory_store" }
+midjourney_client = { path = "crates/api_clients/midjourney_client" }
 mimetypes = { path = "crates/lib/files/mimetypes" }
 openai_sora_client = { path = "crates/api_clients/openai_sora_client" }
 primitives = { path = "crates/lib/data/primitives" }
@@ -238,5 +243,6 @@ sqlite_tasks = { path = "crates/schema/database/sqlite_tasks" }
 storyteller_client = { path = "crates/api_clients/storyteller_client" }
 subprocess_common = { path = "crates/lib/subprocess_common" }
 test_data = { path = "crates/lib/test_data" }
+testing = { path = "crates/lib/testing" }
 tokens = { path = "crates/schema/public/tokens" }
 web_base64 = { path = "crates/lib/data/web_base64" }
