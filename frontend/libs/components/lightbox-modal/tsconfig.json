@@ -3,13 +3,25 @@
   "include": [],
   "references": [
     {
+      "path": "../tooltip"
+    },
+    {
+      "path": "../../model-list"
+    },
+    {
+      "path": "../toaster"
+    },
+    {
+      "path": "../../api"
+    },
+    {
+      "path": "../../analytics/google-analytics"
+    },
+    {
       "path": "../loading-spinner"
     },
     {
       "path": "../../tauri-api"
-    },
-    {
-      "path": "../../analytics/google-analytics"
     },
     {
       "path": "../button"

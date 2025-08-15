@@ -3,10 +3,16 @@
   "include": [],
   "references": [
     {
-      "path": "../../model-list"
+      "path": "../button-icon-select"
     },
     {
       "path": "../camera-settings-modal"
+    },
+    {
+      "path": "../../model-list"
+    },
+    {
+      "path": "../../analytics/google-analytics"
     },
     {
       "path": "../../tauri-api"
@@ -37,9 +43,6 @@
     },
     {
       "path": "../toaster"
-    },
-    {
-      "path": "../../analytics/google-analytics"
     },
     {
       "path": "./tsconfig.lib.json"
