@@ -11,23 +11,30 @@ pub fn main() {
   let family = env::var("CARGO_CFG_TARGET_FAMILY").ok();
 
   match family.as_deref() {
-    Some("windows") => {
-      if let Ok(local_app_data) = env::var("LOCALAPPDATA") {
-        let mut path = PathBuf::from(local_app_data);
-        path = path.join("Temp\\tasks.sqlite");
-        println!("cargo:warning=LocalAppData path: {}", path.display());
-        println!("cargo:rustc-env=DATABASE_URL=sqlite:{}", path.to_str().unwrap_or(""));
-        // Use `path` here...
-      } else {
-        panic!("LOCALAPPDATA environment variable not set");
-      }
-    },
-    Some("unix") => {
-      println!("cargo:rustc-env=DATABASE_URL=sqlite:/tmp/tasks.sqlite");
-    },
+    Some("unix") => unix_temp_database_pathing(),
+    Some("windows") => windows_temp_database_pathing(),
     _ => {
-      println!("cargo:warning=Unsupported target family, using default path.");
-      println!("cargo:rustc-env=DATABASE_URL=sqlite:/tmp/tasks.sqlite");
+      println!("cargo:warning=Unsupported target family, using Unix temp database pathing.");
+      unix_temp_database_pathing();
     },
+  }
+}
+
+fn unix_temp_database_pathing() {
+  println!("cargo:rustc-env=DATABASE_URL=sqlite:/tmp/tasks.sqlite");
+}
+
+fn windows_temp_database_pathing() {
+  if let Ok(local_app_data) = env::var("LOCALAPPDATA") {
+    let path = PathBuf::from(local_app_data);
+    let path = path.join("Temp\\tasks.sqlite");
+    let path = path
+        .to_str()
+        .expect("path should be valid")
+        .to_string();
+    println!("cargo:warning=LocalAppData path: {}", path);
+    println!("cargo:rustc-env=DATABASE_URL=sqlite:{}", path);
+  } else {
+    panic!("LOCALAPPDATA environment variable not set");
   }
 }
