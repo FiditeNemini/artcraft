@@ -1,8 +1,8 @@
-use std::collections::HashSet;
 use cookie_store::cookie_store::CookieStore;
 use errors::AnyhowResult;
 use once_cell::sync::Lazy;
 use reqwest::Url;
+use std::collections::HashSet;
 use tauri::webview::Cookie;
 use tauri::WebviewWindow;
 

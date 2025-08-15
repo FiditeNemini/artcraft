@@ -1,5 +1,6 @@
 use crate::core::events::sendable_event_trait::SendableEvent;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
+use crate::core::utils::window::get_webview_window_hostname::get_webview_window_hostname;
 use crate::services::sora::events::sora_login_success_event::SoraLoginSuccessEvent;
 use crate::services::sora::state::sora_credential_manager::SoraCredentialManager;
 use crate::services::sora::windows::sora_login_window::extract_sora_webview_cookies::extract_sora_webview_cookies;
@@ -73,7 +74,7 @@ async fn check_login_window(
   - Check if we're on the correct domain, if not exit? (or inverse, that we're not in login flow)
    */
 
-  let hostname = get_hostname(webview_window)?;
+  let hostname = get_webview_window_hostname(webview_window)?;
 
   let mut maybe_at_destination = false;
 
@@ -137,12 +138,4 @@ async fn check_login_window(
   }
   
   Ok(true)
-}
-
-fn get_hostname(webview: &WebviewWindow) -> AnyhowResult<String> {
-  let url = webview.url()?;
-  let url_hostname= url.host()
-      .ok_or(anyhow!("no host in url"))?
-      .to_string();
-  Ok(url_hostname)
 }

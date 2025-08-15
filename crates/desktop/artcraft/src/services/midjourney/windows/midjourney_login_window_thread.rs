@@ -1,5 +1,10 @@
+use crate::core::events::basic_sendable_event_trait::BasicSendableEvent;
+use crate::core::events::functional_events::refresh_account_state_event::RefreshAccountStateEvent;
+use crate::core::events::generation_events::common::{GenerationAction, GenerationServiceProvider};
+use crate::core::events::generation_events::generation_complete_event::GenerationCompleteEvent;
 use crate::core::events::sendable_event_trait::SendableEvent;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
+use crate::core::utils::window::get_webview_window_hostname::get_webview_window_hostname;
 use crate::services::midjourney::state::midjourney_credential_manager::MidjourneyCredentialManager;
 use crate::services::midjourney::state::midjourney_user_info::MidjourneyUserInfo;
 use crate::services::midjourney::windows::extract_midjourney_webview_cookies::extract_midjourney_webview_cookies;
@@ -9,6 +14,7 @@ use crate::services::sora::state::sora_credential_manager::SoraCredentialManager
 use crate::services::sora::windows::sora_login_window::extract_sora_webview_cookies::extract_sora_webview_cookies;
 use anyhow::anyhow;
 use cookie_store::cookie_store::CookieStore;
+use enums::common::generation_provider::GenerationProvider;
 use errors::AnyhowResult;
 use log::{error, info};
 use midjourney_client::client::midjourney_hostname::MidjourneyHostname;
@@ -77,7 +83,7 @@ async fn check_login_window(
   3. Done / Landing: https://www.midjourney.com/...
    */
 
-  let hostname = get_hostname(webview_window)?;
+  let hostname = get_webview_window_hostname(webview_window)?;
 
   let mut maybe_at_destination = false;
 
@@ -166,13 +172,14 @@ async fn check_login_window(
     return Ok(false);
   }
 
+  let event = RefreshAccountStateEvent {
+    provider: Some(GenerationProvider::Midjourney),
+  };
+
+  if let Err(err) = event.send(&app_handle) {
+    error!("Failed to send RefreshAccountStateEvent: {:?}", err); // Fail open
+  }
+
   Ok(true)
 }
 
-fn get_hostname(webview: &WebviewWindow) -> AnyhowResult<String> {
-  let url = webview.url()?;
-  let url_hostname= url.host()
-      .ok_or(anyhow!("no host in url"))?
-      .to_string();
-  Ok(url_hostname)
-}
