@@ -12,10 +12,10 @@ use wreq_util::Emulation;
 const DEFAULT_PAGE_SIZE : u64 = 1000;
 
 /// This returns Midjourney's job/media list
-pub struct ImagineRequest{
+pub struct ImagineRequest<'a> {
   pub hostname: MidjourneyHostname,
   pub cookie_header: String,
-  pub user_id: MidjourneyUserId,
+  pub user_id: &'a MidjourneyUserId,
   pub page_size: Option<u64>,
 }
 
@@ -33,13 +33,16 @@ pub struct ImagineItem {
   /// `cute puppy wearing a polar bear suit --ar 4:3 --raw --v 7.0`
   pub full_command: Option<String>,
 
-  pub job_type: Option<JobType>,
+  pub job_type: Option<MidjourneyJobType>,
 }
 
 #[derive(Debug, Clone)]
-pub enum JobType {
+pub enum MidjourneyJobType {
   V6Diffusion,
+  V6p1Diffusion,
+  V6p1RawDiffusion,
   V7Diffusion,
+  V7DraftDiffusion,
   V7DraftRawDiffusion,
   V7RawDiffusion,
   Vid11I2vRenderAJointVideo,
@@ -49,23 +52,26 @@ pub enum JobType {
   Other(String),
 }
 
-impl JobType {
-  pub fn from_str(s: &str) -> JobType {
+impl MidjourneyJobType {
+  pub fn from_str(s: &str) -> MidjourneyJobType {
     match s {
-      "v6_diffusion" => JobType::V6Diffusion,
-      "v7_diffusion" => JobType::V7Diffusion,
-      "v7_draft_raw_diffusion" => JobType::V7DraftRawDiffusion,
-      "v7_raw_diffusion" => JobType::V7RawDiffusion,
-      "vid_1.1_i2v_render_a_joint_video" => JobType::Vid11I2vRenderAJointVideo,
-      "vid_1.1_i2v_render_b_joint_video" => JobType::Vid11I2vRenderBJointVideo,
-      "vid_1.1_i2v_start_end_a_video" => JobType::Vid11I2vStartEndAVideo,
-      "vid_1.1_i2v_start_end_b_video" => JobType::Vid11I2vStartEndBVideo,
-      other => JobType::Other(other.to_string()),
+      "v6_diffusion" => MidjourneyJobType::V6Diffusion,
+      "v6-1_diffusion" => MidjourneyJobType::V6p1Diffusion,
+      "v6-1_raw_diffusion" => MidjourneyJobType::V6p1RawDiffusion,
+      "v7_diffusion" => MidjourneyJobType::V7Diffusion,
+      "v7_draft_diffusion" => MidjourneyJobType::V7DraftDiffusion,
+      "v7_draft_raw_diffusion" => MidjourneyJobType::V7DraftRawDiffusion,
+      "v7_raw_diffusion" => MidjourneyJobType::V7RawDiffusion,
+      "vid_1.1_i2v_render_a_joint_video" => MidjourneyJobType::Vid11I2vRenderAJointVideo,
+      "vid_1.1_i2v_render_b_joint_video" => MidjourneyJobType::Vid11I2vRenderBJointVideo,
+      "vid_1.1_i2v_start_end_a_video" => MidjourneyJobType::Vid11I2vStartEndAVideo,
+      "vid_1.1_i2v_start_end_b_video" => MidjourneyJobType::Vid11I2vStartEndBVideo,
+      other => MidjourneyJobType::Other(other.to_string()),
     }
   }
 }
 
-pub async fn imagine(req: ImagineRequest) -> Result<ImagineResponse, MidjourneyError> {
+pub async fn imagine(req: ImagineRequest<'_>) -> Result<ImagineResponse, MidjourneyError> {
   let cookie_header = req.cookie_header.trim();
 
   if cookie_header.len() < 20 {
@@ -206,7 +212,7 @@ pub async fn imagine(req: ImagineRequest) -> Result<ImagineResponse, MidjourneyE
             id: item.id,
             full_command: item.full_command,
             job_type: item.job_type.as_ref()
-                .map(|jt| JobType::from_str(jt))
+                .map(|jt| MidjourneyJobType::from_str(jt))
           }
         }).collect(),
   })
@@ -230,7 +236,7 @@ mod tests {
     let result = imagine(ImagineRequest {
       cookie_header,
       hostname: MidjourneyHostname::Standard,
-      user_id,
+      user_id: &user_id,
       page_size: None,
     }).await?;
 

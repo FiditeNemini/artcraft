@@ -4,28 +4,33 @@ import { useEffect, useState } from "react";
 import { MidjourneyGetCredentialInfo, MidjourneyGetCredentialInfoSuccess } from "@storyteller/tauri-api";
 import { faSpinnerThird } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useRefreshAccountStateEvent } from "@storyteller/tauri-events";
+import { RefreshAccountStateEvent } from "@storyteller/tauri-events";
 
 export const MidjourneyAccountBlock = () => {
   const [midjourneySession, setMidjourneySession] = useState<MidjourneyGetCredentialInfoSuccess| undefined>(undefined);
   const [isCheckingMidjourneySession, setIsCheckingMidjourneySession] = useState(false);
 
-
-  useEffect(() => {
-    const fetchSession = async () => {
-      setIsCheckingMidjourneySession(true);
-      try {
-        const result = await MidjourneyGetCredentialInfo();
-        setMidjourneySession(result);
-      } catch (e) {
+  const fetchSession = async () => {
+    setIsCheckingMidjourneySession(true);
+    try {
+      const result = await MidjourneyGetCredentialInfo();
+      setMidjourneySession(result);
+    } catch (e) {
       console.error("Error fetching Midjourney session", e);
       setMidjourneySession(undefined);
     } finally {
       setIsCheckingMidjourneySession(false);
     }
   };
+
+  useEffect(() => {
     fetchSession();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useRefreshAccountStateEvent(async (event: RefreshAccountStateEvent) => {
+    fetchSession();
+  });
 
   const handleMidjourneyButton = async () => {
     if (midjourneySession?.payload?.can_clear_state) {
