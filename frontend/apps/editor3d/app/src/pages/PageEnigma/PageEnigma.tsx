@@ -28,6 +28,7 @@ import { PageEditor } from "~/pages/PageEnigma/PageEditor";
 import { GalleryDragComponent } from "@storyteller/ui-gallery-modal";
 import { LoadingDots } from "@storyteller/ui-loading";
 import { PricingModal } from "@storyteller/ui-pricing-modal";
+import { ProviderSetupModal } from "@storyteller/provider-setup-modal";
 
 import {
   isActionReminderOpen,
@@ -120,6 +121,7 @@ export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
       />
       <GenerateModals />
       <ErrorDialog />
+      <ProviderSetupModal />
 
       <EditorLoadingBar />
       <Toaster offsetTop={70} offsetRight={12} />
