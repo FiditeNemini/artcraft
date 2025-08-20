@@ -7,23 +7,20 @@ import { AspectRatioType, useSceneStore } from "./stores/SceneState";
 import { useUndoRedoHotkeys } from "./hooks/useUndoRedoHotkeys";
 import { useDeleteHotkeys } from "./hooks/useDeleteHotkeys";
 import { useCopyPasteHotkeys } from "./hooks/useCopyPasteHotkeys";
-import { PopoverItem, PopoverMenu } from "@storyteller/ui-popover";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClock, faImage } from "@fortawesome/pro-solid-svg-icons";
 import Konva from "konva";
 import { setCanvasRenderBitmap } from "../../signals/canvasRenderBitmap";
 import { captureStageImageBitmap } from "./hooks/useUpdateSnapshot";
 import { ContextMenuContainer } from "./components/ui/ContextMenu";
-import { FalBackgroundRemoval } from "@storyteller/tauri-api";
-import { EnqueueImageBgRemoval } from "@storyteller/tauri-api";
 import { ModelInfo } from "@storyteller/model-list";
 import {
-  instructiveImageEditModels,
-  ModelCategory,
+  CANVAS_2D_PAGE_MODEL_LIST,
+  ModelPage,
   ModelSelector,
   useModelSelectorStore,
 } from "@storyteller/ui-model-selector";
 import { useCanvasBgRemovedEvent } from "@storyteller/tauri-api";
+
+const PAGE_ID : ModelPage = ModelPage.Canvas2D;
 
 export const DecodeBase64ToImage = async (
   base64String: string,
@@ -60,11 +57,11 @@ const PageDraw = () => {
   const store = useSceneStore();
 
   const selectedModel =
-    selectedModels[ModelCategory.Canvas2D] ||
-    instructiveImageEditModels[0]?.label;
+    selectedModels[PAGE_ID] ||
+    CANVAS_2D_PAGE_MODEL_LIST[0]?.label;
 
   const selectedModelInfo: ModelInfo | undefined =
-    instructiveImageEditModels.find(
+    CANVAS_2D_PAGE_MODEL_LIST.find(
       (m) => m.label === selectedModel,
     )?.modelInfo;
 
@@ -450,8 +447,8 @@ const PageDraw = () => {
       </div>
       <div className="absolute bottom-6 left-6 z-20 flex items-center gap-2">
         <ModelSelector
-          items={instructiveImageEditModels}
-          category={ModelCategory.Canvas2D}
+          items={CANVAS_2D_PAGE_MODEL_LIST}
+          page={PAGE_ID}
           panelTitle="Select Model"
           panelClassName="min-w-[280px]"
           buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-white/80 hover:text-white"

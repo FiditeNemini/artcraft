@@ -66,19 +66,18 @@ import {
   removeImageDropListener,
 } from "@storyteller/ui-gallery-modal";
 import {
-  instructiveImageEditModels,
-  ModelCategory,
-  // ModelCategory,
+  STAGE_3D_PAGE_MODEL_LIST,
+  ModelPage,
   ModelSelector,
   useModelSelectorStore,
-  // videoGenerationModels,
-  // useModelSelectorStore,
 } from "@storyteller/ui-model-selector";
 import { LoginModal, useLoginModalStore } from "@storyteller/ui-login-modal";
 import PageDraw from "../PageDraw/PageDraw";
 import { useTabStore } from "../Stores/TabState";
 import PageEdit from "../PageEdit/PageEdit";
 import { ModelInfo } from "@storyteller/model-list";
+
+const PAGE_ID : ModelPage = ModelPage.Stage3D;
 
 export const PageEditor = () => {
   useSignals();
@@ -112,11 +111,11 @@ export const PageEditor = () => {
   }, []);
 
   const selectedModel =
-    selectedModels[ModelCategory.Editor3D] ||
-    instructiveImageEditModels[0]?.label;
+    selectedModels[PAGE_ID] ||
+    STAGE_3D_PAGE_MODEL_LIST[0]?.label;
 
   const selectedModelInfo: ModelInfo | undefined =
-    instructiveImageEditModels.find(
+    STAGE_3D_PAGE_MODEL_LIST.find(
       (m) => m.label === selectedModel,
     )?.modelInfo;
 
@@ -550,8 +549,8 @@ export const PageEditor = () => {
 
                 <div className="absolute bottom-6 left-6 z-20 flex items-center gap-2">
                   <ModelSelector
-                    items={instructiveImageEditModels}
-                    category={ModelCategory.Editor3D}
+                    items={STAGE_3D_PAGE_MODEL_LIST}
+                    page={PAGE_ID}
                     panelTitle="Select Model"
                     panelClassName="min-w-[280px]"
                     buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-white/80 hover:text-white"

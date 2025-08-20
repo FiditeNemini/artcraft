@@ -1,39 +1,44 @@
 import { useState, useRef, useEffect } from "react";
-// https://github.com/SaladTechnologies/comfyui-api
-
-import { PopoverItem, PopoverMenu } from "@storyteller/ui-popover";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClock, faImage } from "@fortawesome/pro-solid-svg-icons";
 import Konva from "konva"; // just for types
-
-// import { setCanvasRenderBitmap } from "../../signals/canvasRenderBitmap"
 import {
   EnqueueImageInpaint,
   EnqueueImageInpaintModel,
 } from "@storyteller/tauri-api";
 import { ContextMenuContainer } from "../PageDraw/components/ui/ContextMenu";
-// import SideToolbar from "../PageDraw/components/ui/SideToolbar";
 import { useCopyPasteHotkeys } from "../PageDraw/hooks/useCopyPasteHotkeys";
 import { useDeleteHotkeys } from "../PageDraw/hooks/useDeleteHotkeys";
 import { useUndoRedoHotkeys } from "../PageDraw/hooks/useUndoRedoHotkeys";
-// import { captureStageImageBitmap } from "../PageDraw/hooks/useUpdateSnapshot";
 import PromptEditor from "./PromptEditor/PromptEditor";
-// import { AspectRatioType } from "../PageDraw/stores/SceneState";
 import { ActiveEditTool, useEditStore } from "./stores/EditState";
 import { EditPaintSurface } from "./EditPaintSurface";
 import { normalizeCanvas } from "../../Helpers/CanvasHelpers";
 import { BaseImageSelector, BaseSelectorImage } from "./BaseImageSelector";
 import DrawToolControlBar from "./DrawToolControlBar";
+import { IMAGE_EDITOR_PAGE_MODEL_LIST, ModelPage, ModelSelector, useModelSelectorStore } from "@storyteller/ui-model-selector";
+import { ModelInfo } from "@storyteller/model-list";
+
+const PAGE_ID : ModelPage = ModelPage.ImageEditor;
 
 const PageEdit = () => {
   //useStateSceneLoader();
+  const { selectedModels } = useModelSelectorStore();
+
+  const selectedModel =
+    selectedModels[PAGE_ID] ||
+    IMAGE_EDITOR_PAGE_MODEL_LIST[0]?.label;
+
+  const selectedModelInfo: ModelInfo | undefined =
+    IMAGE_EDITOR_PAGE_MODEL_LIST.find(
+      (m) => m.label === selectedModel,
+    )?.modelInfo;
 
   // State for canvas dimensions
   const canvasWidth = useRef<number>(1024);
   const canvasHeight = useRef<number>(1024);
+
   // Add new state to track if user is selecting
   const [isSelecting, setIsSelecting] = useState<boolean>(false);
-  const [selectedModel, setSelectedModel] = useState<string>("GPT-4o");
+
   // Create refs for stage and image
   const stageRef = useRef<Konva.Stage>({} as Konva.Stage);
   const leftPanelRef = useRef<Konva.Layer>({} as Konva.Layer);
@@ -41,6 +46,7 @@ const PageEdit = () => {
   const transformerRefs = useRef<{ [key: string]: Konva.Transformer }>({});
   const [isEnqueuing, setIsEnqueuing] = useState<boolean>(false);
   const [generationCount, setGenerationCount] = useState<number>(1);
+
 
   // Use the Zustand store
   const store = useEditStore();
@@ -114,27 +120,6 @@ const PageEdit = () => {
       );
     };
   }, [store]);
-
-  const modelList: PopoverItem[] = [
-    {
-      label: "GPT-4o",
-      icon: <FontAwesomeIcon icon={faImage} className="h-4 w-4" />,
-      selected: selectedModel === "GPT-4o",
-      description: "High quality model",
-      badges: [{ label: "2 min.", icon: <FontAwesomeIcon icon={faClock} /> }],
-    },
-    {
-      label: "FLUX.1 Kontext",
-      icon: <FontAwesomeIcon icon={faImage} className="h-4 w-4" />,
-      selected: selectedModel === "FLUX.1 Kontext",
-      description: "Fast and high-quality model",
-      badges: [{ label: "20 sec.", icon: <FontAwesomeIcon icon={faClock} /> }],
-    },
-  ];
-
-  const handleModelSelect = (item: PopoverItem) => {
-    setSelectedModel(item.label);
-  };
 
   const onFitPressed = async () => {
     // Get the stage and its container dimensions
@@ -263,6 +248,7 @@ const PageEdit = () => {
         }`}
       >
         <PromptEditor
+          modelInfo={selectedModelInfo}
           onModeChange={(mode: string) => {
             store.setActiveTool(mode as ActiveEditTool);
           }}
@@ -328,10 +314,9 @@ const PageEdit = () => {
         </ContextMenuContainer>
       </div>
       <div className="absolute bottom-6 left-6 z-20 flex items-center gap-2">
-        <PopoverMenu
-          items={modelList}
-          onSelect={handleModelSelect}
-          mode="hoverSelect"
+        <ModelSelector
+          items={IMAGE_EDITOR_PAGE_MODEL_LIST}
+          page={PAGE_ID}
           panelTitle="Select Model"
           panelClassName="min-w-[280px]"
           buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-white/80 hover:text-white"

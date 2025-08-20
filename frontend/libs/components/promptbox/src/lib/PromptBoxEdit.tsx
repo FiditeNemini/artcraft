@@ -37,9 +37,11 @@ export const PromptBoxEdit = ({
 }: PromptBoxEditProps) => {
   const [prompt, setPrompt] = useState("");
   const [useSystemPrompt, setUseSystemPrompt] = useState(true);
+
   const [generationCount, setGenerationCount] = useState<number>(
     typeof generationCountProp === "number" ? generationCountProp : 1
   );
+
   const [generationCountList, setGenerationCountList] = useState<PopoverItem[]>(
     []
   );
@@ -53,6 +55,8 @@ export const PromptBoxEdit = ({
     }
   });
 
+  console.log(">>> Model info", modelInfo);
+
   // Sync internal state if a controlled prop is provided
   useEffect(() => {
     if (typeof generationCountProp === "number") {
@@ -63,6 +67,7 @@ export const PromptBoxEdit = ({
   // Build generation count options based on selected model
   useEffect(() => {
     const caps = getCapabilitiesForModel(modelInfo);
+    console.log(">>> caps", caps)
     const items: PopoverItem[] = Array.from(
       { length: caps.maxGenerationCount },
       (_, i) => i + 1

@@ -1,27 +1,9 @@
 import { ModelCreator } from "./ModelCreator.js";
 import { ModelInfo } from "./ModelInfo.js";
-
-export type ModelCategory = "image" | "video";
-
-export interface ModelConfig {
-  id: string;
-  label: string; // UI label
-  description?: string;
-  badges?: { label: string }[];
-  category: ModelCategory;
-  info: ModelInfo;
-  capabilities: ModelCapabilities;
-  tags?: string[]; // optional tags, e.g. ["instructiveEdit"] - for filtering
-}
+import { ModelTag } from "./ModelTag.js";
+import { ModelConfig, ModelCapabilities, ModelCategory } from "./ModelConfig.js";
 
 const mc = ModelCreator;
-
-// Centralized model capability definition
-// For setting options for the model
-// TODO: add more capabilities here - BFlat
-export interface ModelCapabilities {
-  maxGenerationCount: number;
-}
 
 const DEFAULT_CAPABILITIES: ModelCapabilities = {
   maxGenerationCount: 1,
@@ -129,8 +111,28 @@ export const ALL_MODELS: ModelConfig[] = [
     },
     description: "Fast and high-quality model",
     badges: [{ label: "20 sec." }],
-    capabilities: { maxGenerationCount: 4 },
-    tags: ["instructiveEdit"],
+    capabilities: { 
+      maxGenerationCount: 4,
+    },
+    tags: [
+      ModelTag.InstructiveEdit,
+      ModelTag.NonMaskedInpainting,
+    ],
+  }),
+  cfg({
+    id: "flux_pro_inpaint",
+    category: "image",
+    info: {
+      name: "Flux Pro 1 (Inpainting)",
+      tauri_id: "flux_pro_1",
+      creator: mc.BlackForestLabs,
+    },
+    description: "Fast and high-quality model",
+    badges: [{ label: "20 sec." }],
+    capabilities: { 
+      maxGenerationCount: 1 // NB: For some reason Fal only supports ONE image!
+    },
+    tags: [ModelTag.MaskedInpainting],
   }),
 
   //////////////////////////////
@@ -194,6 +196,9 @@ export const ALL_MODELS: ModelConfig[] = [
   }),
 ];
 
+export const ALL_MODELS_BY_ID : Map<string, ModelConfig> = 
+  new Map(ALL_MODELS.map(model => [model.id, model]));
+
 export const getAllModels = (): ModelConfig[] => ALL_MODELS;
 
 export const getModelsByCategory = (category: ModelCategory): ModelConfig[] =>
@@ -202,6 +207,11 @@ export const getModelsByCategory = (category: ModelCategory): ModelConfig[] =>
 export const getInstructiveImageEditModels = (): ModelConfig[] =>
   ALL_MODELS.filter(
     (m) => m.category === "image" && m.tags?.includes("instructiveEdit")
+  );
+
+export const getMaskedInpaintModels = (): ModelConfig[] =>
+  ALL_MODELS.filter(
+    (m) => m.category === "image" && m.tags?.includes(ModelTag.MaskedInpainting)
   );
 
 export const lookupModelByTauriId = (

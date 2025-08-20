@@ -3,12 +3,14 @@ import { JobContextType } from "@storyteller/common";
 import { PromptBoxVideo } from "@storyteller/ui-promptbox";
 import BackgroundGallery from "./BackgroundGallery";
 import {
-  ModelCategory,
+  ModelPage,
   ModelSelector,
   useModelSelectorStore,
-  videoGenerationModels,
+  IMAGE_TO_VIDEO_PAGE_MODEL_LIST,
 } from "@storyteller/ui-model-selector";
 import { ModelInfo } from "@storyteller/model-list";
+
+const PAGE_ID : ModelPage = ModelPage.ImageToVideo;
 
 interface ImageToVideoProps {
   imageMediaId?: string;
@@ -20,10 +22,10 @@ const ImageToVideo = ({ imageMediaId, imageUrl }: ImageToVideoProps) => {
   const { selectedModels } = useModelSelectorStore();
 
   const selectedModel =
-    selectedModels[ModelCategory.ImageToVideo] ||
-    videoGenerationModels[0]?.label;
+    selectedModels[PAGE_ID] ||
+    IMAGE_TO_VIDEO_PAGE_MODEL_LIST[0]?.label;
 
-  const selectedModelInfo: ModelInfo | undefined = videoGenerationModels.find(
+  const selectedModelInfo: ModelInfo | undefined = IMAGE_TO_VIDEO_PAGE_MODEL_LIST.find(
     (m) => m.label === selectedModel,
   )?.modelInfo;
 
@@ -67,8 +69,8 @@ const ImageToVideo = ({ imageMediaId, imageUrl }: ImageToVideoProps) => {
 
           <div className="absolute bottom-6 left-6 z-20 flex items-center gap-2">
             <ModelSelector
-              items={videoGenerationModels}
-              category={ModelCategory.ImageToVideo}
+              items={IMAGE_TO_VIDEO_PAGE_MODEL_LIST}
+              page={PAGE_ID}
               panelTitle="Select Model"
               panelClassName="min-w-[280px]"
               buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-white/80 hover:text-white"
