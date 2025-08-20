@@ -7,8 +7,13 @@ import {
   faPaintbrush,
   faImage,
   faPenNib,
-  // faGem,
 } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faWindowRestore,
+  faSquare,
+  faXmark,
+  faDash,
+} from "@fortawesome/pro-regular-svg-icons";
 import { Button } from "@storyteller/ui-button";
 import { AuthButtons } from "./AuthButtons";
 import { SceneTitleInput } from "./SceneTitleInput";
@@ -39,6 +44,10 @@ import {
 // import { usePricingModalStore } from "@storyteller/ui-pricing-modal"; - Uncomment for pricing modal - BFlat
 import toast from "react-hot-toast";
 import { gtagEvent } from "@storyteller/google-analytics";
+import {
+  useTauriWindowControls,
+  useTauriPlatform,
+} from "@storyteller/tauri-utils";
 
 interface Props {
   pageName: string;
@@ -78,7 +87,7 @@ const appMenuTabs: MenuIconItem[] = [
     id: "EDIT",
     label: "Edit Image",
     icon: <FontAwesomeIcon icon={faPenNib} />,
-  }
+  },
 ];
 
 export const topNavMediaId = signal<string>("");
@@ -89,10 +98,14 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
+  const { isDesktop, isMaximized, minimize, toggleMaximize, close } =
+    useTauriWindowControls();
+  const platform = useTauriPlatform();
+
   const handleOpenGalleryModal = () => {
     galleryModalVisibleViewMode.value = true;
     galleryModalVisibleDuringDrag.value = true;
-    gtagEvent("open_gallery_modal", { "tab": tabStore.activeTabId });
+    gtagEvent("open_gallery_modal", { tab: tabStore.activeTabId });
   };
 
   const tabStore = useTabStore();
@@ -147,13 +160,17 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
 
   return (
     <>
-      <header className="fixed left-0 top-0 z-[60] w-full border-b border-white/5 bg-ui-background">
+      <header
+        className="fixed left-0 top-0 z-[60] w-full border-b border-white/5 bg-ui-background"
+        data-tauri-drag-region
+      >
         <nav
-          className="mx-auto grid h-[56px] w-screen grid-cols-3 items-center justify-between px-3"
+          className="mx-auto grid h-[56px] w-screen grid-cols-3 items-center justify-between ps-3"
           aria-label="navigation"
         >
-          <div className="flex items-center gap-7">
-            <div>
+          <div className="flex items-center gap-3">
+            
+            <div className="mr-2">
               <span className="sr-only">ArtCraft</span>
               <img
                 className="h-[24px] w-auto"
@@ -166,7 +183,7 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
               activeMenu={tabStore.activeTabId}
               disabled={disableTabSwitcher()}
               onMenuChange={(tabId) => {
-                gtagEvent("switch_tab", { "tab": tabId });
+                gtagEvent("switch_tab", { tab: tabId });
 
                 // Prevent a second input if the switcher is throttled.
                 if (switcherThrottle.current) {
@@ -189,11 +206,13 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
                   setDisableSwitcher(false);
                 }, SWITCHER_THROTTLE_TIME);
               }}
-              className="w-fit"
+              className="no-drag w-fit"
             />
           </div>
 
-          <div className="flex items-center justify-center gap-2 font-medium">
+          <div
+            className={`${tabStore.activeTabId === "3D" ? "no-drag" : ""} flex items-center justify-center gap-2 font-medium`}
+          >
             {tabStore.activeTabId === "3D" ? (
               <SceneTitleInput pageName={pageName} />
             ) : (
@@ -203,8 +222,8 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
             )}
           </div>
 
-          <div className="flex justify-end gap-3.5 pr-2">
-            <div className="flex gap-2">
+          <div className="flex justify-end gap-2">
+            <div className="no-drag flex gap-2">
               {/* - Uncomment for pricing modal - BFlat */}
               {/* <Button
                 variant="primary"
@@ -235,7 +254,37 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
 
               <Activity />
             </div>
-            <AuthButtons loginSignUpPressed={loginSignUpPressed} />
+            <div className="no-drag">
+              <AuthButtons loginSignUpPressed={loginSignUpPressed} />
+            </div>
+            {isDesktop && platform !== "macos" && (
+              <div className="no-drag flex items-center">
+                <Button
+                  variant="secondary"
+                  className="h-[32px] w-[44px] rounded-none bg-transparent text-white/70 hover:bg-white/10 hover:text-white"
+                  onClick={minimize}
+                >
+                  <FontAwesomeIcon icon={faDash} className="text-xs" />
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="h-[32px] w-[44px] rounded-none bg-transparent text-white/70 hover:bg-white/10 hover:text-white"
+                  onClick={toggleMaximize}
+                >
+                  <FontAwesomeIcon
+                    icon={isMaximized ? faWindowRestore : faSquare}
+                    className="text-xs"
+                  />
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="h-[32px] w-[44px] rounded-none bg-transparent text-white/70 hover:bg-red/40 hover:text-white"
+                  onClick={close}
+                >
+                  <FontAwesomeIcon icon={faXmark} className="text-lg" />
+                </Button>
+              </div>
+            )}
           </div>
         </nav>
       </header>
