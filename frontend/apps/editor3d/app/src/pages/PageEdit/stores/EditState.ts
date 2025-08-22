@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { LineNode, generateId } from "~/pages/PageDraw/stores/SceneState";
 import { Node } from "~/pages/PageDraw/Node";
 import { BaseSelectorImage } from "../BaseImageSelector";
+import { FetchProxy } from "libs/tauri-utils/src/lib/FetchProxy";
 
 export type ActiveEditTool = "select" | "edit" | "expand";
 export type EditOperation = "add" | "minus";
@@ -69,6 +70,7 @@ interface EditState {
     shouldSaveState: boolean,
   ) => void;
   moveLineNode: (id: string, dx: number, dy: number) => void;
+  clearLineNodes: () => void;
 
   // Add a specific method for file uploads
   createImageFromFile: (
@@ -119,6 +121,11 @@ interface EditState {
 
   // Add aspect ratio action
   getAspectRatioDimensions: () => { width: number; height: number };
+
+  // History stack operations
+  // pushHistory: () => void;
+  // clearHistory: () => void;
+  RESET: () => void;
 }
 
 // Add a flag to prevent saving state during restoration
@@ -140,7 +147,7 @@ const getNextZIndex = (nodes: Node[], lineNodes: LineNode[]): number => {
   return allZIndices.length > 0 ? Math.max(...allZIndices) + 1 : 0;
 };
 
-export const useEditStore = create<EditState>((set, get) => ({
+export const useEditStore = create<EditState>((set, get, store) => ({
   // Initial state
   nodes: [],
   lineNodes: [],
@@ -521,6 +528,10 @@ export const useEditStore = create<EditState>((set, get) => ({
     }
   },
 
+  clearLineNodes() {
+    set({ lineNodes: [] });
+  },
+
   moveLineNode: (id: string, dx: number, dy: number) => {
     set((state) => {
       const newLineNodes = state.lineNodes.map((node) => {
@@ -609,13 +620,14 @@ export const useEditStore = create<EditState>((set, get) => ({
     imgBitmap.onload = () => {
       set({ baseImageBitmap: imgBitmap });
     };
-    imgBitmap.onerror = () => {
-      console.error("Failed to load base image, discarding");
-      imgBitmap.src = ""; // Clear the source to avoid memory leaks
+    imgBitmap.onerror = (event) => {
+      console.error("Failed to load base image, discarding", event);
       set({ baseImageInfo: null, baseImageBitmap: null });
+      imgBitmap.onload = null;
+      imgBitmap.onerror = null;
     };
     imgBitmap.crossOrigin = "anonymous";
-    imgBitmap.src = image.url;
+    imgBitmap.src = image.url + "?basecanvasimg";
   },
 
   // Action for deleting selected items
@@ -987,4 +999,8 @@ export const useEditStore = create<EditState>((set, get) => ({
     // If base image exists, use its dimensions
     return { width: baseImageInfo.width, height: baseImageInfo.height };
   },
+
+  RESET: () => {
+    set(store.getInitialState());
+  }
 }));
