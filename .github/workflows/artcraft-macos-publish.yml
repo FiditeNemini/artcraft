@@ -47,6 +47,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
+      - name: replace tauri config with mac-specific version
+        run: |
+          pushd ${{ github.workspace }}/crates/desktop/artcraft
+          # Use the mac-specific tauri conf for the build
+          # TODO(bt): Replace this with the platform-specific naming conventions
+          cp tauri-mac.conf.json tauri.conf.json
+          popd
+
       - name: install frontend dependencies
         run: |
           # Navigate to the frontend directory to install dependencies
@@ -196,9 +204,6 @@ jobs:
 
           echo "Checking build output..."
           ls -la apps/editor3d/dist/ | head -10
-
-          # Use the mac-specific tauri conf (we need to name it this per convention)
-          cp tauri-mac.conf.json tauri.conf.json
 
           # Update Tauri config to skip the build (since we already built)
           cd ${{ github.workspace }}/crates/desktop/artcraft
