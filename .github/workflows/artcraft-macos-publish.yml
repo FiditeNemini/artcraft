@@ -5,7 +5,7 @@ on:
     branches:
       - release
       - artcraft-release
-      - artcraft-macos  # Additional branch for MacOS testing
+      - artcraft-macos # Additional branch for MacOS testing
 
 # This workflow creates Universal macOS builds with signing certificate support.
 # On each push to the release branches it will create or update a GitHub release, build your app, and upload the artifacts to the release.
@@ -19,8 +19,8 @@ jobs:
       matrix:
         include:
           # Universal macOS builds (arm64 and x86_64)
-          - platform: 'macos-latest-xlarge'
-            args: '--target universal-apple-darwin'
+          - platform: "macos-latest-xlarge"
+            args: "--target universal-apple-darwin"
           # Uncomment below for additional platforms
           # - platform: 'ubuntu-22.04'
           #   args: ''
@@ -199,15 +199,14 @@ jobs:
 
           # Update Tauri config to skip the build (since we already built)
           cd ${{ github.workspace }}/crates/desktop/artcraft
-          cp tauri.conf.json tauri.conf.json.bak
+          cp tauri-mac.conf.json tauri-mac.conf.json.bak
           # Set beforeBuildCommand to empty or a no-op command
           if command -v jq &> /dev/null; then
-            jq '.build.beforeBuildCommand = ""' tauri.conf.json > tauri.conf.json.tmp
-            mv tauri.conf.json.tmp tauri.conf.json
+            jq '.build.beforeBuildCommand = ""' tauri-mac.conf.json > tauri-mac.conf.json.tmp
+            mv tauri-mac.conf.json.tmp tauri-mac.conf.json
           else
-            node -e "const fs = require('fs'); const config = JSON.parse(fs.readFileSync('tauri.conf.json', 'utf8')); config.build.beforeBuildCommand = ''; fs.writeFileSync('tauri.conf.json', JSON.stringify(config, null, 2));"
+            node -e "const fs = require('fs'); const config = JSON.parse(fs.readFileSync('tauri-mac.conf.json', 'utf8')); config.build.beforeBuildCommand = ''; fs.writeFileSync('tauri-mac.conf.json', JSON.stringify(config, null, 2));"
           fi
-
 
       - name: build and publish
         uses: tauri-apps/tauri-action@v0
