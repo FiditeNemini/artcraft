@@ -20,9 +20,10 @@ import {
   ModelSelector,
   useModelSelectorStore,
 } from "@storyteller/ui-model-selector";
-import { ModelInfo } from "@storyteller/model-list";
+import { lookupModelByTauriId, ModelInfo } from "@storyteller/model-list";
 import { useImageEditCompleteEvent } from "@storyteller/tauri-events";
 import { HistoryStack, ImageBundle } from "./HistoryStack";
+import { ModelTag } from "libs/model-list/src/lib/ModelTag";
 import LeftResetStack from "./LeftResetStack";
 
 const PAGE_ID: ModelPage = ModelPage.ImageEditor;
@@ -31,13 +32,15 @@ const PageEdit = () => {
   //useStateSceneLoader();
   const { selectedModels } = useModelSelectorStore();
 
-  const selectedModel =
+  const selectedModelLabel =
     selectedModels[PAGE_ID] || IMAGE_EDITOR_PAGE_MODEL_LIST[0]?.label;
 
+  const selectedModel = IMAGE_EDITOR_PAGE_MODEL_LIST.find(
+    (m) => m.label === selectedModelLabel,
+  );
+
   const selectedModelInfo: ModelInfo | undefined =
-    IMAGE_EDITOR_PAGE_MODEL_LIST.find(
-      (m) => m.label === selectedModel,
-    )?.modelInfo;
+    selectedModel?.modelInfo;
 
   // State for canvas dimensions
   const canvasWidth = useRef<number>(1024);
@@ -267,6 +270,24 @@ const PageEdit = () => {
     ],
   );
 
+  const modelConfig = lookupModelByTauriId(selectedModelInfo!.tauri_id);
+  const supportsMaskedInpainting = modelConfig?.tags?.includes(ModelTag.MaskedInpainting) ?? false;
+
+  if (!supportsMaskedInpainting && (store.activeTool !== "select" || store.lineNodes.length > 0)) {
+    // TODO: Implement a new mode for unsupported masking and hide the nodes layer instead of clearing
+    store.setActiveTool("select");
+    store.clearLineNodes();
+  }
+
+  /*
+    *
+    * Only component logic below this
+    *
+    *
+    *
+    *
+    */
+
   // Display image selector on launch, otherwise hide it
   // Also show loading state if info is set but image is loading
   if (!store.baseImageInfo || !store.baseImageBitmap) {
@@ -342,6 +363,7 @@ const PageEdit = () => {
           isDisabled={isEnqueuing}
           generationCount={generationCount}
           onGenerationCountChange={setGenerationCount}
+          supportsMaskedInpainting={supportsMaskedInpainting}
         />
       </div>
       <div className="relative z-0">
