@@ -1,0 +1,28 @@
+import { ModelCreator } from "src/index.js";
+import { Model } from "./Model.js";
+import { ModelCategory } from "../ModelConfig.js";
+
+export class VideoModel extends Model {
+  // Whether the model supports image starting frames
+  readonly startFrame: boolean;
+
+  // Whether the model supports image ending frames
+  readonly endFrame: boolean;
+
+  constructor(args: {
+    id: string;
+    tauriId: string;
+    fullName: string;
+    category: ModelCategory;
+    creator: ModelCreator;
+    selectorName: string;
+    selectorDescription: string;
+    selectorBadges: string[];
+    startFrame: boolean;
+    endFrame: boolean;
+  }) {
+    super(args);
+    this.startFrame = args.startFrame;
+    this.endFrame = args.endFrame;
+  } 
+}
