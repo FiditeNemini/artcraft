@@ -27,7 +27,7 @@ const PAGE_ID: ModelPage = ModelPage.ImageEditor;
 const PageEdit = () => {
   //useStateSceneLoader();
 
-  const selectedImageModel : ImageModel | undefined = getSelectedImageModel(PAGE_ID);
+  const selectedImageModel: ImageModel | undefined = getSelectedImageModel(PAGE_ID);
 
   // State for canvas dimensions
   const canvasWidth = useRef<number>(1024);
@@ -46,6 +46,8 @@ const PageEdit = () => {
 
   // Use the Zustand store
   const store = useEditStore();
+  const addHistoryImageBundle = useEditStore((state) => state.addHistoryImageBundle);
+  const historyImageBundles = useEditStore((state) => state.historyImageBundles)
 
   // Pass store actions directly as callbacks
   useDeleteHotkeys({ onDelete: store.deleteSelectedItems });
@@ -154,18 +156,6 @@ const PageEdit = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Auto-fit the canvas when base image is loaded
-  useEffect(() => {
-    if (!store.baseImageBitmap) {
-      console.log("No base image bitmap available, skipping auto-fit");
-      return;
-    }
-
-    // When baseImageBitmap changes from null to an actual image, call onFitPressed
-    // Use a slight delay to ensure the image dimensions are properly loaded
-    onFitPressed();
-  }, [onFitPressed, store.baseImageBitmap]);
-
   // Create a function to use the left layer ref and download the bitmap from it
   const getMaskArrayBuffer = async (): Promise<Uint8Array> => {
     if (
@@ -247,11 +237,14 @@ const PageEdit = () => {
   //const supportsMaskedInpainting = modelConfig?.tags?.includes(ModelTag.MaskedInpainting) ?? false;
   const supportsMaskedInpainting = selectedImageModel?.usesInpaintingMask ?? false;
 
-  if (!supportsMaskedInpainting && (store.activeTool !== "select" || store.lineNodes.length > 0)) {
-    // TODO: Implement a new mode for unsupported masking and hide the nodes layer instead of clearing
-    store.setActiveTool("select");
-    store.clearLineNodes();
-  }
+  useEffect(() => {
+    if (!supportsMaskedInpainting && (store.activeTool !== "select" || store.lineNodes.length > 0)) {
+      // TODO: Implement a new mode for unsupported masking and hide the nodes layer instead of clearing
+      store.setActiveTool("select");
+      store.clearLineNodes();
+    }
+  }, [store, supportsMaskedInpainting]);
+
 
   /*
     *
@@ -273,6 +266,7 @@ const PageEdit = () => {
       >
         <BaseImageSelector
           onImageSelect={(image: BaseSelectorImage) => {
+            addHistoryImageBundle({ images: [image] });
             store.setBaseImageInfo(image);
           }}
           showLoading={
@@ -305,11 +299,13 @@ const PageEdit = () => {
           onClear={() => {
             store.RESET();
           }}
-          startingBundles={[{ images: [store.baseImageInfo] } as ImageBundle]}
+          imageBundles={historyImageBundles}
           onImageSelect={(baseImage) => {
             store.clearLineNodes();
             store.setBaseImageInfo(baseImage);
           }}
+          onNewImageBundle={addHistoryImageBundle}
+          selectedImageToken={store.baseImageInfo?.mediaToken}
         />
       </div>
       <div
