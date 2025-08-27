@@ -10,7 +10,6 @@ use crate::core::events::generation_events::common::{GenerationAction, Generatio
 use crate::core::events::generation_events::generation_enqueue_failure_event::GenerationEnqueueFailureEvent;
 use crate::core::events::generation_events::generation_enqueue_success_event::GenerationEnqueueSuccessEvent;
 use crate::core::events::sendable_event_trait::SendableEvent;
-use crate::core::model::contextual_image_edit_models::ContextualImageEditModel;
 use crate::core::model::image_models::ImageModel;
 use crate::core::state::app_env_configs::app_env_configs::AppEnvConfigs;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
@@ -27,6 +26,7 @@ use crate::services::storyteller::state::storyteller_credential_manager::Storyte
 use enums::common::generation_provider::GenerationProvider;
 use enums::tauri::tasks::task_status::TaskStatus;
 use enums::tauri::tasks::task_type::TaskType;
+use enums::tauri::ux::tauri_command_caller::TauriCommandCaller;
 use errors::AnyhowError;
 use log::{error, info, warn};
 use openai_sora_client::recipes::image_remix_with_session_auto_renew::{image_remix_with_session_auto_renew, ImageRemixAutoRenewRequest};
@@ -41,8 +41,19 @@ use storyteller_client::error::storyteller_error::StorytellerError;
 use storyteller_client::media_files::get_media_file::get_media_file;
 use storyteller_client::utils::api_host::ApiHost;
 use tauri::{AppHandle, Manager, State};
-use enums::tauri::ux::tauri_command_caller::TauriCommandCaller;
 use tokens::tokens::media_files::MediaFileToken;
+
+/// This is used in the Tauri command bridge. 
+/// Don't change the serializations without coordinating with the frontend.
+#[derive(Deserialize, Debug, Copy, Clone)]
+#[serde(rename_all = "snake_case")]
+pub enum ContextualImageEditModel {
+  #[serde(rename = "gpt_image_1")]
+  GptImage1,
+
+  #[serde(rename = "flux_pro_kontext_max")]
+  FluxProKontextMax,
+}
 
 #[derive(Deserialize, Debug)]
 pub struct EnqueueContextualEditImageCommand {
