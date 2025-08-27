@@ -1,11 +1,12 @@
-import { ModelCreator } from "./ModelCreator.js";
+import { ModelCreator } from "../classes/metadata/ModelCreator.js";
 import { ModelInfo } from "./ModelInfo.js";
-import { ModelTag } from "./ModelTag.js";
+import { ModelTag } from "../classes/metadata/ModelTag.js";
 import {
   ModelConfig,
   ModelCapabilities,
   ModelCategory,
 } from "./ModelConfig.js";
+import { Model } from "../classes/Model.js";
 
 const mc = ModelCreator;
 
@@ -29,7 +30,7 @@ const cfg = (
   ...m,
 });
 
-export const ALL_MODELS: ModelConfig[] = [
+const ALL_MODELS: ModelConfig[] = [
   //////////////////////////////
   // Image models
   //////////////////////////////
@@ -213,9 +214,9 @@ export const ALL_MODELS: ModelConfig[] = [
   }),
 ];
 
-export const ALL_MODELS_BY_ID: Map<string, ModelConfig> = new Map(
-  ALL_MODELS.map((model) => [model.id, model])
-);
+// export const ALL_MODELS_BY_ID: Map<string, ModelConfig> = new Map(
+//   ALL_MODELS.map((model) => [model.id, model])
+// );
 
 export const getAllModels = (): ModelConfig[] => ALL_MODELS;
 
@@ -239,9 +240,10 @@ export const lookupModelByTauriId = (
 
 // Single exported capability resolver so callers never need to touch anything else
 export const getCapabilitiesForModel = (
-  model?: ModelInfo
+  model?: Model | ModelInfo
 ): ModelCapabilities => {
   if (!model) return DEFAULT_CAPABILITIES;
-  const cfg = lookupModelByTauriId(model.tauri_id);
+  const tauriId = model instanceof Model ? model.tauriId : model.tauri_id;
+  const cfg = lookupModelByTauriId(tauriId);
   return cfg?.capabilities ?? DEFAULT_CAPABILITIES;
 };

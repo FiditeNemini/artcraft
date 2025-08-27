@@ -1,4 +1,5 @@
-import { ModelInfo } from "libs/model-list/src/lib/ModelInfo";
+import { ImageModel } from "@storyteller/model-list";
+import { ModelInfo } from "@storyteller/model-list";
 
 export interface PromptEditorProps {
   initialPrompt?: string;
@@ -11,6 +12,7 @@ export interface PromptEditorProps {
   onEnqueuePressed?: () => void;
   onFitPressed?: () => void;
   selectedModelInfo?: ModelInfo;
+  selectedImageModel?: ImageModel;
 }
 
 export type AspectRatio = "1:1" | "3:2" | "2:3";

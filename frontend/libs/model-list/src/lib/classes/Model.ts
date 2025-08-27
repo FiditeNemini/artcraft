@@ -1,5 +1,6 @@
-import { ModelCreator } from "../ModelCreator.js";
-import { ModelCategory } from "../ModelConfig.js";
+import { ModelCreator } from "./metadata/ModelCreator.js";
+import { ModelCategory, ModelConfig } from "../legacy/ModelConfig.js";
+import { ModelTag } from "./metadata/ModelTag.js";
 
 // NB: Do not create instances of this class directly, use subclasses.
 export class Model {
@@ -29,6 +30,9 @@ export class Model {
   // Labels for the selector
   readonly selectorBadges: string[];
 
+  // A list of filterable "capabilities" that can be used to filter models.
+  readonly tags: ModelTag[];
+
   protected constructor(args: {
     id: string;
     tauriId: string;
@@ -38,6 +42,7 @@ export class Model {
     selectorName: string;
     selectorDescription: string;
     selectorBadges: string[];
+    tags?: ModelTag[];
   }) {
     this.id = args.id;
     this.tauriId = args.tauriId;
@@ -47,5 +52,31 @@ export class Model {
     this.selectorName = args.selectorName;
     this.selectorDescription = args.selectorDescription;
     this.selectorBadges = args.selectorBadges;
+    this.tags = args.tags ?? [];
+  }
+
+  toLegacyBadges() : { label: string }[] {
+    return this.selectorBadges.map((b) => ({ label: b }));
+  }
+
+  // TODO: This is a method to support migration. Kill it after we no longer need it.
+  toLegacyModelConfig(): ModelConfig {
+    return {
+      id: this.id,
+      label: this.selectorName,
+      description: this.selectorDescription,
+      badges: this.toLegacyBadges(),
+      category: this.category,
+      info: {
+        name: this.fullName,
+        tauri_id: this.tauriId,
+        creator: this.creator,
+      },
+      capabilities: {
+        maxGenerationCount: 9, // NB: Sentinel value to detect continued use
+        defaultGenerationCount: 9, // NB: Sentinel value to detect continued use
+      },
+      tags: [],
+    };
   }
 }

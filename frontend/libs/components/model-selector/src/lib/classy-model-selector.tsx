@@ -1,9 +1,9 @@
 import { PopoverMenu, type PopoverItem } from "@storyteller/ui-popover";
-import { useModelSelectorStore } from "./model-selector-store";
+import { useClassyModelSelectorStore } from "./classy-model-selector-store";
 import { useEffect, useMemo } from "react";
 import { ModelPage } from "./model-pages";
 
-interface ModelSelectorProps {
+interface ClassyModelSelectorProps {
   items: Omit<PopoverItem, "selected">[];
   page: ModelPage;
   mode?: "hoverSelect" | "default" | "toggle" | "button";
@@ -14,31 +14,31 @@ interface ModelSelectorProps {
   triggerLabel?: string;
 }
 
-export function ModelSelector({
+export function ClassyModelSelector({
   items,
   page,
   ...popoverProps
-}: ModelSelectorProps) {
-  const { selectedModels, setSelectedModel } = useModelSelectorStore();
-  const selectedModel = selectedModels[page] || items[0]?.label;
+}: ClassyModelSelectorProps) {
+  const { selectedModels, setSelectedModel } = useClassyModelSelectorStore();
+  const selectedModel = selectedModels[page] || items[0]?.model;
 
   // For the first mount, make sure the selected model is set for other components to listen
   useEffect(() => {
     // Initialize selected model if not set
     if (!selectedModels[page] && items[0]) {
-      setSelectedModel(page, items[0].label);
+      setSelectedModel(page, items[0].model!);
     }
   }, []);
 
   const handleModelSelect = (item: PopoverItem) => {
-    setSelectedModel(page, item.label);
+    setSelectedModel(page, item.model!);
   };
 
   const modelList = useMemo(
     () =>
       items.map((item) => ({
         ...item,
-        selected: item.label === selectedModel,
+        selected: item.model === selectedModel,
       })),
     [items, selectedModel]
   );
@@ -53,4 +53,4 @@ export function ModelSelector({
   );
 }
 
-export default ModelSelector;
+export default ClassyModelSelector;
