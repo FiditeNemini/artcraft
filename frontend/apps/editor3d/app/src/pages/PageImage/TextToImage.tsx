@@ -41,7 +41,6 @@ const TextToImage = ({ imageMediaId, imageUrl }: TextToImageProps) => {
   };
 
   useTextToImageGenerationCompleteEvent(async (event) => {
-    console.log(">>> Event", event);
     completeBatch(
       event.generated_images || [],
       event.maybe_frontend_subscriber_id,
@@ -69,6 +68,10 @@ const TextToImage = ({ imageMediaId, imageUrl }: TextToImageProps) => {
     config: { tension: 200, friction: 28, mass: 1.1 },
   });
 
+  // Show the batches in reverse order, with the newest items at top.
+  // Like Midjourney instead of a "chat history" style.
+  const inverseBatch = batches.toReversed();
+
   return (
     <div
       ref={containerRef}
@@ -88,19 +91,8 @@ const TextToImage = ({ imageMediaId, imageUrl }: TextToImageProps) => {
           {hasAnyBatches && (
             <div className="h-full w-full overflow-y-auto pb-40">
               <div className="mx-auto flex max-w-screen-2xl flex-col gap-8 pr-2">
-                {batches.map((batch) => (
+                {inverseBatch.map((batch) => (
                   <div key={batch.id} className="flex items-start gap-4">
-                    <div>
-                      <div className="glass inline-block w-[320px] shrink-0 rounded-xl px-4 py-3 text-left text-sm text-white/90">
-                        <div>{batch.prompt}</div>
-                      </div>
-                      <div className="mt-2 flex justify-end">
-                        <Badge
-                          label={batch.modelLabel}
-                          className="px-2 py-1 text-xs opacity-70"
-                        />
-                      </div>
-                    </div>
                     <div className="grid flex-1 grid-cols-4 gap-4">
                       {batch.status === "pending" && batch.images.length === 0
                         ? Array.from({
@@ -139,6 +131,17 @@ const TextToImage = ({ imageMediaId, imageUrl }: TextToImageProps) => {
                               />
                             </button>
                           ))}
+                    </div>
+                    <div>
+                      <div className="glass inline-block w-[320px] shrink-0 rounded-xl px-4 py-3 text-left text-sm text-white/90">
+                        <div>{batch.prompt}</div>
+                      </div>
+                      <div className="mt-2 flex justify-end">
+                        <Badge
+                          label={batch.modelLabel}
+                          className="px-2 py-1 text-xs opacity-70"
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}
