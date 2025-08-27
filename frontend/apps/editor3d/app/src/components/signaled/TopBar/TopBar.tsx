@@ -36,7 +36,7 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { setLogoutStates } from "~/signals/authentication/utilities";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useTabStore } from "~/pages/Stores/TabState";
+import { TabId, useTabStore } from "~/pages/Stores/TabState";
 import {
   is3DEditorInitialized,
   is3DSceneLoaded,
@@ -59,7 +59,23 @@ interface Props {
 
 const SWITCHER_THROTTLE_TIME = 500; // milliseconds
 
-const appMenuTabs: MenuIconItem[] = [
+// NB: See `TabState` for the default tab.
+const appMenuTabs: MenuIconItem<TabId>[] = [
+  {
+    id: "IMAGE",
+    label: "Text to Image",
+    icon: <FontAwesomeIcon icon={faImage} />,
+  },
+  {
+    id: "VIDEO",
+    label: "Image to Video",
+    icon: <FontAwesomeIcon icon={faFilm} />,
+  },
+  {
+    id: "EDIT",
+    label: "Edit Image",
+    icon: <FontAwesomeIcon icon={faPenNib} />,
+  },
   {
     id: "2D",
     label: "2D Canvas",
@@ -75,21 +91,6 @@ const appMenuTabs: MenuIconItem[] = [
     imageSrc: "/resources/gifs/artcraft-3d-demo.gif",
     description: "Precision control. Great for AI film.",
     large: true,
-  },
-  {
-    id: "IMAGE",
-    label: "Prompt to Image",
-    icon: <FontAwesomeIcon icon={faImage} />,
-  },
-  {
-    id: "VIDEO",
-    label: "Image to Video",
-    icon: <FontAwesomeIcon icon={faFilm} />,
-  },
-  {
-    id: "EDIT",
-    label: "Edit Image",
-    icon: <FontAwesomeIcon icon={faPenNib} />,
   },
 ];
 
