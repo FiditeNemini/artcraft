@@ -29,6 +29,7 @@ use mysql_queries::queries::generic_inference::web::get_inference_job_status::ge
 use mysql_queries::queries::generic_inference::web::job_status::GenericInferenceJobStatus;
 use r2d2_redis::redis::{Commands, RedisResult};
 use redis_common::redis_keys::RedisKeys;
+use server_environment::ServerEnvironment;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use utoipa::ToSchema;
 
@@ -251,6 +252,7 @@ pub async fn get_inference_job_status_handler(
   let record_for_response = record_to_payload(
     record,
     maybe_extra_status_description,
+    server_state.server_environment,
     media_domain,
   );
 
@@ -263,6 +265,7 @@ pub async fn get_inference_job_status_handler(
 fn record_to_payload(
   record: GenericInferenceJobStatus,
   maybe_extra_status_description: Option<String>,
+  server_environment: ServerEnvironment,
   media_domain: MediaDomain,
 ) -> InferenceJobStatusResponsePayload {
   let inference_category = record.request_details.inference_category;
@@ -368,7 +371,11 @@ fn record_to_payload(
       ResultDetailsResponse {
         entity_type: result_details.entity_type,
         entity_token: result_details.entity_token,
-        media_links: MediaLinksBuilder::from_rooted_path(media_domain, &public_bucket_media_path),
+        media_links: MediaLinksBuilder::from_rooted_path_and_env(
+          media_domain,
+          server_environment,
+          &public_bucket_media_path
+        ),
         maybe_public_bucket_media_path: Some(public_bucket_media_path),
         maybe_successfully_completed_at: result_details.maybe_successfully_completed_at,
       }
@@ -384,6 +391,7 @@ mod tests {
   use crate::http_server::endpoints::inference_job::get::get_inference_job_status_handler::record_to_payload;
   use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
   use mysql_queries::queries::generic_inference::web::job_status::{GenericInferenceJobStatus, RequestDetails, ResultDetails};
+  use server_environment::ServerEnvironment;
   use url::Url;
 
   #[test]
@@ -407,7 +415,7 @@ mod tests {
     };
 
     let payload =
-        record_to_payload(status, None, MediaDomain::Storyteller);
+        record_to_payload(status, None, ServerEnvironment::Production, MediaDomain::Storyteller);
 
     assert!(payload.maybe_result.is_some());
 
@@ -446,7 +454,7 @@ mod tests {
     };
 
     let payload =
-        record_to_payload(status, None, MediaDomain::FakeYou);
+        record_to_payload(status, None, ServerEnvironment::Production, MediaDomain::FakeYou);
 
     assert!(payload.maybe_result.is_some());
 

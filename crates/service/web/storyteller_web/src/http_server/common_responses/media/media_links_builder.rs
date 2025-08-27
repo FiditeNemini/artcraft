@@ -16,21 +16,6 @@ const QUALITY : u8 = 95;
 pub struct MediaLinksBuilder {}
 
 impl MediaLinksBuilder {
-  #[deprecated(note = "we need to start passing the domain and the server environment to generate the CDN")]
-  pub fn from_media_path(
-    domain: MediaDomain,
-    bucket_path: &MediaFileBucketPath,
-  ) -> MediaLinks {
-    Self::from_media_path_and_env(domain, ServerEnvironment::Production, bucket_path)
-  }
-
-  #[deprecated(note = "we need to start passing the domain and the server environment to generate the CDN")]
-  pub fn from_rooted_path(
-    domain: MediaDomain,
-    rooted_path: &str,
-  ) -> MediaLinks {
-    Self::from_rooted_path_and_env(domain, ServerEnvironment::Production, rooted_path)
-  }
 
   pub fn from_media_path_and_env(
     domain: MediaDomain,
@@ -148,7 +133,7 @@ use crate::http_server::common_responses::media::media_links_builder::MediaLinks
 
       #[test]
       fn wav_file() {
-        let links = MediaLinksBuilder::from_rooted_path(DOMAIN, "/foo/bar.wav");
+        let links = MediaLinksBuilder::from_rooted_path_and_env(DOMAIN, ServerEnvironment::Production, "/foo/bar.wav");
         assert_eq!(links.cdn_url.as_str(), "https://cdn-2.fakeyou.com/foo/bar.wav");
         assert_eq!(links.maybe_thumbnail_template, None);
         assert_eq!(links.maybe_video_previews, None);
@@ -156,7 +141,7 @@ use crate::http_server::common_responses::media::media_links_builder::MediaLinks
 
       #[test]
       fn glb_file() {
-        let links = MediaLinksBuilder::from_rooted_path(DOMAIN, "/foo/bar.glb");
+        let links = MediaLinksBuilder::from_rooted_path_and_env(DOMAIN, ServerEnvironment::Production, "/foo/bar.glb");
         assert_eq!(links.cdn_url.as_str(), "https://cdn-2.fakeyou.com/foo/bar.glb");
         assert_eq!(links.maybe_thumbnail_template, None);
         assert_eq!(links.maybe_video_previews, None);
@@ -164,7 +149,7 @@ use crate::http_server::common_responses::media::media_links_builder::MediaLinks
 
       #[test]
       fn jpg_image() {
-        let links = MediaLinksBuilder::from_rooted_path(DOMAIN, "/foo/bar.jpg");
+        let links = MediaLinksBuilder::from_rooted_path_and_env(DOMAIN, ServerEnvironment::Production, "/foo/bar.jpg");
         assert_eq!(links.cdn_url.as_str(), "https://cdn-2.fakeyou.com/foo/bar.jpg");
         assert_eq!(links.maybe_thumbnail_template, Some("https://cdn-2.fakeyou.com/cdn-cgi/image/width={WIDTH},quality=95/foo/bar.jpg".to_string()));
         assert_eq!(links.maybe_video_previews, None);
@@ -172,7 +157,7 @@ use crate::http_server::common_responses::media::media_links_builder::MediaLinks
 
       #[test]
       fn mp4_video() {
-        let links = MediaLinksBuilder::from_rooted_path(DOMAIN, "/foo/bar.mp4");
+        let links = MediaLinksBuilder::from_rooted_path_and_env(DOMAIN, ServerEnvironment::Production, "/foo/bar.mp4");
         assert_eq!(links.cdn_url.as_str(), "https://cdn-2.fakeyou.com/foo/bar.mp4");
         assert_eq!(links.maybe_thumbnail_template, None);
         let video_previews = links.maybe_video_previews.expect("should have previews");
@@ -190,7 +175,7 @@ use crate::http_server::common_responses::media::media_links_builder::MediaLinks
       fn wav_file() {
         // https://storage.googleapis.com/vocodes-public/media/9/4/a/2/7/94a27nmbd0bqmd10tg0pp3hz45zytf67/fakeyou_94a27nmbd0bqmd10tg0pp3hz45zytf67.wav
         let media_path = MediaFileBucketPath::from_object_hash("94a27nmbd0bqmd10tg0pp3hz45zytf67", Some("fakeyou_"), Some(".wav"));
-        let links = MediaLinksBuilder::from_media_path(DOMAIN, &media_path);
+        let links = MediaLinksBuilder::from_media_path_and_env(DOMAIN, ServerEnvironment::Production, &media_path);
         assert_eq!(links.cdn_url.as_str(), "https://cdn-2.fakeyou.com/media/9/4/a/2/7/94a27nmbd0bqmd10tg0pp3hz45zytf67/fakeyou_94a27nmbd0bqmd10tg0pp3hz45zytf67.wav");
         assert_eq!(links.maybe_thumbnail_template, None);
         assert_eq!(links.maybe_video_previews, None);
@@ -200,7 +185,7 @@ use crate::http_server::common_responses::media::media_links_builder::MediaLinks
       fn png_image() {
         /// https://storage.googleapis.com/vocodes-public/media/3/7/m/b/3/37mb3gh8fmj85y21thvbv08bzv24atjt/upload_37mb3gh8fmj85y21thvbv08bzv24atjt.png
         let media_path = MediaFileBucketPath::from_object_hash("37mb3gh8fmj85y21thvbv08bzv24atjt", Some("upload_"), Some(".png"));
-        let links = MediaLinksBuilder::from_media_path(DOMAIN, &media_path);
+        let links = MediaLinksBuilder::from_media_path_and_env(DOMAIN, ServerEnvironment::Production, &media_path);
         assert_eq!(links.cdn_url.as_str(), "https://cdn-2.fakeyou.com/media/3/7/m/b/3/37mb3gh8fmj85y21thvbv08bzv24atjt/upload_37mb3gh8fmj85y21thvbv08bzv24atjt.png");
         assert_eq!(links.maybe_thumbnail_template, Some("https://cdn-2.fakeyou.com/cdn-cgi/image/width={WIDTH},quality=95/media/3/7/m/b/3/37mb3gh8fmj85y21thvbv08bzv24atjt/upload_37mb3gh8fmj85y21thvbv08bzv24atjt.png".to_string()));
         assert_eq!(links.maybe_video_previews, None);
@@ -210,7 +195,7 @@ use crate::http_server::common_responses::media::media_links_builder::MediaLinks
       fn mp4_video() {
         // https://storage.googleapis.com/vocodes-public/media/t/6/c/n/y/t6cnyw4g3e8k7carkk2bvrt6nd3fycjv/storyteller_t6cnyw4g3e8k7carkk2bvrt6nd3fycjv.mp4
         let media_path = MediaFileBucketPath::from_object_hash("t6cnyw4g3e8k7carkk2bvrt6nd3fycjv", Some("storyteller_"), Some(".mp4"));
-        let links = MediaLinksBuilder::from_media_path(DOMAIN, &media_path);
+        let links = MediaLinksBuilder::from_media_path_and_env(DOMAIN, ServerEnvironment::Production, &media_path);
         assert_eq!(links.cdn_url.as_str(), "https://cdn-2.fakeyou.com/media/t/6/c/n/y/t6cnyw4g3e8k7carkk2bvrt6nd3fycjv/storyteller_t6cnyw4g3e8k7carkk2bvrt6nd3fycjv.mp4");
         assert_eq!(links.maybe_thumbnail_template, None);
         let video_previews = links.maybe_video_previews.expect("should have previews");
@@ -229,10 +214,11 @@ use crate::http_server::common_responses::media::media_links_builder::MediaLinks
 
     mod rooted_path {
       use super::*;
+      use server_environment::ServerEnvironment;
 
       #[test]
       fn wav_file() {
-        let links = MediaLinksBuilder::from_rooted_path(DOMAIN, "/foo/bar.wav");
+        let links = MediaLinksBuilder::from_rooted_path_and_env(DOMAIN, ServerEnvironment::Production, "/foo/bar.wav");
         assert_eq!(links.cdn_url.as_str(), "https://cdn.storyteller.ai/foo/bar.wav");
         assert_eq!(links.maybe_thumbnail_template, None);
         assert_eq!(links.maybe_video_previews, None);
@@ -240,7 +226,7 @@ use crate::http_server::common_responses::media::media_links_builder::MediaLinks
 
       #[test]
       fn glb_file() {
-        let links = MediaLinksBuilder::from_rooted_path(DOMAIN, "/foo/bar.glb");
+        let links = MediaLinksBuilder::from_rooted_path_and_env(DOMAIN, ServerEnvironment::Production, "/foo/bar.glb");
         assert_eq!(links.cdn_url.as_str(), "https://cdn.storyteller.ai/foo/bar.glb");
         assert_eq!(links.maybe_thumbnail_template, None);
         assert_eq!(links.maybe_video_previews, None);
@@ -248,7 +234,7 @@ use crate::http_server::common_responses::media::media_links_builder::MediaLinks
 
       #[test]
       fn jpg_image() {
-        let links = MediaLinksBuilder::from_rooted_path(DOMAIN, "/foo/bar.jpg");
+        let links = MediaLinksBuilder::from_rooted_path_and_env(DOMAIN, ServerEnvironment::Production, "/foo/bar.jpg");
         assert_eq!(links.cdn_url.as_str(), "https://cdn.storyteller.ai/foo/bar.jpg");
         assert_eq!(links.maybe_thumbnail_template, Some("https://cdn.storyteller.ai/cdn-cgi/image/width={WIDTH},quality=95/foo/bar.jpg".to_string()));
         assert_eq!(links.maybe_video_previews, None);
@@ -256,7 +242,7 @@ use crate::http_server::common_responses::media::media_links_builder::MediaLinks
 
       #[test]
       fn mp4_video() {
-        let links = MediaLinksBuilder::from_rooted_path(DOMAIN, "/foo/bar.mp4");
+        let links = MediaLinksBuilder::from_rooted_path_and_env(DOMAIN, ServerEnvironment::Production, "/foo/bar.mp4");
         assert_eq!(links.cdn_url.as_str(), "https://cdn.storyteller.ai/foo/bar.mp4");
         assert_eq!(links.maybe_thumbnail_template, None);
         let video_previews = links.maybe_video_previews.expect("should have previews");
@@ -269,12 +255,13 @@ use crate::http_server::common_responses::media::media_links_builder::MediaLinks
 
     mod media_path {
       use super::*;
+      use server_environment::ServerEnvironment;
 
       #[test]
       fn wav_file() {
         // https://storage.googleapis.com/vocodes-public/media/9/4/a/2/7/94a27nmbd0bqmd10tg0pp3hz45zytf67/fakeyou_94a27nmbd0bqmd10tg0pp3hz45zytf67.wav
         let media_path = MediaFileBucketPath::from_object_hash("94a27nmbd0bqmd10tg0pp3hz45zytf67", Some("fakeyou_"), Some(".wav"));
-        let links = MediaLinksBuilder::from_media_path(DOMAIN, &media_path);
+        let links = MediaLinksBuilder::from_media_path_and_env(DOMAIN, ServerEnvironment::Production, &media_path);
         assert_eq!(links.cdn_url.as_str(), "https://cdn.storyteller.ai/media/9/4/a/2/7/94a27nmbd0bqmd10tg0pp3hz45zytf67/fakeyou_94a27nmbd0bqmd10tg0pp3hz45zytf67.wav");
         assert_eq!(links.maybe_thumbnail_template, None);
         assert_eq!(links.maybe_video_previews, None);
@@ -284,7 +271,7 @@ use crate::http_server::common_responses::media::media_links_builder::MediaLinks
       fn png_image() {
         /// https://storage.googleapis.com/vocodes-public/media/3/7/m/b/3/37mb3gh8fmj85y21thvbv08bzv24atjt/upload_37mb3gh8fmj85y21thvbv08bzv24atjt.png
         let media_path = MediaFileBucketPath::from_object_hash("37mb3gh8fmj85y21thvbv08bzv24atjt", Some("upload_"), Some(".png"));
-        let links = MediaLinksBuilder::from_media_path(DOMAIN, &media_path);
+        let links = MediaLinksBuilder::from_media_path_and_env(DOMAIN, ServerEnvironment::Production, &media_path);
         assert_eq!(links.cdn_url.as_str(), "https://cdn.storyteller.ai/media/3/7/m/b/3/37mb3gh8fmj85y21thvbv08bzv24atjt/upload_37mb3gh8fmj85y21thvbv08bzv24atjt.png");
         assert_eq!(links.maybe_thumbnail_template, Some("https://cdn.storyteller.ai/cdn-cgi/image/width={WIDTH},quality=95/media/3/7/m/b/3/37mb3gh8fmj85y21thvbv08bzv24atjt/upload_37mb3gh8fmj85y21thvbv08bzv24atjt.png".to_string()));
         assert_eq!(links.maybe_video_previews, None);
@@ -294,7 +281,7 @@ use crate::http_server::common_responses::media::media_links_builder::MediaLinks
       fn mp4_video() {
         // https://storage.googleapis.com/vocodes-public/media/t/6/c/n/y/t6cnyw4g3e8k7carkk2bvrt6nd3fycjv/storyteller_t6cnyw4g3e8k7carkk2bvrt6nd3fycjv.mp4
         let media_path = MediaFileBucketPath::from_object_hash("t6cnyw4g3e8k7carkk2bvrt6nd3fycjv", Some("storyteller_"), Some(".mp4"));
-        let links = MediaLinksBuilder::from_media_path(DOMAIN, &media_path);
+        let links = MediaLinksBuilder::from_media_path_and_env(DOMAIN, ServerEnvironment::Production, &media_path);
         assert_eq!(links.cdn_url.as_str(), "https://cdn.storyteller.ai/media/t/6/c/n/y/t6cnyw4g3e8k7carkk2bvrt6nd3fycjv/storyteller_t6cnyw4g3e8k7carkk2bvrt6nd3fycjv.mp4");
         assert_eq!(links.maybe_thumbnail_template, None);
         let video_previews = links.maybe_video_previews.expect("should have previews");
