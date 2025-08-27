@@ -10,7 +10,7 @@ import { useUndoRedoHotkeys } from "../PageDraw/hooks/useUndoRedoHotkeys";
 import PromptEditor from "./PromptEditor/PromptEditor";
 import { ActiveEditTool, useEditStore } from "./stores/EditState";
 import { EditPaintSurface } from "./EditPaintSurface";
-import { normalizeCanvas } from "../../Helpers/CanvasHelpers";
+import { drawAlphaMask, normalizeCanvas } from "../../Helpers/CanvasHelpers";
 import { BaseImageSelector, BaseSelectorImage } from "./BaseImageSelector";
 import DrawToolControlBar from "./DrawToolControlBar";
 import {
@@ -186,6 +186,10 @@ const PageEdit = () => {
       rect.width(),
       rect.height(),
     );
+
+    // Convert colored canvas to alpha mask
+    // NOTE: This isn't needed because the tauri backend uses the alpha channel anyway
+    // drawAlphaMask(fittedCanvas, rect.width(), rect.height());
 
     const blob = await fittedCanvas.convertToBlob({ type: "image/png" });
     const arrayBuffer = await blob.arrayBuffer();
@@ -370,7 +374,7 @@ const PageEdit = () => {
             }}
             //fillColor={store.fillColor}
             activeTool={store.activeTool}
-            brushColor={store.brushColor}
+            brushColor={"rgba(39, 187, 245, 0.54)"}
             brushSize={store.brushSize}
             onSelectionChange={setIsSelecting}
             stageRef={stageRef}
