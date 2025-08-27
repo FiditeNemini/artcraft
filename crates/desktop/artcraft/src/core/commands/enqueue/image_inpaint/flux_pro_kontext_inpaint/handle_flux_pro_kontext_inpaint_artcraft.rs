@@ -1,6 +1,7 @@
 use crate::core::commands::enqueue::image_bg_removal::enqueue_image_bg_removal_command::EnqueueImageBgRemovalCommand;
 use crate::core::commands::enqueue::image_bg_removal::errors::InternalBgRemovalError;
 use crate::core::commands::enqueue::image_edit::enqueue_contextual_edit_image_command::{EditImageQuality, EditImageSize, EnqueueContextualEditImageCommand};
+use crate::core::commands::enqueue::image_edit::errors::InternalContextualEditImageError;
 use crate::core::commands::enqueue::image_inpaint::enqueue_image_inpaint_command::EnqueueInpaintImageCommand;
 use crate::core::commands::enqueue::image_inpaint::errors::InternalImageInpaintError;
 use crate::core::commands::enqueue::task_enqueue_success::TaskEnqueueSuccess;
@@ -19,6 +20,7 @@ use crate::services::sora::state::sora_credential_manager::SoraCredentialManager
 use crate::services::sora::state::sora_task_queue::SoraTaskQueue;
 use crate::services::storyteller::state::storyteller_credential_manager::StorytellerCredentialManager;
 use anyhow::anyhow;
+use artcraft_api_defs::generate::image::edit::flux_pro_kontext_max_edit_image::{FluxProKontextMaxEditImageNumImages, FluxProKontextMaxEditImageRequest};
 use artcraft_api_defs::generate::image::edit::gpt_image_1_edit_image::{GptImage1EditImageImageQuality, GptImage1EditImageImageSize, GptImage1EditImageNumImages, GptImage1EditImageRequest};
 use artcraft_api_defs::generate::image::generate_flux_1_dev_text_to_image::GenerateFlux1DevTextToImageRequest;
 use artcraft_api_defs::generate::image::generate_flux_1_schnell_text_to_image::GenerateFlux1SchnellTextToImageRequest;
@@ -36,6 +38,7 @@ use images::mask_images::normalize_image_bytes_to_flux_mask::normalize_image_byt
 use log::{error, info};
 use mimetypes::mimetype_info::mimetype_info::MimetypeInfo;
 use storyteller_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
+use storyteller_client::generate::image::edit::flux_pro_kontext_max_edit_image::flux_pro_kontext_max_edit_image;
 use storyteller_client::generate::image::edit::gpt_image_1_edit_image::gpt_image_1_edit_image;
 use storyteller_client::generate::image::generate_flux_1_dev_text_to_image::generate_flux_1_dev_text_to_image;
 use storyteller_client::generate::image::generate_flux_1_schnell_text_to_image::generate_flux_1_schnell_text_to_image;
@@ -48,7 +51,7 @@ use storyteller_client::media_files::upload_image_media_file_from_file::upload_i
 use tauri::AppHandle;
 use tokens::tokens::media_files::MediaFileToken;
 
-pub async fn handle_flux_pro_1_inpaint_artcraft(
+pub async fn handle_flux_pro_kontext_inpaint_artcraft(
   request: &EnqueueInpaintImageCommand,
   app: &AppHandle,
   app_data_root: &AppDataRoot,
@@ -78,22 +81,24 @@ pub async fn handle_flux_pro_1_inpaint_artcraft(
   //  InternalImageInpaintError::StorytellerError(err)
   //})?;
 
-  let mask_media_token = get_mask(
-    request,
-    app_env_configs,
-    &creds,
-  ).await?;
+  // TODO: Experiment in seeing if we can use the mask in any useful way.
+  
+  // let mask_media_token = get_mask(
+  //   request,
+  //   app_env_configs,
+  //   &creds,
+  // ).await?;
 
-  info!("Calling Artcraft flux pro 1 inpaint ...");
+  info!("Calling Artcraft flux pro kontext inpaint ...");
 
   let uuid_idempotency_token = generate_random_uuid();
 
   let num_images = match request.image_count {
     None => None,
-    Some(1) => Some(FluxPro1InpaintImageNumImages::One),
-    Some(2) => Some(FluxPro1InpaintImageNumImages::Two),
-    Some(3) => Some(FluxPro1InpaintImageNumImages::Three),
-    Some(4) => Some(FluxPro1InpaintImageNumImages::Four),
+    Some(1) => Some(FluxProKontextMaxEditImageNumImages::One),
+    Some(2) => Some(FluxProKontextMaxEditImageNumImages::Two),
+    Some(3) => Some(FluxProKontextMaxEditImageNumImages::Three),
+    Some(4) => Some(FluxProKontextMaxEditImageNumImages::Four),
     Some(other) => {
       return Err(InternalImageInpaintError::InvalidNumberOfRequestedImages {
         min: 1,
@@ -103,77 +108,78 @@ pub async fn handle_flux_pro_1_inpaint_artcraft(
     },
   };
 
-  let request = FluxPro1InpaintImageRequest {
+
+  let request = FluxProKontextMaxEditImageRequest {
     uuid_idempotency_token,
     prompt: Some(request.prompt.clone()),
     image_media_token,
-    mask_media_token,
     num_images,
   };
 
-  let result = flux_pro_1_inpaint_image(
+  let result = flux_pro_kontext_max_edit_image(
     &app_env_configs.storyteller_host,
     Some(&creds),
     request,
   ).await;
-  
+
+
   let job_id = match result {
     Ok(enqueued) => {
       // TODO(bt,2025-07-05): Enqueue job token?
-      info!("Successfully enqueued Artcraft flux pro 1 inpaint. Job token: {}",
+      info!("Successfully enqueued Artcraft flux pro kontext inpaint. Job token: {}",
         enqueued.inference_job_token);
       enqueued.inference_job_token
     }
     Err(err) => {
-      error!("Failed to use Artcraft flux pro 1 inpaint: {:?}", err);
+      error!("Failed to use Artcraft flux pro kontext inpaint: {:?}", err);
       return Err(InternalImageInpaintError::StorytellerError(err));
     }
   };
   
   Ok(TaskEnqueueSuccess {
     provider: GenerationProvider::Artcraft,
-    model: Some(GenerationModel::FluxPro1),
+    model: Some(GenerationModel::FluxProKontextMax),
     provider_job_id: Some(job_id.to_string()),
     task_type: TaskType::ImageInpaintEdit,
   })
 }
 
-async fn get_mask(
-  request: &EnqueueInpaintImageCommand,
-  app_env_configs: &AppEnvConfigs,
-  storyteller_creds: &StorytellerCredentialSet,
-) -> Result<MediaFileToken, InternalImageInpaintError> {
-
-  if request.mask_image_media_token.is_some() && request.mask_image_raw_bytes.is_some() {
-    return Err(InternalImageInpaintError::MaskMediaTokenAndBytesSupplied);
-  }
-
-  if let Some(token) = request.mask_image_media_token.as_ref() {
-    return Ok(token.clone());
-  };
-
-  let image_bytes = request.mask_image_raw_bytes.as_ref()
-    .ok_or(InternalImageInpaintError::NoMaskImageSpecified)?;
-
-  let image_bytes = normalize_image_bytes_to_flux_mask(image_bytes)
-      .map_err(|err| {
-        error!("Failed to convert image bytes to png: {:?}", err);
-        InternalImageInpaintError::CouldNotEncodeMask
-      })?;
-
-  info!("Uploading image media file from bytes...");
-
-  let result = upload_image_media_file_from_bytes(UploadImageBytesArgs {
-    api_host: &app_env_configs.storyteller_host,
-    maybe_creds: Some(&storyteller_creds),
-    image_bytes: image_bytes.0,
-    image_type: ImageType::Png,
-    is_intermediate_system_file: true,
-  }).await
-      .map_err(|err| {
-        error!("Failed to upload image media file: {:?}", err);
-        InternalImageInpaintError::StorytellerError(err)
-      })?;
-
-  Ok(result.media_file_token)
-}
+// async fn get_mask(
+//   request: &EnqueueInpaintImageCommand,
+//   app_env_configs: &AppEnvConfigs,
+//   storyteller_creds: &StorytellerCredentialSet,
+// ) -> Result<MediaFileToken, InternalImageInpaintError> {
+// 
+//   if request.mask_image_media_token.is_some() && request.mask_image_raw_bytes.is_some() {
+//     return Err(InternalImageInpaintError::MaskMediaTokenAndBytesSupplied);
+//   }
+// 
+//   if let Some(token) = request.mask_image_media_token.as_ref() {
+//     return Ok(token.clone());
+//   };
+// 
+//   let image_bytes = request.mask_image_raw_bytes.as_ref()
+//     .ok_or(InternalImageInpaintError::NoMaskImageSpecified)?;
+// 
+//   let image_bytes = normalize_image_bytes_to_flux_mask(image_bytes)
+//       .map_err(|err| {
+//         error!("Failed to convert image bytes to png: {:?}", err);
+//         InternalImageInpaintError::CouldNotEncodeMask
+//       })?;
+// 
+//   info!("Uploading image media file from bytes...");
+// 
+//   let result = upload_image_media_file_from_bytes(UploadImageBytesArgs {
+//     api_host: &app_env_configs.storyteller_host,
+//     maybe_creds: Some(&storyteller_creds),
+//     image_bytes: image_bytes.0,
+//     image_type: ImageType::Png,
+//     is_intermediate_system_file: true,
+//   }).await
+//       .map_err(|err| {
+//         error!("Failed to upload image media file: {:?}", err);
+//         InternalImageInpaintError::StorytellerError(err)
+//       })?;
+// 
+//   Ok(result.media_file_token)
+// }
