@@ -36,6 +36,7 @@ export type EditPaintSurfaceProps = {
   transformerRefs: React.RefObject<{ [key: string]: Konva.Transformer }>;
   leftPanelRef: React.RefObject<Konva.Layer>;
   baseImageRef: React.RefObject<Konva.Image>;
+  isGenerating?: boolean;
 };
 
 export const EditPaintSurface = ({
@@ -51,6 +52,7 @@ export const EditPaintSurface = ({
   transformerRefs,
   leftPanelRef,
   baseImageRef,
+  isGenerating = false,
 }: EditPaintSurfaceProps) => {
   // switch off to be preview panel mode.
   const singlePaneMode = true;
@@ -67,6 +69,9 @@ export const EditPaintSurface = ({
   const rightContainerRef = React.useRef<HTMLDivElement>(null);
   const cursorLayerRef = React.useRef<Konva.Layer>(null);
   const cursorShapeRef = React.useRef<Konva.Circle>(null);
+  const borderLayerRef = React.useRef<Konva.Layer>(null);
+  const runnerRectRef = React.useRef<Konva.Rect>(null);
+  const runnerRectRef2 = React.useRef<Konva.Rect>(null);
 
   // Layout dimensions
   const leftPanelWidth = 1024;
@@ -642,6 +647,124 @@ export const EditPaintSurface = ({
     }
   };
 
+  // Animated generating border around the actual canvas area (continuous, cornerless)
+  useEffect(() => {
+    if (
+      !isGenerating ||
+      !runnerRectRef.current ||
+      !borderLayerRef.current ||
+      !runnerRectRef2.current
+    ) {
+      return;
+    }
+    const rectA = runnerRectRef.current;
+    const rectB = runnerRectRef2.current;
+    const layer = borderLayerRef.current;
+    let distance = 0;
+    const speedPixelsPerSecond = 1200; // very fast runner speed
+    const runnerThickness = 10; // thicker
+    const anim = new Konva.Animation((frame) => {
+      if (!frame) return;
+      const w = store.getAspectRatioDimensions().width;
+      const h = store.getAspectRatioDimensions().height;
+      const perimeter = 2 * (w + h);
+      const baseRunner = Math.max(24, Math.round(perimeter * 0.12));
+      const maxRunner = Math.floor(Math.max(w, h) * 0.5);
+      const runnerLength = Math.min(baseRunner, maxRunner);
+
+      distance =
+        (distance + speedPixelsPerSecond * (frame.timeDiff / 1000)) % perimeter;
+      let d = distance;
+
+      // Top edge: left -> right
+      if (d < w) {
+        const seg = Math.min(runnerLength, w - d);
+        rectA.x(d);
+        rectA.y(0);
+        rectA.width(seg);
+        rectA.height(runnerThickness);
+        const overflow = runnerLength - seg;
+        if (overflow > 0) {
+          rectB.x(w - runnerThickness);
+          rectB.y(0);
+          rectB.width(runnerThickness);
+          rectB.height(Math.min(overflow, h));
+        } else {
+          rectB.width(0);
+          rectB.height(0);
+        }
+        return;
+      }
+      d -= w;
+
+      // Right edge: top -> bottom
+      if (d < h) {
+        const seg = Math.min(runnerLength, h - d);
+        rectA.x(w - runnerThickness);
+        rectA.y(d);
+        rectA.width(runnerThickness);
+        rectA.height(seg);
+        const overflow = runnerLength - seg;
+        if (overflow > 0) {
+          rectB.x(Math.max(0, w - overflow));
+          rectB.y(h - runnerThickness);
+          rectB.width(Math.min(overflow, w));
+          rectB.height(runnerThickness);
+        } else {
+          rectB.width(0);
+          rectB.height(0);
+        }
+        return;
+      }
+      d -= h;
+
+      // Bottom edge: right -> left
+      if (d < w) {
+        const seg = Math.min(runnerLength, w - d);
+        rectA.x(w - d - seg);
+        rectA.y(h - runnerThickness);
+        rectA.width(seg);
+        rectA.height(runnerThickness);
+        const overflow = runnerLength - seg;
+        if (overflow > 0) {
+          rectB.x(0);
+          rectB.y(Math.max(0, h - overflow));
+          rectB.width(runnerThickness);
+          rectB.height(Math.min(overflow, h));
+        } else {
+          rectB.width(0);
+          rectB.height(0);
+        }
+        return;
+      }
+      d -= w;
+
+      // Left edge: bottom -> top
+      {
+        const seg = Math.min(runnerLength, h - d);
+        rectA.x(0);
+        rectA.y(h - d - seg);
+        rectA.width(runnerThickness);
+        rectA.height(seg);
+        const overflow = runnerLength - seg;
+        if (overflow > 0) {
+          rectB.x(0);
+          rectB.y(0);
+          rectB.width(Math.min(overflow, w));
+          rectB.height(runnerThickness);
+        } else {
+          rectB.width(0);
+          rectB.height(0);
+        }
+      }
+    }, layer);
+    anim.start();
+    return () => {
+      anim.stop();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isGenerating]);
+
   useLayoutEffect(() => {
     const cursorNode = cursorShapeRef.current;
     const cursorLayer = cursorLayerRef.current;
@@ -1188,141 +1311,190 @@ export const EditPaintSurface = ({
       onChange={setLeftPct}
       left={
         <div className="flex h-full w-full items-center justify-center overflow-hidden">
-          <Stage
-            ref={stageRef}
-            width={window.innerWidth * (leftPct / 100)}
-            height={window.innerHeight}
-            scaleX={1} // Initial scale, controlled by wheel/zoom
-            scaleY={1} // Initial scale, controlled by wheel/zoom
+          <div
+            className={`${isGenerating ? "canvas-generating" : ""}`}
             style={{
-              // display: "block",
-              background: "transparent", // Or use fillColor if stage background is desired directly
+              width: window.innerWidth * (leftPct / 100),
+              height: window.innerHeight,
             }}
-            x={stagePosition.x} // Set the x position
-            y={stagePosition.y} // Set the y position
-            onWheel={handleStageWheel}
-            onMouseDown={handleStageMouseDown}
-            onMouseMove={handleStageMouseMove}
-            onMouseUp={handleStageMouseUp}
-            onClick={handleStageClick}
-            onMouseEnter={handleStageMouseEnter}
-            onMouseLeave={handleStageMouseLeave}
-            // Touch events
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
           >
-            <Layer
-              clipFunc={(ctx) => {
-                ctx.rect(
-                  0,
-                  0,
-                  store.getAspectRatioDimensions().width,
-                  store.getAspectRatioDimensions().height,
-                ); // leftPanelWidth, leftPanelHeight);
+            <Stage
+              ref={stageRef}
+              width={window.innerWidth * (leftPct / 100)}
+              height={window.innerHeight}
+              scaleX={1} // Initial scale, controlled by wheel/zoom
+              scaleY={1} // Initial scale, controlled by wheel/zoom
+              style={{
+                // display: "block",
+                background: "transparent", // Or use fillColor if stage background is desired directly
               }}
-              imageSmoothingEnabled={false} // Disable image smoothing for pixel art
+              x={stagePosition.x} // Set the x position
+              y={stagePosition.y} // Set the y position
+              onWheel={handleStageWheel}
+              onMouseDown={handleStageMouseDown}
+              onMouseMove={handleStageMouseMove}
+              onMouseUp={handleStageMouseUp}
+              onClick={handleStageClick}
+              onMouseEnter={handleStageMouseEnter}
+              onMouseLeave={handleStageMouseLeave}
+              // Touch events
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
             >
-              <Rect
-                x={0}
-                y={0}
-                fillPatternImage={checkerImage || undefined}
-                fillPatternRepeat="repeat"
-                fillPatternScaleX={window.devicePixelRatio}
-                fillPatternScaleY={window.devicePixelRatio}
-                width={store.getAspectRatioDimensions().width}
-                height={store.getAspectRatioDimensions().height}
-                listening={false}
-                zIndex={-2}
+              <Layer
+                clipFunc={(ctx) => {
+                  ctx.rect(
+                    0,
+                    0,
+                    store.getAspectRatioDimensions().width,
+                    store.getAspectRatioDimensions().height,
+                  ); // leftPanelWidth, leftPanelHeight);
+                }}
                 imageSmoothingEnabled={false} // Disable image smoothing for pixel art
-              />
-            </Layer>
-            <Layer
-              clipFunc={(ctx) => {
-                ctx.rect(
-                  0,
-                  0,
-                  store.getAspectRatioDimensions().width,
-                  store.getAspectRatioDimensions().height,
-                ); // leftPanelWidth, leftPanelHeight);
-              }}
-              imageSmoothingEnabled={false} // Disable image smoothing for pixel art
-            >
-              <Rect
-                x={0}
-                y={0}
-                fillPatternImage={checkerImage || undefined}
-                fillPatternRepeat="repeat"
-                fillPatternScaleX={window.devicePixelRatio}
-                fillPatternScaleY={window.devicePixelRatio}
-                width={store.getAspectRatioDimensions().width}
-                height={store.getAspectRatioDimensions().height}
-                listening={false}
-                zIndex={-2}
-                imageSmoothingEnabled={false} // Disable image smoothing for pixel art
-              />
-            </Layer>
-            <Layer
-              clipFunc={(ctx) => {
-                ctx.rect(
-                  0,
-                  0,
-                  store.getAspectRatioDimensions().width,
-                  store.getAspectRatioDimensions().height,
-                ); // leftPanelWidth, leftPanelHeight);
-              }}
-            >
-              <Image
-                ref={baseImageRef}
-                x={0}
-                y={0}
-                image={store.baseImageBitmap || undefined}
-                width={store.getAspectRatioDimensions().width}
-                height={store.getAspectRatioDimensions().height}
-                listening={false}
-                zIndex={-1}
-              />
-            </Layer>
-            {/* Left Panel */}
-            <Layer
-              ref={leftPanelRef}
-              clipFunc={(ctx) => {
-                ctx.rect(
-                  0,
-                  0,
-                  store.getAspectRatioDimensions().width,
-                  store.getAspectRatioDimensions().height,
-                ); // leftPanelWidth, leftPanelHeight);
-              }}
-            >
-              {/* Render all nodes including line nodes */}
-              {[...nodes, ...store.lineNodes]
-                .sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0))
-                .map((node) => {
-                  // console.log("Rendering node:", node);
-                  return renderNode(node);
-                })}
-
-              {/* Render selection rectangle */}
-              {selectionRect && (
+              >
                 <Rect
-                  ref={selectionRectRef}
-                  x={Math.min(selectionRect.startX, selectionRect.endX)}
-                  y={Math.min(selectionRect.startY, selectionRect.endY)}
-                  width={Math.abs(selectionRect.endX - selectionRect.startX)}
-                  height={Math.abs(selectionRect.endY - selectionRect.startY)}
-                  fill="rgba(0, 161, 255, 0.1)"
-                  stroke="rgb(0, 161, 255)"
-                  strokeWidth={1}
+                  x={0}
+                  y={0}
+                  fillPatternImage={checkerImage || undefined}
+                  fillPatternRepeat="repeat"
+                  fillPatternScaleX={window.devicePixelRatio}
+                  fillPatternScaleY={window.devicePixelRatio}
+                  width={store.getAspectRatioDimensions().width}
+                  height={store.getAspectRatioDimensions().height}
                   listening={false}
-                  cornerRadius={2}
+                  zIndex={-2}
+                  imageSmoothingEnabled={false} // Disable image smoothing for pixel art
                 />
+              </Layer>
+              <Layer
+                clipFunc={(ctx) => {
+                  ctx.rect(
+                    0,
+                    0,
+                    store.getAspectRatioDimensions().width,
+                    store.getAspectRatioDimensions().height,
+                  ); // leftPanelWidth, leftPanelHeight);
+                }}
+                imageSmoothingEnabled={false} // Disable image smoothing for pixel art
+              >
+                <Rect
+                  x={0}
+                  y={0}
+                  fillPatternImage={checkerImage || undefined}
+                  fillPatternRepeat="repeat"
+                  fillPatternScaleX={window.devicePixelRatio}
+                  fillPatternScaleY={window.devicePixelRatio}
+                  width={store.getAspectRatioDimensions().width}
+                  height={store.getAspectRatioDimensions().height}
+                  listening={false}
+                  zIndex={-2}
+                  imageSmoothingEnabled={false} // Disable image smoothing for pixel art
+                />
+              </Layer>
+              <Layer
+                clipFunc={(ctx) => {
+                  ctx.rect(
+                    0,
+                    0,
+                    store.getAspectRatioDimensions().width,
+                    store.getAspectRatioDimensions().height,
+                  ); // leftPanelWidth, leftPanelHeight);
+                }}
+              >
+                <Image
+                  ref={baseImageRef}
+                  x={0}
+                  y={0}
+                  image={store.baseImageBitmap || undefined}
+                  width={store.getAspectRatioDimensions().width}
+                  height={store.getAspectRatioDimensions().height}
+                  listening={false}
+                  zIndex={-1}
+                />
+              </Layer>
+              {/* Left Panel */}
+              <Layer
+                ref={leftPanelRef}
+                clipFunc={(ctx) => {
+                  ctx.rect(
+                    0,
+                    0,
+                    store.getAspectRatioDimensions().width,
+                    store.getAspectRatioDimensions().height,
+                  ); // leftPanelWidth, leftPanelHeight);
+                }}
+              >
+                {/* Render all nodes including line nodes */}
+                {[...nodes, ...store.lineNodes]
+                  .sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0))
+                  .map((node) => {
+                    // console.log("Rendering node:", node);
+                    return renderNode(node);
+                  })}
+
+                {/* Render selection rectangle */}
+                {selectionRect && (
+                  <Rect
+                    ref={selectionRectRef}
+                    x={Math.min(selectionRect.startX, selectionRect.endX)}
+                    y={Math.min(selectionRect.startY, selectionRect.endY)}
+                    width={Math.abs(selectionRect.endX - selectionRect.startX)}
+                    height={Math.abs(selectionRect.endY - selectionRect.startY)}
+                    fill="rgba(0, 161, 255, 0.1)"
+                    stroke="rgb(0, 161, 255)"
+                    strokeWidth={1}
+                    listening={false}
+                    cornerRadius={2}
+                  />
+                )}
+              </Layer>
+              <Layer ref={cursorLayerRef} listening={false} draggable={false}>
+                <Circle ref={cursorShapeRef} visible={false} />
+              </Layer>
+              {isGenerating && (
+                <Layer ref={borderLayerRef} listening={false}>
+                  {(() => {
+                    const w = store.getAspectRatioDimensions().width;
+                    const h = store.getAspectRatioDimensions().height;
+                    const perimeter = 2 * (w + h);
+                    const runnerLength = Math.max(
+                      24,
+                      Math.round(perimeter * 0.08),
+                    );
+                    return (
+                      <>
+                        <Rect
+                          ref={runnerRectRef}
+                          x={0}
+                          y={0}
+                          width={runnerLength}
+                          height={10}
+                          fill={"rgba(59,130,246,1)"}
+                          shadowColor={"rgba(59,130,246,1)"}
+                          shadowBlur={16}
+                          shadowOpacity={0.9}
+                          listening={false}
+                        />
+                        <Rect
+                          ref={runnerRectRef2}
+                          x={0}
+                          y={0}
+                          width={0}
+                          height={0}
+                          fill={"rgba(59,130,246,1)"}
+                          shadowColor={"rgba(59,130,246,1)"}
+                          shadowBlur={16}
+                          shadowOpacity={0.9}
+                          listening={false}
+                        />
+                      </>
+                    );
+                  })()}
+                </Layer>
               )}
-            </Layer>
-            <Layer ref={cursorLayerRef} listening={false} draggable={false}>
-              <Circle ref={cursorShapeRef} visible={false} />
-            </Layer>
-          </Stage>
+            </Stage>
+          </div>
         </div>
       }
       right={

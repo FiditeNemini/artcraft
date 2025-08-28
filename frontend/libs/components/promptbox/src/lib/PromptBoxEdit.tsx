@@ -182,8 +182,8 @@ export const PromptBoxEdit = ({
               onChange={handleChange}
               onPaste={handlePaste}
               onKeyDown={handleKeyDown}
-              onFocus={() => { }}
-              onBlur={() => { }}
+              onFocus={() => {}}
+              onBlur={() => {}}
             />
           </div>
           <div className="mt-2 flex items-center justify-between gap-2">
@@ -257,10 +257,13 @@ export const PromptBoxEdit = ({
                 disabled={isDisabled || !prompt.trim()}
               >
                 {isDisabled ? (
-                  <FontAwesomeIcon
-                    icon={faSpinnerThird}
-                    className="animate-spin text-lg"
-                  />
+                  <>
+                    <FontAwesomeIcon
+                      icon={faSpinnerThird}
+                      className="animate-spin text-lg"
+                    />
+                    <span className="ml-2">Generating</span>
+                  </>
                 ) : (
                   "Generate"
                 )}

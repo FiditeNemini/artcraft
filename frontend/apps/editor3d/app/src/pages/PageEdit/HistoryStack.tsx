@@ -2,11 +2,10 @@ import { Button } from "@storyteller/ui-button";
 import { useImageEditCompleteEvent } from "@storyteller/tauri-events";
 import {
   faClockRotateLeft,
-  faTrash,
   faTrashXmark,
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useRef } from "react";
 import { twMerge } from "tailwind-merge";
 import { BaseSelectorImage } from "./BaseImageSelector";
 import { Tooltip } from "@storyteller/ui-tooltip";
@@ -30,10 +29,10 @@ interface HistoryStackProps {
 
 export const HistoryStack = ({
   onClear,
-  onImageSelect = () => { },
+  onImageSelect = () => {},
   imageBundles,
-  onNewImageBundle = () => { },
-  selectedImageToken
+  onNewImageBundle = () => {},
+  selectedImageToken,
 }: HistoryStackProps) => {
   useImageEditCompleteEvent(async (event) => {
     const newBundle: ImageBundle = {
@@ -47,11 +46,19 @@ export const HistoryStack = ({
     };
 
     onNewImageBundle(newBundle);
+    if (newBundle.images.length > 0) {
+      onImageSelect(newBundle.images[0]);
+      // ensure the scroll container jumps to top for latest bundle
+      setTimeout(() => {
+        scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+      }, 0);
+    }
   });
 
   // This is used to force image reloads in different sessions
   // and prevent fetching CORS-tainted images from cache
   const sessionRandBuster = useRef(Math.random());
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   const handleClear = () => {
     onClear();
@@ -59,39 +66,56 @@ export const HistoryStack = ({
 
   return (
     <div className="h-auto w-20 rounded-lg">
-      <div className={"glass max-h-[50vh] flex flex-col-reverse items-center justify-center gap-2 overflow-y-auto rounded-lg p-1.5"}>
-        {imageBundles.map((bundle, index) => (
-          <Fragment key={index}>
-            {bundle.images.map((image) => (
-              <Button
-                key={image.mediaToken}
-                className={twMerge(
-                  "relative aspect-square h-full w-full border-2 bg-transparent p-0 hover:bg-transparent hover:opacity-80",
-                  selectedImageToken === image.mediaToken &&
-                  "border-primary hover:opacity-100",
+      <div className="glass rounded-lg p-1.5">
+        <div className="mb-2 flex w-full items-center justify-center">
+          <FontAwesomeIcon
+            icon={faClockRotateLeft}
+            className="p-1 text-gray-400"
+          />
+        </div>
+        <div
+          ref={scrollRef}
+          className={
+            "scrollbar-hidden flex max-h-[50vh] flex-col items-center justify-start gap-2 overflow-y-auto"
+          }
+        >
+          {[...imageBundles]
+            .slice()
+            .reverse()
+            .map((bundle, index) => (
+              <Fragment key={index}>
+                {bundle.images.map((image) => (
+                  <Button
+                    key={image.mediaToken}
+                    className={twMerge(
+                      "relative aspect-square h-full w-full border-2 bg-transparent p-0 hover:bg-transparent hover:opacity-80",
+                      selectedImageToken === image.mediaToken &&
+                        "border-primary hover:opacity-100",
+                    )}
+                    onClick={() => {
+                      onImageSelect(image);
+                    }}
+                  >
+                    {/* TODO: Fix CORS issue here */}
+                    <img
+                      src={
+                        image.url + "?historystack+" + sessionRandBuster.current
+                      }
+                      alt=""
+                      crossOrigin="anonymous"
+                      className="absolute inset-0 h-full w-full rounded-lg object-cover"
+                    />
+                  </Button>
+                ))}
+                {index < imageBundles.length - 1 && (
+                  <hr
+                    className="h-0.5 min-h-0.5 w-3/4 rounded-md border-none bg-white/15"
+                    key={"hr" + index}
+                  />
                 )}
-                onClick={() => {
-                  onImageSelect(image);
-                }}
-              >
-                {/* TODO: Fix CORS issue here */}
-                <img
-                  src={image.url + "?historystack+" + sessionRandBuster.current}
-                  alt=""
-                  crossOrigin="anonymous"
-                  className="absolute inset-0 h-full w-full rounded-lg object-cover"
-                />
-              </Button>
+              </Fragment>
             ))}
-            {index < imageBundles.length - 1 && (
-              <hr className="min-h-0.5 h-0.5 w-3/4 rounded-md border-none bg-white/10" key={"hr" + index} />
-            )}
-          </Fragment>
-        ))}
-        <FontAwesomeIcon
-          icon={faClockRotateLeft}
-          className="p-1 text-gray-400"
-        />
+        </div>
       </div>
 
       <div className="mt-3 flex justify-center">

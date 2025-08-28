@@ -1,8 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import Konva from "konva"; // just for types
-import {
-  EnqueueImageInpaint,
-} from "@storyteller/tauri-api";
+import { EnqueueImageInpaint } from "@storyteller/tauri-api";
 import { ContextMenuContainer } from "../PageDraw/components/ui/ContextMenu";
 import { useCopyPasteHotkeys } from "../PageDraw/hooks/useCopyPasteHotkeys";
 import { useDeleteHotkeys } from "../PageDraw/hooks/useDeleteHotkeys";
@@ -10,7 +8,7 @@ import { useUndoRedoHotkeys } from "../PageDraw/hooks/useUndoRedoHotkeys";
 import PromptEditor from "./PromptEditor/PromptEditor";
 import { ActiveEditTool, useEditStore } from "./stores/EditState";
 import { EditPaintSurface } from "./EditPaintSurface";
-import { drawAlphaMask, normalizeCanvas } from "../../Helpers/CanvasHelpers";
+import { normalizeCanvas } from "../../Helpers/CanvasHelpers";
 import { BaseImageSelector, BaseSelectorImage } from "./BaseImageSelector";
 import DrawToolControlBar from "./DrawToolControlBar";
 import {
@@ -27,7 +25,8 @@ const PAGE_ID: ModelPage = ModelPage.ImageEditor;
 const PageEdit = () => {
   //useStateSceneLoader();
 
-  const selectedImageModel: ImageModel | undefined = getSelectedImageModel(PAGE_ID);
+  const selectedImageModel: ImageModel | undefined =
+    getSelectedImageModel(PAGE_ID);
 
   // State for canvas dimensions
   const canvasWidth = useRef<number>(1024);
@@ -42,12 +41,17 @@ const PageEdit = () => {
   const baseImageKonvaRef = useRef<Konva.Image>({} as Konva.Image);
   const transformerRefs = useRef<{ [key: string]: Konva.Transformer }>({});
   const [isEnqueuing, setIsEnqueuing] = useState<boolean>(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [generationCount, setGenerationCount] = useState<number>(1);
 
   // Use the Zustand store
   const store = useEditStore();
-  const addHistoryImageBundle = useEditStore((state) => state.addHistoryImageBundle);
-  const historyImageBundles = useEditStore((state) => state.historyImageBundles)
+  const addHistoryImageBundle = useEditStore(
+    (state) => state.addHistoryImageBundle,
+  );
+  const historyImageBundles = useEditStore(
+    (state) => state.historyImageBundles,
+  );
 
   // Pass store actions directly as callbacks
   useDeleteHotkeys({ onDelete: store.deleteSelectedItems });
@@ -205,6 +209,7 @@ const PageEdit = () => {
       }
 
       setIsEnqueuing(true);
+      setIsGenerating(true);
 
       const editedImageToken = store.baseImageInfo?.mediaToken;
 
@@ -225,6 +230,9 @@ const PageEdit = () => {
           image_count: generationCount,
           frontend_caller: "image_editor",
         });
+      } catch (error) {
+        setIsGenerating(false);
+        throw error;
       } finally {
         setIsEnqueuing(false);
       }
@@ -239,25 +247,28 @@ const PageEdit = () => {
 
   //const modelConfig = lookupModelByTauriId(selectedImageModel!.tauriId);
   //const supportsMaskedInpainting = modelConfig?.tags?.includes(ModelTag.MaskedInpainting) ?? false;
-  const supportsMaskedInpainting = selectedImageModel?.usesInpaintingMask ?? false;
+  const supportsMaskedInpainting =
+    selectedImageModel?.usesInpaintingMask ?? false;
 
   useEffect(() => {
-    if (!supportsMaskedInpainting && (store.activeTool !== "select" || store.lineNodes.length > 0)) {
+    if (
+      !supportsMaskedInpainting &&
+      (store.activeTool !== "select" || store.lineNodes.length > 0)
+    ) {
       // TODO: Implement a new mode for unsupported masking and hide the nodes layer instead of clearing
       store.setActiveTool("select");
       store.clearLineNodes();
     }
   }, [store, supportsMaskedInpainting]);
 
-
   /*
-    *
-    * Only component logic below this
-    *
-    *
-    *
-    *
-    */
+   *
+   * Only component logic below this
+   *
+   *
+   *
+   *
+   */
 
   // Display image selector on launch, otherwise hide it
   // Also show loading state if info is set but image is loading
@@ -284,8 +295,9 @@ const PageEdit = () => {
   return (
     <>
       <div
-        className={`preserve-aspect-ratio fixed left-1/2 top-0 z-10 -translate-x-1/2 transform ${isSelecting ? "pointer-events-none" : "pointer-events-auto"
-          }`}
+        className={`preserve-aspect-ratio fixed left-1/2 top-0 z-10 -translate-x-1/2 transform ${
+          isSelecting ? "pointer-events-none" : "pointer-events-auto"
+        }`}
         style={{ display: store.activeTool === "edit" ? "block" : "none" }}
       >
         <DrawToolControlBar
@@ -296,8 +308,9 @@ const PageEdit = () => {
         />
       </div>
       <div
-        className={`preserve-aspect-ratio fixed right-4 top-1/2 z-10 -translate-y-1/2 transform ${isSelecting ? "pointer-events-none" : "pointer-events-auto"
-          }`}
+        className={`preserve-aspect-ratio fixed right-4 top-1/2 z-10 -translate-y-1/2 transform ${
+          isSelecting ? "pointer-events-none" : "pointer-events-auto"
+        }`}
       >
         <HistoryStack
           onClear={() => {
@@ -308,13 +321,17 @@ const PageEdit = () => {
             store.clearLineNodes();
             store.setBaseImageInfo(baseImage);
           }}
-          onNewImageBundle={addHistoryImageBundle}
+          onNewImageBundle={(newBundle: ImageBundle) => {
+            addHistoryImageBundle(newBundle);
+            setIsGenerating(false);
+          }}
           selectedImageToken={store.baseImageInfo?.mediaToken}
         />
       </div>
       <div
-        className={`preserve-aspect-ratio fixed bottom-0 left-1/2 z-10 -translate-x-1/2 transform ${isSelecting ? "pointer-events-none" : "pointer-events-auto"
-          }`}
+        className={`preserve-aspect-ratio fixed bottom-0 left-1/2 z-10 -translate-x-1/2 transform ${
+          isSelecting ? "pointer-events-none" : "pointer-events-auto"
+        }`}
       >
         <PromptEditor
           selectedImageModel={selectedImageModel}
@@ -324,7 +341,7 @@ const PageEdit = () => {
           selectedMode={store.activeTool}
           onGenerateClick={handleGenerate}
           onFitPressed={onFitPressed}
-          isDisabled={isEnqueuing}
+          isDisabled={isEnqueuing || isGenerating}
           generationCount={generationCount}
           onGenerationCountChange={setGenerationCount}
           supportsMaskedInpainting={supportsMaskedInpainting}
@@ -381,6 +398,7 @@ const PageEdit = () => {
             transformerRefs={transformerRefs}
             leftPanelRef={leftPanelRef}
             baseImageRef={baseImageKonvaRef}
+            isGenerating={isGenerating}
           />
         </ContextMenuContainer>
       </div>
