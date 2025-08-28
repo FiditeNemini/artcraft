@@ -315,6 +315,7 @@ const PageEdit = () => {
         <HistoryStack
           onClear={() => {
             store.RESET();
+            setIsGenerating(false);
           }}
           imageBundles={historyImageBundles}
           onImageSelect={(baseImage) => {
