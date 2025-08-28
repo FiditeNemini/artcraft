@@ -276,27 +276,3 @@ img {
 .ReactCrop__crop-selection:focus {
   outline: none !important;
 }
-
-/* Animated canvas border when generating: single runner line clockwise */
-.canvas-generating {
-  position: relative;
-}
-.canvas-border-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-}
-.canvas-border-runner {
-  stroke: rgba(59, 130, 246, 0.95);
-  stroke-width: 3;
-  fill: none;
-  stroke-linecap: round;
-  stroke-dasharray: 8 92;
-  animation: canvas-border-run 1.6s linear infinite;
-}
-@keyframes canvas-border-run {
-  to {
-    stroke-dashoffset: -100;
-  }
-}

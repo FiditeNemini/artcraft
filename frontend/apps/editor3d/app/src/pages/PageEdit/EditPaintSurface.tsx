@@ -1312,7 +1312,6 @@ export const EditPaintSurface = ({
       left={
         <div className="flex h-full w-full items-center justify-center overflow-hidden">
           <div
-            className={`${isGenerating ? "canvas-generating" : ""}`}
             style={{
               width: window.innerWidth * (leftPct / 100),
               height: window.innerHeight,
