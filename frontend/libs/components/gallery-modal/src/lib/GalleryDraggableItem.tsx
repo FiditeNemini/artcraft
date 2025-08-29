@@ -111,6 +111,10 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
             ) : (
               <img
                 data-gallery-draggable-1="true"
+                // NB: "loading=lazy" is necessary to prevent loading GIGABYTES of images!
+                // It is a bit finnicky, too: you must include this attribute 
+                // BEFORE the `src` attribute, or it won't work.
+                loading="lazy"
                 ref={imgRef}
                 src={item.thumbnail}
                 alt={item.label}
@@ -179,6 +183,10 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
               ) : (
                 <img
                   data-gallery-draggable-2="true"
+                  // NB: "loading=lazy" is necessary to prevent loading GIGABYTES of images!
+                  // It is a bit finnicky, too: you must include this attribute 
+                  // BEFORE the `src` attribute, or it won't work.
+                  loading="lazy"
                   ref={imgRef}
                   src={item.thumbnail}
                   alt={item.label}
