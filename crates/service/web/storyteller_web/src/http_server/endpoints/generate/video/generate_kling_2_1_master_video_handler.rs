@@ -228,6 +228,14 @@ pub async fn generate_kling_2_1_master_video_handler(
     }
   };
 
+  let _r = transaction
+      .commit()
+      .await
+      .map_err(|err| {
+        error!("Error committing MySQL transaction: {:?}", err);
+        CommonWebError::ServerError
+      })?;
+
   Ok(Json(GenerateKling21MasterImageToVideoResponse {
     success: true,
     inference_job_token: job_token,
