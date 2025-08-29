@@ -57,6 +57,8 @@ pub async fn enqueue_seedance_1_lite_image_to_video_webhook<U: IntoUrl, T: IntoU
     // TODO: Add these later
     camera_fixed: None,
     seed: -1,
+    // Static
+    enable_safety_checker: Some(false),
   };
 
   let result = image_to_video(request)

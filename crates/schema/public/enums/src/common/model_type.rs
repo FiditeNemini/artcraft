@@ -31,6 +31,12 @@ pub enum ModelType {
   GptImage1,
   #[serde(rename = "recraft_3")]
   Recraft3,
+  #[serde(rename = "seededit_3")]
+  SeedEdit3,
+  #[serde(rename = "qwen")]
+  Qwen,
+  #[serde(rename = "gemini_25_flash")]
+  Gemini25Flash,
 
   /// Midjourney without distinguishing a model type or version
   #[serde(rename = "midjourney")]
@@ -63,8 +69,14 @@ pub enum ModelType {
   Kling21Master,
   #[serde(rename = "seedance_1p0_lite")]
   Seedance10Lite,
+  #[serde(rename = "seedance_1p0_pro")]
+  Seedance10Pro,
   #[serde(rename = "veo_2")]
   Veo2,
+  #[serde(rename = "veo_3")]
+  Veo3,
+  #[serde(rename = "veo_3_fast")]
+  Veo3Fast,
 
   // 3D Object generation models
   #[serde(rename = "hunyuan_3d_2p0")]
@@ -92,6 +104,9 @@ impl ModelType {
       Self::FluxProKontextMax => "flux_pro_kontext_max",
       Self::GptImage1 => "gpt_image_1",
       Self::Recraft3 => "recraft_3",
+      Self::SeedEdit3 => "seededit_3",
+      Self::Qwen => "qwen",
+      Self::Gemini25Flash => "gemini_25_flash",
       Self::Midjourney => "midjourney",
       Self::MidjourneyV6 => "midjourney_v6",
       Self::MidjourneyV6p1 => "midjourney_v6p1",
@@ -106,7 +121,10 @@ impl ModelType {
       Self::Kling21Pro => "kling_2p1_pro",
       Self::Kling21Master => "kling_2p1_master",
       Self::Seedance10Lite => "seedance_1p0_lite",
+      Self::Seedance10Pro => "seedance_1p0_pro",
       Self::Veo2 => "veo_2",
+      Self::Veo3 => "veo_3",
+      Self::Veo3Fast => "veo_3_fast",
 
       // 3D Object generation models
       Self::Hunyuan3d2_0 => "hunyuan_3d_2p0",
@@ -126,6 +144,9 @@ impl ModelType {
       "flux_pro_kontext_max" => Ok(Self::FluxProKontextMax),
       "gpt_image_1" => Ok(Self::GptImage1),
       "recraft_3" => Ok(Self::Recraft3),
+      "seededit_3" => Ok(Self::SeedEdit3),
+      "qwen" => Ok(Self::Qwen),
+      "gemini_25_flash" => Ok(Self::Gemini25Flash),
       "midjourney" => Ok(Self::Midjourney),
       "midjourney_v6" => Ok(Self::MidjourneyV6),
       "midjourney_v6p1" => Ok(Self::MidjourneyV6p1),
@@ -140,7 +161,10 @@ impl ModelType {
       "kling_2p1_pro" => Ok(Self::Kling21Pro),
       "kling_2p1_master" => Ok(Self::Kling21Master),
       "seedance_1p0_lite" => Ok(Self::Seedance10Lite),
+      "seedance_1p0_pro" => Ok(Self::Seedance10Pro),
       "veo_2" => Ok(Self::Veo2),
+      "veo_3" => Ok(Self::Veo3),
+      "veo_3_fast" => Ok(Self::Veo3Fast),
 
       // 3D Object generation models
       "hunyuan_3d_2p0" => Ok(Self::Hunyuan3d2_0),
@@ -164,6 +188,9 @@ impl ModelType {
       Self::FluxProKontextMax,
       Self::GptImage1,
       Self::Recraft3,
+      Self::SeedEdit3,
+      Self::Qwen,
+      Self::Gemini25Flash,
       Self::Midjourney,
       Self::MidjourneyV6,
       Self::MidjourneyV6p1,
@@ -178,7 +205,10 @@ impl ModelType {
       Self::Kling21Pro,
       Self::Kling21Master,
       Self::Seedance10Lite,
+      Self::Seedance10Pro,
       Self::Veo2,
+      Self::Veo3,
+      Self::Veo3Fast,
 
       // 3D Object generation models
       Self::Hunyuan3d2_0,
@@ -207,6 +237,9 @@ mod tests {
       assert_serialization(ModelType::FluxProKontextMax, "flux_pro_kontext_max");
       assert_serialization(ModelType::GptImage1, "gpt_image_1");
       assert_serialization(ModelType::Recraft3, "recraft_3");
+      assert_serialization(ModelType::SeedEdit3, "seededit_3");
+      assert_serialization(ModelType::Qwen, "qwen");
+      assert_serialization(ModelType::Gemini25Flash, "gemini_25_flash");
       assert_serialization(ModelType::Midjourney, "midjourney");
       assert_serialization(ModelType::MidjourneyV6, "midjourney_v6");
       assert_serialization(ModelType::MidjourneyV6p1, "midjourney_v6p1");
@@ -220,7 +253,10 @@ mod tests {
       assert_serialization(ModelType::Kling21Pro, "kling_2p1_pro");
       assert_serialization(ModelType::Kling21Master, "kling_2p1_master");
       assert_serialization(ModelType::Seedance10Lite, "seedance_1p0_lite");
+      assert_serialization(ModelType::Seedance10Pro, "seedance_1p0_pro");
       assert_serialization(ModelType::Veo2, "veo_2");
+      assert_serialization(ModelType::Veo3, "veo_3");
+      assert_serialization(ModelType::Veo3Fast, "veo_3_fast");
       // 3D Object generation models
       assert_serialization(ModelType::Hunyuan3d2_0, "hunyuan_3d_2p0");
       assert_serialization(ModelType::Hunyuan3d2_1, "hunyuan_3d_2p1");
@@ -238,6 +274,9 @@ mod tests {
       assert_eq!(ModelType::FluxProKontextMax.to_str(), "flux_pro_kontext_max");
       assert_eq!(ModelType::GptImage1.to_str(), "gpt_image_1");
       assert_eq!(ModelType::Recraft3.to_str(), "recraft_3");
+      assert_eq!(ModelType::SeedEdit3.to_str(), "seededit_3");
+      assert_eq!(ModelType::Qwen.to_str(), "qwen");
+      assert_eq!(ModelType::Gemini25Flash.to_str(), "gemini_25_flash");
       assert_eq!(ModelType::Midjourney.to_str(), "midjourney");
       assert_eq!(ModelType::MidjourneyV6.to_str(), "midjourney_v6");
       assert_eq!(ModelType::MidjourneyV6p1.to_str(), "midjourney_v6p1");
@@ -252,7 +291,10 @@ mod tests {
       assert_eq!(ModelType::Kling21Pro.to_str(), "kling_2p1_pro");
       assert_eq!(ModelType::Kling21Master.to_str(), "kling_2p1_master");
       assert_eq!(ModelType::Seedance10Lite.to_str(), "seedance_1p0_lite");
+      assert_eq!(ModelType::Seedance10Pro.to_str(), "seedance_1p0_pro");
       assert_eq!(ModelType::Veo2.to_str(), "veo_2");
+      assert_eq!(ModelType::Veo3.to_str(), "veo_3");
+      assert_eq!(ModelType::Veo3Fast.to_str(), "veo_3_fast");
 
       // 3D Object generation models
       assert_eq!(ModelType::Hunyuan3d2_0.to_str(), "hunyuan_3d_2p0");
@@ -271,6 +313,9 @@ mod tests {
       assert_eq!(ModelType::from_str("flux_pro_kontext_max").unwrap(), ModelType::FluxProKontextMax);
       assert_eq!(ModelType::from_str("gpt_image_1").unwrap(), ModelType::GptImage1);
       assert_eq!(ModelType::from_str("recraft_3").unwrap(), ModelType::Recraft3);
+      assert_eq!(ModelType::from_str("seededit_3").unwrap(), ModelType::SeedEdit3);
+      assert_eq!(ModelType::from_str("qwen").unwrap(), ModelType::Qwen);
+      assert_eq!(ModelType::from_str("gemini_25_flash").unwrap(), ModelType::Gemini25Flash);
       assert_eq!(ModelType::from_str("midjourney").unwrap(), ModelType::Midjourney);
       assert_eq!(ModelType::from_str("midjourney_v6").unwrap(), ModelType::MidjourneyV6);
       assert_eq!(ModelType::from_str("midjourney_v6p1").unwrap(), ModelType::MidjourneyV6p1);
@@ -284,7 +329,10 @@ mod tests {
       assert_eq!(ModelType::from_str("kling_2p1_pro").unwrap(), ModelType::Kling21Pro);
       assert_eq!(ModelType::from_str("kling_2p1_master").unwrap(), ModelType::Kling21Master);
       assert_eq!(ModelType::from_str("seedance_1p0_lite").unwrap(), ModelType::Seedance10Lite);
+      assert_eq!(ModelType::from_str("seedance_1p0_pro").unwrap(), ModelType::Seedance10Pro);
       assert_eq!(ModelType::from_str("veo_2").unwrap(), ModelType::Veo2);
+      assert_eq!(ModelType::from_str("veo_3").unwrap(), ModelType::Veo3);
+      assert_eq!(ModelType::from_str("veo_3_fast").unwrap(), ModelType::Veo3Fast);
       // 3D Object generation models
       assert_eq!(ModelType::from_str("hunyuan_3d_2p0").unwrap(), ModelType::Hunyuan3d2_0);
       assert_eq!(ModelType::from_str("hunyuan_3d_2p1").unwrap(), ModelType::Hunyuan3d2_1);
@@ -293,7 +341,7 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = ModelType::all_variants();
-      assert_eq!(variants.len(), 24);
+      assert_eq!(variants.len(), 30);
       // Image models
       assert_eq!(variants.pop_first(), Some(ModelType::Flux1Dev));
       assert_eq!(variants.pop_first(), Some(ModelType::Flux1Schnell));
@@ -304,6 +352,9 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(ModelType::FluxProKontextMax));
       assert_eq!(variants.pop_first(), Some(ModelType::GptImage1));
       assert_eq!(variants.pop_first(), Some(ModelType::Recraft3));
+      assert_eq!(variants.pop_first(), Some(ModelType::SeedEdit3));
+      assert_eq!(variants.pop_first(), Some(ModelType::Qwen));
+      assert_eq!(variants.pop_first(), Some(ModelType::Gemini25Flash));
       assert_eq!(variants.pop_first(), Some(ModelType::Midjourney));
       assert_eq!(variants.pop_first(), Some(ModelType::MidjourneyV6));
       assert_eq!(variants.pop_first(), Some(ModelType::MidjourneyV6p1));
@@ -317,7 +368,10 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(ModelType::Kling21Pro));
       assert_eq!(variants.pop_first(), Some(ModelType::Kling21Master));
       assert_eq!(variants.pop_first(), Some(ModelType::Seedance10Lite));
+      assert_eq!(variants.pop_first(), Some(ModelType::Seedance10Pro));
       assert_eq!(variants.pop_first(), Some(ModelType::Veo2));
+      assert_eq!(variants.pop_first(), Some(ModelType::Veo3));
+      assert_eq!(variants.pop_first(), Some(ModelType::Veo3Fast));
       // 3D Object generation models
       assert_eq!(variants.pop_first(), Some(ModelType::Hunyuan3d2_0));
       assert_eq!(variants.pop_first(), Some(ModelType::Hunyuan3d2_1));
