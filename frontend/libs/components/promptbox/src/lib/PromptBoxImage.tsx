@@ -400,8 +400,6 @@ export const PromptBoxImage = ({
       ? crypto.randomUUID()
       : Math.random().toString(36).slice(2);
 
-    onEnqueuePressed?.(prompt, generationCount, subscriberId);
-
     setTimeout(() => {
       // TODO(bt,2025-05-08): This is a hack so we don't accidentally wind up with a permanently disabled prompt box if
       // the backend hangs on a given request.
@@ -409,26 +407,38 @@ export const PromptBoxImage = ({
       setIsEnqueueing(false);
     }, 10000);
 
-    const aspectRatio = getCurrentAspectRatio();
-    
-    const request : EnqueueTextToImageRequest = {
-      prompt: prompt,
-      model: selectedModel,
-      aspect_ratio: aspectRatio,
-      number_images: generationCount,
-      frontend_caller: "text_to_image",
-      frontend_subscriber_id: subscriberId,
-    };
+    try {
+      const aspectRatio = getCurrentAspectRatio();
 
-    if (selectedModel?.canUseImagePrompt && !!referenceImages && referenceImages.length > 0) {
-      request.image_media_tokens = referenceImages.map((image) => image.mediaToken);
+      const request: EnqueueTextToImageRequest = {
+        prompt: prompt,
+        model: selectedModel,
+        aspect_ratio: aspectRatio,
+        number_images: generationCount,
+        frontend_caller: "text_to_image",
+        frontend_subscriber_id: subscriberId,
+      };
+
+      if (
+        selectedModel?.canUseImagePrompt &&
+        !!referenceImages &&
+        referenceImages.length > 0
+      ) {
+        request.image_media_tokens = referenceImages.map(
+          (image) => image.mediaToken
+        );
+      }
+
+      const generateResponse = await EnqueueTextToImage(request);
+      console.log("PromptBoxImage - generateResponse", generateResponse);
+
+      await onEnqueuePressed?.(prompt, generationCount, subscriberId);
+    } catch (err) {
+      console.error("PromptBoxImage - enqueue failed", err);
+      toast.error("Failed to start image generation. Please try again.");
+    } finally {
+      setIsEnqueueing(false);
     }
-
-    const generateResponse = await EnqueueTextToImage(request);
-
-    console.log("PromptBoxImage - generateResponse", generateResponse);
-
-    setIsEnqueueing(false);
   };
 
   const getCurrentResolutionIcon = () => {
