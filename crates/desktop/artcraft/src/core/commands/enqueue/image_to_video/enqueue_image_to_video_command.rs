@@ -1,5 +1,6 @@
+use crate::core::commands::enqueue::common::notify_frontend_of_errors::notify_frontend_of_errors;
+use crate::core::commands::enqueue::generate_error::{BadInputReason, GenerateError, MissingCredentialsReason, ProviderFailureReason};
 use crate::core::commands::enqueue::image_to_video::generic::handle_video::handle_video;
-use crate::core::commands::enqueue::image_to_video::internal_video_error::InternalVideoError;
 use crate::core::commands::enqueue::task_enqueue_success::TaskEnqueueSuccess;
 use crate::core::commands::response::failure_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus};
 use crate::core::commands::response::shorthand::Response;
@@ -20,7 +21,7 @@ use serde_derive::{Deserialize, Serialize};
 use tauri::{AppHandle, State};
 use tokens::tokens::media_files::MediaFileToken;
 
-/// This is used in the Tauri command bridge. 
+/// This is used in the Tauri command bridge.
 /// Don't change the serializations without coordinating with the frontend.
 #[derive(Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "snake_case")]
@@ -116,28 +117,30 @@ pub async fn enqueue_image_to_video_command(
   match result {
     Err(err) => {
       error!("error: {:?}", err);
+      
+      notify_frontend_of_errors(&app, &err).await;
 
       let mut status = CommandErrorStatus::ServerError;
       let mut error_type = EnqueueImageToVideoErrorType::ServerError;
       let mut error_message = "A server error occurred. Please try again. If it continues, please tell our staff about the problem.";
 
       match err {
-        InternalVideoError::NoModelSpecified => {
+        GenerateError::BadInput(BadInputReason::NoModelSpecified)=> {
           status = CommandErrorStatus::BadRequest;
           error_type = EnqueueImageToVideoErrorType::ModelNotSpecified;
           error_message = "No model specified for video generation";
         }
-        InternalVideoError::NoProviderAvailable => {
+        GenerateError::NoProviderAvailable => {
           status = CommandErrorStatus::ServerError;
           error_type = EnqueueImageToVideoErrorType::NoProviderAvailable;
           error_message = "No configured provider available for video generation";
         }
-        InternalVideoError::NeedsFalApiKey => {
+        GenerateError::MissingCredentials(MissingCredentialsReason::NeedsFalApiKey) => {
           status = CommandErrorStatus::Unauthorized;
           error_type = EnqueueImageToVideoErrorType::NeedsFalApiKey;
           error_message = "You need to set a FAL api key";
         },
-        InternalVideoError::NeedsStorytellerCredentials => {
+        GenerateError::MissingCredentials(MissingCredentialsReason::NeedsStorytellerCredentials) => {
           status = CommandErrorStatus::Unauthorized;
           error_type = EnqueueImageToVideoErrorType::NeedsStorytellerCredentials;
           error_message = "You need to be logged into Artcraft.";
@@ -179,7 +182,7 @@ pub async fn handle_request(
   fal_creds_manager: &FalCredentialManager,
   storyteller_creds_manager: &StorytellerCredentialManager,
   fal_task_queue: &FalTaskQueue,
-) -> Result<TaskEnqueueSuccess, InternalVideoError> {
+) -> Result<TaskEnqueueSuccess, GenerateError> {
 
   let result = handle_video(
     request,

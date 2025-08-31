@@ -1,9 +1,8 @@
+use crate::core::commands::enqueue::generate_error::GenerateError;
 use crate::core::commands::enqueue::image_bg_removal::enqueue_image_bg_removal_command::EnqueueImageBgRemovalCommand;
-use crate::core::commands::enqueue::image_bg_removal::errors::InternalBgRemovalError;
 use crate::core::commands::enqueue::image_bg_removal::generic::handle_generic_bg_removal_artcraft::handle_generic_bg_removal_artcraft;
 use crate::core::commands::enqueue::image_bg_removal::generic::handle_generic_bg_removal_fal::handle_generic_bg_removal_fal;
 use crate::core::commands::enqueue::image_edit::enqueue_contextual_edit_image_command::EnqueueContextualEditImageCommand;
-use crate::core::commands::enqueue::image_edit::errors::InternalContextualEditImageError;
 use crate::core::commands::enqueue::image_edit::gpt_image_1::handle_gpt_image_1_edit_artcraft::handle_gpt_image_1_edit_artcraft;
 use crate::core::commands::enqueue::image_edit::gpt_image_1::handle_gpt_image_1_edit_sora::handle_gpt_image_1_edit_sora;
 use crate::core::commands::enqueue::task_enqueue_success::TaskEnqueueSuccess;
@@ -27,7 +26,7 @@ pub async fn handle_generic_bg_removal(
   storyteller_creds_manager: &StorytellerCredentialManager,
   fal_creds_manager: &FalCredentialManager,
   fal_task_queue: &FalTaskQueue,
-) -> Result<TaskEnqueueSuccess, InternalBgRemovalError> {
+) -> Result<TaskEnqueueSuccess, GenerateError> {
 
   let priority = provider_priority_store.get_priority()?;
 
@@ -65,5 +64,5 @@ pub async fn handle_generic_bg_removal(
     }
   }
 
-  Err(InternalBgRemovalError::NoProviderAvailable)
+  Err(GenerateError::NoProviderAvailable)
 }
