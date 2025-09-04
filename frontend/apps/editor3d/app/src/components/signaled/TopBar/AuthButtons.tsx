@@ -11,12 +11,9 @@ export const AuthButtons = ({
 }) => {
   useSignals();
 
-  const { status, userInfo } = authentication;
-
-  console.log("Current State:", status.value);
+  const { status } = authentication;
 
   if (status.value === AUTH_STATUS.LOGGED_IN) {
-    console.log("SHOWING DROPDOWN");
     return null;
   } else {
     return (

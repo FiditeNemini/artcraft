@@ -12,6 +12,7 @@ import {
   faDownLeftAndUpRightToCenter,
 } from "@fortawesome/pro-solid-svg-icons";
 import { DomLevels } from "@storyteller/common";
+import { Root as VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 // ---------------------------------------------------------------------------
 // GLOBAL inert / aria-hidden stripper – applies once per page load
@@ -184,6 +185,8 @@ export const Modal = ({
   closeOnEsc = true,
   allowBackgroundInteraction = false,
   expandable = false,
+  accessibleTitle,
+  accessibleDescription,
 }: {
   isOpen: boolean;
   title?: ReactNode;
@@ -206,6 +209,8 @@ export const Modal = ({
   closeOnEsc?: boolean;
   allowBackgroundInteraction?: boolean;
   expandable?: boolean;
+  accessibleTitle?: string;
+  accessibleDescription?: string;
 }) => {
   // Draggable logic
   const [position, setPosition] = useState<{ x: number; y: number } | null>(
@@ -899,6 +904,9 @@ export const Modal = ({
                   <Dialog.Content
                     forceMount
                     asChild
+                    {...(accessibleDescription
+                      ? {}
+                      : ({ "aria-describedby": undefined } as any))}
                     onPointerDownOutside={(e) => {
                       if (!closeOnOutsideClick || allowBackgroundInteraction) {
                         e.preventDefault();
@@ -934,7 +942,14 @@ export const Modal = ({
                       }}
                     >
                       <div className="w-full h-full">
-                        {title && (
+                        {accessibleDescription && (
+                          <VisuallyHidden asChild>
+                            <Dialog.Description>
+                              {accessibleDescription}
+                            </Dialog.Description>
+                          </VisuallyHidden>
+                        )}
+                        {title ? (
                           <Dialog.Title
                             className={twMerge(
                               "mb-4 flex justify-between pb-0 text-xl font-bold text-white"
@@ -967,6 +982,12 @@ export const Modal = ({
                               )}
                             </>
                           </Dialog.Title>
+                        ) : (
+                          <VisuallyHidden asChild>
+                            <Dialog.Title>
+                              {accessibleTitle ?? "Dialog"}
+                            </Dialog.Title>
+                          </VisuallyHidden>
                         )}
                         <div className={`h-full`.trim()}>
                           {enhancedChildren}
