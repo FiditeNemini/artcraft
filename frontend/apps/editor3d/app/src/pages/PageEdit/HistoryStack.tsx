@@ -22,6 +22,7 @@ export interface ImageBundle {
 interface HistoryStackProps {
   onClear: () => void;
   onImageSelect?: (image: BaseSelectorImage) => void;
+  onImageRemove?: (image: BaseSelectorImage) => void;
   imageBundles: ImageBundle[];
   onNewImageBundle?: (newBundle: ImageBundle) => void;
   pendingPlaceholders?: { id: string; count: number }[];
@@ -179,6 +180,7 @@ export const HistoryStack = ({
                       crossOrigin="anonymous"
                       className="absolute inset-0 h-full w-full rounded-lg object-cover"
                     />
+                    <FontAwesomeIcon icon={faXmark} className="absolute top-0 right-0 h-4 w-4 text-lg text-danger" />
                   </Button>
                 ))}
                 {index < imageBundles.length - 1 && (
