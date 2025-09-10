@@ -51,6 +51,9 @@ const PageEdit = () => {
   const addHistoryImageBundle = useEditStore(
     (state) => state.addHistoryImageBundle,
   );
+  const removeHistoryImage = useEditStore(
+    (state) => state.removeHistoryImage,
+  );
   const historyImageBundles = useEditStore(
     (state) => state.historyImageBundles,
   );
@@ -296,9 +299,8 @@ const PageEdit = () => {
   return (
     <>
       <div
-        className={`preserve-aspect-ratio fixed left-1/2 top-0 z-10 -translate-x-1/2 transform ${
-          isSelecting ? "pointer-events-none" : "pointer-events-auto"
-        }`}
+        className={`preserve-aspect-ratio fixed left-1/2 top-0 z-10 -translate-x-1/2 transform ${isSelecting ? "pointer-events-none" : "pointer-events-auto"
+          }`}
         style={{ display: store.activeTool === "edit" ? "block" : "none" }}
       >
         <DrawToolControlBar
@@ -309,9 +311,8 @@ const PageEdit = () => {
         />
       </div>
       <div
-        className={`preserve-aspect-ratio fixed right-4 top-1/2 z-10 -translate-y-1/2 transform ${
-          isSelecting ? "pointer-events-none" : "pointer-events-auto"
-        }`}
+        className={`preserve-aspect-ratio fixed right-4 top-1/2 z-10 -translate-y-1/2 transform ${isSelecting ? "pointer-events-none" : "pointer-events-auto"
+          }`}
       >
         <HistoryStack
           onClear={() => {
@@ -325,6 +326,13 @@ const PageEdit = () => {
             store.clearLineNodes();
             store.setBaseImageInfo(baseImage);
           }}
+          onImageRemove={(baseImage) => {
+            if (pendingGenerations.length === 0 && store.historyImageBundles.length === 1 && store.historyImageBundles[0].images.length <= 1) {
+              store.RESET();
+            } else {
+              removeHistoryImage(baseImage);
+            }
+          }}
           onNewImageBundle={(newBundle: ImageBundle) => {
             addHistoryImageBundle(newBundle);
           }}
@@ -335,9 +343,8 @@ const PageEdit = () => {
         />
       </div>
       <div
-        className={`preserve-aspect-ratio fixed bottom-0 left-1/2 z-10 -translate-x-1/2 transform ${
-          isSelecting ? "pointer-events-none" : "pointer-events-auto"
-        }`}
+        className={`preserve-aspect-ratio fixed bottom-0 left-1/2 z-10 -translate-x-1/2 transform ${isSelecting ? "pointer-events-none" : "pointer-events-auto"
+          }`}
       >
         <PromptEditor
           selectedImageModel={selectedImageModel}

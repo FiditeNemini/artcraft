@@ -2,6 +2,7 @@ import { Button } from "@storyteller/ui-button";
 import { useImageEditCompleteEvent } from "@storyteller/tauri-events";
 import {
   faClockRotateLeft,
+  faTrashAlt,
   faTrashXmark,
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -34,6 +35,7 @@ interface HistoryStackProps {
 export const HistoryStack = ({
   onClear,
   onImageSelect = () => {},
+  onImageRemove = () => {},
   imageBundles,
   onNewImageBundle = () => {},
   pendingPlaceholders = [],
@@ -71,6 +73,10 @@ export const HistoryStack = ({
 
   const handleClear = () => {
     onClear();
+  };
+
+  const handleOnImageRemove = (baseImage: BaseSelectorImage) => {
+    onImageRemove(baseImage);
   };
 
   // Scroll to top when new pending placeholders are added (after enqueue)
@@ -164,7 +170,7 @@ export const HistoryStack = ({
                   <Button
                     key={image.mediaToken}
                     className={twMerge(
-                      "relative aspect-square h-full w-full border-2 bg-transparent p-0 hover:bg-transparent hover:opacity-80",
+                      "group relative aspect-square h-full w-full overflow-hidden rounded-lg border-2 bg-transparent p-0 hover:bg-transparent hover:opacity-80",
                       selectedImageToken === image.mediaToken &&
                         "border-primary hover:opacity-100",
                     )}
@@ -178,9 +184,36 @@ export const HistoryStack = ({
                       }
                       alt=""
                       crossOrigin="anonymous"
-                      className="absolute inset-0 h-full w-full rounded-lg object-cover"
+                      className="absolute inset-0 h-full w-full object-cover"
                     />
-                    <FontAwesomeIcon icon={faXmark} className="absolute top-0 right-0 h-4 w-4 text-lg text-danger" />
+                    <div
+                      className="absolute -right-0 -top-0 flex h-5 w-5 items-center justify-center rounded-bl-lg bg-red/50 opacity-0 transition-opacity hover:bg-red/80 group-hover:opacity-100"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        showActionReminder({
+                          reminderType: "default",
+                          title: "Delete Image",
+                          primaryActionIcon: faTrashXmark,
+                          primaryActionBtnClassName: "bg-red hover:bg-red/80",
+                          message: (
+                            <p className="text-sm text-white/70">
+                              Are you sure you want to delete this image? This
+                              action cannot be undone.
+                            </p>
+                          ),
+                          primaryActionText: "Delete",
+                          onPrimaryAction: () => {
+                            handleOnImageRemove(image);
+                            isActionReminderOpen.value = false;
+                          },
+                        });
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={faTrashAlt}
+                        className="h-full w-full text-[13px] text-white"
+                      />
+                    </div>
                   </Button>
                 ))}
                 {index < imageBundles.length - 1 && (
