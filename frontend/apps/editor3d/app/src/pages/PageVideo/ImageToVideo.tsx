@@ -101,19 +101,20 @@ const ImageToVideo = ({ imageMediaId, imageUrl }: ImageToVideoProps) => {
     >
       <div className="relative h-full w-full p-16">
         <div className="flex h-full w-full flex-col items-center justify-center rounded-md pb-12">
-          {!showPromptAtBottom && (
-            <div
-              className={twMerge(
-                "relative z-20 mb-52 flex flex-col items-center justify-center text-center drop-shadow-xl",
-                imageRowVisible && "mb-80",
-              )}
-            >
-              <span className="text-7xl font-bold">Generate Video</span>
-              <span className="pt-2 text-xl opacity-80">
-                Choose an image, add a prompt, then generate
-              </span>
-            </div>
-          )}
+          {/* TODO: Uncomment when backend supports history frontend id */}
+          {/* {!showPromptAtBottom && ( */}
+          <div
+            className={twMerge(
+              "relative z-20 mb-52 flex flex-col items-center justify-center text-center drop-shadow-xl",
+              imageRowVisible && "mb-80",
+            )}
+          >
+            <span className="text-7xl font-bold">Generate Video</span>
+            <span className="pt-2 text-xl opacity-80">
+              Choose an image, add a prompt, then generate
+            </span>
+          </div>
+          {/* )} */}
 
           {/* TODO: Uncomment when backend supports history frontend id */}
           {/* {hasAnyBatches && (
