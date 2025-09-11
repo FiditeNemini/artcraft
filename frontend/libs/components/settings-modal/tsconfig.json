@@ -3,7 +3,13 @@
   "include": [],
   "references": [
     {
+      "path": "../../analytics/google-analytics"
+    },
+    {
       "path": "../modal"
+    },
+    {
+      "path": "../pricing-modal"
     },
     {
       "path": "../switch"
@@ -15,13 +21,16 @@
       "path": "../../soundboard"
     },
     {
+      "path": "../../tauri-events"
+    },
+    {
+      "path": "../input"
+    },
+    {
       "path": "../login-modal"
     },
     {
       "path": "../../api"
-    },
-    {
-      "path": "../input"
     },
     {
       "path": "../button"
@@ -31,12 +40,6 @@
     },
     {
       "path": "../../tauri-api"
-    },
-    {
-      "path": "../../tauri-events"
-    },
-    {
-      "path": "../../analytics/google-analytics"
     },
     {
       "path": "./tsconfig.lib.json"
