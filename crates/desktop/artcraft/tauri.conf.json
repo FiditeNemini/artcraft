@@ -49,6 +49,7 @@
           "https://*.fakeyou.com",
           "https://*.storyteller.ai",
           "https://www.clarity.ms",
+          "https://scripts.clarity.ms",
           "ipc://localhost",
           "tauri://localhost"
         ],
