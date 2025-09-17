@@ -19,6 +19,7 @@ export const CREATOR_ICON_PATHS: Partial<Record<ModelCreator, string>> = {
   [ModelCreator.Higgsfield]: "/resources/images/services/higgsfield.svg",
   [ModelCreator.Alibaba]: "/resources/images/services/alibaba.svg",
   [ModelCreator.Vidu]: "/resources/images/services/vidu.svg",
+  [ModelCreator.ArtCraft]: "/resources/images/services/artcraft.svg",
 };
 
 const DEFAULT_ICON_PATH = "/resources/images/services/generic.svg";

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import {
   DndContext,
   closestCenter,
@@ -21,25 +21,29 @@ import {
   faGripVertical,
   faSpinnerThird,
 } from "@fortawesome/pro-solid-svg-icons";
-import { SetProviderOrder, Provider, GetProviderOrder } from "@storyteller/tauri-api";
+import {
+  SetProviderOrder,
+  Provider,
+  GetProviderOrder,
+} from "@storyteller/tauri-api";
+import { getCreatorIcon, ModelCreator } from "@storyteller/model-list";
 
 interface ProviderItem {
   id: Provider;
   name: string;
-  emoji: string;
 }
 
 interface SortableItemProps {
   id: string;
   name: string;
-  emoji: string;
+  icon: ReactNode;
   isUpdating?: boolean;
 }
 
 const SortableItem = ({
   id,
   name,
-  emoji,
+  icon,
   isUpdating = false,
 }: SortableItemProps) => {
   const {
@@ -69,7 +73,9 @@ const SortableItem = ({
       `}
     >
       <div className="flex items-center gap-3">
-        <span className="text-lg">{emoji}</span>
+        <span className="inline-flex items-center justify-center h-4 w-4">
+          {icon}
+        </span>
         <span className="font-medium">{name}</span>
       </div>
       <div className="flex items-center">
@@ -83,9 +89,27 @@ const SortableItem = ({
 };
 
 const ProviderItemMap = {
-  [Provider.ArtCraft]: { id: Provider.ArtCraft, name: "ArtCraft", emoji: "🎨" },
-  [Provider.Fal]: { id: Provider.Fal, name: "Fal", emoji: "🤖" },
-  [Provider.Sora]: { id: Provider.Sora, name: "Sora / ChatGPT", emoji: "⚡" },
+  [Provider.ArtCraft]: { id: Provider.ArtCraft, name: "ArtCraft" },
+  [Provider.Fal]: { id: Provider.Fal, name: "Fal" },
+  [Provider.Sora]: { id: Provider.Sora, name: "Sora / ChatGPT" },
+};
+
+const PROVIDER_TO_CREATOR: Partial<Record<Provider, ModelCreator>> = {
+  [Provider.ArtCraft]: ModelCreator.ArtCraft,
+  [Provider.Fal]: ModelCreator.Fal,
+  [Provider.Sora]: ModelCreator.OpenAi,
+};
+
+const getProviderIcon = (provider: Provider): ReactNode => {
+  const creator = PROVIDER_TO_CREATOR[provider];
+  if (creator) return getCreatorIcon(creator, "h-4 w-4 invert");
+  return (
+    <img
+      src="/resources/images/services/generic.svg"
+      alt="generic logo"
+      className="h-4 w-4 invert"
+    />
+  );
 };
 
 export const ProviderPrioritySettingsPane = () => {
@@ -107,7 +131,7 @@ export const ProviderPrioritySettingsPane = () => {
       // Add providers not in backend (in order)
       for (const [key, value] of Object.entries(ProviderItemMap)) {
         if (!providers.payload.providers.includes(key as Provider)) {
-          items.push(value)
+          items.push(value);
         }
       }
 
@@ -163,8 +187,9 @@ export const ProviderPrioritySettingsPane = () => {
     <div className="space-y-4">
       <div>
         <p className="text-sm text-white/70 mb-4">
-          Drag and drop to reorder model provider priority. Higher items will be tried
-          first. You can use this to control favorite services and spending.
+          Drag and drop to reorder model provider priority. Higher items will be
+          tried first. You can use this to control favorite services and
+          spending.
         </p>
       </div>
 
@@ -180,7 +205,7 @@ export const ProviderPrioritySettingsPane = () => {
                 key={item.id}
                 id={item.id}
                 name={item.name}
-                emoji={item.emoji}
+                icon={getProviderIcon(item.id)}
                 isUpdating={isUpdating}
               />
             ))}
