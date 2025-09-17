@@ -92,6 +92,12 @@
       "path": "../../libs/common"
     },
     {
+      "path": "../../libs/state/credits"
+    },
+    {
+      "path": "../../libs/state/subscription"
+    },
+    {
       "path": "../../libs/analytics/google-analytics"
     },
     {

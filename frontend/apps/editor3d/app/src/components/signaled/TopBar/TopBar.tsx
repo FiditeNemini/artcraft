@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   faGear,
   faImages,
@@ -18,7 +18,6 @@ import {
 } from "@fortawesome/pro-regular-svg-icons";
 import { Button } from "@storyteller/ui-button";
 import { PopoverMenu } from "@storyteller/ui-popover";
-import { AuthButtons } from "./AuthButtons";
 import { SceneTitleInput } from "./SceneTitleInput";
 import { Activity } from "~/pages/PageEnigma/comps/GenerateModals/Activity";
 import {
@@ -58,6 +57,10 @@ import {
   usePricingModalStore,
   useCreditsModalStore,
 } from "@storyteller/ui-pricing-modal";
+import { useCreditsBalanceChangedEvent } from "@storyteller/tauri-events"
+import { useSubscriptionPlanChangedEvent } from "@storyteller/tauri-events"
+import { useCreditsState } from "@storyteller/credits"
+import { useSubscriptionState } from "@storyteller/subscription"
 
 interface Props {
   pageName: string;
@@ -150,6 +153,25 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
   const [disableSwitcher, setDisableSwitcher] = useState(false);
   const switcherThrottle = useRef(false);
 
+  const creditsStore = useCreditsState();
+  const sumTotalCredits = creditsStore.totalCredits;
+
+  const subscriptionStore = useSubscriptionState();
+  const hasPaidPlan = subscriptionStore.hasPaidPlan();
+
+  useEffect(() => {
+    creditsStore.fetchFromServer();
+    subscriptionStore.fetchFromServer();
+  }, []);
+
+  useCreditsBalanceChangedEvent(async () => {
+    creditsStore.fetchFromServer();
+  });
+
+  useSubscriptionPlanChangedEvent(async () => {
+    subscriptionStore.fetchFromServer();
+  });
+
   const disableTabSwitcher = () => {
     return (
       disableSwitcher ||
@@ -218,7 +240,7 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
 
   const pageTitle = getPageTitle();
 
-  const { toggleModal } = usePricingModalStore();
+  const { toggleModal: toggleSubscriptionModal } = usePricingModalStore();
   const { toggleModal: toggleCreditsModal } = useCreditsModalStore();
 
   return (
@@ -300,7 +322,7 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
                 }
                 triggerLabel={
                   <span className="whitespace-nowrap text-sm font-medium">
-                    180 Credits
+                    {sumTotalCredits} Credits
                   </span>
                 }
                 buttonClassName="h-[30px] px-2 ps-1.5 bg-transparent hover:bg-white/10"
@@ -327,7 +349,7 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
                         icon={faCoinFront}
                         className="text-2xl text-primary"
                       />
-                      180
+                      {sumTotalCredits}
                     </div>
                     <div className="mt-3 flex gap-2">
                       <Button
@@ -345,7 +367,7 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
                         className="h-9 grow"
                         onClick={() => {
                           close();
-                          toggleModal();
+                          toggleSubscriptionModal();
                         }}
                         icon={faGem}
                       >
@@ -356,14 +378,16 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
                 )}
               </PopoverMenu>
 
-              <Button
-                variant="primary"
-                icon={faGem}
-                onClick={toggleModal}
-                className="h-[38px] shadow-md shadow-primary-500/50 transition-all duration-300 hover:shadow-md hover:shadow-primary-500/75"
-              >
-                Upgrade
-              </Button>
+              {!hasPaidPlan && (
+                <Button
+                  variant="primary"
+                  icon={faGem}
+                  onClick={toggleSubscriptionModal}
+                  className="h-[38px] shadow-md shadow-primary-500/50 transition-all duration-300 hover:shadow-md hover:shadow-primary-500/75"
+                >
+                  Upgrade
+                </Button>
+              )}
 
               <Tooltip content="Settings" position="bottom" delay={300}>
                 <Button
@@ -391,9 +415,11 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
 
               <Activity />
             </div>
+
             <div className="no-drag">
-              <AuthButtons loginSignUpPressed={loginSignUpPressed} />
+              {/* TODO(bt,2025-09-12): This was the old auth buttons that didn't work. We need to remove this and clean up the DOM. */}
             </div>
+
             {isDesktop && platform !== "macos" && (
               <div className="no-drag flex items-center">
                 <Button

@@ -53,6 +53,18 @@ CREATE TABLE user_subscriptions (
   -- Subscription object status enum as string
   maybe_stripe_subscription_status VARCHAR(32) DEFAULT NULL,
 
+  -- Primarily managed by the `invoice.paid` and `invoice.payment_failed` webhooks.
+  -- NB: Not applicable to FakeYou subscriptions!
+  maybe_stripe_invoice_is_paid BOOLEAN DEFAULT NULL,
+
+  -- Which day of the month, or month of the year, etc. to anchor the subscription to.
+  -- See docs on the subscription object.
+  -- Stripe: 
+  --   "The reference point that aligns future billing cycle dates. It sets the day 
+  --    of week for week intervals, the day of month for month and year intervals, and 
+  --    the month of year for year intervals. The timestamp is in UTC format."
+  maybe_stripe_billing_cycle_anchor TIMESTAMP DEFAULT NULL,
+
   maybe_stripe_is_production BOOLEAN DEFAULT NULL,
 
   -- ========== VECTOR CLOCK ==========
@@ -64,6 +76,8 @@ CREATE TABLE user_subscriptions (
 
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+ -- NB(bt, 2025-09-16): I don't think we write to the soft deleted_at field for user_subscriptions.
   deleted_at TIMESTAMP DEFAULT NULL,
 
   -- ========== SUBSCRIPTION TIMESTAMPS ==========
@@ -72,7 +86,10 @@ CREATE TABLE user_subscriptions (
   -- This may predate the Stripe object `created` timestamp due to backdating.
   subscription_start_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-  -- We'll use this to determine if the subscription is active.
+  -- Our synthetic "expire" date. Moved forward for active subscriptions,
+  -- backdated for canceled subscriptions.
+  --
+  -- TODO: We'll (maybe?) use this to determine if the subscription is active.
   --
   -- Always compare against MySQL's clock rather than the app's clock so that we
   -- don't get weird clock skew behaviors across multiple requests.
@@ -82,8 +99,12 @@ CREATE TABLE user_subscriptions (
   subscription_expires_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
   -- Billing periods.
-  -- Maybe useful for debugging.
+  -- Stripe API: subscription.items[0].data.current_period_start
   current_billing_period_start_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  -- Stripe API: subscription.items[0].data.current_period_end
+  -- current_period_end is when the subscription renews (or cancels, if the
+  -- subscription is set to cancel).
   current_billing_period_end_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
   -- Subscription cancellation (future and past)

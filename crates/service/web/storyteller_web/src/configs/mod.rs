@@ -4,4 +4,6 @@ pub mod plans;
 pub mod reserved_names;
 pub mod static_api_tokens;
 pub mod static_model;
+pub mod stripe_artcraft_metadata_keys;
 pub mod supported_languages_for_models;
+pub mod artcraft_products;

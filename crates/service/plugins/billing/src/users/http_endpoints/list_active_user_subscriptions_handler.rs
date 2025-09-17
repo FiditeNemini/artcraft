@@ -1,11 +1,10 @@
 use actix_http::StatusCode;
-use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
+use actix_web::{web, HttpRequest, HttpResponse, ResponseError};
+use component_traits::traits::internal_user_lookup::InternalUserLookup;
+use enums::common::payments_namespace::PaymentsNamespace;
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::error;
 use utoipa::ToSchema;
-
-use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-
-use crate::stripe::traits::internal_user_lookup::InternalUserLookup;
 
 // =============== Success Response ===============
 
@@ -19,7 +18,7 @@ pub struct ListActiveUserSubscriptionsResponse {
 #[derive(Serialize, ToSchema)]
 pub struct SubscriptionProductKey {
   /// This should always be "fakeyou".
-  pub namespace: String,
+  pub namespace: PaymentsNamespace,
 
   /// Possible values: fakeyou_plus, fakeyou_pro, fakeyou_elite, etc.
   pub product_slug: String,

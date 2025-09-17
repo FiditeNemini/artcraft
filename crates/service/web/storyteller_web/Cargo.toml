@@ -39,6 +39,7 @@ bootstrap = { path = "../../../lib/bootstrap" }
 bucket_paths = { path = "../../../lib/bucket_paths" }
 cloud_storage.workspace = true
 collections = { path = "../../../lib/data/collections" }
+component_traits.workspace = true
 composite_identifiers = { path = "../../../schema/public/composite_identifiers" }
 config = { path = "../../../lib/deprecated/config" }
 cookies = { path = "../../../lib/cookies" }
@@ -82,6 +83,7 @@ videos = { path = "../../../lib/files/videos" }
 
 # Internal Components
 billing_component = { path = "../../plugins/billing" }
+billing_artcraft_component = { path = "../../plugins/billing_artcraft" }
 user_traits_component = { path = "../../plugins/user_traits_component" }
 
 # External
@@ -98,6 +100,14 @@ regex.workspace = true
 strum_macros = "0.26.4"
 time = "0.3.30"
 url.workspace = true
+
+# Stripe for ArtCraft
+async_stripe_artcraft = { package = "async-stripe", version = "0.41.0", default-features = false, features = ["runtime-tokio-hyper", "connect", "billing", "checkout", "webhook-events"] }
+#async_stripe_artcraft = { git = "https://github.com/arlyon/async-stripe", branch = "openapi-1720743905", default-features = false, features = ["runtime-tokio-hyper", "connect", "billing", "checkout", "webhook-events"] }
+#async_stripe_artcraft = { git = "https://github.com/arlyon/async-stripe", branch = "next", default-features = false, features = ["runtime-tokio-hyper", "connect", "billing", "checkout", "webhook-events"] }
+
+# Money
+async-stripe = { version = "0.26.0", default-features = false, features = ["runtime-tokio-hyper", "connect", "billing", "checkout", "webhook-events"] }
 
 # Language tag parsing
 # TODO: Move to language support crate
@@ -141,9 +151,6 @@ actix-service.workspace = true
 actix-web.workspace = true
 actix-web-actors.workspace = true
 actix-web-lab.workspace = true
-
-# Money
-async-stripe = { version = "0.26.0", default-features = false, features = ["runtime-tokio-hyper", "connect", "billing", "checkout", "webhook-events"] }
 
 # Crypto
 magic-crypt = "3.1.13" # encrypting sort IDs for the frontend so we don't leak info

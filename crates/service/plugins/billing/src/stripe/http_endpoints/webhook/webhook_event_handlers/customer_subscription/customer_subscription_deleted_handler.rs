@@ -1,7 +1,7 @@
 use log::error;
 use sqlx::MySqlPool;
 use stripe::Subscription;
-
+use enums::common::payments_namespace::PaymentsNamespace;
 use mysql_queries::queries::users::user_subscriptions::get_user_subscription_by_stripe_subscription_id::get_user_subscription_by_stripe_subscription_id;
 use mysql_queries::queries::users::user_subscriptions::upsert_user_subscription_by_stripe_id::UpsertUserSubscription;
 use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
@@ -40,11 +40,11 @@ pub async fn customer_subscription_deleted_handler(
           StripeWebhookError::ServerError(reason) // NB: This was probably *our* fault.
         })?;
 
-  let mut subscription_namespace = UNKNOWN_SUBSCRIPTION_NAMESPACE;
+  let mut subscription_namespace = PaymentsNamespace::FakeYou;
   let mut subscription_product_slug = UNKNOWN_SUBSCRIPTION_PRODUCT_SLUG;
 
   if let Some(ref internal_product) = maybe_internal_subscription_product {
-    subscription_namespace = &internal_product.subscription_category;
+    subscription_namespace = internal_product.subscription_category;
     subscription_product_slug = &internal_product.subscription_product_key;
   }
 
@@ -85,6 +85,7 @@ pub async fn customer_subscription_deleted_handler(
         maybe_stripe_subscription_status: Some(summary.stripe_subscription_status),
         maybe_stripe_is_production: Some(summary.stripe_is_production),
         subscription_start_at: summary.subscription_start_date,
+        maybe_stripe_billing_cycle_anchor: None,
         current_billing_period_start_at: summary.current_billing_period_start,
         current_billing_period_end_at: summary.current_billing_period_end,
         subscription_expires_at: calculate_subscription_end_date(&summary),

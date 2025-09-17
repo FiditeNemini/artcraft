@@ -5,6 +5,7 @@ use sqlx::MySqlPool;
 
 use actix_helpers::middleware::banned_cidr_filter::banned_cidr_set::BannedCidrSet;
 use actix_helpers::middleware::banned_ip_filter::ip_ban_list::ip_ban_list::IpBanList;
+use billing_artcraft_component::utils::artcraft_stripe_config::ArtcraftStripeConfigWithClient;
 use billing_component::stripe::stripe_config::StripeConfig;
 use cloud_storage::bucket_client::BucketClient;
 use email_sender::smtp_email_sender::SmtpEmailSender;
@@ -49,6 +50,7 @@ pub struct ServerState {
   pub server_info: ServerInfo,
 
   pub stripe: StripeSettings,
+  pub stripe_artcraft: ArtcraftStripeConfigWithClient,
 
   pub hostname: String,
 
@@ -223,6 +225,15 @@ pub struct EphemeralInMemoryCaches {
 pub struct StripeSettings {
   pub config: StripeConfig,
   pub client: stripe::Client,
+}
+
+#[derive(Clone)]
+pub struct StripeArtcraftSettings {
+  pub secret_key: String,
+  pub secret_webhook_signing_key: String,
+  pub checkout_success_url: String,
+  pub checkout_cancel_url: String,
+  pub client: async_stripe_artcraft::Client,
 }
 
 /// Flags set at service startup

@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use crate::billing::wallets::temporary_test_wallet_deduction::temporary_test_wallet_deduction;
 use crate::http_server::common_responses::common_web_error::CommonWebError;
 use crate::http_server::common_responses::media::media_links_builder::MediaLinksBuilder;
 use crate::http_server::endpoints::generate::common::payments_error_test::payments_error_test;
@@ -66,6 +67,13 @@ pub async fn flux_pro_kontext_max_edit_image_handler(
       .avt_cookie_manager
       .get_avt_token_from_request(&http_request);
 
+  let user_token = match maybe_user_session.as_ref() {
+    Some(session) => &session.user_token,
+    None => {
+      return Err(CommonWebError::NotAuthorized);
+    }
+  };
+
   // TODO: Limit usage for new accounts. Billing, free credits metering, etc.
 
   //let user_session = match maybe_user_session {
@@ -86,12 +94,6 @@ pub async fn flux_pro_kontext_max_edit_image_handler(
   let media_tokens = vec![
     request.image_media_token.clone(),
   ];
-
-  let result = batch_get_media_files_by_tokens_with_connection(
-    &mut mysql_connection,
-    &media_tokens,
-    CAN_SEE_DELETED,
-  ).await;
 
   let result = batch_get_media_files_by_tokens_with_connection(
     &mut mysql_connection,
@@ -138,6 +140,28 @@ pub async fn flux_pro_kontext_max_edit_image_handler(
         error!("Error inserting idempotency token: {:?}", err);
         CommonWebError::BadInputWithSimpleMessage("repeated idempotency token".to_string())
       })?;
+
+  // TODO: This is test code
+  let credits = match request.num_images {
+    Some(FluxProKontextMaxEditImageNumImages::One) => 50,
+    Some(FluxProKontextMaxEditImageNumImages::Two) => 100,
+    Some(FluxProKontextMaxEditImageNumImages::Three) => 150,
+    Some(FluxProKontextMaxEditImageNumImages::Four) => 1234,
+    None => 50, // Default to One
+  };
+
+  // TODO: This is test code
+  let result = temporary_test_wallet_deduction(
+    user_token,
+    Some("todo-reference-token"),
+    credits,
+    &mut mysql_connection,
+  ).await;
+
+  // TODO: This is test code
+  if let Err(err) = result {
+    warn!("Temporary wallet deduction failed: {:?}", err); // Infallible for now.
+  }
 
   info!("Fal webhook URL: {}", server_state.fal.webhook_url);
 

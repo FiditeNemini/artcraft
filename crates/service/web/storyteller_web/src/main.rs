@@ -45,12 +45,13 @@ use actix_helpers::middleware::disabled_endpoint_filter::disabled_endpoint_filte
 use actix_helpers::middleware::disabled_endpoint_filter::disabled_endpoints::disabled_endpoints::DisabledEndpoints;
 use actix_helpers::middleware::disabled_endpoint_filter::disabled_endpoints::exact_match_disabled_endpoints::ExactMatchDisabledEndpoints;
 use actix_helpers::middleware::disabled_endpoint_filter::disabled_endpoints::prefix_disabled_endpoints::PrefixDisabledEndpoints;
+use billing_artcraft_component::utils::artcraft_stripe_config::ArtcraftStripeConfig;
 use billing_component::stripe::stripe_config::{FullUrlOrPath, StripeCheckoutConfigs, StripeConfig, StripeCustomerPortalConfigs, StripeSecrets};
 use billing_component::stripe::traits::internal_product_to_stripe_lookup::InternalProductToStripeLookup;
 use billing_component::stripe::traits::internal_subscription_product_lookup::InternalSubscriptionProductLookup;
-use billing_component::stripe::traits::internal_user_lookup::InternalUserLookup;
 use bootstrap::bootstrap::{bootstrap, BootstrapArgs};
 use cloud_storage::bucket_client::BucketClient;
+use component_traits::traits::internal_user_lookup::InternalUserLookup;
 use config::common_env::CommonEnv;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use email_sender::smtp_email_sender::SmtpEmailSender;
@@ -81,7 +82,7 @@ use crate::http_server::web_utils::handle_multipart_error::handle_multipart_erro
 use crate::http_server::web_utils::scoped_temp_dir_creator::ScopedTempDirCreator;
 use crate::state::certs::google_sign_in_cert::GoogleSignInCert;
 use crate::state::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
-use crate::state::server_state::{DurableInMemoryCaches, EnvConfig, EphemeralInMemoryCaches, FalData, InMemoryCaches, OpenAiData, ServerInfo, ServerState, StaticFeatureFlags, StripeSettings, TrollBans};
+use crate::state::server_state::{DurableInMemoryCaches, EnvConfig, EphemeralInMemoryCaches, FalData, InMemoryCaches, OpenAiData, ServerInfo, ServerState, StaticFeatureFlags, StripeArtcraftSettings, StripeSettings, TrollBans};
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
 use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
@@ -412,6 +413,15 @@ async fn main() -> AnyhowResult<()> {
       config: stripe_configs,
       client: stripe_client,
     },
+    stripe_artcraft: {
+      ArtcraftStripeConfig {
+        secret_key: easyenv::get_env_string_required("STRIPE_ARTCRAFT_SECRET_KEY")?,
+        secret_webhook_signing_key: easyenv::get_env_string_required("STRIPE_ARTCRAFT_SECRET_WEBHOOK_KEY")?,
+        checkout_success_url: easyenv::get_env_string_required("STRIPE_ARTCRAFT_CHECKOUT_SUCCESS_URL")?,
+        checkout_cancel_url: easyenv::get_env_string_required("STRIPE_ARTCRAFT_CHECKOUT_CANCEL_URL")?,
+        portal_return_url: easyenv::get_env_string_required("STRIPE_ARTCRAFT_PORTAL_RETURN_URL")?,
+      }.to_config_with_client()
+    },
     hostname: server_hostname,
     startup_time,
     server_environment_old: server_environment,
@@ -610,6 +620,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
 
     // NB: app_data being clone()'d below should all be safe (dependencies included)
     let app = App::new()
+      .app_data(web::Data::new(server_state_arc.stripe_artcraft.clone()))
       .app_data(web::Data::new(server_state_arc.firehose_publisher.clone()))
       .app_data(web::Data::new(server_state_arc.mysql_pool.clone()))
       .app_data(web::Data::new(server_state_arc.redis_pool.clone()))

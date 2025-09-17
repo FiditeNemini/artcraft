@@ -2,6 +2,7 @@ pub mod analytics;
 pub mod app_state;
 pub mod beta_keys;
 pub mod comments;
+pub mod credits;
 pub mod download_job;
 pub mod featured_items;
 pub mod generate;
