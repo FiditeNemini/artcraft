@@ -3,7 +3,7 @@
   "include": [],
   "references": [
     {
-      "path": "../../tauri-api"
+      "path": "../../state/subscription"
     },
     {
       "path": "../tab-selector"
