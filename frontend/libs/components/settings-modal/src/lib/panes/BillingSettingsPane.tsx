@@ -23,36 +23,30 @@ interface BillingSettingsPaneProps {}
 export const BillingSettingsPane = (args: BillingSettingsPaneProps) => {
   const { toggleModal: toggleSubscriptionModal } = usePricingModalStore();
 
-  //const creditsStore = useCreditsState();
-  //const sumTotalCredits = creditsStore.totalCredits;
-  const sumTotalCredits = 100;
+  const creditsStore = useCreditsState();
 
-  //const subscriptionStore = useSubscriptionState();
+  const sumTotalCredits = creditsStore.totalCredits;
 
-  //const maybePlanSlug = subscriptionStore.subscriptionInfo?.productSlug;
-  const maybePlanSlug = "free";
+  const subscriptionStore = useSubscriptionState();
+
+  const maybePlanSlug = subscriptionStore.subscriptionInfo?.productSlug;
 
   const currentPlanDetails: SubscriptionPlanDetails = maybePlanSlug
     ? SUBSCRIPTION_PLANS_BY_SLUG.get(maybePlanSlug) || FREE_PLAN
     : FREE_PLAN;
 
-  //const canCancelPlan = subscriptionStore.canCancelPlan();
-  const canCancelPlan = false;
+  const canCancelPlan = subscriptionStore.canCancelPlan();
 
-  //const nextBillAt =
-  //  subscriptionStore.subscriptionInfo?.nextBillAt?.toLocaleDateString();
-  const nextBillAt = "";
-  //const subscriptionEndAt =
-  //  subscriptionStore.subscriptionInfo?.subscriptionEndAt?.toLocaleDateString();
-  const subscriptionEndAt = "";
+  const nextBillAt = subscriptionStore.subscriptionInfo?.nextBillAt?.toLocaleDateString();
+  const subscriptionEndAt = subscriptionStore.subscriptionInfo?.subscriptionEndAt?.toLocaleDateString();
 
   const changeOrUpgradePlanButtonLabel = canCancelPlan
     ? "Change plan"
     : "Upgrade plan";
 
   useEffect(() => {
-    //creditsStore.fetchFromServer();
-    //subscriptionStore.fetchFromServer();
+    creditsStore.fetchFromServer();
+    subscriptionStore.fetchFromServer();
   }, []);
 
   return (
@@ -123,7 +117,7 @@ export const BillingSettingsPane = (args: BillingSettingsPaneProps) => {
             </div>
           </div>
 
-          {/*<CreditsTally creditsStore={creditsStore} />*/}
+          <CreditsTally creditsStore={creditsStore} />
         </div>
       </div>
     </>
