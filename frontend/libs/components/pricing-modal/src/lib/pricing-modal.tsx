@@ -30,11 +30,13 @@ interface PricingModalProps {}
 export function PricingModal({}: PricingModalProps = {}) {
   const { isOpen, closeModal } = usePricingModalStore();
 
-  const subscriptionStore = useSubscriptionState();
+  //const subscriptionStore = useSubscriptionState();
 
-  const hasActiveSub = subscriptionStore.hasPaidPlan();
+  //const hasActiveSub = subscriptionStore.hasPaidPlan();
+  const hasActiveSub = false;
 
-  const activePlanId = subscriptionStore.subscriptionInfo?.productSlug;
+  //const activePlanId = subscriptionStore.subscriptionInfo?.productSlug;
+  const activePlanId = "free";
 
   const [billingType, setBillingType] = useState("yearly");
   const isYearly = billingType === "yearly";

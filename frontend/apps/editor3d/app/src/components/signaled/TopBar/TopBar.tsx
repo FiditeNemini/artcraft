@@ -156,12 +156,13 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
   const creditsStore = useCreditsState();
   const sumTotalCredits = creditsStore.totalCredits;
 
-  const subscriptionStore = useSubscriptionState();
-  const hasPaidPlan = subscriptionStore.hasPaidPlan();
+  //const subscriptionStore = useSubscriptionState();
+  //const hasPaidPlan = subscriptionStore.hasPaidPlan();
+  const hasPaidPlan = false;
 
   useEffect(() => {
     creditsStore.fetchFromServer();
-    subscriptionStore.fetchFromServer();
+    //subscriptionStore.fetchFromServer();
   }, []);
 
   useCreditsBalanceChangedEvent(async () => {
@@ -169,7 +170,7 @@ export const TopBar = ({ pageName, loginSignUpPressed }: Props) => {
   });
 
   useSubscriptionPlanChangedEvent(async () => {
-    subscriptionStore.fetchFromServer();
+    //subscriptionStore.fetchFromServer();
   });
 
   const disableTabSwitcher = () => {
