@@ -40,7 +40,7 @@ pub struct UploadNewEngineAssetFileForm {
 
   // TODO: is MultipartBytes better than TempFile ?
   /// The uploaded file
-  #[multipart(limit = "512 MiB")]
+  #[multipart(limit = "5 GiB")]
   #[schema(value_type = Vec<u8>, format = Binary)]
   file: TempFile,
 
