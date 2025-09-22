@@ -61,7 +61,7 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
         file_name = field_filename.clone();
         file_bytes = checked_read_multipart_bytes(&mut field).await
             .map_err(|err| {
-              warn!("Error reading audio upload: {:?}", &err);
+              warn!("Error reading multipart upload: {:?}", &err);
               err
             })?;
       },
