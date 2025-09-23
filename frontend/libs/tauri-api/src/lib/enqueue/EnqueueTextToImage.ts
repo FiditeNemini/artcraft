@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { CommandResult } from "../common/CommandStatus";
-import { Model, ModelInfo } from "@storyteller/model-list";
+import { Model } from "@storyteller/model-list";
 
 export enum EnqueueTextToImageErrorType {
   /// Caller didn't specify a model
@@ -15,7 +15,7 @@ export enum EnqueueTextToImageErrorType {
 
 export interface EnqueueTextToImageRequest {
   // The model to use.
-  model?: Model | ModelInfo | EnqueueTextToImageModel;
+  model?: Model | EnqueueTextToImageModel;
 
   // The text prompt.
   prompt?: string;
@@ -86,13 +86,16 @@ export const EnqueueTextToImage = async (request: EnqueueTextToImageRequest) : P
   let modelName = undefined;
 
   if (!!request.model) {
+    // NB: We can't use "instanceof" checks with Vite minification and class name mangling.
     if (typeof request.model === "string") {
       modelName = request.model;
-    } else if (request.model instanceof Model) {
+    } else if (typeof request.model.tauriId === "string") {
       modelName = request.model.tauriId;
-    } else {
-      modelName = request.model.tauri_id;
     }
+  }
+
+  if (!modelName) {
+    throw new Error("No model specified in request: " + JSON.stringify(request));
   }
 
   let mutableRequest : EnqueueTextToImageRawRequest = {
