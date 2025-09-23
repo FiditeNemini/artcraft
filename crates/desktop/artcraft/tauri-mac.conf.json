@@ -36,6 +36,7 @@
           "http://ipc.localhost",
           "https://*.fakeyou.com",
           "https://*.storyteller.ai",
+          "https://*.clarity.ms",
           "https://unpkg.com/detect-gpu@5.0.70/",
           "https://www.google-analytics.com",
           "https://www.googletagmanager.com",
