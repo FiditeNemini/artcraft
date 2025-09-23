@@ -26,9 +26,7 @@ module.exports = {
   },
 
   // Base config
-  extends: ["eslint:recommended", "plugin:storybook/recommended"],
-
-  ignorePatterns: ["storybook-static/*"],
+  extends: ["eslint:recommended"],
 
   overrides: [
     // React
