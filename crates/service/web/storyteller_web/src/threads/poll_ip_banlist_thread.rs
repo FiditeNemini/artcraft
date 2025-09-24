@@ -11,6 +11,8 @@ use mysql_queries::queries::ip_bans::list_ip_bans::list_ip_bans;
 
 const DYNAMIC_BAN_LIST_NAME : &str = "DYNAMIC_POLLING_IP_BAN_LIST";
 
+const WAIT_BETWEEN_POLLS_MILLIS: u64 = 1_000 * 60 * 5; // 5 minutes
+
 pub async fn poll_ip_bans(
   ip_ban_list: IpBanList,
   mysql_pool: MySqlPool,
@@ -48,6 +50,6 @@ pub async fn poll_ip_bans(
       },
     }
 
-    tokio::time::sleep(Duration::from_millis(20_000)).await;
+    tokio::time::sleep(Duration::from_millis(WAIT_BETWEEN_POLLS_MILLIS)).await;
   }
 }
