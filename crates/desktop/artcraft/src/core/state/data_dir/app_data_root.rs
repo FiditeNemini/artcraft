@@ -14,7 +14,7 @@ use std::path::{Path, PathBuf};
 const DEFAULT_DATA_DIR : &str = "Artcraft";
 
 /// Note: Tauri appends ".log" to the end of the filename.
-const LOG_FILE_NAME : &str = "application_debug";
+const LOG_FILE_NAME : &str = "artcraft_debug";
 
 /// The path to the application data directory, which includes "asset" and "weights" data.
 #[derive(Clone)]
