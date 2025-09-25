@@ -1,12 +1,12 @@
 use crate::core::commands::response::shorthand::InfallibleResponse;
 use crate::core::commands::response::success_response_wrapper::SerializeMarker;
 use crate::core::state::app_env_configs::app_env_configs::AppEnvConfigs;
+use crate::core::state::artcraft_platform_info::{ArtcraftOs, ArtcraftPlatformInfo};
 use crate::core::state::os_platform::OsPlatform;
 use chrono::{DateTime, Utc};
 use log::info;
 use serde_derive::Serialize;
 use tauri::State;
-use crate::core::state::artcraft_platform_info::{ArtcraftOs, ArtcraftPlatformInfo};
 
 #[derive(Debug, Serialize)]
 pub struct AppInfoResponse {
