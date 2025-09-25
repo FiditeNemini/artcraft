@@ -72,6 +72,7 @@ pub fn run() {
 
   println!("Getting platform info...");
   let artcraft_platform_info = ArtcraftPlatformInfo::get();
+  let artcraft_platform_info_2 = artcraft_platform_info.clone();
 
   println!("Platform info: {:?}", artcraft_platform_info);
 
@@ -142,6 +143,7 @@ pub fn run() {
           handle,
           root,
           env_config,
+          artcraft_platform_info_2,
           storyteller_creds,
           sora_creds,
           sora_tasks,

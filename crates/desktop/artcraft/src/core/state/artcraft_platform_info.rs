@@ -57,3 +57,14 @@ impl ArtcraftPlatformInfo {
     }
   }
 }
+
+impl ArtcraftOs {
+  pub fn as_str(&self) -> &'static str {
+    match self {
+      ArtcraftOs::Windows => "windows",
+      ArtcraftOs::MacOS => "macos",
+      ArtcraftOs::Linux => "linux",
+      ArtcraftOs::Unknown => "unknown",
+    }
+  }
+}

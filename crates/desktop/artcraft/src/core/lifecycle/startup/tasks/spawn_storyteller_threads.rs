@@ -1,4 +1,5 @@
 use crate::core::state::app_env_configs::app_env_configs::AppEnvConfigs;
+use crate::core::state::artcraft_platform_info::ArtcraftPlatformInfo;
 use crate::core::state::task_database::TaskDatabase;
 use crate::services::storyteller::state::storyteller_credential_manager::StorytellerCredentialManager;
 use crate::services::storyteller::threads::storyteller_activity_thread::storyteller_activity_thread;
@@ -9,6 +10,7 @@ use tauri::{AppHandle, Manager};
 pub fn spawn_storyteller_threads(
   app: &AppHandle,
   app_env_configs: &AppEnvConfigs,
+  artcraft_platform_info: &ArtcraftPlatformInfo,
   task_database: &TaskDatabase,
   storyteller_creds_manager: &StorytellerCredentialManager,
 ) -> AnyhowResult<()> {
@@ -22,6 +24,7 @@ pub fn spawn_storyteller_threads(
 
   tauri::async_runtime::spawn(storyteller_activity_thread(
     app_env_configs.clone(),
+    artcraft_platform_info.clone(),
     storyteller_creds_manager.clone(),
   ));
   

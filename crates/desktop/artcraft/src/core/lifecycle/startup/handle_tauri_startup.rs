@@ -8,6 +8,7 @@ use crate::core::lifecycle::startup::tasks::spawn_main_window_thread::spawn_main
 use crate::core::lifecycle::startup::tasks::spawn_sora_task_polling_thread::spawn_sora_task_polling_thread;
 use crate::core::lifecycle::startup::tasks::spawn_storyteller_threads::spawn_storyteller_threads;
 use crate::core::state::app_env_configs::app_env_configs::AppEnvConfigs;
+use crate::core::state::artcraft_platform_info::ArtcraftPlatformInfo;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
 use crate::services::fal::state::fal_credential_manager::FalCredentialManager;
 use crate::services::fal::state::fal_task_queue::FalTaskQueue;
@@ -23,6 +24,7 @@ pub async fn handle_tauri_startup(
   app: AppHandle,
   root: AppDataRoot,
   app_env_configs: AppEnvConfigs,
+  artcraft_platform_info: ArtcraftPlatformInfo,
   storyteller_creds_manager: StorytellerCredentialManager,
   sora_credential_manager: SoraCredentialManager,
   sora_task_queue: SoraTaskQueue,
@@ -53,6 +55,7 @@ pub async fn handle_tauri_startup(
   spawn_storyteller_threads(
     &app,
     &app_env_configs,
+    &artcraft_platform_info,
     &task_database,
     &storyteller_creds_manager,
   )?;

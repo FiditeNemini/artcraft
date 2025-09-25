@@ -1,5 +1,6 @@
 use crate::core::events::basic_sendable_event_trait::BasicSendableEvent;
 use crate::core::state::app_env_configs::app_env_configs::AppEnvConfigs;
+use crate::core::state::artcraft_platform_info::ArtcraftPlatformInfo;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
 use crate::core::state::data_dir::trait_data_subdir::DataSubdir;
 use crate::core::state::os_platform::OsPlatform;
@@ -35,16 +36,16 @@ const ERROR_SLEEP_MILLIS : u64 = 1_000 * 60 * 3; // 3 minutes;
 
 pub async fn storyteller_activity_thread(
   app_env_configs: AppEnvConfigs,
+  artcraft_platform_info: ArtcraftPlatformInfo,
   storyteller_creds_manager: StorytellerCredentialManager,
 ) -> ! {
   let startup = Instant::now();
-  let os_info = os_info::get();
   loop {
     let res = polling_loop(
       &app_env_configs,
       &storyteller_creds_manager,
       startup,
-      &os_info,
+      &artcraft_platform_info,
     ).await;
     if let Err(err) = res {
       error!("An error occurred: {:?}", err);
@@ -58,7 +59,7 @@ async fn polling_loop(
   app_env_configs: &AppEnvConfigs,
   storyteller_creds_manager: &StorytellerCredentialManager,
   startup: Instant,
-  os_info: &Info,
+  artcraft_platform_info: &ArtcraftPlatformInfo,
 ) -> AnyhowResult<()> {
   loop {
     let creds = storyteller_creds_manager.get_credentials()?;
@@ -79,18 +80,11 @@ async fn polling_loop(
 
     let time_since_startup = Instant::now().duration_since(startup);
 
-    let maybe_os_platform = OsPlatform::maybe_get_str()
-        .map(|s| s.to_string());
-
-    let maybe_os_version = Some(os_info.version().to_string())
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty());
-
     let request = LogAppActiveUserRequest {
       maybe_app_name: Some(CLIENT_NAME.to_string()),
-      maybe_app_version: Some(CLIENT_VERSION.to_string()),
-      maybe_os_platform,
-      maybe_os_version,
+      maybe_app_version: Some(artcraft_platform_info.artcraft_version.clone()),
+      maybe_os_platform: Some(artcraft_platform_info.os_platform.as_str().to_owned()),
+      maybe_os_version: Some(artcraft_platform_info.os_version.clone()),
       maybe_session_duration_seconds: Some(time_since_startup.as_secs()),
     };
 
