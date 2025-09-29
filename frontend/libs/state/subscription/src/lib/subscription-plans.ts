@@ -1,6 +1,6 @@
 import { SubscriptionPlanDetails } from "./subscription-plan-details.js";
 
-export const FREE_PLAN : SubscriptionPlanDetails = {
+export const FREE_PLAN: SubscriptionPlanDetails = {
   slug: "free",
   name: "Free",
   isPaidPlan: false,
@@ -9,11 +9,14 @@ export const FREE_PLAN : SubscriptionPlanDetails = {
   features: [
     { text: "Free daily generations", included: true },
     { text: "Limited access to ArtCraft tools", included: true },
+    { text: "~15 Midjourney images", included: true },
+    { text: "~100 GPT-1 images", included: true },
+    { text: "~1 minute Kling video", included: true },
   ],
   colorScheme: "dark" as const,
 };
 
-export const SUBSCRIPTION_PLANS : SubscriptionPlanDetails[] = [
+export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
   FREE_PLAN,
   {
     slug: "artcraft_basic",
@@ -24,11 +27,11 @@ export const SUBSCRIPTION_PLANS : SubscriptionPlanDetails[] = [
     originalMonthlyPrice: 10,
     originalYearlyPrice: 120,
     features: [
-      { text: "~1,010 Flux images", included: true },
-      { text: "~36,000 real-time images", included: true },
-      { text: "~180 enhanced images", included: true },
-      { text: "~6 training jobs", included: true },
+      { text: "~1,000 Flux images", included: true },
       { text: "Commercial license", included: true },
+      { text: "~300 Midjourney images", included: true },
+      { text: "~5,000 GPT-1 images", included: true },
+      { text: "~10 minutes Kling video", included: true },
     ],
     colorScheme: "green" as const,
   },
@@ -41,11 +44,11 @@ export const SUBSCRIPTION_PLANS : SubscriptionPlanDetails[] = [
     originalMonthlyPrice: 35,
     originalYearlyPrice: 420,
     features: [
-      { text: "~5,048 Flux images", included: true },
-      { text: "~180,000 real-time images", included: true },
-      { text: "~900 enhanced images", included: true },
-      { text: "~30 training jobs", included: true },
+      { text: "~5,000 Flux images", included: true },
       { text: "Commercial license", included: true },
+      { text: "~1,000 Midjourney images", included: true },
+      { text: "~20,000 GPT-1 images", included: true },
+      { text: "~30 minutes Kling video", included: true },
     ],
     colorScheme: "purple" as const,
   },
@@ -58,16 +61,15 @@ export const SUBSCRIPTION_PLANS : SubscriptionPlanDetails[] = [
     originalMonthlyPrice: 60,
     originalYearlyPrice: 720,
     features: [
-      { text: "~15,142 Flux images", included: true },
-      { text: "~540,000 real-time images", included: true },
-      { text: "~2,700 enhanced images", included: true },
-      { text: "~90 training jobs", included: true },
+      { text: "~15,000 Flux images", included: true },
       { text: "Commercial license", included: true },
+      { text: "~3,000 Midjourney images", included: true },
+      { text: "~50,000 GPT-1 images", included: true },
+      { text: "~60 minutes Kling video", included: true },
     ],
     colorScheme: "orange" as const,
   },
-]
+];
 
-export const SUBSCRIPTION_PLANS_BY_SLUG : Map<string, SubscriptionPlanDetails> = new Map(
-  SUBSCRIPTION_PLANS.map((plan) => [plan.slug, plan])
-);
+export const SUBSCRIPTION_PLANS_BY_SLUG: Map<string, SubscriptionPlanDetails> =
+  new Map(SUBSCRIPTION_PLANS.map((plan) => [plan.slug, plan]));
