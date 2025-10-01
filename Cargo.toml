@@ -6,7 +6,8 @@ resolver = "2"
 members = [
   # API clients for external services
   # These might be custom implementations or wrappers over other client libraries.
-  "crates/api_clients/artcraft_api_defs", # TODO: api_clients/{artcraft}/{api_defs,client}
+  "crates/api_clients/artcraft/artcraft_api_defs", # TODO: api_clients/{artcraft}/{api_defs,client}
+  "crates/api_clients/artcraft/storyteller_client",
   "crates/api_clients/cloud_storage",
   "crates/api_clients/fal_client",
   "crates/api_clients/google_drive_common",
@@ -15,7 +16,6 @@ members = [
   "crates/api_clients/openai_sora_client",
   "crates/api_clients/openart_client",
   "crates/api_clients/runwayml_client",
-  "crates/api_clients/storyteller_client",
   "crates/api_clients/thumbnail_generator",
 
   # CLI tools for operations, etc.
@@ -181,7 +181,7 @@ workspace-build-acceleration = { path = "crates/workspace-build-acceleration" }
 # Internal libs
 # Setting paths here ensures we don't need to do so in every crate's Cargo.toml
 # It makes refactoring much easier.
-artcraft_api_defs = { path = "crates/api_clients/artcraft_api_defs" }
+artcraft_api_defs = { path = "crates/api_clients/artcraft/artcraft_api_defs" }
 build_metadata = { path = "crates/lib/build_metadata" }
 cloud_storage = { path = "crates/api_clients/cloud_storage" }
 cloudflare_errors = { path = "crates/lib/cloudflare_errors" }
@@ -205,7 +205,7 @@ openai_sora_client = { path = "crates/api_clients/openai_sora_client" }
 primitives = { path = "crates/lib/data/primitives" }
 shared_service_components = { path = "crates/lib/shared_service_components" }
 sqlite_tasks = { path = "crates/schema/database/sqlite_tasks" }
-storyteller_client = { path = "crates/api_clients/storyteller_client" }
+storyteller_client = { path = "crates/api_clients/artcraft/storyteller_client" }
 subprocess_common = { path = "crates/lib/subprocess_common" }
 test_data = { path = "crates/lib/test_data" }
 testing = { path = "crates/lib/testing" }
