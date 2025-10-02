@@ -1,17 +1,17 @@
-use crate::creds::credential_migration::CredentialMigrationRef;
 use crate::creds::sora_credential_set::SoraCredentialSet;
 use crate::creds::sora_jwt_bearer_token::SoraJwtBearerToken;
 use crate::creds::sora_sentinel::SoraSentinel;
-use crate::requests::bearer::generate_bearer_with_cookie::generate_bearer_with_cookie;
+use crate::error::sora_error::SoraError;
+use crate::error::sora_generic_api_error::SoraGenericApiError;
+use crate::error::sora_specific_api_error::SoraSpecificApiError;
+use crate::requests::auth_bearer::generate_bearer_jwt_with_cookie::generate_bearer_jwt_with_cookie;
+use crate::requests::auth_sentinel::generate_sentinel_token::generate_sentinel_token;
 use crate::requests::image_gen::common::{ImageSize, NumImages, SoraImageGenResponse};
 use crate::requests::image_gen::sora_image_gen_remix::{sora_image_gen_remix, SoraImageGenRemixRequest};
 use crate::requests::image_gen::sora_image_gen_simple::{sora_image_gen_simple, SoraImageGenSimpleRequest};
-use crate::requests::image_gen::{image_gen_http_request, SoraImageGenError};
-use crate::requests::sentinel_refresh::generate::token::generate_token;
-use crate::sora_error::SoraError;
 use anyhow::anyhow;
 use errors::AnyhowResult;
-use log::{info, warn};
+use log::{error, info, warn};
 use std::time::Duration;
 
 pub struct SimpleImageGenAutoRenewRequest<'a> {
@@ -30,7 +30,7 @@ pub async fn simple_image_gen_with_session_auto_renew(request: SimpleImageGenAut
     prompt: request.prompt.clone(), // NB: Clone because used again
     num_images: request.num_images,
     image_size: request.image_size,
-    credentials: CredentialMigrationRef::New(request.credentials),
+    credentials: request.credentials,
     request_timeout: request.request_timeout,
   }).await;
 
@@ -45,35 +45,40 @@ pub async fn simple_image_gen_with_session_auto_renew(request: SimpleImageGenAut
   let mut refresh_sentinel = false;
 
   match err {
-    // We'll fail these requests...
-    SoraImageGenError::TooManyConcurrentTasks(_) => {
-      return Err(SoraError::TooManyConcurrentTasks);
+    // We'll specifically fail these non-retryable requests...
+    
+    SoraError::ApiSpecific(SoraSpecificApiError::TooManyConcurrentTasks) |
+    SoraError::ApiSpecific(SoraSpecificApiError::SoraUsernameNotYetCreated) => {
+      error!("Non-retryable image generation error: {:?}", err);
+      return Err(err);
     }
-    SoraImageGenError::GenericError(err) => {
-      return Err(SoraError::OtherBadStatus(anyhow!("image gen failed with GenericError: {:?}", err)))
-    }
-    SoraImageGenError::NetworkError(err) => {
-      // TODO: The underlying type should be a reqwest::Error.
-      return Err(SoraError::OtherBadStatus(anyhow!("network error: {:?}", err)))
-    }
-    SoraImageGenError::UsernameRequired(_err) => {
-      return Err(SoraError::SoraUsernameNotYetCreated)
-    }
-
+    
     // We'll retry these requests...
-
-    SoraImageGenError::SentinelBlock(err) => {
+    
+    SoraError::ApiSpecific(SoraSpecificApiError::SentinelBlockError) => {
       warn!("Image generation failed due to sentinel block error: {:?}", err);
       refresh_sentinel = true;
     }
-    SoraImageGenError::TokenExpired(err) => {
+    SoraError::ApiSpecific(SoraSpecificApiError::TokenExpiredError) => {
       warn!("Image generation failed due to token expired error: {:?}", err);
       refresh_sentinel = true; // TODO: Not sure what this error is, actually.
       refresh_jwt = true;
     }
-    SoraImageGenError::InvalidJwt(err) => {
+    SoraError::ApiSpecific(SoraSpecificApiError::InvalidJwt) => {
       warn!("Image generation failed due to invalid jwt error: {:?}", err);
       refresh_jwt = true;
+    }
+    SoraError::ApiSpecific(SoraSpecificApiError::UnauthorizedCookieOrBearerExpired) => {
+      warn!("Image generation failed due to auth error (nb: this is a legacy error): {:?}", err);
+      refresh_jwt = true;
+      refresh_sentinel = true;
+    }
+    
+    // We'll fail everything else eagerly...
+
+    _ => {
+      error!("Image generation error: {:?}", err);
+      return Err(err);
     }
   }
 
@@ -82,15 +87,17 @@ pub async fn simple_image_gen_with_session_auto_renew(request: SimpleImageGenAut
   if refresh_jwt {
     info!("Generating new JWT bearer token...");
     let cookies = request.credentials.cookies.as_str();
-    let response = generate_bearer_with_cookie(cookies).await;
+    let response = generate_bearer_jwt_with_cookie(cookies).await;
     match response {
       Err(err) => {
-        return Err(SoraError::OtherBadStatus(anyhow!("failed to generate new JWT bearer token: {:?}", err)))
+        error!("Error asking to generate JWT: {:?}", err);
+        return Err(err);
       }
       Ok(bearer) => {
         match SoraJwtBearerToken::new(bearer) {
           Err(err) => {
-            return Err(SoraError::OtherBadStatus(anyhow!("Failed to parse new JWT bearer token: {:?}", err)));
+            error!("Failed to parse new JWT: {:?}", err);
+            return Err(err);
           }
           Ok(bearer) => new_bearer = Some(bearer),
         }
@@ -102,10 +109,11 @@ pub async fn simple_image_gen_with_session_auto_renew(request: SimpleImageGenAut
 
   if refresh_sentinel {
     info!("Generating new sentinel...");
-    let response = generate_token().await;
+    let response = generate_sentinel_token().await;
     match response {
       Err(err) => {
-        return Err(SoraError::OtherBadStatus(anyhow!("failed to generate new sentinel: {:?}", err)))
+        error!("failed to generate new sentinel: {:?}", err);
+        return Err(err)
       }
       Ok(sentinel) => new_sentinel = Some(SoraSentinel::new(sentinel)),
     }
@@ -127,20 +135,9 @@ pub async fn simple_image_gen_with_session_auto_renew(request: SimpleImageGenAut
     prompt: request.prompt,
     num_images: request.num_images,
     image_size: request.image_size,
-    credentials: CredentialMigrationRef::New(&new_creds),
+    credentials: &new_creds,
     request_timeout: request.request_timeout,
-  }).await;
-
-  match result {
-    Ok(response) => Ok((response, Some(new_creds))),
-    Err(err) => match err {
-      image_gen_http_request::SoraImageGenError::TooManyConcurrentTasks(err) => {
-        Err(SoraError::TooManyConcurrentTasks)
-      }
-      _ => {
-        warn!("Image gen failed again: {:?}", err);
-        Err(SoraError::OtherBadStatus(anyhow!("image gen failed again: {:?}", err)))
-      }
-    }
-  }
+  }).await?;
+  
+  Ok((result, Some(new_creds)))
 }

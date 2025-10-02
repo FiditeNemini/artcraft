@@ -1,6 +1,6 @@
-use crate::creds::credential_migration::CredentialMigrationRef;
+use crate::creds::sora_credential_set::SoraCredentialSet;
+use crate::error::sora_error::SoraError;
 use crate::requests::upload::upload_media_http_request::{upload_media_http_request, SoraMediaUploadResponse};
-use crate::sora_error::SoraError;
 use std::path::PathBuf;
 use std::time::Duration;
 
@@ -9,7 +9,7 @@ use std::time::Duration;
 pub async fn sora_media_upload_from_bytes(
   bytes: Vec<u8>, 
   file_name: String, 
-  creds: CredentialMigrationRef<'_>,
+  creds: &SoraCredentialSet,
   maybe_timeout: Option<Duration>,
 ) -> Result<SoraMediaUploadResponse, SoraError> {
   let file_path = PathBuf::from(&file_name);

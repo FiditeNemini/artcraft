@@ -1,9 +1,9 @@
-use crate::creds::credential_migration::CredentialMigrationRef;
 use crate::creds::sora_credential_set::SoraCredentialSet;
+use crate::error::sora_error::SoraError;
+use crate::error::sora_specific_api_error::SoraSpecificApiError;
 use crate::recipes::maybe_refresh_credentials_on_sora_error::maybe_refresh_credentials_on_sora_error;
 use crate::requests::upload::upload_media_from_file::sora_media_upload_from_file;
 use crate::requests::upload::upload_media_http_request::{upload_media_http_request, SoraMediaUploadResponse};
-use crate::sora_error::SoraError;
 use log::{info, warn};
 use std::path::Path;
 use std::time::Duration;
@@ -24,7 +24,7 @@ pub async fn image_upload_from_file_with_session_auto_renew<P: AsRef<Path>>(
 
   let result = sora_media_upload_from_file(
     request.file_path.as_ref().clone(), // FIXME(bt): This is horrible, but the client needs to take ownership. :(
-    CredentialMigrationRef::New(request.credentials),
+    request.credentials,
     /// This function can try to upload several times. This is the timeout for *individual* requests.
     request.request_timeout,
   ).await;
@@ -32,7 +32,7 @@ pub async fn image_upload_from_file_with_session_auto_renew<P: AsRef<Path>>(
   let err = match result {
     Ok(response) => return Ok((response, None)),
     // We can't retry some errors.
-    Err(err @ SoraError::SoraUsernameNotYetCreated) => return Err(err),
+    Err(err @ SoraError::ApiSpecific(SoraSpecificApiError::SoraUsernameNotYetCreated)) => return Err(err),
     // Retry all other errors.
     Err(err) => err,
   };
@@ -45,7 +45,7 @@ pub async fn image_upload_from_file_with_session_auto_renew<P: AsRef<Path>>(
 
   let result = sora_media_upload_from_file(
     request.file_path,
-    CredentialMigrationRef::New(&new_creds),
+    &new_creds,
     request.request_timeout,
   ).await?;
 

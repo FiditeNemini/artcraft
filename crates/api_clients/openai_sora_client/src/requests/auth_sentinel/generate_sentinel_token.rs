@@ -1,16 +1,17 @@
 use super::request::GenerateSentinelRefreshRequest;
-use crate::sora_error::SoraError;
-use crate::utils::classify_general_http_error::classify_general_http_error;
+use crate::constants::user_agent::USER_AGENT;
+use crate::error::sora_error::SoraError;
+use crate::error::sora_generic_api_error::SoraGenericApiError;
+use crate::requests::list_media::list_media::ListMediaResponse;
+use crate::utils_internal::classify_general_http_error::classify_general_http_error;
 use errors::AnyhowResult;
 use idempotency::uuid::generate_random_uuid;
 use log::error;
 use serde_derive::{Deserialize, Serialize};
 use thiserror::Error;
+use wreq::Client;
 
 const SORA_IMAGE_GEN_URL: &str = "https://chatgpt.com/backend-api/sentinel/req";
-
-/// This user agent is tied to the sentinel generation. If we need to change it, we may need to change sentinel generation too.
-const USER_AGENT : &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36";
 
 const SENTINEL_FLOW: &str = "sora_create_task";
 
@@ -43,16 +44,20 @@ pub struct SentinelResponse {
 }
 
 
-pub async fn generate_token() -> Result<String, SoraError> {
+pub async fn generate_sentinel_token() -> Result<String, SoraError> {
   let (_request, base64_request) = GenerateSentinelRefreshRequest::new().with_fourth_and_tenth();
   let request = SentinelRequest::new(base64_request);
-  let client = reqwest::Client::new();
+  let client = Client::new();
   let response = client.post(SORA_IMAGE_GEN_URL)
-    .header("User-Agent", USER_AGENT)
-    .header("Content-Type", "application/json")
-    .json(&request)
-    .send()
-    .await?;
+      .header("User-Agent", USER_AGENT)
+      .header("Content-Type", "application/json")
+      .json(&request)
+      .send()
+      .await
+      .map_err(|err| {
+        error!("Client failed to generate sentinel token: {:?}", err);
+        SoraGenericApiError::WreqError(err)
+      })?;
   
   if !response.status().is_success() {
     error!("Failed to generate sentinel: {}", response.status());
@@ -60,8 +65,19 @@ pub async fn generate_token() -> Result<String, SoraError> {
     return Err(error);
   }
 
-  let response_json: SentinelResponse = response.json().await?;
-  Ok(response_json.token)
+  let text_body = &response.text().await
+      .map_err(|err| {
+        error!("sora error reading sentinel token text body: {}", err);
+        SoraGenericApiError::WreqError(err)
+      })?;
+
+  let response = serde_json::from_str::<SentinelResponse>(&text_body)
+      .map_err(|err| {
+        error!("Failed to parse media list response: {}", err);
+        SoraGenericApiError::SerdeResponseParseErrorWithBody(err, text_body.to_string())
+      })?;
+
+  Ok(response.token)
 }
 
 
@@ -71,7 +87,7 @@ mod tests {
 
   #[tokio::test]
   async fn test_generate_token() {
-    let token = generate_token().await.unwrap();
+    let token = generate_sentinel_token().await.unwrap();
     println!("{}", token);
   }
 }

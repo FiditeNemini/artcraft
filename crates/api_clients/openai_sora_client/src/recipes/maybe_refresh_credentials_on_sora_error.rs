@@ -1,7 +1,9 @@
 use crate::creds::sora_credential_set::SoraCredentialSet;
 use crate::creds::sora_jwt_bearer_token::SoraJwtBearerToken;
-use crate::requests::bearer::generate_bearer_with_cookie::generate_bearer_with_cookie;
-use crate::sora_error::SoraError;
+use crate::error::sora_client_error::SoraClientError;
+use crate::error::sora_error::SoraError;
+use crate::error::sora_specific_api_error::SoraSpecificApiError;
+use crate::requests::auth_bearer::generate_bearer_jwt_with_cookie::generate_bearer_jwt_with_cookie;
 use anyhow::anyhow;
 use log::{error, info, warn};
 
@@ -10,31 +12,33 @@ use log::{error, info, warn};
 pub async fn maybe_refresh_credentials_on_sora_error(creds: &SoraCredentialSet, error: SoraError) -> Result<SoraCredentialSet, SoraError> {
 
   match error {
-    SoraError::NoBearerTokenAvailable => {
-      warn!("Previous request failed due to missing bearer token.");
+    SoraError::Client(SoraClientError::NoBearerTokenForRequest) => {
+      error!("Previous request failed due to missing bearer token.");
     }
-    SoraError::UnauthorizedCookieOrBearerExpired => {
-      warn!("Previous request failed due to invalid bearer token.");
+    SoraError::ApiSpecific(SoraSpecificApiError::UnauthorizedCookieOrBearerExpired) => {
+      error!("Previous request failed due to invalid bearer token.");
     }
     _ => {
-      error!("Previous request failed with error: {:?}", error);
-      return Err(SoraError::OtherBadStatus(anyhow!("previous request failed with error: {:?}", error)))
+      error!("Previous request failed due to the following error: {:?}", error);
+      return Err(error)
     }
   }
 
   info!("Generating new JWT bearer token...");
 
   let cookies = creds.cookies.as_str();
-  let response = generate_bearer_with_cookie(cookies).await;
+  let response = generate_bearer_jwt_with_cookie(cookies).await;
 
   let new_bearer = match response {
     Err(err) => {
-      return Err(SoraError::OtherBadStatus(anyhow!("failed to generate new JWT bearer token: {:?}", err)))
+      error!("Error generating new JWT bearer token: {}", err);
+      return Err(err);
     }
     Ok(bearer) => {
       match SoraJwtBearerToken::new(bearer) {
         Err(err) => {
-          return Err(SoraError::OtherBadStatus(anyhow!("failed to parse new JWT bearer token: {:?}", err)));
+          error!("Error parsing new JWT bearer token: {}", err);
+          return Err(err);
         }
         Ok(bearer) => bearer,
       }

@@ -1,18 +1,18 @@
-use crate::creds::credential_migration::CredentialMigrationRef;
+use crate::creds::sora_credential_set::SoraCredentialSet;
+use crate::error::sora_error::SoraError;
 use crate::requests::image_gen::common::{ImageSize, NumImages, SoraImageGenResponse};
 use crate::requests::image_gen::image_gen_http_request::{image_gen_http_request, OperationType, RawSoraImageGenRequest, VideoGenType};
-use crate::requests::image_gen::SoraImageGenError;
 use std::time::Duration;
 
 pub struct SoraImageGenSimpleRequest<'a> {
   pub prompt: String,
   pub num_images: NumImages,
   pub image_size: ImageSize,
-  pub credentials: CredentialMigrationRef<'a>,
+  pub credentials: &'a SoraCredentialSet,
   pub request_timeout: Option<Duration>,
 }
 
-pub async fn sora_image_gen_simple(args: SoraImageGenSimpleRequest<'_>) -> Result<SoraImageGenResponse, SoraImageGenError> {
+pub async fn sora_image_gen_simple(args: SoraImageGenSimpleRequest<'_>) -> Result<SoraImageGenResponse, SoraError> {
   let sora_request = RawSoraImageGenRequest {
     r#type: VideoGenType::ImageGen,
     operation: OperationType::SimpleCompose,
@@ -24,8 +24,11 @@ pub async fn sora_image_gen_simple(args: SoraImageGenSimpleRequest<'_>) -> Resul
     inpaint_items: vec![],
   };
 
-  // TODO: Error handling.
-  let result = image_gen_http_request(sora_request, args.credentials, args.request_timeout).await?;
+  let result = image_gen_http_request(
+    sora_request, 
+    args.credentials, 
+    args.request_timeout
+  ).await?;
 
   Ok(SoraImageGenResponse {
     task_id: result.id,
@@ -34,8 +37,7 @@ pub async fn sora_image_gen_simple(args: SoraImageGenSimpleRequest<'_>) -> Resul
 
 #[cfg(test)]
 mod tests {
-  use crate::credentials::SoraCredentials;
-  use crate::creds::credential_migration::CredentialMigrationRef;
+  use crate::creds::sora_credential_builder::SoraCredentialBuilder;
   use crate::requests::image_gen::common::{ImageSize, NumImages};
   use crate::requests::image_gen::sora_image_gen_simple::{sora_image_gen_simple, SoraImageGenSimpleRequest};
   use errors::AnyhowResult;
@@ -54,17 +56,17 @@ mod tests {
     let bearer = read_to_string(test_file_path("test_data/temp/bearer.txt")?)?;
     let bearer = bearer.trim().to_string();
 
-    let creds = SoraCredentials {
-      bearer_token: bearer,
-      cookie,
-      sentinel: Some(sentinel),
-    };
+    let creds = SoraCredentialBuilder::new()
+        .with_cookies(&cookie)
+        .with_jwt_bearer_token(&bearer)
+        .with_sora_sentinel(&sentinel)
+        .build()?;
 
     let response = sora_image_gen_simple(SoraImageGenSimpleRequest {
       prompt: "A pirate and a ninja fight in a battle inside a UFO. Fully photo realistic, lifelike, lens flare".to_string(),
       num_images: NumImages::One,
       image_size: ImageSize::Square,
-      credentials: CredentialMigrationRef::Legacy(&creds),
+      credentials: &creds,
       request_timeout: None,
     }).await?;
 

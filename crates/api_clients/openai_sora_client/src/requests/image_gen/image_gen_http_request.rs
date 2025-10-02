@@ -1,38 +1,17 @@
-use crate::creds::credential_migration::CredentialMigrationRef;
-use crate::requests::image_gen::image_gen_status::TaskId;
-use log::warn;
+use crate::constants::user_agent::USER_AGENT;
+use crate::creds::sora_credential_set::SoraCredentialSet;
+use crate::error::sora_client_error::SoraClientError;
+use crate::error::sora_error::SoraError;
+use crate::error::sora_generic_api_error::SoraGenericApiError;
+use crate::error::sora_specific_api_error::SoraSpecificApiError;
+use crate::requests::common::task_id::TaskId;
+use log::{error, warn};
 use serde_derive::{Deserialize, Serialize};
 use std::time::Duration;
 use thiserror::Error;
+use wreq::{Client, StatusCode};
 
 const SORA_IMAGE_GEN_URL: &str = "https://sora.com/backend/video_gen";
-
-/// This user agent is tied to the sentinel generation. If we need to change it, we may need to change sentinel generation too.
-const USER_AGENT : &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36";
-
-#[derive(Error, Debug)]
-pub enum SoraImageGenError {
-  #[error("Sora token expired: {0}")]
-  TokenExpired(String),
-
-  #[error("Sora sentinel block: {0}")]
-  SentinelBlock(String),
-
-  #[error("Sora too many concurrent tasks: {0}")]
-  TooManyConcurrentTasks(String),
-
-  #[error("Sora invalid JWT: {0}")]
-  InvalidJwt(String),
-
-  #[error("Sora API error: {0}")]
-  GenericError(String),
-
-  #[error("Network error: {0}")]
-  NetworkError(String),
-
-  #[error("Sora username required: {0}")]
-  UsernameRequired(String),
-}
 
 #[derive(Serialize, Debug)]
 #[serde(rename_all = "snake_case")]
@@ -155,36 +134,20 @@ impl std::fmt::Display for RawSoraErrorInner {
 /// Don't expose the internal request implementation as there are only a few "correct" ways to call the API.
 pub (crate) async fn image_gen_http_request(
   sora_request: RawSoraImageGenRequest, 
-  credentials: CredentialMigrationRef<'_>, 
+  credentials: &SoraCredentialSet,
   request_timeout: Option<Duration>,
-) -> Result<RawSoraResponse, SoraImageGenError> {
-  let client = reqwest::Client::new();
+) -> Result<RawSoraResponse, SoraError> {
+  let client = Client::new();
 
-  let mut cookie;
-  let mut authorization_header;
-  let mut sentinel;
+  let cookie = credentials.cookies.to_string();
 
-  match credentials {
-    CredentialMigrationRef::Legacy(creds) => {
-      cookie = creds.cookie.clone();
-      authorization_header = creds.authorization_header_value();
-      // TODO(bt,2025-04-23): We're using a Sora payload error in place of application state error. Surface this differently.
-      sentinel = creds.sentinel.as_ref()
-          .map(|sentinel| sentinel.to_string())
-          .ok_or(SoraImageGenError::SentinelBlock("Sentinel is required for image generation.".to_string()))?;
-    }
-    CredentialMigrationRef::New(creds) => {
-      cookie = creds.cookies.to_string();
-      // TODO(bt,2025-04-23): We're using a Sora payload error in place of application state error. Surface this differently.
-      authorization_header = creds.jwt_bearer_token.as_ref()
-          .ok_or(SoraImageGenError::InvalidJwt("JWT bearer is required for image generation".to_string()))?
-          .to_authorization_header_value();
-      // TODO(bt,2025-04-23): We're using a Sora payload error in place of application state error. Surface this differently.
-      sentinel = creds.sora_sentinel.as_ref()
-          .map(|sentinel| sentinel.get_sentinel().to_string())
-          .ok_or(SoraImageGenError::SentinelBlock("Sentinel is required for image generation.".to_string()))?;
-    }
-  }
+  let authorization_header = credentials.jwt_bearer_token.as_ref()
+      .ok_or(SoraClientError::NoBearerTokenForRequest)?
+      .to_authorization_header_value();
+
+  let sentinel = credentials.sora_sentinel.as_ref()
+      .map(|sentinel| sentinel.get_sentinel().to_string())
+      .ok_or(SoraClientError::NoSentinelTokenForRequest)?;
 
   let mut http_request = client.post(SORA_IMAGE_GEN_URL)
       .header("User-Agent", USER_AGENT)
@@ -199,52 +162,70 @@ pub (crate) async fn image_gen_http_request(
   }
 
   let http_request = http_request.json(&sora_request).build()
-      .map_err(|e| SoraImageGenError::NetworkError(e.to_string()))?;
+      .map_err(|err| {
+        error!("Error building Sora image generation HTTP request: {:?}", err);
+        SoraClientError::WreqClientError(err)
+      })?;
 
   let response = client.execute(http_request)
       .await
-      .map_err(|e| SoraImageGenError::NetworkError(e.to_string()))?;
+      .map_err(|err| {
+        error!("Error during Sora image generation request: {:?}", err);
+        SoraClientError::WreqClientError(err)
+      })?;
 
   let status = response.status();
 
   let response_body = &response.text().await
-      .map_err(|e| SoraImageGenError::NetworkError(e.to_string()))?;
+      .map_err(|err| {
+        error!("Error reading Sora image generation response body: {:?}", err);
+        SoraClientError::WreqClientError(err)
+      })?;
 
-  if status != reqwest::StatusCode::OK {
+  if status != StatusCode::OK {
     warn!("Sora image generation failure. Raw response: {:?}", response_body);
     
     let error_response: RawSoraErrorResponse = serde_json::from_str(response_body)
-        .map_err(|e| SoraImageGenError::GenericError(format!("Failed to parse error response: {}", e)))?;
+        .map_err(|err| SoraGenericApiError::SerdeParseErrorWithBodyOnNon200(err, response_body.to_string()))?;
 
     // Check for specific error codes
     if let Some(code) = &error_response.error.code {
       match code {
         SoraErrorCode::TokenExpired => {
-          return Err(SoraImageGenError::TokenExpired(error_response.error.message));
+          error!("Sora token expired: {}", error_response.error);
+          return Err(SoraSpecificApiError::TokenExpiredError.into());
         }
         SoraErrorCode::SentinelBlock => {
-          return Err(SoraImageGenError::SentinelBlock(error_response.error.message));
+          error!("Sora image generation error sentinel block: {}", error_response.error);
+          return Err(SoraSpecificApiError::SentinelBlockError.into());
         }
         SoraErrorCode::TooManyConcurrentTasks => {
-          return Err(SoraImageGenError::TooManyConcurrentTasks(error_response.error.message));
+          error!("Too many concurrent tasks. Please wait.");
+          return Err(SoraSpecificApiError::TooManyConcurrentTasks.into());
         }
-        SoraErrorCode::Unknown(_) => {
-          return Err(SoraImageGenError::GenericError(error_response.error.message));
+        SoraErrorCode::Unknown(message) => {
+          error!("Unknown error: {} - message: {}", error_response.error.message, message);
+          return Err(SoraGenericApiError::UncategorizedBadResponse(error_response.error.message).into());
         }
         SoraErrorCode::InvalidJwt => {
-          return Err(SoraImageGenError::InvalidJwt(error_response.error.message));
+          error!("Invalid JWT token: {}", error_response.error.message);
+          return Err(SoraSpecificApiError::InvalidJwt.into());
         }
         SoraErrorCode::UsernameRequired => {
-          return Err(SoraImageGenError::UsernameRequired(error_response.error.message));
+          error!("Username required: {}", error_response.error.message);
+          return Err(SoraSpecificApiError::SoraUsernameNotYetCreated.into());
         }
       }
     }
 
-    return Err(SoraImageGenError::GenericError(error_response.error.message));
+    error!("Sora image generation failure: {}", error_response.error);
+    return Err(SoraGenericApiError::UncategorizedBadResponse(
+      format!("Unknown error code: {:?}, message: {:?}", error_response.error.code, error_response.error.message))
+        .into());
   }
 
   let response = serde_json::from_str(response_body)
-      .map_err(|e| SoraImageGenError::GenericError(format!("Failed to parse success response: {}", e)))?;
+      .map_err(|err| SoraGenericApiError::SerdeResponseParseErrorWithBody(err, response_body.to_string()))?;
 
   Ok(response)
 }

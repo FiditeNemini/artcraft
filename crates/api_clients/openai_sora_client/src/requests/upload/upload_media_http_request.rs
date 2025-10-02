@@ -1,12 +1,15 @@
-use std::time::Duration;
-use crate::credentials::{SoraCredentials, USER_AGENT};
-use crate::creds::credential_migration::CredentialMigrationRef;
-use crate::sora_error::SoraError;
-use crate::utils::classify_general_http_error::classify_general_http_error;
-use log::info;
-use reqwest::multipart::{Form, Part};
-use reqwest::Client;
+use crate::constants::user_agent::USER_AGENT;
+use crate::creds::sora_credential_set::SoraCredentialSet;
+use crate::error::sora_client_error::SoraClientError;
+use crate::error::sora_error::SoraError;
+use crate::error::sora_generic_api_error::SoraGenericApiError;
+use crate::utils_internal::classify_general_http_error::classify_general_http_error;
+use log::{error, info};
 use serde::Deserialize;
+use std::io::empty;
+use std::time::Duration;
+use wreq::multipart::{Form, Part};
+use wreq::Client;
 
 const SORA_UPLOAD_MEDIA_URL: &str = "https://sora.com/backend/uploads";
 
@@ -62,40 +65,30 @@ pub struct SoraMediaUploadResponse {
 
 pub (crate) struct SoraMediaUploadRequest<'a> {
   pub file_path: String,
-  pub credentials: &'a SoraCredentials,
+  pub credentials: &'a SoraCredentialSet,
 }
 
 pub (crate) async fn upload_media_http_request(
   file_bytes: Vec<u8>,
   filename: String,
   mime_type: &str,
-  credentials: CredentialMigrationRef<'_>,
+  credentials: &SoraCredentialSet,
   maybe_timeout: Option<Duration>,
 ) -> Result<SoraMediaUploadResponse, SoraError> {
 
   // Create multipart form
-  let part = Part::bytes(file_bytes) // NB: Reqwest needs to own the bytes.
-    .file_name(filename) // NB: Reqwest needs to own the bytes
-    .mime_str(mime_type)?;
+  let part = Part::bytes(file_bytes) // NB: Reqwest needs to own the bytes. 
+      .file_name(filename) // NB: Reqwest needs to own the bytes
+      .mime_str(mime_type)
+      .map_err(|e| SoraClientError::MultipartFormError(e))?;
 
   let form = Form::new().part("file", part);
 
-  let cookie;
-  let auth_header;
-
-  match credentials {
-    CredentialMigrationRef::Legacy(creds) => {
-      cookie = creds.cookie.clone();
-      auth_header = creds.authorization_header_value();
-    }
-    CredentialMigrationRef::New(creds) => {
-      cookie = creds.cookies.to_string();
-      auth_header = creds.jwt_bearer_token
-          .as_ref()
-          .ok_or(SoraError::NoBearerTokenAvailable)?
-          .to_authorization_header_value();
-    }
-  }
+  let cookie = credentials.cookies.to_string();
+  let auth_header = credentials.jwt_bearer_token
+      .as_ref()
+      .ok_or(SoraClientError::NoBearerTokenForRequest)?
+      .to_authorization_header_value();
 
   // Make API request
   let client = Client::new();
@@ -109,7 +102,11 @@ pub (crate) async fn upload_media_http_request(
     request_builder = request_builder.timeout(timeout);
   }
 
-  let response = request_builder.send().await?;
+  let response = request_builder.send()
+      .await
+      .map_err(|err| {
+        SoraGenericApiError::WreqError(err)
+      })?;
 
   // Check response status
   if !response.status().is_success() {
@@ -118,7 +115,17 @@ pub (crate) async fn upload_media_http_request(
     return Err(error);
   }
 
-  // Parse response
-  let upload_response = response.json::<SoraMediaUploadResponse>().await?;
+  let response_body = &response.text().await
+      .map_err(|err| {
+        error!("Error reading response body while attempting file upload: {:?}", err);
+        SoraGenericApiError::WreqError(err)
+      })?;
+
+  let upload_response : SoraMediaUploadResponse = serde_json::from_str(&response_body)
+      .map_err(|err| {
+        error!("Error parsing response body while attempting file upload: {:?}", err);
+        SoraGenericApiError::SerdeResponseParseErrorWithBody(err, response_body.to_string())
+      })?;
+
   Ok(upload_response)
 }
