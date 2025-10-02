@@ -1,4 +1,4 @@
-import { ReactNode, useRef, useState, useEffect } from "react";
+import { ReactNode, useRef, useEffect } from "react";
 import {
   Popover,
   Transition,
@@ -14,6 +14,26 @@ import {
   faCircleCheck,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Model, ModelInfo } from "@storyteller/model-list";
+
+// Global hover manager to debounce close across adjacent hover popovers
+let globalCloseTimer: NodeJS.Timeout | null = null;
+const cancelGlobalClose = () => {
+  if (globalCloseTimer) {
+    clearTimeout(globalCloseTimer);
+    globalCloseTimer = null;
+  }
+};
+const scheduleGlobalClose = (fn: () => void, delayMs: number) => {
+  cancelGlobalClose();
+  globalCloseTimer = setTimeout(() => {
+    fn();
+    globalCloseTimer = null;
+  }, delayMs);
+};
+
+// Global coordination so opening one hover popover closes others immediately
+const ST_POPOVER_OPEN_EVENT = "st-popover-open";
+let popoverIdCounter = 0;
 
 export interface PopoverItem {
   label: string;
@@ -116,6 +136,7 @@ export const PopoverMenu = ({
     return () => {
       if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
       if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+      cancelGlobalClose();
     };
   }, []);
 
@@ -129,23 +150,17 @@ export const PopoverMenu = ({
       if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
       openTimeoutRef.current = setTimeout(() => {
         openFn();
-      }, 120);
+      }, 0);
     }
   };
 
-  const handleButtonMouseLeave = (closeFn: () => void) => {
+  const handleButtonMouseLeave = () => {
+    // Defer close to wrapper/panel leave so moving from button to panel doesn't close
     if (!(mode === "hoverSelect" || closeOnUnhover)) return;
     if (openTimeoutRef.current) {
       clearTimeout(openTimeoutRef.current);
       openTimeoutRef.current = null;
     }
-    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-    closeTimeoutRef.current = setTimeout(
-      () => {
-        closeFn();
-      },
-      mode === "hoverSelect" ? 200 : 120
-    );
   };
 
   const handlePanelMouseEnter = () => {
@@ -173,275 +188,325 @@ export const PopoverMenu = ({
         {({ open, close }) => (
           <>
             {(() => {
+              const thisId = ++popoverIdCounter;
               useEffect(() => {
                 onOpenChange?.(open);
+                if (open && (mode === "hoverSelect" || closeOnUnhover)) {
+                  // Broadcast that this popover opened; others should close
+                  window.dispatchEvent(
+                    new CustomEvent(ST_POPOVER_OPEN_EVENT, {
+                      detail: { id: thisId },
+                    })
+                  );
+                }
+                const handler = (e: Event) => {
+                  const detail = (e as CustomEvent).detail as { id: number };
+                  if (detail?.id !== thisId && open) {
+                    // Another popover opened; close this one immediately
+                    close();
+                  }
+                };
+                window.addEventListener(
+                  ST_POPOVER_OPEN_EVENT,
+                  handler as EventListener
+                );
+                return () =>
+                  window.removeEventListener(
+                    ST_POPOVER_OPEN_EVENT,
+                    handler as EventListener
+                  );
               }, [open]);
               return null;
             })()}
-            <PopoverButton
-              className={className}
-              onMouseEnter={() =>
-                handleButtonMouseEnter(open, () => {
-                  if (popoverButtonRef.current && !open) {
-                    popoverButtonRef.current.click();
-                  }
-                })
-              }
-              onMouseLeave={() => handleButtonMouseLeave(close)}
-              onClick={(e) => {
-                if (mode === "hoverSelect" && open) {
-                  e.preventDefault();
-                  e.stopPropagation();
+            <div
+              className="inline-flex"
+              onMouseEnter={() => {
+                if (closeTimeoutRef.current) {
+                  clearTimeout(closeTimeoutRef.current);
+                  closeTimeoutRef.current = null;
                 }
+                cancelGlobalClose();
               }}
-              ref={popoverButtonRef}
+              onMouseLeave={() => {
+                if (!(mode === "hoverSelect" || closeOnUnhover)) return;
+                if (openTimeoutRef.current) {
+                  clearTimeout(openTimeoutRef.current);
+                  openTimeoutRef.current = null;
+                }
+                if (closeTimeoutRef.current)
+                  clearTimeout(closeTimeoutRef.current);
+                // Use global close so moving to another hover popover cancels this
+                scheduleGlobalClose(
+                  () => close(),
+                  mode === "hoverSelect" ? 200 : 120
+                );
+              }}
             >
-              {triggerIcon}
-              {mode === "toggle" && selectedItem ? (
-                <span className="truncate">{selectedItem.label}</span>
-              ) : null}
-              {mode === "default" && triggerLabel ? (
-                <span className="truncate">{triggerLabel}</span>
-              ) : null}
-              {mode === "hoverSelect" && selectedItem ? (
-                <div className="flex items-center gap-1.5">
-                  <span className="opacity-70">{triggerLabel}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="truncate">{selectedItem.label}</span>
-                    <FontAwesomeIcon icon={faChevronUp} className="text-sm" />
-                  </div>
-                </div>
-              ) : null}
-            </PopoverButton>
-
-            <Transition
-              show={open}
-              enter="transition duration-75 ease-out"
-              enterFrom={
-                position === "bottom"
-                  ? "translate-y-1 opacity-0"
-                  : "-translate-y-1 opacity-0"
-              }
-              enterTo="translate-y-0 opacity-100"
-              leave="transition duration-75 ease-in"
-              leaveFrom="translate-y-0 opacity-100"
-              leaveTo={
-                position === "bottom"
-                  ? "translate-y-1 opacity-0"
-                  : "-translate-y-1 opacity-0"
-              }
-            >
-              <PopoverPanel
-                static
-                className={twMerge(
-                  "absolute transform-gpu z-10",
-                  positionClasses[position],
-                  alignClasses[align],
-                  position === "bottom" ? "origin-top" : "origin-bottom"
-                )}
+              <PopoverButton
+                className={className}
+                onMouseEnter={() =>
+                  handleButtonMouseEnter(open, () => {
+                    if (popoverButtonRef.current && !open) {
+                      popoverButtonRef.current.click();
+                    }
+                  })
+                }
+                onMouseLeave={handleButtonMouseLeave}
+                onClick={(e) => {
+                  if (mode === "hoverSelect" && open) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
+                }}
+                ref={popoverButtonRef}
               >
-                <div
+                {triggerIcon}
+                {mode === "toggle" && selectedItem ? (
+                  <span className="truncate">{selectedItem.label}</span>
+                ) : null}
+                {mode === "default" && triggerLabel ? (
+                  <span className="truncate">{triggerLabel}</span>
+                ) : null}
+                {mode === "hoverSelect" && selectedItem ? (
+                  <div className="flex items-center gap-1.5">
+                    <span className="opacity-70">{triggerLabel}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="truncate">{selectedItem.label}</span>
+                      <FontAwesomeIcon icon={faChevronUp} className="text-sm" />
+                    </div>
+                  </div>
+                ) : null}
+              </PopoverButton>
+
+              <Transition
+                show={open}
+                enter="transition duration-75 ease-out"
+                enterFrom={
+                  position === "bottom"
+                    ? "translate-y-1 opacity-0"
+                    : "-translate-y-1 opacity-0"
+                }
+                enterTo="translate-y-0 opacity-100"
+                leave="transition duration-75 ease-in"
+                leaveFrom="translate-y-0 opacity-100"
+                leaveTo={
+                  position === "bottom"
+                    ? "translate-y-1 opacity-0"
+                    : "-translate-y-1 opacity-0"
+                }
+              >
+                <PopoverPanel
+                  static
                   className={twMerge(
-                    "z-10 min-w-48 mt-2 rounded-lg bg-ui-panel p-1.5 shadow-lg border border-ui-panel-border",
-                    position === "top" ? "mb-2" : "mt-2",
-                    panelClassName
+                    "absolute transform-gpu z-50",
+                    positionClasses[position],
+                    alignClasses[align],
+                    position === "bottom" ? "origin-top" : "origin-bottom"
                   )}
-                  onMouseEnter={handlePanelMouseEnter}
-                  onMouseLeave={() => handlePanelMouseLeave(close)}
                 >
-                  {panelTitle && (
-                    <div className="mb-2 mt-0.5 flex justify-between px-1.5 text-sm font-normal text-base-fg opacity-70">
-                      {panelTitle}
-                      {panelActionLabel && (
-                        <button
-                          onClick={() => {
-                            onPanelAction?.(panelActionLabel);
-                            close();
-                          }}
-                          className="text-end text-sm text-base-fg/85 hover:underline"
-                        >
-                          {panelActionLabel}
-                        </button>
-                      )}
-                    </div>
-                  )}
-                  {mode === "default" && children ? (
-                    <div className="text-sm text-base-fg">
-                      {typeof children === "function"
-                        ? children(close)
-                        : children}
-                    </div>
-                  ) : mode === "hoverSelect" ? (
-                    <div className="flex flex-col gap-0 text-sm text-base-fg">
-                      {items.map((item, index) => (
-                        <div key={index}>
-                          <div
+                  <div
+                    className={twMerge(
+                      "z-10 min-w-48 mt-2 rounded-lg bg-ui-panel p-1.5 shadow-lg border border-ui-panel-border",
+                      position === "top" ? "mb-2" : "mt-2",
+                      panelClassName
+                    )}
+                    onMouseEnter={handlePanelMouseEnter}
+                    onMouseLeave={() => handlePanelMouseLeave(close)}
+                  >
+                    {panelTitle && (
+                      <div className="mb-2 mt-0.5 flex justify-between px-1.5 text-sm font-normal text-base-fg opacity-70">
+                        {panelTitle}
+                        {panelActionLabel && (
+                          <button
                             onClick={() => {
-                              if (!item.disabled) {
-                                handleItemClick(item, close);
-                              }
+                              onPanelAction?.(panelActionLabel);
+                              close();
                             }}
-                            className={twMerge(
-                              "group flex cursor-pointer items-start gap-2 rounded-lg px-2 py-2 transition-all",
-                              item.selected
-                                ? "bg-ui-controls/70 border-l-4 border-primary"
-                                : "hover:bg-ui-controls/50",
-                              item.disabled
-                                ? "!cursor-not-allowed opacity-50"
-                                : ""
-                            )}
-                            style={{ minHeight: 48 }}
+                            className="text-end text-sm text-base-fg/85 hover:underline"
                           >
-                            <div className="flex items-center gap-2 w-full">
-                              <div className="flex items-start gap-2 grow">
-                                {showIconsInList && (
-                                  <span className="mt-1 flex h-5 w-5 items-center justify-center text-lg text-base-fg/80">
-                                    {item.icon}
-                                  </span>
-                                )}
-                                <div className="flex flex-1 flex-col min-w-0">
-                                  <div className="flex items-center gap-2 min-w-0">
-                                    <span className="truncate font-semibold text-base-fg text-base">
-                                      {item.label}
+                            {panelActionLabel}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                    {mode === "default" && children ? (
+                      <div className="text-sm text-base-fg">
+                        {typeof children === "function"
+                          ? children(close)
+                          : children}
+                      </div>
+                    ) : mode === "hoverSelect" ? (
+                      <div className="flex flex-col gap-0 text-sm text-base-fg">
+                        {items.map((item, index) => (
+                          <div key={index}>
+                            <div
+                              onClick={() => {
+                                if (!item.disabled) {
+                                  handleItemClick(item, close);
+                                }
+                              }}
+                              className={twMerge(
+                                "group flex cursor-pointer items-start gap-2 rounded-lg px-2 py-2 transition-all",
+                                item.selected
+                                  ? "bg-ui-controls/70 border-l-4 border-primary"
+                                  : "hover:bg-ui-controls/50",
+                                item.disabled
+                                  ? "!cursor-not-allowed opacity-50"
+                                  : ""
+                              )}
+                              style={{ minHeight: 48 }}
+                            >
+                              <div className="flex items-center gap-2 w-full">
+                                <div className="flex items-start gap-2 grow">
+                                  {showIconsInList && (
+                                    <span className="mt-1 flex h-5 w-5 items-center justify-center text-lg text-base-fg/80">
+                                      {item.icon}
                                     </span>
-                                  </div>
-
-                                  {item.description && (
-                                    <div className="truncate text-xs text-base-fg/60 mt-0.5">
-                                      {item.description}
-                                    </div>
                                   )}
+                                  <div className="flex flex-1 flex-col min-w-0">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <span className="truncate font-semibold text-base-fg text-base">
+                                        {item.label}
+                                      </span>
+                                    </div>
 
-                                  <div className="flex flex-row gap-1 flex-wrap mt-1.5">
-                                    {item.badges &&
-                                      Array.isArray(item.badges) &&
-                                      item.badges.map((badge, i) => (
-                                        <div
-                                          key={i}
-                                          className="flex items-center gap-1 min-w-0"
-                                        >
-                                          <span className="inline-flex items-center rounded bg-black/40 px-1.5 py-0.5 text-xs font-medium text-base-fg gap-1">
-                                            {badge?.icon && (
-                                              <span>{badge.icon}</span>
-                                            )}
-                                            {badge?.label || ""}
-                                          </span>
-                                        </div>
-                                      ))}
+                                    {item.description && (
+                                      <div className="truncate text-xs text-base-fg/60 mt-0.5">
+                                        {item.description}
+                                      </div>
+                                    )}
+
+                                    <div className="flex flex-row gap-1 flex-wrap mt-1.5">
+                                      {item.badges &&
+                                        Array.isArray(item.badges) &&
+                                        item.badges.map((badge, i) => (
+                                          <div
+                                            key={i}
+                                            className="flex items-center gap-1 min-w-0"
+                                          >
+                                            <span className="inline-flex items-center rounded bg-black/40 px-1.5 py-0.5 text-xs font-medium text-base-fg gap-1">
+                                              {badge?.icon && (
+                                                <span>{badge.icon}</span>
+                                              )}
+                                              {badge?.label || ""}
+                                            </span>
+                                          </div>
+                                        ))}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
 
-                              {item.selected && (
-                                <span className="text-primary text-xl font-bold bg-white rounded-full p-0 h-4 w-4 flex items-center justify-center mr-1">
-                                  <FontAwesomeIcon icon={faCircleCheck} />
-                                </span>
-                              )}
+                                {item.selected && (
+                                  <span className="text-primary text-xl font-bold bg-white rounded-full p-0 h-4 w-4 flex items-center justify-center mr-1">
+                                    <FontAwesomeIcon icon={faCircleCheck} />
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                          {item.divider && (
-                            <div className="my-1 border-t border-white/10" />
-                          )}
-                        </div>
-                      ))}
-                      {showAddButton && onAdd && (
-                        <Button
-                          variant="secondary"
-                          className={twMerge(
-                            "w-full mb-0.5 mt-2 border-none py-1",
-                            disableAddButton
-                              ? "cursor-not-allowed bg-[#7B7B84]/50 opacity-50"
-                              : "bg-[#7B7B84] hover:bg-[#8c8c96]"
-                          )}
-                          onClick={onAdd}
-                          disabled={disableAddButton}
-                        >
-                          + Add
-                        </Button>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex flex-col gap-0 text-sm text-base-fg">
-                      {items.map((item, index) => (
-                        <div key={index}>
-                          <Button
-                            className={twMerge(
-                              "flex w-full items-center shadow-none justify-between px-1.5",
-                              "bg-transparent hover:bg-ui-controls/60",
-                              mode === "toggle" && item.selected
-                                ? "hover:bg-ui-controls/80"
-                                : "",
-                              item.disabled
-                                ? "!cursor-not-allowed opacity-50"
-                                : "",
-                              "border-0"
+                            {item.divider && (
+                              <div className="my-1 border-t border-white/10" />
                             )}
-                            onClick={() =>
-                              !item.disabled && handleItemClick(item, close)
-                            }
+                          </div>
+                        ))}
+                        {showAddButton && onAdd && (
+                          <Button
                             variant="secondary"
-                            disabled={item.disabled}
+                            className={twMerge(
+                              "w-full mb-0.5 mt-2 border-none py-1",
+                              disableAddButton
+                                ? "cursor-not-allowed bg-[#7B7B84]/50 opacity-50"
+                                : "bg-[#7B7B84] hover:bg-[#8c8c96]"
+                            )}
+                            onClick={onAdd}
+                            disabled={disableAddButton}
                           >
-                            <div className="flex items-center gap-2 truncate">
-                              {showIconsInList && item.icon}
-                              {mode === "toggle" ? (
+                            + Add
+                          </Button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-0 text-sm text-base-fg">
+                        {items.map((item, index) => (
+                          <div key={index}>
+                            <Button
+                              className={twMerge(
+                                "flex w-full items-center shadow-none justify-between px-1.5",
+                                "bg-transparent hover:bg-ui-controls/60",
+                                mode === "toggle" && item.selected
+                                  ? "hover:bg-ui-controls/80"
+                                  : "",
+                                item.disabled
+                                  ? "!cursor-not-allowed opacity-50"
+                                  : "",
+                                "border-0"
+                              )}
+                              onClick={() =>
+                                !item.disabled && handleItemClick(item, close)
+                              }
+                              variant="secondary"
+                              disabled={item.disabled}
+                            >
+                              <div className="flex items-center gap-2 truncate">
+                                {showIconsInList && item.icon}
+                                {mode === "toggle" ? (
+                                  <span
+                                    className={twMerge(
+                                      "truncate",
+                                      item.selected
+                                        ? "text-base-fg"
+                                        : "text-base-fg/70"
+                                    )}
+                                  >
+                                    {item.label}
+                                  </span>
+                                ) : (
+                                  <span className="truncate">{item.label}</span>
+                                )}
+                              </div>
+                              {mode === "toggle" && (
                                 <span
                                   className={twMerge(
-                                    "truncate",
+                                    "ml-2 h-5 w-5 rounded-full border flex items-center justify-center transition-colors",
                                     item.selected
-                                      ? "text-base-fg"
-                                      : "text-base-fg/70"
+                                      ? "border-primary bg-primary"
+                                      : "border-transparent bg-transparent"
                                   )}
                                 >
-                                  {item.label}
+                                  {item.selected && (
+                                    <FontAwesomeIcon
+                                      icon={faCheck}
+                                      className="text-base-fg text-xs font-bold"
+                                    />
+                                  )}
                                 </span>
-                              ) : (
-                                <span className="truncate">{item.label}</span>
                               )}
-                            </div>
-                            {mode === "toggle" && (
-                              <span
-                                className={twMerge(
-                                  "ml-2 h-5 w-5 rounded-full border flex items-center justify-center transition-colors",
-                                  item.selected
-                                    ? "border-primary bg-primary"
-                                    : "border-transparent bg-transparent"
-                                )}
-                              >
-                                {item.selected && (
-                                  <FontAwesomeIcon
-                                    icon={faCheck}
-                                    className="text-base-fg text-xs font-bold"
-                                  />
-                                )}
-                              </span>
+                            </Button>
+                            {item.divider && (
+                              <div className="my-1 border-t border-white/10" />
                             )}
+                          </div>
+                        ))}
+                        {showAddButton && onAdd && (
+                          <Button
+                            variant="secondary"
+                            className={twMerge(
+                              "w-full mb-0.5 mt-2 py-1 border-0",
+                              disableAddButton
+                                ? "cursor-not-allowed opacity-50"
+                                : ""
+                            )}
+                            onClick={onAdd}
+                            disabled={disableAddButton}
+                          >
+                            + Add
                           </Button>
-                          {item.divider && (
-                            <div className="my-1 border-t border-white/10" />
-                          )}
-                        </div>
-                      ))}
-                      {showAddButton && onAdd && (
-                        <Button
-                          variant="secondary"
-                          className={twMerge(
-                            "w-full mb-0.5 mt-2 py-1 border-0",
-                            disableAddButton
-                              ? "cursor-not-allowed opacity-50"
-                              : ""
-                          )}
-                          onClick={onAdd}
-                          disabled={disableAddButton}
-                        >
-                          + Add
-                        </Button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </PopoverPanel>
-            </Transition>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </PopoverPanel>
+              </Transition>
+            </div>
           </>
         )}
       </Popover>
