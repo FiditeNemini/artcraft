@@ -6,7 +6,9 @@ import {
   ClassyModelSelector,
   IMAGE_TO_VIDEO_PAGE_MODEL_LIST,
   ModelPage,
-  getSelectedVideoModel,
+  useSelectedVideoModel,
+  ProviderSelector,
+  PROVIDER_LOOKUP_BY_PAGE,
 } from "@storyteller/ui-model-selector";
 import { VideoModel } from "@storyteller/model-list";
 import { animated, useSpring } from "@react-spring/web";
@@ -38,7 +40,7 @@ const ImageToVideo = ({ imageMediaId, imageUrl }: ImageToVideoProps) => {
   const [promptHeight, setPromptHeight] = useState<number>(138);
 
   const selectedVideoModel: VideoModel | undefined =
-    getSelectedVideoModel(PAGE_ID);
+    useSelectedVideoModel(PAGE_ID);
 
   const jobContext: JobContextType = {
     jobTokens: [],
@@ -201,7 +203,7 @@ const ImageToVideo = ({ imageMediaId, imageUrl }: ImageToVideoProps) => {
           <BackgroundGallery />
           {/* } */}
 
-          <div className="absolute bottom-6 left-6 z-20 flex items-center gap-2">
+          <div className="absolute bottom-6 left-6 z-20 flex items-center gap-5">
             <ClassyModelSelector
               items={IMAGE_TO_VIDEO_PAGE_MODEL_LIST}
               page={PAGE_ID}
@@ -210,6 +212,15 @@ const ImageToVideo = ({ imageMediaId, imageUrl }: ImageToVideoProps) => {
               buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-white/80 hover:text-white"
               showIconsInList
               triggerLabel="Model"
+            />
+            <ProviderSelector
+              page={PAGE_ID}
+              model={selectedVideoModel}
+              providersByModel={PROVIDER_LOOKUP_BY_PAGE[PAGE_ID]}
+              panelTitle="Select Provider"
+              panelClassName="min-w-[220px]"
+              buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-white/80 hover:text-white"
+              triggerLabel="Provider"
             />
           </div>
           <div className="absolute bottom-6 right-6 z-20 flex items-center gap-2">

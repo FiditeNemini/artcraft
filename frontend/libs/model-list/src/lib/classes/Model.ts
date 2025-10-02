@@ -14,7 +14,7 @@ export class Model {
   // A unique frontend-only string for the model
   readonly id: string;
 
-  // A unique identifier that Tauri uses for the model (this 
+  // A unique identifier that Tauri uses for the model (this
   // might differ from our backend or other systems)
   readonly tauriId: string;
 
@@ -40,6 +40,9 @@ export class Model {
   // A list of filterable "capabilities" that can be used to filter models.
   readonly tags: ModelTag[];
 
+  // Optional provider preferences; two-to-many via page and providers.
+  readonly preferredProvidersByPage?: Partial<Record<string, string[]>>;
+
   protected constructor(args: {
     id: string;
     tauriId: string;
@@ -50,6 +53,7 @@ export class Model {
     selectorDescription: string;
     selectorBadges: string[];
     tags?: ModelTag[];
+    preferredProvidersByPage?: Partial<Record<string, string[]>>;
   }) {
     this.id = args.id;
     this.tauriId = args.tauriId;
@@ -60,9 +64,10 @@ export class Model {
     this.selectorDescription = args.selectorDescription;
     this.selectorBadges = args.selectorBadges;
     this.tags = args.tags ?? [];
+    this.preferredProvidersByPage = args.preferredProvidersByPage;
   }
 
-  toLegacyBadges() : { label: string }[] {
+  toLegacyBadges(): { label: string }[] {
     return this.selectorBadges.map((b) => ({ label: b }));
   }
 

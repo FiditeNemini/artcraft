@@ -13,9 +13,11 @@ import { BaseImageSelector, BaseSelectorImage } from "./BaseImageSelector";
 import DrawToolControlBar from "./DrawToolControlBar";
 import {
   ClassyModelSelector,
-  getSelectedImageModel,
+  useSelectedImageModel,
   IMAGE_EDITOR_PAGE_MODEL_LIST,
   ModelPage,
+  ProviderSelector,
+  PROVIDER_LOOKUP_BY_PAGE,
 } from "@storyteller/ui-model-selector";
 import { ImageModel } from "@storyteller/model-list";
 import { HistoryStack, ImageBundle } from "./HistoryStack";
@@ -27,7 +29,7 @@ const PageEdit = () => {
   //useStateSceneLoader();
 
   const selectedImageModel: ImageModel | undefined =
-    getSelectedImageModel(PAGE_ID);
+    useSelectedImageModel(PAGE_ID);
 
   // State for canvas dimensions
   const canvasWidth = useRef<number>(1024);
@@ -463,7 +465,7 @@ const PageEdit = () => {
           />
         </ContextMenuContainer>
       </div>
-      <div className="absolute bottom-6 left-6 z-20 flex items-center gap-2">
+      <div className="absolute bottom-6 left-6 z-20 flex items-center gap-5">
         <ClassyModelSelector
           items={IMAGE_EDITOR_PAGE_MODEL_LIST}
           page={PAGE_ID}
@@ -472,6 +474,15 @@ const PageEdit = () => {
           buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-base-fg opacity-80 hover:opacity-100"
           showIconsInList
           triggerLabel="Model"
+        />
+        <ProviderSelector
+          page={PAGE_ID}
+          model={selectedImageModel}
+          providersByModel={PROVIDER_LOOKUP_BY_PAGE[PAGE_ID]}
+          panelTitle="Select Provider"
+          panelClassName="min-w-[220px]"
+          buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-base-fg opacity-80 hover:opacity-100"
+          triggerLabel="Provider"
         />
       </div>
       <div className="absolute bottom-6 right-6 z-20 flex items-center gap-2">

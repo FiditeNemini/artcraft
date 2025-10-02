@@ -1,25 +1,47 @@
 import { create } from "zustand";
 import { ModelPage } from "./model-pages";
 import { ImageModel, Model, VideoModel } from "@storyteller/model-list";
+import { Provider } from "@storyteller/tauri-api";
 
 interface ClassyModelSelectorState {
   selectedModels: { [page in ModelPage]?: Model };
+  selectedProviders: { [page in ModelPage]?: { [modelId: string]: Provider } };
   setSelectedModel: (page: ModelPage, model: Model) => void;
+  setSelectedProvider: (
+    page: ModelPage,
+    modelId: string,
+    provider: Provider
+  ) => void;
 }
 
-export const useClassyModelSelectorStore = create<ClassyModelSelectorState>((set) => ({
-  selectedModels: {},
-  setSelectedModel: (page, model) =>
-    set((state) => ({
-      selectedModels: {
-        ...state.selectedModels,
-        [page]: model,
-      },
-    })),
-}));
+export const useClassyModelSelectorStore = create<ClassyModelSelectorState>(
+  (set) => ({
+    selectedModels: {},
+    selectedProviders: {},
+    setSelectedModel: (page, model) =>
+      set((state) => ({
+        selectedModels: {
+          ...state.selectedModels,
+          [page]: model,
+        },
+      })),
+    setSelectedProvider: (page, modelId, provider) =>
+      set((state) => ({
+        selectedProviders: {
+          ...state.selectedProviders,
+          [page]: {
+            ...(state.selectedProviders[page] ?? {}),
+            [modelId]: provider,
+          },
+        },
+      })),
+  })
+);
 
-export const getSelectedImageModel = (page: ModelPage) : ImageModel | undefined => {
-  const { selectedModels } = useClassyModelSelectorStore();
+export const getSelectedImageModel = (
+  page: ModelPage
+): ImageModel | undefined => {
+  const { selectedModels } = useClassyModelSelectorStore.getState();
   const maybeModel = selectedModels[page];
   if (!maybeModel) {
     return undefined;
@@ -32,8 +54,10 @@ export const getSelectedImageModel = (page: ModelPage) : ImageModel | undefined 
   return undefined;
 };
 
-export const getSelectedVideoModel = (page: ModelPage) : VideoModel | undefined => {
-  const { selectedModels } = useClassyModelSelectorStore();
+export const getSelectedVideoModel = (
+  page: ModelPage
+): VideoModel | undefined => {
+  const { selectedModels } = useClassyModelSelectorStore.getState();
   const maybeModel = selectedModels[page];
   if (!maybeModel) {
     return undefined;
@@ -45,3 +69,45 @@ export const getSelectedVideoModel = (page: ModelPage) : VideoModel | undefined 
   }
   return maybeModel as VideoModel;
 };
+
+export const getSelectedProviderForModel = (
+  page: ModelPage,
+  modelId: string
+): Provider | undefined => {
+  const { selectedProviders } = useClassyModelSelectorStore.getState();
+  const byPage = selectedProviders[page];
+  if (!byPage) return undefined;
+  return byPage[modelId];
+};
+
+// Reactive hooks for UI subscriptions
+export const useSelectedModel = (page: ModelPage): Model | undefined =>
+  useClassyModelSelectorStore((s) => s.selectedModels[page]);
+
+export const useSelectedImageModel = (
+  page: ModelPage
+): ImageModel | undefined => {
+  const maybeModel = useSelectedModel(page);
+  if (!maybeModel) return undefined;
+  return maybeModel.kind === "image_model"
+    ? (maybeModel as ImageModel)
+    : undefined;
+};
+
+export const useSelectedVideoModel = (
+  page: ModelPage
+): VideoModel | undefined => {
+  const maybeModel = useSelectedModel(page);
+  if (!maybeModel) return undefined;
+  return maybeModel.kind === "video_model"
+    ? (maybeModel as VideoModel)
+    : undefined;
+};
+
+export const useSelectedProviderForModel = (
+  page: ModelPage,
+  modelId: string | undefined
+): Provider | undefined =>
+  useClassyModelSelectorStore((s) =>
+    modelId ? s.selectedProviders[page]?.[modelId] : undefined
+  );

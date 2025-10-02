@@ -208,6 +208,14 @@ img {
   pointer-events: none;
 }
 
+/* Icon auto-contrast: invert only in dark themes */
+.icon-auto-contrast {
+  filter: invert(1);
+}
+.theme-light .icon-auto-contrast {
+  filter: none;
+}
+
 /* Hide native scrollbars while preserving scrollability */
 .scrollbar-hidden {
   -ms-overflow-style: none; /* IE and Edge */

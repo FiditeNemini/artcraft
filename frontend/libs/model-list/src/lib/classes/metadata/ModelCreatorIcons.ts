@@ -29,7 +29,7 @@ export const getCreatorIconPath = (creator: ModelCreator): string | undefined =>
 
 export const getCreatorIcon = (
   creator: ModelCreator,
-  className = "h-4 w-4 invert"
+  className = "h-4 w-4 icon-auto-contrast"
 ): ReactNode | null => {
   const path = getCreatorIconPath(creator) ?? DEFAULT_ICON_PATH;
   return React.createElement("img", {

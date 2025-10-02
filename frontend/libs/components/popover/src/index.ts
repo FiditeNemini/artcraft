@@ -1,2 +1,1 @@
-
-export * from './lib/popover';
+export * from "./lib/popover";

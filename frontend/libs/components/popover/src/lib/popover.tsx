@@ -106,77 +106,64 @@ export const PopoverMenu = ({
     end: "right-0",
   };
 
-  // Track hover state and refs
-  const [isHovering, setIsHovering] = useState(false);
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Hover timers and refs
+  const openTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const popoverButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Cleanup timeout on unmount
+  // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-      }
+      if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
     };
   }, []);
 
   const handleButtonMouseEnter = (open: boolean, openFn: () => void) => {
     if (!(mode === "hoverSelect" || closeOnUnhover)) return;
-
-    setIsHovering(true);
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-      hoverTimeoutRef.current = null;
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
     }
-
     if (!open && mode === "hoverSelect") {
-      hoverTimeoutRef.current = setTimeout(() => {
+      if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
+      openTimeoutRef.current = setTimeout(() => {
         openFn();
-      }, 100);
+      }, 120);
     }
   };
 
   const handleButtonMouseLeave = (closeFn: () => void) => {
     if (!(mode === "hoverSelect" || closeOnUnhover)) return;
-
-    setIsHovering(false);
-
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
+    if (openTimeoutRef.current) {
+      clearTimeout(openTimeoutRef.current);
+      openTimeoutRef.current = null;
     }
-
-    hoverTimeoutRef.current = setTimeout(
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    closeTimeoutRef.current = setTimeout(
       () => {
-        if (!isHovering) {
-          closeFn();
-        }
+        closeFn();
       },
-      mode === "hoverSelect" ? 300 : 150
+      mode === "hoverSelect" ? 200 : 120
     );
   };
 
   const handlePanelMouseEnter = () => {
     if (!(mode === "hoverSelect" || closeOnUnhover)) return;
-    setIsHovering(true);
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-      hoverTimeoutRef.current = null;
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
     }
   };
 
   const handlePanelMouseLeave = (closeFn: () => void) => {
     if (!(mode === "hoverSelect" || closeOnUnhover)) return;
-    setIsHovering(false);
-
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-    }
-
-    hoverTimeoutRef.current = setTimeout(
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    closeTimeoutRef.current = setTimeout(
       () => {
         closeFn();
       },
-      mode === "hoverSelect" ? 300 : 150
+      mode === "hoverSelect" ? 200 : 120
     );
   };
 
@@ -297,8 +284,8 @@ export const PopoverMenu = ({
                             className={twMerge(
                               "group flex cursor-pointer items-start gap-2 rounded-lg px-2 py-2 transition-all",
                               item.selected
-                                ? "bg-black/40 border-l-4 border-primary"
-                                : "hover:bg-black/20",
+                                ? "bg-ui-controls/70 border-l-4 border-primary"
+                                : "hover:bg-ui-controls/50",
                               item.disabled
                                 ? "!cursor-not-allowed opacity-50"
                                 : ""

@@ -16,9 +16,11 @@ import {
   CANVAS_2D_PAGE_MODEL_LIST,
   ClassyModelSelector,
   ModelPage,
+  ProviderSelector,
+  PROVIDER_LOOKUP_BY_PAGE,
+  useSelectedImageModel,
 } from "@storyteller/ui-model-selector";
 import { useCanvasBgRemovedEvent } from "@storyteller/tauri-api";
-import { getSelectedImageModel } from "@storyteller/ui-model-selector";
 import { TutorialModalButton } from "@storyteller/ui-tutorial-modal";
 
 const PAGE_ID: ModelPage = ModelPage.Canvas2D;
@@ -57,7 +59,7 @@ const PageDraw = () => {
   const store = useSceneStore();
 
   const selectedImageModel: ImageModel | undefined =
-    getSelectedImageModel(PAGE_ID);
+    useSelectedImageModel(PAGE_ID);
 
   useDeleteHotkeys({ onDelete: store.deleteSelectedItems });
   useUndoRedoHotkeys({ undo: store.undo, redo: store.redo });
@@ -441,7 +443,7 @@ const PageDraw = () => {
           />
         </ContextMenuContainer>
       </div>
-      <div className="absolute bottom-6 left-6 z-20 flex items-center gap-2">
+      <div className="absolute bottom-6 left-6 z-20 flex items-center gap-5">
         <ClassyModelSelector
           items={CANVAS_2D_PAGE_MODEL_LIST}
           page={PAGE_ID}
@@ -450,6 +452,15 @@ const PageDraw = () => {
           buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-white/80 hover:text-white"
           showIconsInList
           triggerLabel="Model"
+        />
+        <ProviderSelector
+          page={PAGE_ID}
+          model={selectedImageModel}
+          providersByModel={PROVIDER_LOOKUP_BY_PAGE[PAGE_ID]}
+          panelTitle="Select Provider"
+          panelClassName="min-w-[220px]"
+          buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-white/80 hover:text-white"
+          triggerLabel="Provider"
         />
       </div>
       <div className="absolute bottom-6 right-6 z-20 flex items-center gap-2">

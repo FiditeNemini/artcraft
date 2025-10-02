@@ -7,7 +7,9 @@ import {
   TEXT_TO_IMAGE_PAGE_MODEL_LIST,
   ModelPage,
   ClassyModelSelector,
-  getSelectedImageModel,
+  useSelectedImageModel,
+  ProviderSelector,
+  PROVIDER_LOOKUP_BY_PAGE,
 } from "@storyteller/ui-model-selector";
 import { ImageModel } from "@storyteller/model-list";
 interface TextToImageProps {
@@ -38,7 +40,7 @@ const TextToImage = ({ imageMediaId, imageUrl }: TextToImageProps) => {
   const [promptHeight, setPromptHeight] = useState<number>(138);
 
   const selectedImageModel: ImageModel | undefined =
-    getSelectedImageModel(PAGE_ID);
+    useSelectedImageModel(PAGE_ID);
 
   const jobContext: JobContextType = {
     jobTokens: [],
@@ -213,7 +215,7 @@ const TextToImage = ({ imageMediaId, imageUrl }: TextToImageProps) => {
 
           {!showPromptAtBottom && <BackgroundGallery />}
 
-          <div className="absolute bottom-6 left-6 z-20 flex items-center gap-2">
+          <div className="absolute bottom-6 left-6 z-20 flex items-center gap-5">
             <ClassyModelSelector
               items={TEXT_TO_IMAGE_PAGE_MODEL_LIST}
               page={PAGE_ID}
@@ -223,6 +225,15 @@ const TextToImage = ({ imageMediaId, imageUrl }: TextToImageProps) => {
               buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-white/80 hover:text-white"
               showIconsInList
               triggerLabel="Model"
+            />
+            <ProviderSelector
+              page={PAGE_ID}
+              model={selectedImageModel}
+              providersByModel={PROVIDER_LOOKUP_BY_PAGE[PAGE_ID]}
+              panelTitle="Select Provider"
+              panelClassName="min-w-[220px]"
+              buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-white/80 hover:text-white"
+              triggerLabel="Provider"
             />
           </div>
           <div className="absolute bottom-6 right-6 z-20 flex items-center gap-2">
