@@ -281,7 +281,7 @@ const Landing = () => {
                     </h3>
                     <p className="text-white/80 text-sm sm:text-base lg:text-lg leading-relaxed">
                       <span className="text-primary-400 font-semibold">
-                        Our tool lets you design visually, like Figma.
+                        Create images and videos with our easy-to-use AI tool.
                       </span>{" "}
                       Draw on a canvas or work in a 3D space as if you're
                       playing a video game.
