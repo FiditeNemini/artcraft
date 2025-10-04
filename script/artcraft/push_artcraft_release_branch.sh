@@ -2,13 +2,17 @@
 
 set -euxo pipefail
 
-git branch -D artcraft-release
+declare -r RELEASE_BRANCH="artcraft-release"
+
+if git show-ref --verify --quiet "refs/heads/${RELEASE_BRANCH}"; then
+  git branch -D artcraft-release
+fi
 
 git checkout main
 git pull
 
-git checkout -b artcraft-release
-git push origin artcraft-release
+git checkout -b "${RELEASE_BRANCH}"
+git push origin "${RELEASE_BRANCH}"
 
 git checkout main
 
