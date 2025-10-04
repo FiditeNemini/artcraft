@@ -1,15 +1,7 @@
-import { useState } from "react";
 import { SoraAccountBlock } from "./SoraAccountBlock";
 import { ArtcraftAccountBlock } from "./ArtcraftAccountBlock";
 import { FalApiKeyBlock } from "./FalApiKeyBlock";
-import { OpenAIApiKeyBlock } from "./OpenAIKeyBlock";
 import { MidjourneyAccountBlock } from "./MidjourneyAccountBlock";
-
-interface AccountInfo {
-  username: string;
-  subscription: string;
-  credits: number;
-}
 
 interface AccountSettingsPaneProps {
   globalAccountLogoutCallback: () => void;
@@ -18,15 +10,6 @@ interface AccountSettingsPaneProps {
 export const AccountSettingsPane = ({
   globalAccountLogoutCallback,
 }: AccountSettingsPaneProps) => {
-  const [accountInfo] = useState<AccountInfo>({
-    username: "-",
-    subscription: "-",
-    credits: 0,
-  });
-
-  const [palApiKey, setPalApiKey] = useState("");
-  const [klingApiKey, setKlingApiKey] = useState("");
-
   return (
     <>
       <div className="space-y-4 text-base-fg">

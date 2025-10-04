@@ -6,6 +6,9 @@
       "path": "../popover"
     },
     {
+      "path": "../../tauri-api"
+    },
+    {
       "path": "../../model-list"
     },
     {

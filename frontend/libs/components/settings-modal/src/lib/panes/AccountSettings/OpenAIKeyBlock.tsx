@@ -11,6 +11,8 @@ export const OpenAIApiKeyBlock = () => {
   const [isCheckingOpenAIApiKey, setIsCheckingOpenAIApiKey] =
     useState(false);
 
+  console.log(isCheckingOpenAIApiKey);
+
   useEffect(() => {
     const fetchKey = async () => {
       setIsCheckingOpenAIApiKey(true);

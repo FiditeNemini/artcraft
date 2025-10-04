@@ -4,13 +4,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinnerThird } from "@fortawesome/pro-solid-svg-icons";
 import {
   SoraGetCredentialInfo,
-  SoraSessionState,
   LogoutSoraSession,
-  useSoraLoginListener,
   SoraGetCredentialInfoSuccess,
 } from "@storyteller/tauri-api";
 import { invoke } from "@tauri-apps/api/core";
-import { RefreshAccountStateEvent, useRefreshAccountStateEvent } from "libs/tauri-events/src/lib/events/functional/RefreshAccountStateEvent";
+import { RefreshAccountStateEvent, useRefreshAccountStateEvent } from "@storyteller/tauri-events";
 
 export const SoraAccountBlock = () => {
   const [soraSession, setSoraSession] = useState<SoraGetCredentialInfoSuccess| undefined>(undefined);

@@ -10,6 +10,8 @@ export const FalApiKeyBlock = () => {
   const [isCheckingFalApiKey, setIsCheckingFalApiKey] =
     useState(false);
 
+  console.log(isCheckingFalApiKey);
+
   useEffect(() => {
     const fetchKey = async () => {
       setIsCheckingFalApiKey(true);
