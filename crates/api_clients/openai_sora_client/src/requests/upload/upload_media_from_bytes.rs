@@ -1,6 +1,7 @@
 use crate::creds::sora_credential_set::SoraCredentialSet;
 use crate::error::sora_error::SoraError;
-use crate::requests::upload::upload_media_http_request::{upload_media_http_request, SoraMediaUploadResponse};
+use crate::requests::upload::upload_media_http_request::upload_media_http_request;
+use crate::requests::upload::upload_media_http_response::SoraMediaUploadResponse;
 use std::path::PathBuf;
 use std::time::Duration;
 

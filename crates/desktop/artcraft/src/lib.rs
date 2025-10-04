@@ -41,12 +41,11 @@ use crate::services::midjourney::commands::midjourney_open_login_command::midjou
 use crate::services::midjourney::state::midjourney_credential_manager::MidjourneyCredentialManager;
 use crate::services::sora::commands::check_sora_session_command::check_sora_session_command;
 use crate::services::sora::commands::open_sora_login_command::open_sora_login_command;
-use crate::services::sora::commands::sora_image_generation_command::sora_image_generation_command;
-use crate::services::sora::commands::sora_image_remix_command::sora_image_remix_command;
+use crate::services::sora::commands::sora_get_credential_info_command::sora_get_credential_info_command;
 use crate::services::sora::commands::sora_logout_command::sora_logout_command;
 use crate::services::sora::state::sora_credential_manager::SoraCredentialManager;
 use crate::services::sora::state::sora_task_queue::SoraTaskQueue;
-use crate::services::sora::threads::sora_task_polling_thread::sora_task_polling_thread;
+use crate::services::sora::threads::sora_task_polling::sora_task_polling_thread::sora_task_polling_thread;
 use crate::services::storyteller::commands::storyteller_get_credits_command::storyteller_get_credits_command;
 use crate::services::storyteller::commands::storyteller_get_subscription_command::storyteller_get_subscription_command;
 use crate::services::storyteller::commands::storyteller_purge_credentials_command::storyteller_purge_credentials_command;
@@ -200,8 +199,7 @@ pub fn run() {
     platform_info_command,
     set_fal_api_key_command,
     set_provider_order_command,
-    sora_image_generation_command,
-    sora_image_remix_command,
+    sora_get_credential_info_command,
     sora_logout_command,
     storyteller_get_credits_command,
     storyteller_get_subscription_command,

@@ -6,25 +6,39 @@ import { PopoverMenu, PopoverItem } from "@storyteller/ui-popover";
 import { Tooltip } from "@storyteller/ui-tooltip";
 import { Button, ToggleButton } from "@storyteller/ui-button";
 import { Modal } from "@storyteller/ui-modal";
-import { EnqueueImageToVideo } from "@storyteller/tauri-api";
+import { EnqueueImageToVideo, EnqueueImageToVideoRequest } from "@storyteller/tauri-api";
 import {
   faMessageXmark,
   faMessageCheck,
   faSparkles,
   faSpinnerThird,
+  faSquare,
+  faPortrait,
 } from "@fortawesome/pro-solid-svg-icons";
 import { faRectangle } from "@fortawesome/pro-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { IsDesktopApp } from "@storyteller/tauri-utils";
 import { GalleryItem, GalleryModal } from "@storyteller/ui-gallery-modal";
-import { VideoModel } from "@storyteller/model-list";
+import { SizeIconOption, SizeOption, VideoModel } from "@storyteller/model-list";
 import { usePromptVideoStore, RefImage } from "./promptStore";
 import { gtagEvent } from "@storyteller/google-analytics";
 import { ImagePromptRow } from "./ImagePromptRow";
 import type { UploadImageFn } from "./ImagePromptRow";
 import { twMerge } from "tailwind-merge";
 import { toast } from "@storyteller/ui-toaster";
+
+const DEFAULT_RESOLUTIONS : SizeOption[] =  [
+  {
+    tauriValue: "720p",
+    textLabel: "720p",
+    icon: SizeIconOption.Landscape,
+  },
+  {
+    tauriValue: "480p",
+    textLabel: "480p",
+    icon: SizeIconOption.Landscape,
+  },
+];
 
 interface PromptBoxVideoProps {
   useJobContext: () => JobContextType;
@@ -63,7 +77,6 @@ export const PromptBoxVideo = ({
     }
   }, [imageMediaId, url]);
 
-  console.log("Is this a desktop app?", IsDesktopApp());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [content, setContent] = useState<React.ReactNode>(null);
   const prompt = usePromptVideoStore((s) => s.prompt);
@@ -89,18 +102,63 @@ export const PromptBoxVideo = ({
     showImagePrompts ||
     referenceImages.length > 0 ||
     uploadingImages.length > 0;
-  const [resolutionList, setResolutionList] = useState<PopoverItem[]>([
-    {
-      label: "720p",
-      selected: resolution === "720p",
-      icon: <FontAwesomeIcon icon={faRectangle} className="h-4 w-4" />,
-    },
-    {
-      label: "480p",
-      selected: resolution === "480p",
-      icon: <FontAwesomeIcon icon={faRectangle} className="h-4 w-4" />,
-    },
-  ]);
+
+  // TODO: Get rid of default resolutions. Just disable it if not present.
+  let resolutionOptions: PopoverItem[];
+
+  if (!!selectedModel?.sizeOptions && selectedModel.sizeOptions.length > 0) {
+    // When switching to a new model, the existing resolution might not be correct.
+    // This is a gross and nasty hack to handle the case where the resolution is not found.
+    const resolutionExists = selectedModel.sizeOptions.some((option) => option.textLabel === resolution);
+    const useFirstOption = !resolutionExists;
+
+    resolutionOptions = selectedModel.sizeOptions.map((option, index) => {
+      let faIcon = faRectangle;
+      switch (option.icon) {
+        case SizeIconOption.Landscape:
+          faIcon = faRectangle;
+          break;
+        case SizeIconOption.Portrait:
+          faIcon = faPortrait;
+          break;
+        case SizeIconOption.Square:
+          faIcon = faSquare;
+          break;
+      }
+      const icon = <FontAwesomeIcon icon={faIcon} className="h-4 w-4" />;
+      return {
+        label: option.textLabel,
+        selected: option.textLabel === resolution || (useFirstOption && index === 0),
+        icon: icon,
+      };
+    });
+  } else {
+    const resolutionExists = DEFAULT_RESOLUTIONS.some((option) => option.textLabel === resolution);
+    const useFirstOption = !resolutionExists;
+
+    resolutionOptions = DEFAULT_RESOLUTIONS.map((option, index) => {
+      let faIcon = faRectangle;
+      switch (option.icon) {
+        case SizeIconOption.Landscape:
+          faIcon = faRectangle;
+          break;
+        case SizeIconOption.Portrait:
+          faIcon = faPortrait;
+          break;
+        case SizeIconOption.Square:
+          faIcon = faSquare;
+          break;
+      }
+      const icon = <FontAwesomeIcon icon={faIcon} className="h-4 w-4" />;
+      return {
+        label: option.textLabel,
+        selected: option.textLabel === resolution || (useFirstOption && index === 0),
+        icon: icon,
+      };
+    });
+  }
+
+  const [resolutionList, setResolutionList] = useState<PopoverItem[]>(resolutionOptions);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -130,7 +188,7 @@ export const PromptBoxVideo = ({
   const handleResolutionSelect = (selectedItem: PopoverItem) => {
     setResolution(selectedItem.label as any);
     setResolutionList((prev) =>
-      prev.map((item) => ({
+      resolutionOptions.map((item) => ({
         ...item,
         selected: item.label === selectedItem.label,
       }))
@@ -158,11 +216,7 @@ export const PromptBoxVideo = ({
   const handleEnqueue = async () => {
     if (!prompt.trim()) {
       console.warn("Cannot generate video: prompt is empty");
-      return;
-    }
-
-    if (referenceImages.length === 0) {
-      console.warn("Cannot generate video: no reference image provided");
+      toast.error("Please enter a prompt to generate video");
       return;
     }
 
@@ -171,9 +225,25 @@ export const PromptBoxVideo = ({
       return;
     }
 
+    if (selectedModel?.requiresImage && referenceImages.length === 0) {
+      console.warn("Cannot generate video: no reference image provided");
+      toast.error("Please choose a starting frame image to generate video");
+      return;
+    }
+
     setIsEnqueueing(true);
 
     gtagEvent("enqueue_video");
+
+    const subscriberId = crypto.randomUUID
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2);
+
+    let imageMediaToken = undefined;
+
+    if (referenceImages.length > 0) {
+      imageMediaToken = referenceImages[0].mediaToken;
+    }
 
     setTimeout(() => {
       // TODO(bt,2025-05-08): This is a hack so we don't accidentally wind up with a permanently disabled prompt box if
@@ -182,18 +252,20 @@ export const PromptBoxVideo = ({
       setIsEnqueueing(false);
     }, 10000);
 
-    const subscriberId = crypto.randomUUID
-      ? crypto.randomUUID()
-      : Math.random().toString(36).slice(2);
-
-    await EnqueueImageToVideo({
+    let request : EnqueueImageToVideoRequest = {
       model: selectedModel,
-      image_media_token: referenceImages[0].mediaToken,
+      image_media_token: imageMediaToken,
       prompt: prompt,
       end_frame_image_media_token: endFrameImage?.mediaToken,
       frontend_caller: "image_to_video",
       frontend_subscriber_id: subscriberId,
-    });
+    };
+
+    if (selectedModel?.tauriId === "sora_2") {
+      request.sora_orientation = resolution === "720p" ? "landscape" : "portrait";
+    }
+
+    await EnqueueImageToVideo(request);
 
     onEnqueuePressed?.(prompt, subscriberId);
 
@@ -211,8 +283,11 @@ export const PromptBoxVideo = ({
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
 
-      if (prompt.trim() && referenceImages.length === 0) {
-        toast.error("Please choose a starting frame image to generate video");
+      if (selectedModel?.requiresImage && referenceImages.length === 0) {
+        return;
+      }
+
+      if (!prompt.trim()) {
         return;
       }
 
@@ -221,6 +296,10 @@ export const PromptBoxVideo = ({
   };
 
   const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
+
+  const modelNeedsAnImageButNoneAreSelected = 
+    selectedModel?.requiresImage && 
+    referenceImages.length === 0;
 
   // Hide/clear ending frame if model doesn't support it
   useEffect(() => {
@@ -329,7 +408,7 @@ export const PromptBoxVideo = ({
                 closeOnClick={true}
               >
                 <PopoverMenu
-                  items={resolutionList}
+                  items={resolutionOptions}
                   onSelect={handleResolutionSelect}
                   mode="toggle"
                   panelTitle="Resolution"
@@ -368,7 +447,7 @@ export const PromptBoxVideo = ({
                 disabled={
                   isEnqueueing ||
                   !prompt.trim() ||
-                  referenceImages.length === 0 ||
+                  modelNeedsAnImageButNoneAreSelected ||
                   !selectedModel
                 }
               >

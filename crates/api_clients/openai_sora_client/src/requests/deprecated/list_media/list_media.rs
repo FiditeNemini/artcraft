@@ -2,14 +2,14 @@ use crate::creds::sora_credential_set::SoraCredentialSet;
 use crate::error::sora_client_error::SoraClientError;
 use crate::error::sora_error::SoraError;
 use crate::error::sora_generic_api_error::SoraGenericApiError;
-use crate::requests::upload::upload_media_http_request::SoraMediaUploadResponse;
 use crate::utils_internal::classify_general_http_error::classify_general_http_error;
 use log::{error, info};
 use once_cell::sync::Lazy;
 use serde_derive::Deserialize;
 use wreq::Client;
 
-const SORA_MEDIA_LIST_URL: &str = "https://sora.chatgpt.com/backend/video_gen?limit=50";
+//const SORA_MEDIA_LIST_URL: &str = "https://sora.chatgpt.com/backend/video_gen?limit=50";
+const SORA_MEDIA_LIST_URL : &str = "https://sora.chatgpt.com/backend/v2/list_tasks?limit=20";
 
 #[derive(Debug, Deserialize)]
 pub struct ListMediaResponse {
