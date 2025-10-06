@@ -725,8 +725,6 @@ const Landing = () => {
         </motion.div>
       </div>
 
-      <div className="pb-8 sm:pb-12"></div>
-
       <Footer />
     </div>
   );

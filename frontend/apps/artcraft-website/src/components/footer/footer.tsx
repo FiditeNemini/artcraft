@@ -3,11 +3,11 @@ import {
   faTiktok,
   faDiscord,
   faYoutube,
-  faGithub,
   faGithubAlt,
 } from "@fortawesome/free-brands-svg-icons";
 import { SOCIAL_LINKS } from "../../config/links";
 import { parseFrontmatter, pathToFilename } from "../../utils/markdown";
+import { Link } from "react-router-dom";
 
 const faqFiles = import.meta.glob("../../pages/faq/content/*.md", {
   query: "?raw",
@@ -96,35 +96,35 @@ export default function Example() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6 text-sm/6">
             <div className="flex flex-col items-center sm:items-start gap-2">
               <div className="text-gray-200 mb-1">Pages</div>
-              <a href="/" className="text-gray-400 hover:text-white">
+              <Link to="/" className="text-gray-400 hover:text-white">
                 Home
-              </a>
+              </Link>
             </div>
             <div className="flex flex-col items-center sm:items-start gap-2">
               <div className="text-gray-200 mb-1">Tutorials</div>
-              <a href="/tutorials" className="text-gray-400 hover:text-white">
+              <Link to="/tutorials" className="text-gray-400 hover:text-white">
                 All Tutorials
-              </a>
+              </Link>
               {Object.entries(tutorialFiles).map(([path, raw]) => {
                 const { frontmatter } = parseFrontmatter(raw as string);
                 const slug = pathToFilename(path);
                 if (frontmatter.isPublished === "false") return null;
                 return (
-                  <a
+                  <Link
                     key={slug}
-                    href={`/tutorials/${slug}`}
+                    to={`/tutorials/${slug}`}
                     className="text-gray-400 hover:text-white"
                   >
                     {frontmatter.title || slug}
-                  </a>
+                  </Link>
                 );
               })}
             </div>
             <div className="flex flex-col items-center sm:items-start gap-2">
               <div className="text-gray-200 mb-1">FAQ</div>
-              <a href="/faq" className="text-gray-400 hover:text-white">
+              <Link to="/faq" className="text-gray-400 hover:text-white">
                 All FAQs
-              </a>
+              </Link>
               {Object.entries(faqFiles).map(([path, raw]) => {
                 const { frontmatter } = parseFrontmatter(raw as string);
                 const slug = pathToFilename(path);
@@ -133,13 +133,13 @@ export default function Example() {
                 const truncated =
                   title.length > 36 ? title.slice(0, 33) + "…" : title;
                 return (
-                  <a
+                  <Link
                     key={slug}
-                    href={`/faq/${slug}`}
+                    to={`/faq/${slug}`}
                     className="text-gray-400 hover:text-white"
                   >
                     {truncated}
-                  </a>
+                  </Link>
                 );
               })}
             </div>
