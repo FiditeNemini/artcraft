@@ -9,7 +9,7 @@ slug: 3d-editor
 
 ## Compose scenes like a playable set
 
-The 3D Editor lets you place subjects, cameras, and lights in a real‑time scene. Drag‑and‑drop images to create simple 3D proxies, pose characters, and orbit the camera until the shot feels right. When you generate, the AI keeps your framing and lighting intact.
+The 3D Editor lets you place subjects, cameras, and lights in a real‑time scene. Add objects and characters, pose characters, and orbit the camera until the shot feels right. When you generate, the AI keeps your framing and pose intact.
 
 ## Why 3D matters
 
@@ -19,7 +19,7 @@ The 3D Editor lets you place subjects, cameras, and lights in a real‑time scen
 
 ## Workflow
 
-1. Choose a preset or import images to build the scene.
+1. Choose a preset from ArtCraft presets by clicking the + button above or import images to build the scene.
 2. Place the subject, set the camera height and focal length.
 3. Add a concise prompt for style and materials.
 4. Generate, compare, and tweak until it clicks.
