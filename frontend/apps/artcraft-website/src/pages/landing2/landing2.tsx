@@ -14,6 +14,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Footer from "../../components/footer";
 import { useState, useRef, useEffect } from "react";
 import ModelBadgeGrid from "../../components/model-badge-grid";
+import Seo from "../../components/seo";
 
 // Current Mac version (update this when a new version is released)
 // If a rollback is necessary, roll back to the last known good date.
@@ -89,6 +90,10 @@ const Landing = () => {
 
   return (
     <div className="relative min-h-screen bg-[#101014] text-white overflow-hidden bg-dots">
+      <Seo
+        title="ArtCraft. AI Video and Images. Fast and Open Desktop App."
+        description="ArtCraft is an Open Desktop app for generating AI Video and Images. You own ArtCraft!"
+      />
       {/* Hero Section */}
       <main className="relative mb-8 md:mb-12 pt-24 sm:pt-24 min-h-[400px] sm:min-h-[600px] md:min-h-[700px] flex items-center justify-center px-2 sm:px-4 md:px-0">
         {/* Glowing Gradient Orb Background */}
