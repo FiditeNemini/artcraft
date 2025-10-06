@@ -9,7 +9,7 @@ slug: 3d-editor
 
 ## Compose scenes like a playable set
 
-The 3D Editor lets you place subjects, cameras, and lights in a real‑time scene. Add objects and characters, pose characters, and orbit the camera until the shot feels right. When you generate, the AI keeps your framing and pose intact.
+The 3D Editor lets you place subjects, and cameras in a real‑time scene. Add objects and characters, pose characters, and orbit the camera until the shot feels right. When you generate, the AI keeps your framing and pose intact.
 
 ## Why 3D matters
 
