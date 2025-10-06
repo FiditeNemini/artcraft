@@ -48,7 +48,11 @@ export default function Navbar() {
             </div>
             <div className="hidden md:ml-10 md:flex md:items-center md:space-x-6">
               {NAV_ITEMS.map((item) => {
-                const isCurrent = location.pathname === item.href;
+                const isCurrent =
+                  item.href === "/"
+                    ? location.pathname === "/"
+                    : location.pathname === item.href ||
+                      location.pathname.startsWith(item.href + "/");
                 return (
                   <Link
                     key={item.name}

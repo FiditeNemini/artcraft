@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import Seo from "../../components/seo";
 import { Link } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -58,8 +59,15 @@ export const TutorialsPage = () => {
     return items.filter((t) => t.category === activeCategory);
   }, [activeCategory, items]);
 
+  const pageTitle =
+    activeCategory === "All"
+      ? "Tutorials - ArtCraft"
+      : `${activeCategory} Tutorials - ArtCraft`;
+  const pageDescription = "Learn tips, tricks, and workflows for ArtCraft.";
+
   return (
     <div className="relative min-h-screen bg-[#101014] text-white overflow-hidden bg-dots">
+      <Seo title={pageTitle} description={pageDescription} />
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
         <div className="w-[900px] h-[900px] rounded-full bg-gradient-to-br from-blue-700 via-blue-500 to-[#00AABA] opacity-25 blur-[120px]"></div>
       </div>

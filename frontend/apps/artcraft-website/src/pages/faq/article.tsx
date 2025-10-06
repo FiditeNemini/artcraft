@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Seo from "../../components/seo";
 import { parseFrontmatter, markdownToHtml } from "../../utils/markdown";
-import { Button } from "@storyteller/ui-button";
 import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const markdownFiles = import.meta.glob("./content/*.md", {
   query: "?raw",
@@ -69,14 +69,13 @@ const FaqArticle = () => {
 
       <div className="relative z-10 mx-auto w-full max-w-3xl px-4 sm:px-6 pt-24 sm:pt-32 pb-32">
         <div className="mb-6">
-          <Button
-            as="link"
-            href="/faq"
-            icon={faChevronLeft}
-            className="rounded-lg px-4 py-2 text-sm border border-white/10 bg-white/5 hover:bg-white/10"
+          <Link
+            to="/faq"
+            className="rounded-lg px-4 py-2 text-sm border border-white/10 bg-white/5 hover:bg-white/10 inline-flex items-center gap-2"
           >
+            <FontAwesomeIcon icon={faChevronLeft} />
             Back to FAQ
-          </Button>
+          </Link>
         </div>
 
         <h1 className="text-4xl font-bold mb-4 !leading-tight">
