@@ -79,7 +79,7 @@ export const IMAGE_MODELS: ImageModel[] = [
     fullName: "Gemini 2.5 Flash",
     category: "image",
     creator: ModelCreator.Google,
-    selectorName: "Gemini 2.5 Flash",
+    selectorName: "Nano Banana",
     selectorDescription: "Ultra instructive model",
     selectorBadges: ["35 sec."],
     maxGenerationCount: 4,
