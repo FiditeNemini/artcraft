@@ -1,5 +1,6 @@
 use std::collections::BTreeSet;
 
+use crate::error::enum_error::EnumError;
 #[cfg(test)]
 use strum::EnumCount;
 #[cfg(test)]
@@ -22,6 +23,9 @@ impl_enum_display_and_debug_using_to_str!(GenerationProvider);
 impl_mysql_enum_coders!(GenerationProvider);
 impl_mysql_from_row!(GenerationProvider);
 
+// For Tauri
+impl_sqlite_enum_coders!(GenerationProvider);
+
 // NB: We can derive `sqlx::Type` instead of using `impl_mysql_enum_coders`
 
 impl GenerationProvider {
@@ -34,13 +38,13 @@ impl GenerationProvider {
     }
   }
 
-  pub fn from_str(job_status: &str) -> Result<Self, String> {
-    match job_status {
+  pub fn from_str(value: &str) -> Result<Self, EnumError> {
+    match value {
       "artcraft" => Ok(Self::Artcraft),
       "fal" => Ok(Self::Fal),
       "midjourney" => Ok(Self::Midjourney),
       "sora" => Ok(Self::Sora),
-      _ => Err(format!("invalid generation_provider: {:?}", job_status)),
+      _ => Err(EnumError::CouldNotConvertFromString(value.to_string())),
     }
   }
 
@@ -58,8 +62,9 @@ impl GenerationProvider {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_helpers::assert_serialization;
   use crate::common::generation_provider::GenerationProvider;
+  use crate::error::enum_error::EnumError;
+  use crate::test_helpers::assert_serialization;
 
   mod explicit_checks {
     use super::*;
@@ -86,6 +91,17 @@ mod tests {
       assert_eq!(GenerationProvider::from_str("fal").unwrap(), GenerationProvider::Fal);
       assert_eq!(GenerationProvider::from_str("midjourney").unwrap(), GenerationProvider::Midjourney);
       assert_eq!(GenerationProvider::from_str("sora").unwrap(), GenerationProvider::Sora);
+    }
+
+    #[test]
+    fn from_str_err() {
+      let result = GenerationProvider::from_str("asdf");
+      assert!(result.is_err());
+      if let Err(EnumError::CouldNotConvertFromString(value)) = result {
+        assert_eq!(value, "asdf");
+      } else {
+        panic!("Expected EnumError::CouldNotConvertFromString");
+      }
     }
 
     #[test]
