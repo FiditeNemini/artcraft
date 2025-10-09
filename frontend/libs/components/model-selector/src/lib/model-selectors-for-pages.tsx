@@ -43,8 +43,9 @@ export const TEXT_TO_IMAGE_PAGE_MODEL_LIST : ModelList =
       const set : Set<Model> = new Set();
       set.add(IMAGE_MODELS_BY_ID.get("flux_pro_1_1")!); // Don't put Midjourney first!
       IMAGE_MODELS
-        .filter((model) => !model.usesInpaintingMask) // We can't use masked inpainting models here
-        .filter((model) => model.id !== "flux_pro_kontext_max") // NB: Flux Pro Kontext Max requires an input image
+        .filter((model) => model.canTextToImage)
+        //.filter((model) => !model.usesInpaintingMask) // We can't use masked inpainting models here
+        //.filter((model) => model.id !== "flux_pro_kontext_max") // NB: Flux Pro Kontext Max requires an input image
         .forEach((m) => set.add(m));
       return Array.from(set);
     })(),

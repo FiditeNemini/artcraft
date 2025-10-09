@@ -27,6 +27,10 @@ export class ImageModel extends Model {
   // Maximum number of image prompts that can be attached
   readonly maxImagePromptCount: number;
 
+  // Whether the model can be used for text-to-image
+  // If true, it'll be displayed on the text-to-image page.
+  readonly canTextToImage: boolean;
+
   constructor(args: {
     id: string;
     tauriId: string;
@@ -42,6 +46,7 @@ export class ImageModel extends Model {
     usesInpaintingMask?: boolean;
     canUseImagePrompt?: boolean;
     maxImagePromptCount?: number;
+    canTextToImage?: boolean;
     tags?: ModelTag[];
   }) {
     if (args.maxGenerationCount < 1) {
@@ -62,5 +67,6 @@ export class ImageModel extends Model {
     this.usesInpaintingMask = args.usesInpaintingMask ?? false;
     this.canUseImagePrompt = args.canUseImagePrompt ?? false;
     this.maxImagePromptCount = Math.max(0, args.maxImagePromptCount ?? 1);
+    this.canTextToImage = args.canTextToImage === false ? false : true; // Default to true !
   }
 }
