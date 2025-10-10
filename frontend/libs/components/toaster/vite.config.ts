@@ -7,7 +7,13 @@ import * as path from 'path';
 export default defineConfig(() => ({
   root: __dirname,
   cacheDir: '../../../node_modules/.vite/libs/components/toaster',
-  plugins: [react(), dts({ entryRoot: 'src', tsconfigPath: path.join(__dirname, 'tsconfig.lib.json') })],
+  plugins: [
+    react(), 
+    dts({ 
+      entryRoot: 'src', 
+      tsconfigPath: path.join(__dirname, 'tsconfig.lib.json') 
+    })
+  ],
   // Uncomment this if you are using workers.
   // worker: {
   //  plugins: [ nxViteTsPaths() ],
@@ -32,7 +38,18 @@ export default defineConfig(() => ({
     },
     rollupOptions: {
       // External packages that should not be bundled into your library.
-      external: ['react','react-dom','react/jsx-runtime']
+      external: [
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+        'react-hot-toast'
+      ],
+      output: {
+        globals: {
+          'react-hot-toast': 'react-hot-toast',
+        },
+        preserveModules: false,
+      },
     },
   },
   test: {
