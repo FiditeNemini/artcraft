@@ -35,6 +35,8 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
   let mut sort_by_priority_count = 0;
 
   while !job_dependencies.job.system.application_shutdown.get() {
+    info!("Job loop iteration starting...");
+
     if let Some(pause_file) = job_dependencies.fs.maybe_pause_file.as_deref() {
       while file_exists(pause_file) {
         warn!("Pause file exists. Pausing until deleted: {:?}", pause_file);
@@ -52,6 +54,8 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
     let maybe_scoped_model_types = job_dependencies.job.system.scoped_model_type_execution.get_scoped_model_types();
 
     let batch_query_start_time = Instant::now();
+
+    info!("Querying jobs...");
 
     let maybe_available_jobs = list_available_generic_inference_jobs(ListAvailableGenericInferenceJobArgs {
       num_records: job_dependencies.job.system.job_batch_size,
@@ -116,6 +120,8 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
     }
 
     error_timeout_millis = START_TIMEOUT_MILLIS; // reset
+
+    info!("Job loop batch processing complete. Sleeping {} ms", job_dependencies.job.system.job_batch_wait_millis);
 
     std::thread::sleep(Duration::from_millis(job_dependencies.job.system.job_batch_wait_millis));
   }
@@ -192,6 +198,8 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
       job_duration.as_millis() as u64,
       &job_duration_instrumentation_attributes);
   }
+
+  info!("Process job batch loop ended.");
   Ok(())
 }
 
