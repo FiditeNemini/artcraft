@@ -18,6 +18,8 @@ use serde_derive::{Deserialize, Serialize};
 use sqlite_tasks::queries::list_tasks_for_frontend::list_tasks_for_frontend;
 use storyteller_client::endpoints::media_files::delete_media_file::delete_media_file;
 use tauri::{AppHandle, State};
+use enums::tauri::tasks::task_media_file_class::TaskMediaFileClass;
+use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::sqlite::tasks::TaskId;
 
@@ -34,9 +36,31 @@ pub struct TaskQueueItem {
   pub model_type: Option<TaskModelType>,
   pub provider: Option<GenerationProvider>,
   pub provider_job_id: Option<String>,
+  pub completed_item: Option<CompletedItemData>,
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
   pub completed_at: Option<DateTime<Utc>>,
+}
+
+#[derive(Serialize)]
+pub struct CompletedItemData {
+  pub primary_media_file: MediaFileData,
+
+  /// The type of file(s) generated.
+  pub media_file_class: Option<TaskMediaFileClass>,
+
+  /// If generated in a batch, we probably have a batch token we can query.
+  pub maybe_batch_token: Option<BatchGenerationToken>,
+}
+
+#[derive(Serialize)]
+pub struct MediaFileData {
+  pub token: MediaFileToken,
+  pub cdn_url: String,
+  pub maybe_thumbnail_url_template: Option<String>,
+
+  // NB: The frontend wants this.
+  pub created_at: DateTime<Utc>,
 }
 
 impl SerializeMarker for GetTaskQueueCommandResponse {}
@@ -74,17 +98,45 @@ pub async fn handle_request(
   let tasks = list_tasks_for_frontend(task_database.get_connection())
       .await?;
 
-  Ok(tasks.tasks.into_iter()
-      .map(|task| TaskQueueItem {
-        id: task.id,
-        task_status: task.status,
-        task_type: task.task_type,
-        model_type: task.model_type,
-        provider: task.provider,
-        provider_job_id: task.provider_job_id,
-        created_at: task.created_at,
-        updated_at: task.updated_at,
-        completed_at: task.completed_at,
-      })
-      .collect())
+  let mut transformed_tasks = Vec::with_capacity(tasks.tasks.len());
+
+  for task in tasks.tasks.into_iter() {
+    let mut completed_item = None;
+
+    if task.status == TaskStatus::CompleteSuccess {
+      let token_and_url = task.on_complete_primary_media_file_token
+          .zip(task.on_complete_primary_media_file_cdn_url);
+
+      if let Some((primary_media_file_token, media_file_url)) = token_and_url{
+        completed_item = Some(CompletedItemData {
+          primary_media_file: MediaFileData {
+            token: primary_media_file_token,
+            cdn_url: media_file_url.clone(),
+            maybe_thumbnail_url_template: task.on_complete_primary_media_file_thumbnail_url_template.clone(),
+            // NB: This isn't the exact completion date. Also, fallback to now if missing.
+            created_at: task.completed_at.unwrap_or_else(Utc::now),
+          },
+          media_file_class: task.on_complete_primary_media_file_class,
+          maybe_batch_token: task.on_complete_batch_token,
+        });
+      } else {
+        warn!("Task {} is marked complete but has no primary media file token or URL.", task.id);
+      }
+    }
+
+    transformed_tasks.push(TaskQueueItem {
+      id: task.id,
+      task_status: task.status,
+      task_type: task.task_type,
+      model_type: task.model_type,
+      provider: task.provider,
+      provider_job_id: task.provider_job_id,
+      created_at: task.created_at,
+      updated_at: task.updated_at,
+      completed_at: task.completed_at,
+      completed_item,
+    })
+  }
+
+  Ok(transformed_tasks)
 }

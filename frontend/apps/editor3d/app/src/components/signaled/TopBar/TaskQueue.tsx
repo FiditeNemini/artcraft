@@ -29,16 +29,16 @@ import {
   getProviderDisplayName,
   getModelDisplayName,
 } from "@storyteller/model-list";
-import { MediaFilesApi } from "@storyteller/api";
 import { CloseButton } from "@storyteller/ui-close-button";
 import { ActionReminderModal } from "@storyteller/ui-action-reminder-modal";
+import { TaskMediaFileClass } from "@storyteller/api-enums";
 
 type InProgressTask = {
   id: string;
   title: string;
   subtitle?: string;
   progress: number;
-  updatedAt?: string;
+  updatedAt?: Date;
   canDismiss?: boolean;
 };
 
@@ -47,10 +47,11 @@ type CompletedTask = {
   title: string;
   subtitle?: string;
   thumbnailUrl?: string;
-  completedAt?: string;
-  updatedAt?: string;
+  completedAt?: Date;
+  updatedAt?: Date;
   imageUrls?: string[];
   mediaTokens?: string[];
+  mediaFileClass?: TaskMediaFileClass;
 };
 
 const InProgressCard = ({
@@ -129,6 +130,16 @@ const CompletedCard = ({
           <img
             src={task.thumbnailUrl}
             alt={task.title}
+            onError={(e) => {
+              console.log("Failed to load thumbnail", e);
+              let errorPlaceholder = "/resources/placeholders/placeholder.png";
+              switch (task.mediaFileClass) {
+                case TaskMediaFileClass.Video:
+                  errorPlaceholder = "/resources/placeholders/placeholder_play.png";
+                  break;
+              }
+              e.currentTarget.src = errorPlaceholder;
+            }}
             className="h-full w-full object-cover"
           />
         ) : (
@@ -148,7 +159,7 @@ const CompletedCard = ({
         )}
         {task.completedAt && (
           <div className="text-base-fg text-xs opacity-60">
-            {task.completedAt}
+            {task.completedAt.toISOString()}
           </div>
         )}
       </div>
@@ -219,43 +230,11 @@ export const TaskQueue = () => {
     const load = async () => {
       try {
         const result = await GetTaskQueue();
+
         if (cancelled) return;
         console.log("TaskQueue:GetTaskQueue result", result);
-        const { tasks } = result;
 
-        // Fetch media files for thumbnails, using dummy tokens from API for now
-        const tokens = result.results as string[] | undefined;
-        let imageUrls: string[] = [];
-        let mediaTokens: string[] | undefined = undefined;
-        if (tokens && tokens.length > 0) {
-          try {
-            const api = new MediaFilesApi();
-            const batchToken = tokens.find((t) => t.startsWith("batch_"));
-            if (batchToken) {
-              const resp = await api.GetMediaFilesByBatchToken({
-                batchToken,
-              });
-              if (resp.success && resp.data) {
-                imageUrls = resp.data
-                  .filter((m) => !!m?.media_links?.cdn_url)
-                  .map((m) => m.media_links.cdn_url);
-                mediaTokens = resp.data.map((m) => m.token);
-              }
-            } else {
-              const resp = await api.ListMediaFilesByTokens({
-                mediaTokens: tokens,
-              });
-              if (resp.success && resp.data) {
-                imageUrls = resp.data
-                  .filter((m) => !!m?.media_links?.cdn_url)
-                  .map((m) => m.media_links.cdn_url);
-                mediaTokens = resp.data.map((m) => m.token);
-              }
-            }
-          } catch (_) {
-            // ignore
-          }
-        }
+        const { tasks } = result;
 
         const now = Date.now();
         const inProg = tasks
@@ -286,7 +265,7 @@ export const TaskQueue = () => {
               title: `Generating ${parts.kind || "Task"}...`,
               subtitle: parts.subtitle,
               progress,
-              updatedAt: t.updated_at?.toISOString(),
+              updatedAt: t.updated_at,
               canDismiss,
             };
           });
@@ -309,11 +288,17 @@ export const TaskQueue = () => {
           .map((t: TaskQueueItem) => ({
             id: t.id,
             ...formatTitleParts(t),
-            thumbnailUrl: imageUrls?.[0],
-            completedAt: t.completed_at?.toISOString(),
-            updatedAt: t.updated_at?.toISOString(),
-            imageUrls: imageUrls?.length ? imageUrls : undefined,
-            mediaTokens: mediaTokens?.length ? mediaTokens : undefined,
+            thumbnailUrl: t.completed_item?.primary_media_file?.maybe_thumbnail_url_template ? 
+              t.completed_item?.primary_media_file?.maybe_thumbnail_url_template.replace("{WIDTH}", "250") : 
+              undefined,
+            imageUrls: t.completed_item?.primary_media_file?.cdn_url ? 
+              [t.completed_item?.primary_media_file?.cdn_url] : 
+              [],
+            mediaTokens: t.completed_item?.primary_media_file?.token ? 
+              [t.completed_item?.primary_media_file?.token] : 
+              [],
+            completedAt: t.completed_at,
+            updatedAt: t.updated_at,
           }));
 
         setInProgress(inProg);
@@ -478,8 +463,8 @@ export const TaskQueue = () => {
                                     id: firstMediaToken,
                                     label: t.title,
                                     thumbnail: t.thumbnailUrl || null,
-                                    fullImage: t.thumbnailUrl || null,
-                                    createdAt: new Date().toISOString(),
+                                    fullImage: t.imageUrls?.[0] || null,
+                                    createdAt: (t.completedAt || new Date()).toISOString(),
                                     mediaClass: "image",
                                   } as GalleryItem;
                                   galleryModalLightboxMediaId.value = item.id;
@@ -600,9 +585,9 @@ export const TaskQueue = () => {
                             id: t.id,
                             label: t.title,
                             thumbnail: t.thumbnailUrl || null,
-                            fullImage: t.thumbnailUrl || null,
-                            createdAt: new Date().toISOString(),
-                            mediaClass: "image",
+                            fullImage: t.imageUrls?.[0] || null,
+                            createdAt: (t.completedAt || new Date()).toISOString(),
+                            mediaClass: t.mediaFileClass,
                           } as GalleryItem;
                           galleryModalLightboxMediaId.value = item.id;
                           galleryModalLightboxImage.value = item as GalleryItem;

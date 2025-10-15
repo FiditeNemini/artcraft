@@ -4,12 +4,12 @@ import {
   TaskStatus,
   TaskType,
   TaskModelType,
+  TaskMediaFileClass,
   GenerationProvider,
 } from "@storyteller/api-enums";
 
 interface GetTaskQueueResponse {
   tasks: TaskQueueItem[];
-  results?: string[];
 }
 
 export interface TaskQueueItem {
@@ -19,9 +19,23 @@ export interface TaskQueueItem {
   model_type?: TaskModelType;
   provider?: GenerationProvider;
   provider_job_id?: string;
+  completed_item?: TaskQueueCompletedItem;
   created_at: Date;
   updated_at: Date;
   completed_at?: Date;
+}
+
+export interface TaskQueueCompletedItem {
+  primary_media_file: MediaFileData,
+  media_file_class?: TaskMediaFileClass,
+  maybe_batch_token?: string,
+}
+
+export interface MediaFileData {
+  token: string,
+  cdn_url: string,
+  maybe_thumbnail_url_template?: string,
+  created_at: Date,
 }
 
 interface GetTaskQueueSuccess extends CommandResult {
@@ -37,6 +51,12 @@ export const GetTaskQueue = async (): Promise<GetTaskQueueResponse> => {
 
   // Convert timestamps to Date objects
   const newTasks: TaskQueueItem[] = tasks.map((task) => {
+    let completed_item = task.completed_item;
+
+    if (!!completed_item) {
+      completed_item.primary_media_file.created_at = new Date(completed_item.primary_media_file.created_at);
+    }
+
     return {
       id: task.id,
       task_status: task.task_status,
@@ -44,18 +64,15 @@ export const GetTaskQueue = async (): Promise<GetTaskQueueResponse> => {
       model_type: task.model_type,
       provider: task.provider,
       provider_job_id: task.provider_job_id,
+      completed_item: completed_item,
       created_at: new Date(task.created_at),
       updated_at: new Date(task.updated_at),
       completed_at: task.completed_at ? new Date(task.completed_at) : undefined,
     };
   });
 
-  // Dummy tokens until backend provides real ones
-  const dummyTokens: string[] = ["batch_g_4r8m6kx41yxm7yvs0kqapm3e"];
-
   return {
     tasks: newTasks,
-    results: dummyTokens,
   };
 };
 
