@@ -478,6 +478,11 @@ export const PromptBox3D = ({
               isImageRowVisible &&
               "rounded-t-none"
           )}
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+          onMouseUp={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()}
+          onPointerUp={(e) => e.stopPropagation()}
         >
           <div className="flex justify-center gap-2">
             {selectedImageModel?.canUseImagePrompt && (

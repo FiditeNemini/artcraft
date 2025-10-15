@@ -393,6 +393,11 @@ export const ImagePromptRow = ({
           "absolute -top-[72px] left-0 glass w-[730px] rounded-t-xl flex",
           className
         )}
+        onMouseDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
+        onMouseUp={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
+        onPointerUp={(e) => e.stopPropagation()}
       >
         <div
           className={twMerge(
