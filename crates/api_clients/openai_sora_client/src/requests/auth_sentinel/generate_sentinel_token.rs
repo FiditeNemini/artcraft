@@ -1,5 +1,5 @@
 use super::request::GenerateSentinelRefreshRequest;
-use crate::constants::user_agent::USER_AGENT;
+use crate::constants::user_agent::CLIENT_USER_AGENT;
 use crate::error::sora_error::SoraError;
 use crate::error::sora_generic_api_error::SoraGenericApiError;
 use crate::utils_internal::classify_general_http_error::classify_general_http_error;
@@ -43,12 +43,16 @@ pub struct SentinelResponse {
 }
 
 
+/// Note: This looks like an incomplete implementation of the original Python implementation.
+/// Curiously, it worked with Sora 1.0 (and continues to work), but it fails for Sora 2.0 while the
+/// unchanged Python implementation works. We'll be deprecating this.
+#[deprecated(note="use new sentinel token flow")]
 pub async fn generate_sentinel_token() -> Result<String, SoraError> {
   let (_request, base64_request) = GenerateSentinelRefreshRequest::new().with_fourth_and_tenth();
   let request = SentinelRequest::new(base64_request);
   let client = Client::new();
   let response = client.post(SORA_IMAGE_GEN_URL)
-      .header("User-Agent", USER_AGENT)
+      .header("User-Agent", CLIENT_USER_AGENT)
       .header("Content-Type", "application/json")
       .json(&request)
       .send()
@@ -85,6 +89,7 @@ mod tests {
   use super::*;
 
   #[tokio::test]
+  #[ignore] // Only manually trigger this
   async fn test_generate_token() {
     let token = generate_sentinel_token().await.unwrap();
     println!("{}", token);
