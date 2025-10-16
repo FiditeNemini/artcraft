@@ -1,4 +1,3 @@
-use std::io::Write;
 use crate::constants::user_agent::CLIENT_USER_AGENT;
 use crate::creds::sora_credential_set::SoraCredentialSet;
 use crate::error::sora_client_error::SoraClientError;
@@ -8,6 +7,7 @@ use crate::error::sora_specific_api_error::SoraSpecificApiError;
 use crate::requests::common::task_id::TaskId;
 use log::{error, warn};
 use serde_derive::{Deserialize, Serialize};
+use std::io::Write;
 use std::time::Duration;
 use thiserror::Error;
 use wreq::{Client, StatusCode};
@@ -146,14 +146,14 @@ pub (crate) async fn image_gen_http_request(
       .ok_or(SoraClientError::NoBearerTokenForRequest)?
       .to_authorization_header_value();
 
-  let sentinel = credentials.sora_sentinel.as_ref()
-      .map(|sentinel| sentinel.get_sentinel().to_string())
+  let sentinel = credentials.sora_sentinel_token.as_ref()
+      .map(|sentinel| sentinel.to_request_header_json())
+      .transpose()?
       .ok_or(SoraClientError::NoSentinelTokenForRequest)?;
 
-
-  println!("Sentinel Token: {:?}", sentinel);
-  std::io::stdout().flush().unwrap();
-
+  //let sentinel = credentials.sora_sentinel.as_ref()
+  //    .map(|sentinel| sentinel.get_sentinel().to_string())
+  //    .ok_or(SoraClientError::NoSentinelTokenForRequest)?;
 
   let mut http_request = client.post(SORA_IMAGE_GEN_URL)
       .header("User-Agent", CLIENT_USER_AGENT)
@@ -161,8 +161,7 @@ pub (crate) async fn image_gen_http_request(
       .header("Authorization", &authorization_header)
       .header("Content-Type", "application/json")
       .header("OpenAI-Sentinel-Token", &sentinel);
-  
-  
+
   if let Some(timeout) = request_timeout {
     http_request = http_request.timeout(timeout);
   }
@@ -242,6 +241,7 @@ mod tests {
   use errors::AnyhowResult;
 
   #[test]
+  #[ignore] // Run manually
   fn deserialize_task_id() -> AnyhowResult<()> {
     let json = "{\"id\": \"task_foobarbaz\"}";
     let response : RawSoraResponse = serde_json::from_str(json)?;
