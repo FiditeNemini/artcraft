@@ -10,10 +10,14 @@ use crate::core::utils::task_database_pending_statuses::TASK_DATABASE_PENDING_ST
 use crate::services::sora::state::sora_credential_manager::SoraCredentialManager;
 use crate::services::sora::state::sora_task_queue::SoraTaskQueue;
 use crate::services::sora::threads::sora_task_polling::helpers::download_extension::DownloadExtension;
+use crate::services::sora::threads::sora_task_polling::helpers::generation_type::GenerationType;
+use crate::services::sora::threads::sora_task_polling::helpers::upload_generation_to_backend::{upload_generation_to_backend, UploadGenerationToBackendArgs};
 use crate::services::storyteller::state::storyteller_credential_manager::StorytellerCredentialManager;
 use artcraft_api_defs::prompts::create_prompt::CreatePromptRequest;
+use artcraft_api_defs::utils::media_links_to_thumbnail_template::media_links_to_thumbnail_template;
 use enums::common::generation_provider::GenerationProvider;
 use enums::common::model_type::ModelType;
+use enums::tauri::tasks::task_media_file_class::TaskMediaFileClass;
 use enums::tauri::tasks::task_status;
 use errors::AnyhowResult;
 use idempotency::uuid::generate_random_uuid;
@@ -25,12 +29,14 @@ use openai_sora_client::requests::common::task_id::TaskId;
 use openai_sora_client::requests::list_classic_tasks::list_classic_tasks::{PartialGeneration, PartialTaskResponse};
 use reqwest::Url;
 use sqlite_tasks::queries::list_tasks_by_provider_and_status::{list_tasks_by_provider_and_status, ListTasksByProviderAndStatusArgs, Task, TaskList};
+use sqlite_tasks::queries::update_successful_task_status_with_metadata::{update_successful_task_status_with_metadata, UpdateSuccessfulTaskArgs};
 use sqlite_tasks::queries::update_task_status::{update_task_status, UpdateTaskArgs};
 use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
 use storyteller_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
+use storyteller_client::endpoints::media_files::get_media_file::get_media_file;
 use storyteller_client::endpoints::media_files::upload_image_media_file_from_file::{upload_image_media_file_from_file, UploadImageFromFileArgs};
 use storyteller_client::endpoints::media_files::upload_video_media_file_from_file::{upload_video_media_file_from_file, UploadVideoFromFileArgs};
 use storyteller_client::endpoints::prompts::create_prompt::create_prompt;
@@ -49,11 +55,6 @@ pub struct GenerationItem {
   pub url: String,
 }
 
-#[derive(Copy, Clone, Eq, PartialEq)]
-enum GenerationType {
-  Image,
-  Video,
-}
 
 pub async fn handle_classic_successful_generations(
   app_handle: &AppHandle,
@@ -99,46 +100,67 @@ pub async fn handle_classic_successful_generations(
 
     info!("Created prompt: {:?}", &prompt_response.prompt_token);
 
+    let mut maybe_primary_media_file_token = None;
+
     for (_i, item) in generation.items.iter().enumerate() {
       info!("Downloading generated file...");
       let download_path = download_generation_item(item, &app_data_root, recommended_download_extension).await?;
 
       info!("Uploading to backend...");
 
-      match generation_type {
-        GenerationType::Image => {
-          let result = upload_image_media_file_from_file(UploadImageFromFileArgs {
-            api_host: &app_env_configs.storyteller_host,
-            maybe_creds: Some(&storyteller_creds),
-            path: download_path,
-            is_intermediate_system_file: false,
-            maybe_prompt_token: Some(&prompt_response.prompt_token),
-            maybe_batch_token: None, // TODO: This should be added soon.
-          }).await?;
+      let media_token = upload_generation_to_backend(UploadGenerationToBackendArgs {
+        storyteller_api_host: &app_env_configs.storyteller_host,
+        storyteller_creds: &storyteller_creds,
+        upload_path: download_path,
+        maybe_prompt_token: Some(&prompt_response.prompt_token),
+        maybe_batch_token: None, // TODO: This should be added soon.
+        generation_type,
+      }).await?;
 
-          info!("Uploaded image to API backend: {:?}", result.media_file_token);
-        }
-        GenerationType::Video => {
-          let result = upload_video_media_file_from_file(UploadVideoFromFileArgs {
-            api_host: &app_env_configs.storyteller_host,
-            maybe_creds: Some(&storyteller_creds),
-            path: download_path,
-            maybe_prompt_token: Some(&prompt_response.prompt_token),
-          }).await?;
-
-          info!("Uploaded video to API backend: {:?}", result.media_file_token);
-        }
+      if maybe_primary_media_file_token.is_none() {
+        maybe_primary_media_file_token = Some(media_token.clone());
       }
     }
 
     // Clear from SQLite task database.
     if let Some(local_task) = sqlite_tasks_by_sora_task_id.get(task_id.as_str()) {
-      info!("Marking local task as failed: {:?}", local_task.id);
+      info!("Marking local task as succeeded: {:?}", local_task.id);
 
-      let updated = update_task_status(UpdateTaskArgs {
+      let generation_class = match generation_type {
+        GenerationType::Image => TaskMediaFileClass::Image,
+        GenerationType::Video => TaskMediaFileClass::Video,
+      };
+
+      let mut maybe_cdn_url = None;
+      let mut maybe_thumbnail_url_template = None;
+
+      if let Some(media_file_token) = maybe_primary_media_file_token.as_ref() {
+        info!("Looking up file to grab CDN and thumbnail URLs: {:?} ...", media_file_token);
+
+        let lookup_result = get_media_file(
+          &app_env_configs.storyteller_host,
+          media_file_token,
+        ).await;
+        match lookup_result {
+          Ok(response) => {
+            maybe_cdn_url = Some(response.media_file.media_links.cdn_url.to_string());
+            maybe_thumbnail_url_template = media_links_to_thumbnail_template(&response.media_file.media_links)
+                .map(|s| s.to_string());
+          }
+          Err(err) => {
+            error!("Failed to look up media file after upload: {:?} (failing open)", err);
+          }
+        }
+      }
+
+      let updated = update_successful_task_status_with_metadata(UpdateSuccessfulTaskArgs {
         db: task_database.get_connection(),
         task_id: &local_task.id,
-        status: task_status::TaskStatus::CompleteSuccess,
+        maybe_batch_token: None, // TODO: Support when we have batches of items.
+        maybe_primary_media_file_token: maybe_primary_media_file_token.as_ref(),
+        maybe_primary_media_file_class: Some(generation_class),
+        maybe_primary_media_file_thumbnail_url_template: maybe_thumbnail_url_template.as_deref(),
+        maybe_primary_media_file_cdn_url: maybe_cdn_url.as_deref(),
       }).await?;
 
       if updated {

@@ -107,7 +107,7 @@ pub async fn handle_request(
       let token_and_url = task.on_complete_primary_media_file_token
           .zip(task.on_complete_primary_media_file_cdn_url);
 
-      if let Some((primary_media_file_token, media_file_url)) = token_and_url{
+      if let Some((primary_media_file_token, media_file_url)) = token_and_url {
         completed_item = Some(CompletedItemData {
           primary_media_file: MediaFileData {
             token: primary_media_file_token,

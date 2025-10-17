@@ -17,6 +17,7 @@ use crate::services::storyteller::threads::events::maybe_handle_text_to_image_co
 use crate::services::storyteller::threads::events::maybe_send_background_removal_complete_event::maybe_send_background_removal_complete_event;
 use anyhow::anyhow;
 use artcraft_api_defs::jobs::list_session_jobs::ListSessionJobsItem;
+use artcraft_api_defs::utils::media_links_to_thumbnail_template::media_links_to_thumbnail_template;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::common::generation_provider::GenerationProvider;
 use enums::common::job_status_plus::JobStatusPlus;
@@ -236,13 +237,7 @@ fn get_thumbnail_template<'a>(job: &'a ListSessionJobsItem) -> Option<&'a str> {
     Some(result) => &result.media_links,
   };
 
-  // NB: We only populate video previews for video tasks.
-  if let Some(video) = links.maybe_video_previews.as_ref() {
-    return Some(&video.animated_thumbnail_template);
-  }
-
-  // Last option - use the image thumbnail template if it exists.
-  links.maybe_thumbnail_template.as_deref()
+  media_links_to_thumbnail_template(links)
 }
 
 fn get_media_file_class<'a>(job: &'a ListSessionJobsItem) -> Option<TaskMediaFileClass> {
