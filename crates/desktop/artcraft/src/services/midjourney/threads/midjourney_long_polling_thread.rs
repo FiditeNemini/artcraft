@@ -11,10 +11,12 @@ use crate::services::midjourney::threads::events::maybe_handle_text_to_image_com
 use crate::services::midjourney::utils::download_midjourney_image::download_midjourney_image;
 use crate::services::storyteller::state::storyteller_credential_manager::StorytellerCredentialManager;
 use artcraft_api_defs::prompts::create_prompt::CreatePromptRequest;
+use artcraft_api_defs::utils::media_links_to_thumbnail_template::media_links_to_thumbnail_template;
 use cookie_store::cookie_store::CookieStore;
 use enums::by_table::prompts::prompt_type::PromptType;
 use enums::common::generation_provider::GenerationProvider;
 use enums::common::model_type::ModelType;
+use enums::tauri::tasks::task_media_file_class::TaskMediaFileClass;
 use enums::tauri::tasks::task_status::TaskStatus;
 use errors::AnyhowResult;
 use idempotency::uuid::generate_random_uuid;
@@ -26,12 +28,14 @@ use midjourney_client::utils::get_image_url::get_image_url;
 use midjourney_client::utils::image_downloader_client::ImageDownloaderClient;
 use once_cell::sync::Lazy;
 use sqlite_tasks::queries::list_tasks_by_provider_and_status::{list_tasks_by_provider_and_status, ListTasksByProviderAndStatusArgs, Task, TaskList};
+use sqlite_tasks::queries::update_successful_task_status_with_metadata::{update_successful_task_status_with_metadata, UpdateSuccessfulTaskArgs};
 use sqlite_tasks::queries::update_task_status::{update_task_status, UpdateTaskArgs};
 use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
 use storyteller_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
+use storyteller_client::endpoints::media_files::get_media_file::get_media_file;
 use storyteller_client::endpoints::media_files::upload_image_media_file_from_file::{upload_image_media_file_from_file, UploadImageFromFileArgs};
 use storyteller_client::endpoints::prompts::create_prompt::create_prompt;
 use storyteller_client::error::api_error::ApiError;
@@ -264,6 +268,8 @@ async fn upload_midjourney_batch(
 
   info!("Using synthetic batch token: {:?}", &batch_token);
 
+  let mut maybe_primary_media_file_token = None;
+
   for index in 0..4 {
     info!("Downloading generated Midjourney file...");
 
@@ -302,8 +308,11 @@ async fn upload_midjourney_batch(
       }).await;
 
       match result {
-        Ok(media_file) => {
-          info!("Successfully uploaded to backend: {:?}", media_file);
+        Ok(result) => {
+          info!("Successfully uploaded to backend: {:?}", result.media_file_token);
+          if maybe_primary_media_file_token.is_none() {
+            maybe_primary_media_file_token = Some(result.media_file_token);
+          }
           break;
         },
         Err(StorytellerError::Api(ApiError::TooManyRequests(_))) => {
@@ -326,10 +335,36 @@ async fn upload_midjourney_batch(
     tokio::time::sleep(std::time::Duration::from_millis(100)).await;
   }
 
-  let updated = update_task_status(UpdateTaskArgs {
+  let mut maybe_cdn_url = None;
+  let mut maybe_thumbnail_url_template = None;
+
+  if let Some(media_file_token) = maybe_primary_media_file_token.as_ref() {
+    info!("Looking up file to grab CDN and thumbnail URLs: {:?} ...", media_file_token);
+
+    let lookup_result = get_media_file(
+      &app_env_configs.storyteller_host,
+      media_file_token,
+    ).await;
+    match lookup_result {
+      Ok(response) => {
+        maybe_cdn_url = Some(response.media_file.media_links.cdn_url.to_string());
+        maybe_thumbnail_url_template = media_links_to_thumbnail_template(&response.media_file.media_links)
+            .map(|s| s.to_string());
+      }
+      Err(err) => {
+        error!("Failed to look up media file after upload: {:?} (failing open)", err);
+      }
+    }
+  }
+
+  let updated = update_successful_task_status_with_metadata(UpdateSuccessfulTaskArgs {
     db: task_database.get_connection(),
     task_id: &local_task.id,
-    status: TaskStatus::CompleteSuccess,
+    maybe_batch_token: Some(&batch_token),
+    maybe_primary_media_file_token: maybe_primary_media_file_token.as_ref(),
+    maybe_primary_media_file_class: Some(TaskMediaFileClass::Image), // TODO: Just images for now.
+    maybe_primary_media_file_thumbnail_url_template: maybe_thumbnail_url_template.as_deref(),
+    maybe_primary_media_file_cdn_url: maybe_cdn_url.as_deref(),
   }).await?;
 
   if !updated {
