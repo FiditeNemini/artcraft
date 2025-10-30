@@ -1,0 +1,135 @@
+curl 'wss://grok.com/ws/imagine/listen' \
+  -H 'Upgrade: websocket' \
+  -H 'Origin: https://grok.com' \
+  -H 'Cache-Control: no-cache' \
+  -H 'Accept-Language: en-US,en;q=0.9' \
+  -H 'Pragma: no-cache' \
+  -b 'cf_clearance=o10zUU.x20fFOkj6tPIzI73QFT.kG3rLwdtt5P9KNzI-1760710012-1.2.1.1-q0vgGudZ42zQLs1EEEdVDkqeJGaJxkL0m60w05izUQ4NVtFNawTmElVUNYS5gOXSRnCjQkTmcMu0bI4yw3gkf.0EyfR9fE3McXK9zjwnMDZLC5MDsYazzaMA87sU4seMjd3G8oKfdi.r2pZ2rUzkoLSAJ11.q7IpHUvWsk8zcpxm1hLg9LcvfX0c.Sbcf.8mwY_32NVpIZT_0rzdp71FJUOZGabSOK4isjC409u7GOg; _ga=GA1.1.1232202746.1760710013; i18nextLng=en; x-anonuserid=621371fd-a877-4245-900c-1aa8db6039f2; x-challenge=2CHUrpA5J8%2FW2%2F1H8glEE3WKIXTKrbU7mMARWLT5DHzp5MS6nUk1aTHt7gqzv1vCxfnIdHTdeq4ZLYwcBj1DL%2FBptSSVT9OKi9DQDsN%2BKk0Ur3jg1uS%2BuPtwYSNZ%2B6CtuLCrDZqlDh%2FfFTzYr2sQ9nT3R72HfOyS%2FFXw0qvCgoROCtZCiGY%3D; x-signature=qPh93ojC8uCXOUvq7t0SzcwsyXKOE%2BRXH6dH26oL8lxwRIabYha6eniSt329QvpjBEeUqlekeStaek44mDpEYg%3D%3D; sso=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uX2lkIjoiOGU3MDFiNzctOTdkNC00ZjM0LWExOTctOWFmMDU1MzY3NDAwIn0.-a6x0InxbGzfTVfUlrdzxskxCnvMDI8lC90z4wHeGIk; sso-rw=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uX2lkIjoiOGU3MDFiNzctOTdkNC00ZjM0LWExOTctOWFmMDU1MzY3NDAwIn0.-a6x0InxbGzfTVfUlrdzxskxCnvMDI8lC90z4wHeGIk; stblid=b3331fc1-45d7-466b-83df-67427c0b2367; mp_ea93da913ddb66b6372b89d97b1029ac_mixpanel=%7B%22distinct_id%22%3A%2285980643-ffab-4984-a3de-59a608c47d7f%22%2C%22%24device_id%22%3A%2279ce237a-a0f3-4913-bf4b-519ac8a98263%22%2C%22%24initial_referrer%22%3A%22%24direct%22%2C%22%24initial_referring_domain%22%3A%22%24direct%22%2C%22__mps%22%3A%7B%7D%2C%22__mpso%22%3A%7B%7D%2C%22__mpus%22%3A%7B%7D%2C%22__mpa%22%3A%7B%7D%2C%22__mpu%22%3A%7B%7D%2C%22__mpr%22%3A%5B%5D%2C%22__mpap%22%3A%5B%5D%2C%22%24user_id%22%3A%2285980643-ffab-4984-a3de-59a608c47d7f%22%7D; _ga_8FEWB057YH=GS2.1.s1760710013$o1$g1$t1760710085$j60$l0$h0' \
+  -H 'Connection: Upgrade' \
+  -H 'Sec-WebSocket-Key: 3cx4uqFUq7dJfGvZsbsVEg==' \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36' \
+  -H 'Sec-WebSocket-Version: 13' \
+  -H 'Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits'
+
+
+--------------------------------------
+
+https://stackoverflow.com/questions/47860689/how-to-read-a-websocket-response-with-curl
+
+curl --include \
+     --no-buffer \
+     -b 'cf_clearance=o10zUU.x20fFOkj6tPIzI73QFT.kG3rLwdtt5P9KNzI-1760710012-1.2.1.1-q0vgGudZ42zQLs1EEEdVDkqeJGaJxkL0m60w05izUQ4NVtFNawTmElVUNYS5gOXSRnCjQkTmcMu0bI4yw3gkf.0EyfR9fE3McXK9zjwnMDZLC5MDsYazzaMA87sU4seMjd3G8oKfdi.r2pZ2rUzkoLSAJ11.q7IpHUvWsk8zcpxm1hLg9LcvfX0c.Sbcf.8mwY_32NVpIZT_0rzdp71FJUOZGabSOK4isjC409u7GOg; _ga=GA1.1.1232202746.1760710013; i18nextLng=en; x-anonuserid=621371fd-a877-4245-900c-1aa8db6039f2; x-challenge=2CHUrpA5J8%2FW2%2F1H8glEE3WKIXTKrbU7mMARWLT5DHzp5MS6nUk1aTHt7gqzv1vCxfnIdHTdeq4ZLYwcBj1DL%2FBptSSVT9OKi9DQDsN%2BKk0Ur3jg1uS%2BuPtwYSNZ%2B6CtuLCrDZqlDh%2FfFTzYr2sQ9nT3R72HfOyS%2FFXw0qvCgoROCtZCiGY%3D; x-signature=qPh93ojC8uCXOUvq7t0SzcwsyXKOE%2BRXH6dH26oL8lxwRIabYha6eniSt329QvpjBEeUqlekeStaek44mDpEYg%3D%3D; sso=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uX2lkIjoiOGU3MDFiNzctOTdkNC00ZjM0LWExOTctOWFmMDU1MzY3NDAwIn0.-a6x0InxbGzfTVfUlrdzxskxCnvMDI8lC90z4wHeGIk; sso-rw=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uX2lkIjoiOGU3MDFiNzctOTdkNC00ZjM0LWExOTctOWFmMDU1MzY3NDAwIn0.-a6x0InxbGzfTVfUlrdzxskxCnvMDI8lC90z4wHeGIk; stblid=b3331fc1-45d7-466b-83df-67427c0b2367; mp_ea93da913ddb66b6372b89d97b1029ac_mixpanel=%7B%22distinct_id%22%3A%2285980643-ffab-4984-a3de-59a608c47d7f%22%2C%22%24device_id%22%3A%2279ce237a-a0f3-4913-bf4b-519ac8a98263%22%2C%22%24initial_referrer%22%3A%22%24direct%22%2C%22%24initial_referring_domain%22%3A%22%24direct%22%2C%22__mps%22%3A%7B%7D%2C%22__mpso%22%3A%7B%7D%2C%22__mpus%22%3A%7B%7D%2C%22__mpa%22%3A%7B%7D%2C%22__mpu%22%3A%7B%7D%2C%22__mpr%22%3A%5B%5D%2C%22__mpap%22%3A%5B%5D%2C%22%24user_id%22%3A%2285980643-ffab-4984-a3de-59a608c47d7f%22%7D; _ga_8FEWB057YH=GS2.1.s1760710013$o1$g1$t1760710085$j60$l0$h0' \
+     --header "Connection: Upgrade" \
+     --header "Upgrade: websocket" \
+     --header "Host: grok.com" \
+     --header "Origin: https://grok.com" \
+     --header "Sec-WebSocket-Key: SGVsbG8sIHdvcmxkIQ==" \
+     --header "Sec-WebSocket-Version: 13" \
+     "https://grok.com/ws/imagine/listen"
+
+-------------------------------------------
+
+This turns a 401 into a 400 - it's a mix of:
+
+    - the above SO answer
+    - "copy as curl" from Chrome"
+    - curl-impersonate:
+
+curl-impersonate-chrome  -vvv 'wss://grok.com/ws/imagine/listen' \
+  --include \
+  --no-buffer \
+  -H 'Connection: Upgrade' \
+  -H 'Upgrade: websocket' \
+  -H 'Host: grok.com' \
+  -H 'Origin: https://grok.com' \
+  -H 'Sec-WebSocket-Key: XjPVg9OQe7CJOH6U7lq5vw==' \
+  -H 'Sec-WebSocket-Version: 13' \
+  -b '_ga=GA1.1.1232202746.1760710013; i18nextLng=en; sso=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uX2lkIjoiOGU3MDFiNzctOTdkNC00ZjM0LWExOTctOWFmMDU1MzY3NDAwIn0.-a6x0InxbGzfTVfUlrdzxskxCnvMDI8lC90z4wHeGIk; sso-rw=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uX2lkIjoiOGU3MDFiNzctOTdkNC00ZjM0LWExOTctOWFmMDU1MzY3NDAwIn0.-a6x0InxbGzfTVfUlrdzxskxCnvMDI8lC90z4wHeGIk; stblid=b3331fc1-45d7-466b-83df-67427c0b2367; mp_ea93da913ddb66b6372b89d97b1029ac_mixpanel=%7B%22distinct_id%22%3A%2285980643-ffab-4984-a3de-59a608c47d7f%22%2C%22%24device_id%22%3A%2279ce237a-a0f3-4913-bf4b-519ac8a98263%22%2C%22%24initial_referrer%22%3A%22%24direct%22%2C%22%24initial_referring_domain%22%3A%22%24direct%22%2C%22__mps%22%3A%7B%7D%2C%22__mpso%22%3A%7B%7D%2C%22__mpus%22%3A%7B%7D%2C%22__mpa%22%3A%7B%7D%2C%22__mpu%22%3A%7B%7D%2C%22__mpr%22%3A%5B%5D%2C%22__mpap%22%3A%5B%5D%2C%22%24user_id%22%3A%2285980643-ffab-4984-a3de-59a608c47d7f%22%7D; cf_clearance=e7.LXFbmc.U81rZIqxuBfBe88yuBZMXEP.zwxNkbOxw-1760724394-1.2.1.1-JMHrapBGxcZriUw852.NCqwFRpZJFvoYxq.mV0jDpKCkiHBZwpdv09XJi6eFLJUYJJ6UDZ3c1eAsucVYLdWN.SvA9M6qzujj8nY4ym03PxQlMEd2OmXJogtDDJbPhA5AZEGxA39_6QQlvaBIUBnYPALYrTl9XJN_V4q3n4BXtpoBzrIJURMIn0mW3esUCGv0NukuVQrkrNtMgqT5SUmTGi0idaBYoR_2_wv4P09lsug; _ga_8FEWB057YH=GS2.1.s1760724394$o3$g1$t1760724401$j53$l0$h0' \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36'
+
+        > Sec-WebSocket-Version: 13
+        > User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36
+        >
+        * TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+        * TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+        * old SSL session ID is stale, removing
+        < HTTP/1.1 400 Bad Request
+        < Date: Fri, 17 Oct 2025 18:15:29 GMT
+        < Content-Length: 0
+        < Connection: keep-alive
+        < speculation-rules: "/cdn-cgi/speculation"
+        < Server: cloudflare
+        < CF-RAY: 9901c814add7452d-ATL
+        * Refused WebSockets upgrade: 400
+        * Closing connection 0
+        * TLSv1.3 (OUT), TLS alert, close notify (256):
+        curl: (22) Refused WebSockets upgrade: 400
+
+Removing the cookie turns it into a Cloudflare 401.
+
+--------------------------------------------
+
+--include --no-buffer --header "Connection: Upgrade" \
+     --header "Upgrade: websocket" \
+     --header "Host: example.com" \
+     --header "Sec-WebSocket-Key: SGVsbG8sIHdvcmxkIQ==" \
+     --header "Sec-WebSocket-Version: 13" \
+
+---------------------------------------------
+
+Curl script works. We needed to remove headers that curl was automatically adding (and thus we were duplicating) :
+
+curl-impersonate-chrome  -vvv 'wss://grok.com/ws/imagine/listen' \
+  --include \
+  --no-buffer \
+  -H 'Connection: Upgrade' \
+  -H 'Upgrade: websocket' \
+  -b '_ga=GA1.1.1232202746.1760710013; i18nextLng=en; sso=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uX2lkIjoiOGU3MDFiNzctOTdkNC00ZjM0LWExOTctOWFmMDU1MzY3NDAwIn0.-a6x0InxbGzfTVfUlrdzxskxCnvMDI8lC90z4wHeGIk; sso-rw=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uX2lkIjoiOGU3MDFiNzctOTdkNC00ZjM0LWExOTctOWFmMDU1MzY3NDAwIn0.-a6x0InxbGzfTVfUlrdzxskxCnvMDI8lC90z4wHeGIk; stblid=b3331fc1-45d7-466b-83df-67427c0b2367; mp_ea93da913ddb66b6372b89d97b1029ac_mixpanel=%7B%22distinct_id%22%3A%2285980643-ffab-4984-a3de-59a608c47d7f%22%2C%22%24device_id%22%3A%2279ce237a-a0f3-4913-bf4b-519ac8a98263%22%2C%22%24initial_referrer%22%3A%22%24direct%22%2C%22%24initial_referring_domain%22%3A%22%24direct%22%2C%22__mps%22%3A%7B%7D%2C%22__mpso%22%3A%7B%7D%2C%22__mpus%22%3A%7B%7D%2C%22__mpa%22%3A%7B%7D%2C%22__mpu%22%3A%7B%7D%2C%22__mpr%22%3A%5B%5D%2C%22__mpap%22%3A%5B%5D%2C%22%24user_id%22%3A%2285980643-ffab-4984-a3de-59a608c47d7f%22%7D; cf_clearance=e7.LXFbmc.U81rZIqxuBfBe88yuBZMXEP.zwxNkbOxw-1760724394-1.2.1.1-JMHrapBGxcZriUw852.NCqwFRpZJFvoYxq.mV0jDpKCkiHBZwpdv09XJi6eFLJUYJJ6UDZ3c1eAsucVYLdWN.SvA9M6qzujj8nY4ym03PxQlMEd2OmXJogtDDJbPhA5AZEGxA39_6QQlvaBIUBnYPALYrTl9XJN_V4q3n4BXtpoBzrIJURMIn0mW3esUCGv0NukuVQrkrNtMgqT5SUmTGi0idaBYoR_2_wv4P09lsug; _ga_8FEWB057YH=GS2.1.s1760724394$o3$g1$t1760724401$j53$l0$h0' \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36'
+
+> GET /ws/imagine/listen HTTP/1.1
+> Host: grok.com
+> Accept: */*
+> Cookie: _ga=GA1.1.1232202746.1760710013; i18nextLng=en; sso=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uX2lkIjoiOGU3MDFiNzctOTdkNC00ZjM0LWExOTctOWFmMDU1MzY3NDAwIn0.-a6x0InxbGzfTVfUlrdzxskxCnvMDI8lC90z4wHeGIk; sso-rw=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uX2lkIjoiOGU3MDFiNzctOTdkNC00ZjM0LWExOTctOWFmMDU1MzY3NDAwIn0.-a6x0InxbGzfTVfUlrdzxskxCnvMDI8lC90z4wHeGIk; stblid=b3331fc1-45d7-466b-83df-67427c0b2367; mp_ea93da913ddb66b6372b89d97b1029ac_mixpanel=%7B%22distinct_id%22%3A%2285980643-ffab-4984-a3de-59a608c47d7f%22%2C%22%24device_id%22%3A%2279ce237a-a0f3-4913-bf4b-519ac8a98263%22%2C%22%24initial_referrer%22%3A%22%24direct%22%2C%22%24initial_referring_domain%22%3A%22%24direct%22%2C%22__mps%22%3A%7B%7D%2C%22__mpso%22%3A%7B%7D%2C%22__mpus%22%3A%7B%7D%2C%22__mpa%22%3A%7B%7D%2C%22__mpu%22%3A%7B%7D%2C%22__mpr%22%3A%5B%5D%2C%22__mpap%22%3A%5B%5D%2C%22%24user_id%22%3A%2285980643-ffab-4984-a3de-59a608c47d7f%22%7D; cf_clearance=e7.LXFbmc.U81rZIqxuBfBe88yuBZMXEP.zwxNkbOxw-1760724394-1.2.1.1-JMHrapBGxcZriUw852.NCqwFRpZJFvoYxq.mV0jDpKCkiHBZwpdv09XJi6eFLJUYJJ6UDZ3c1eAsucVYLdWN.SvA9M6qzujj8nY4ym03PxQlMEd2OmXJogtDDJbPhA5AZEGxA39_6QQlvaBIUBnYPALYrTl9XJN_V4q3n4BXtpoBzrIJURMIn0mW3esUCGv0NukuVQrkrNtMgqT5SUmTGi0idaBYoR_2_wv4P09lsug; _ga_8FEWB057YH=GS2.1.s1760724394$o3$g1$t1760724401$j53$l0$h0
+> Connection: Upgrade
+> Sec-WebSocket-Version: 13
+> Sec-WebSocket-Key: JpMsHjXLPEmOsa89FQBeHA==
+> Connection: Upgrade
+> Upgrade: websocket
+> User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36
+>
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+* old SSL session ID is stale, removing
+< HTTP/1.1 101 Switching Protocols
+< Date: Fri, 17 Oct 2025 18:56:23 GMT
+< Connection: upgrade
+< Upgrade: websocket
+< Sec-WebSocket-Accept: 67ERWy4vrrAcKi3+zna7zswEyOA=
+< CF-Ray: 990203fe38bd78ce-ATL
+< CF-Cache-Status: DYNAMIC
+< Strict-Transport-Security: max-age=31536000; includeSubDomains
+< x-trace-id: 638d9aa7a99ee6510e0fc833caecd273
+< speculation-rules: "/cdn-cgi/speculation"
+< Server: cloudflare
+* Received 101, switch to WebSocket; mask af11ea2e
+<
+
+------------------------------------------------------------
+
+Here are the internal headers from Wreq:
+
+Execute... print headers...
+
+WS Request Header: host: "grok.com"
+
+WS Request Header: cookie: "_ga=GA1.1.1232202746.1760710013; i18nextLng=en; sso=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uX2lkIjoiOGU3MDFiNzctOTdkNC00ZjM0LWExOTctOWFmMDU1MzY3NDAwIn0.-a6x0InxbGzfTVfUlrdzxskxCnvMDI8lC90z4wHeGIk; sso-rw=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uX2lkIjoiOGU3MDFiNzctOTdkNC00ZjM0LWExOTctOWFmMDU1MzY3NDAwIn0.-a6x0InxbGzfTVfUlrdzxskxCnvMDI8lC90z4wHeGIk; stblid=b3331fc1-45d7-466b-83df-67427c0b2367; mp_ea93da913ddb66b6372b89d97b1029ac_mixpanel=%7B%22distinct_id%22%3A%2285980643-ffab-4984-a3de-59a608c47d7f%22%2C%22%24device_id%22%3A%2279ce237a-a0f3-4913-bf4b-519ac8a98263%22%2C%22%24initial_referrer%22%3A%22%24direct%22%2C%22%24initial_referring_domain%22%3A%22%24direct%22%2C%22__mps%22%3A%7B%7D%2C%22__mpso%22%3A%7B%7D%2C%22__mpus%22%3A%7B%7D%2C%22__mpa%22%3A%7B%7D%2C%22__mpu%22%3A%7B%7D%2C%22__mpr%22%3A%5B%5D%2C%22__mpap%22%3A%5B%5D%2C%22%24user_id%22%3A%2285980643-ffab-4984-a3de-59a608c47d7f%22%7D; cf_clearance=e7.LXFbmc.U81rZIqxuBfBe88yuBZMXEP.zwxNkbOxw-1760724394-1.2.1.1-JMHrapBGxcZriUw852.NCqwFRpZJFvoYxq.mV0jDpKCkiHBZwpdv09XJi6eFLJUYJJ6UDZ3c1eAsucVYLdWN.SvA9M6qzujj8nY4ym03PxQlMEd2OmXJogtDDJbPhA5AZEGxA39_6QQlvaBIUBnYPALYrTl9XJN_V4q3n4BXtpoBzrIJURMIn0mW3esUCGv0NukuVQrkrNtMgqT5SUmTGi0idaBYoR_2_wv4P09lsug; _ga_8FEWB057YH=GS2.1.s1760724394$o3$g1$t1760724401$j53$l0$h0"
+WS Request Header: connection: "upgrade"
+WS Request Header: upgrade: "websocket"
+WS Request Header: sec-websocket-version: "13"
+WS Request Header: sec-websocket-key: "Dh44njJrey+qIso3X1IdhA=="
+
+
+WS Request Header: user-agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+Response version: HTTP/1.1
+
