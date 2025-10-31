@@ -6,6 +6,7 @@ use crate::datatypes::api::svg_path_data::SvgPathData;
 use crate::datatypes::api::user_id::UserId;
 use crate::datatypes::api::verification_token::VerificationToken;
 use crate::datatypes::api::xsid_numbers::XsidNumbers;
+use crate::error::categorize_grok_http_error::categorize_grok_http_error;
 use crate::error::grok_client_error::GrokClientError;
 use crate::error::grok_error::GrokError;
 use crate::error::grok_generic_api_error::GrokGenericApiError;
@@ -111,7 +112,7 @@ impl <'a> GrokVideoGenChatConversationBuilder<'a> {
   }
 
 
-  pub async fn send(&self) -> Result<GrokVideoGenChatConversationResponse, GrokError> {
+  pub async fn wait_for_video(&self) -> Result<GrokVideoGenChatConversationResponse, GrokError> {
     info!("Configuring client and request...");
     let client = Self::build_client()?;
     let http_request = self.build_request(&client)?;
@@ -139,7 +140,7 @@ impl <'a> GrokVideoGenChatConversationBuilder<'a> {
 
     /// TODO: Handle anti-bot detection
     /// Body: {"error":{"code":7,"message":"Request rejected by anti-bot rules.","details":[]}}
-    let response_body = &response.text()
+    let response_body = response.text()
         .await
         .map_err(|err| {
           error!("Error reading Grok create media response body: {:?}", err);
@@ -266,13 +267,29 @@ impl <'a> GrokVideoGenChatConversationBuilder<'a> {
     Ok(http_request)
   }
 
-  async fn send_request(client: &Client, request: Request) -> Result<Response, GrokGenericApiError> {
-    Ok(client.execute(request)
+  async fn send_request(client: &Client, request: Request) -> Result<Response, GrokError> {
+    let response = client.execute(request)
         .await
         .map_err(|err| {
           error!("Error during create media: {:?}", err);
           GrokGenericApiError::WreqError(err)
-        })?)
+        })?;
+
+    let status = response.status();
+
+    if !status.is_success() {
+      let maybe_body = response.text()
+          .await
+          .map_err(|err| {
+            error!("Error reading Grok video generation response body: {:?}", err);
+            err
+          })
+          .ok();
+
+      return Err(categorize_grok_http_error(status, maybe_body.as_deref()))
+    }
+
+    Ok(response)
   }
 }
 
@@ -335,7 +352,7 @@ mod tests {
       request_timeout: None,
     };
 
-    let result = request.send().await?;
+    let result = request.wait_for_video().await?;
 
     println!("Result: {:?}", result);
 

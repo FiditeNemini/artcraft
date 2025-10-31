@@ -41,6 +41,9 @@ pub enum GrokGenericApiError {
   SerdeParseErrorWithBodyOnNon200(serde_json::Error, String),
 
   /// An uncategorized bad HTTP response from Grok.
+  UncategorizedBadResponseWithStatus(StatusCode),
+  
+  /// An uncategorized bad HTTP response from Grok.
   UncategorizedBadResponseWithStatusAndBody {
     status_code: StatusCode,
     body: String,
@@ -69,6 +72,7 @@ impl Display for GrokGenericApiError {
       Self::UnexpectedWebsocketUpgradeStatusCode(status) => write!(f, "Unexpected websocket upgrade status code: {}", status),
       Self::SerdeResponseParseErrorWithBody(err, body) => write!(f, "Failed to parse response body: {:?}. Body: {}", err, body),
       Self::SerdeParseErrorWithBodyOnNon200(err, body) => write!(f, "Failed to parse non-200 response body: {:?}. Body: {}", err, body),
+      Self::UncategorizedBadResponseWithStatus(status) => write!(f, "Uncategorized with status code: {}", status),
       Self::UncategorizedBadResponseWithStatusAndBody { status_code, body } => write!(f, "Uncategorized bad response: status code {}, body: {}", status_code, body),
       Self::UploadFailed => write!(f, "Upload failed"),
       Self::WreqWebsocketUpgradeError(err) => write!(f, "Websocket upgrade error: {}", err),

@@ -122,7 +122,7 @@ pub async fn upload_image_and_generate_video<P: AsRef<Path>>(args: UploadImageAn
 
   if args.wait_for_generation {
     info!("Waiting for video generation...");
-    let video_gen_result = request.send().await?;
+    let video_gen_result = request.wait_for_video().await?;
     maybe_video_file_id = video_gen_result.video_file_id;
     generation_is_complete = true;
   } else {
