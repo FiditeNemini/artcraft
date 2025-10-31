@@ -1,6 +1,7 @@
 use crate::core::artcraft_error::ArtcraftError;
 use base64::DecodeError;
 use errors::AnyhowError;
+use grok_client::error::grok_error::GrokError;
 use midjourney_client::error::midjourney_error::MidjourneyError;
 use openai_sora_client::error::sora_error::SoraError;
 use storyteller_client::error::storyteller_error::StorytellerError;
@@ -53,6 +54,7 @@ pub enum BadInputReason {
 
 #[derive(Debug)]
 pub enum MissingCredentialsReason {
+  NeedsGrokCredentials,
   NeedsFalApiKey,
   NeedsMidjourneyCredentials,
   NeedsMidjourneyUserId,
@@ -76,6 +78,7 @@ pub enum BillingProvider {
 
 #[derive(Debug)]
 pub enum ProviderFailureReason {
+  GrokError(GrokError),
   //Fal(FalErrorPlus),
   MidjourneyError(MidjourneyError),
   /// NB: The midjourney client doesn't categorize all errors, so we have to do so on our end.
@@ -114,6 +117,10 @@ impl GenerateError {
     Self::MissingCredentials(MissingCredentialsReason::NeedsFalApiKey)
   }
 
+  pub fn needs_grok_credentials() -> Self {
+    Self::MissingCredentials(MissingCredentialsReason::NeedsGrokCredentials)
+  }
+
   pub fn needs_midjourney_credentials() -> Self {
     Self::MissingCredentials(MissingCredentialsReason::NeedsMidjourneyCredentials)
   }
@@ -139,6 +146,7 @@ impl From<ArtcraftError> for GenerateError {
       ArtcraftError::AnyhowError(e) => Self::AnyhowError(e),
       ArtcraftError::DecodeError(e) => Self::DecodeError(e),
       ArtcraftError::IoError(e) => Self::IoError(e),
+      ArtcraftError::GrokError(e) => Self::ProviderFailure(ProviderFailureReason::GrokError(e)),
       ArtcraftError::StorytellerError(e) => Self::ProviderFailure(ProviderFailureReason::StorytellerError(e)),
     }
   }
@@ -149,6 +157,12 @@ impl From<ArtcraftError> for GenerateError {
 //    Self::ProviderFailure(ProviderFailureReason::Fal(value))
 //  }
 //}
+
+impl From<GrokError> for GenerateError {
+  fn from(value: GrokError) -> Self {
+    Self::ProviderFailure(ProviderFailureReason::GrokError(value))
+  }
+}
 
 impl From<MidjourneyError> for GenerateError {
   fn from(value: MidjourneyError) -> Self {

@@ -26,6 +26,12 @@ pub enum GrokClientError {
   /// Can't read a local file for uploading.
   CannotReadLocalFileForUpload(std::io::Error),
 
+  /// Couldn't write to the file
+  CannotOpenLocalFileForWriting(std::io::Error),
+
+  /// Couldn't write to the file
+  CannotWriteLocalFile(std::io::Error),
+
   /// File for upload has an invalid path.
   FileForUploadHasInvalidPath,
 
@@ -46,6 +52,9 @@ pub enum GrokClientError {
   
   /// Something is broken with timeout math
   TimeoutMathBroken,
+
+  /// Can't make request because cookies aren't present
+  NoCookiesPresent,
 
 //  /// An error reading the file for upload.
 //  FileForUploadReadError(std::io::Error),
@@ -96,6 +105,8 @@ impl Display for GrokClientError {
       Self::WebsocketSendError(err) => write!(f, "Websocket send error: {}", err),
       Self::CannotOpenLocalFileForUpload(err) => write!(f, "Cannot open local file for upload: {}", err),
       Self::CannotReadLocalFileForUpload(err) => write!(f, "Cannot read local file for upload: {}", err),
+      Self::CannotOpenLocalFileForWriting(err) => write!(f, "Cannot open local file for writing: {}", err),
+      Self::CannotWriteLocalFile(err) => write!(f, "Cannot write local file: {}", err),
       Self::FileForUploadHasInvalidPath => write!(f, "File for upload has invalid path"),
       Self::HtmlParsingError => write!(f, "Html parsing error"),
       Self::FailedToDecodeVerificationToken(err) => write!(f, "Failed to decode verification token: {}", err),
@@ -103,6 +114,7 @@ impl Display for GrokClientError {
       Self::ScriptLogicOutOfDate => write!(f, "Script logic out of date"),
       Self::BadSignatureInputs => write!(f, "Bad signature inputs"),
       Self::TimeoutMathBroken => write!(f, "Timeout math is broken"),
+      Self::NoCookiesPresent => write!(f, "No cookies present"),
 
       //Self::FileForUploadReadError(err) => write!(f, "Error reading file for upload: {}", err),
       //Self::FileForUploadHasInvalidPath => write!(f, "The file path provided for upload is invalid."),
