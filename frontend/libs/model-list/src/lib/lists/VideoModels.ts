@@ -4,11 +4,11 @@ import { SizeIconOption } from "../classes/metadata/SizeOption.js";
 
 export const VIDEO_MODELS: VideoModel[] = [
   new VideoModel({
-    id: "grok",
-    tauriId: "grok",
+    id: "grok_video",
+    tauriId: "grok_video",
     fullName: "Grok Video",
     category: "video",
-    creator: ModelCreator.Kling,
+    creator: ModelCreator.Grok,
     selectorName: "Grok Video",
     selectorDescription: "Fastest video model",
     selectorBadges: ["20 sec."],

@@ -221,8 +221,8 @@ async fn upload_grok_video(
     uuid_idempotency_token: generate_random_uuid(),
     positive_prompt: grok_video_post.prompt.clone(),
     negative_prompt: None,
-    model_type: Some(ModelType::Midjourney), // TODO: TEMP
-    generation_provider: Some(GenerationProvider::Midjourney), // TODO: TEMP
+    model_type: Some(ModelType::GrokVideo),
+    generation_provider: Some(GenerationProvider::Grok),
   };
 
   let prompt_response = create_prompt(
@@ -339,7 +339,7 @@ async fn upload_grok_video(
   let event = GenerationCompleteEvent {
     //media_file_token: result.media_file_token,
     action: Some(GenerationAction::GenerateVideo),
-    service: GenerationServiceProvider::Midjourney, // TODO
+    service: GenerationServiceProvider::Grok,
     model: None,
   };
 

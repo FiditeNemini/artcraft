@@ -28,8 +28,8 @@ use crate::services::grok::state::grok_credential_manager::GrokCredentialManager
 #[derive(Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum VideoModel {
-  #[serde(rename = "grok")]
-  Grok,
+  #[serde(rename = "grok_video")]
+  GrokVideo,
   
   #[serde(rename = "kling_1.6_pro")]
   Kling16Pro,
@@ -213,7 +213,7 @@ pub async fn handle_request(
 ) -> Result<TaskEnqueueSuccess, GenerateError> {
 
   let result = match request.model {
-    Some(VideoModel::Grok) => {
+    Some(VideoModel::GrokVideo) => {
       handle_grok_video(
         &request,
         app,

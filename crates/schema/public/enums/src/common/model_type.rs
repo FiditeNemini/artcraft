@@ -29,6 +29,9 @@ pub enum ModelType {
   FluxProKontextMax,
   #[serde(rename = "gpt_image_1")]
   GptImage1,
+  // Generic grok image model without a version
+  #[serde(rename = "grok_image")]
+  GrokImage,
   #[serde(rename = "recraft_3")]
   Recraft3,
   #[serde(rename = "seededit_3")]
@@ -61,6 +64,10 @@ pub enum ModelType {
   //FluxPro1Infill,
 
   // Video models
+  
+  // Generic grok video model without a version
+  #[serde(rename = "grok_video")]
+  GrokVideo, 
   #[serde(rename = "kling_1p6_pro")]
   Kling16Pro,
   #[serde(rename = "kling_2p1_pro")]
@@ -105,6 +112,7 @@ impl ModelType {
       Self::FluxPro11Ultra => "flux_pro_1p1_ultra",
       Self::FluxProKontextMax => "flux_pro_kontext_max",
       Self::GptImage1 => "gpt_image_1",
+      Self::GrokImage => "grok_image",
       Self::Recraft3 => "recraft_3",
       Self::SeedEdit3 => "seededit_3",
       Self::Qwen => "qwen",
@@ -119,6 +127,7 @@ impl ModelType {
       Self::MidjourneyV7Raw => "midjourney_v7_raw",
 
       // Video models
+      Self::GrokVideo => "grok_video",
       Self::Kling16Pro => "kling_1p6_pro",
       Self::Kling21Pro => "kling_2p1_pro",
       Self::Kling21Master => "kling_2p1_master",
@@ -146,6 +155,7 @@ impl ModelType {
       "flux_pro_1p1_ultra" => Ok(Self::FluxPro11Ultra),
       "flux_pro_kontext_max" => Ok(Self::FluxProKontextMax),
       "gpt_image_1" => Ok(Self::GptImage1),
+      "grok_image" => Ok(Self::GrokImage),
       "recraft_3" => Ok(Self::Recraft3),
       "seededit_3" => Ok(Self::SeedEdit3),
       "qwen" => Ok(Self::Qwen),
@@ -160,6 +170,7 @@ impl ModelType {
       "midjourney_v7_raw" => Ok(Self::MidjourneyV7Raw),
 
       // Video models
+      "grok_video" => Ok(Self::GrokVideo),
       "kling_1p6_pro" => Ok(Self::Kling16Pro),
       "kling_2p1_pro" => Ok(Self::Kling21Pro),
       "kling_2p1_master" => Ok(Self::Kling21Master),
@@ -191,6 +202,7 @@ impl ModelType {
       Self::FluxPro11Ultra,
       Self::FluxProKontextMax,
       Self::GptImage1,
+      Self::GrokImage,
       Self::Recraft3,
       Self::SeedEdit3,
       Self::Qwen,
@@ -205,6 +217,7 @@ impl ModelType {
       Self::MidjourneyV7Raw,
 
       // Video models
+      Self::GrokVideo,
       Self::Kling16Pro,
       Self::Kling21Pro,
       Self::Kling21Master,
@@ -241,6 +254,7 @@ mod tests {
       assert_serialization(ModelType::FluxPro11Ultra, "flux_pro_1p1_ultra");
       assert_serialization(ModelType::FluxProKontextMax, "flux_pro_kontext_max");
       assert_serialization(ModelType::GptImage1, "gpt_image_1");
+      assert_serialization(ModelType::GrokImage, "grok_image");
       assert_serialization(ModelType::Recraft3, "recraft_3");
       assert_serialization(ModelType::SeedEdit3, "seededit_3");
       assert_serialization(ModelType::Qwen, "qwen");
@@ -254,6 +268,7 @@ mod tests {
       assert_serialization(ModelType::MidjourneyV7DraftRaw, "midjourney_v7_draft_raw");
       assert_serialization(ModelType::MidjourneyV7Raw, "midjourney_v7_raw");
       // Video models
+      assert_serialization(ModelType::GrokVideo, "grok_video");
       assert_serialization(ModelType::Kling16Pro, "kling_1p6_pro");
       assert_serialization(ModelType::Kling21Pro, "kling_2p1_pro");
       assert_serialization(ModelType::Kling21Master, "kling_2p1_master");
@@ -279,6 +294,7 @@ mod tests {
       assert_eq!(ModelType::FluxPro11Ultra.to_str(), "flux_pro_1p1_ultra");
       assert_eq!(ModelType::FluxProKontextMax.to_str(), "flux_pro_kontext_max");
       assert_eq!(ModelType::GptImage1.to_str(), "gpt_image_1");
+      assert_eq!(ModelType::GrokImage.to_str(), "grok_image");
       assert_eq!(ModelType::Recraft3.to_str(), "recraft_3");
       assert_eq!(ModelType::SeedEdit3.to_str(), "seededit_3");
       assert_eq!(ModelType::Qwen.to_str(), "qwen");
@@ -293,6 +309,7 @@ mod tests {
       assert_eq!(ModelType::MidjourneyV7Raw.to_str(), "midjourney_v7_raw");
 
       // Video models
+      assert_eq!(ModelType::GrokVideo.to_str(), "grok_video");
       assert_eq!(ModelType::Kling16Pro.to_str(), "kling_1p6_pro");
       assert_eq!(ModelType::Kling21Pro.to_str(), "kling_2p1_pro");
       assert_eq!(ModelType::Kling21Master.to_str(), "kling_2p1_master");
@@ -319,6 +336,7 @@ mod tests {
       assert_eq!(ModelType::from_str("flux_pro_1p1_ultra").unwrap(), ModelType::FluxPro11Ultra);
       assert_eq!(ModelType::from_str("flux_pro_kontext_max").unwrap(), ModelType::FluxProKontextMax);
       assert_eq!(ModelType::from_str("gpt_image_1").unwrap(), ModelType::GptImage1);
+      assert_eq!(ModelType::from_str("grok_image").unwrap(), ModelType::GrokImage);
       assert_eq!(ModelType::from_str("recraft_3").unwrap(), ModelType::Recraft3);
       assert_eq!(ModelType::from_str("seededit_3").unwrap(), ModelType::SeedEdit3);
       assert_eq!(ModelType::from_str("qwen").unwrap(), ModelType::Qwen);
@@ -332,6 +350,7 @@ mod tests {
       assert_eq!(ModelType::from_str("midjourney_v7_draft_raw").unwrap(), ModelType::MidjourneyV7DraftRaw);
       assert_eq!(ModelType::from_str("midjourney_v7_raw").unwrap(), ModelType::MidjourneyV7Raw);
       // Video models
+      assert_eq!(ModelType::from_str("grok_video").unwrap(), ModelType::GrokVideo);
       assert_eq!(ModelType::from_str("kling_1p6_pro").unwrap(), ModelType::Kling16Pro);
       assert_eq!(ModelType::from_str("kling_2p1_pro").unwrap(), ModelType::Kling21Pro);
       assert_eq!(ModelType::from_str("kling_2p1_master").unwrap(), ModelType::Kling21Master);
@@ -349,7 +368,7 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = ModelType::all_variants();
-      assert_eq!(variants.len(), 31);
+      assert_eq!(variants.len(), 33);
       // Image models
       assert_eq!(variants.pop_first(), Some(ModelType::Flux1Dev));
       assert_eq!(variants.pop_first(), Some(ModelType::Flux1Schnell));
@@ -359,6 +378,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(ModelType::FluxPro11Ultra));
       assert_eq!(variants.pop_first(), Some(ModelType::FluxProKontextMax));
       assert_eq!(variants.pop_first(), Some(ModelType::GptImage1));
+      assert_eq!(variants.pop_first(), Some(ModelType::GrokImage));
       assert_eq!(variants.pop_first(), Some(ModelType::Recraft3));
       assert_eq!(variants.pop_first(), Some(ModelType::SeedEdit3));
       assert_eq!(variants.pop_first(), Some(ModelType::Qwen));
@@ -372,6 +392,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(ModelType::MidjourneyV7DraftRaw));
       assert_eq!(variants.pop_first(), Some(ModelType::MidjourneyV7Raw));
       // Video models
+      assert_eq!(variants.pop_first(), Some(ModelType::GrokVideo));
       assert_eq!(variants.pop_first(), Some(ModelType::Kling16Pro));
       assert_eq!(variants.pop_first(), Some(ModelType::Kling21Pro));
       assert_eq!(variants.pop_first(), Some(ModelType::Kling21Master));
