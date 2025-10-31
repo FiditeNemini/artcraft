@@ -37,8 +37,10 @@ pub async fn get_or_update_grok_full_credentials(grok_credential_manager: &GrokC
       return Err(ArtcraftError::from(err));
     }
     Ok(secrets) => {
+      info!("Grok client secrets successfully upgraded...");
       let full_creds = GrokFullCredentials::from_cookies_and_client_secrets(cookies, secrets);
       grok_credential_manager.replace_full_credentials(full_creds.clone())?;
+      info!("Persisting grok credentials to disk...");
       grok_credential_manager.persist_to_disk()?;
       return Ok(full_creds)
     }

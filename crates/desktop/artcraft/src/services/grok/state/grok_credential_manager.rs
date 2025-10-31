@@ -51,9 +51,7 @@ impl GrokCredentialManager {
 
         credential_data = Arc::new(RwLock::new(GrokCredentialHolder {
           browser_cookies: maybe_cookies,
-          grok_user_data: user_data,
           grok_full_credentials: None, // NB: We don't want to keep this on disk. It goes stale.
-          grok_client_secrets: None, // NB: We don't want to keep this on disk. It goes stale.
         }));
       }
     };
@@ -94,13 +92,6 @@ impl GrokCredentialManager {
     }
   }
 
-  pub fn maybe_copy_client_secrets(&self) -> anyhow::Result<Option<GrokClientSecrets>> {
-    match self.credential_data.read() {
-      Err(err) => Err(anyhow::anyhow!("Failed to acquire read lock: {:?}", err)),
-      Ok(holder) => Ok(holder.grok_client_secrets.clone()),
-    }
-  }
-
   pub fn replace_cookie_store(&self, store: CookieStore) -> anyhow::Result<()> {
     match self.credential_data.write() {
       Err(err) => Err(anyhow::anyhow!("Failed to acquire write lock: {:?}", err)),
@@ -121,16 +112,6 @@ impl GrokCredentialManager {
     }
   }
 
-  pub fn replace_client_secrets(&self, secrets: GrokClientSecrets) -> anyhow::Result<()> {
-    match self.credential_data.write() {
-      Err(err) => Err(anyhow::anyhow!("Failed to acquire write lock: {:?}", err)),
-      Ok(mut holder) => {
-        holder.grok_client_secrets = Some(secrets);
-        Ok(())
-      }
-    }
-  }
-
   // NB: This is just a heuristic. We'll add better checks later.
   pub fn do_task_polling(&self) -> anyhow::Result<bool> {
     self.session_appears_active()
@@ -143,7 +124,7 @@ impl GrokCredentialManager {
       Ok(store) => store.clone(),
     };
 
-    if holder.grok_user_data.is_some() {
+    if holder.grok_full_credentials.is_some() {
       return Ok(true);
     }
 
@@ -191,12 +172,12 @@ impl GrokCredentialManager {
       user_cookies: creds.browser_cookies
           .as_ref()
           .map(|cookies| cookies.to_serializable()),
-      user_id: creds.grok_user_data
+      user_id: creds.grok_full_credentials
           .as_ref()
-          .map(|data| data.user_id.to_string()),
-      user_email: creds.grok_user_data
+          .map(|creds| creds.client_secrets.user_id.to_string()),
+      user_email: creds.grok_full_credentials
           .as_ref()
-          .map(|data| data.user_email.as_ref())
+          .map(|data| data.client_secrets.user_email.as_ref())
           .flatten()
           .map(|email| email.to_string()),
     };

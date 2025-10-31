@@ -111,8 +111,10 @@ async fn get_grok_creds(app: &AppHandle, grok_credential_manager: &GrokCredentia
       error!("Failed to fetch Grok client secrets: {}", err); // NB: Fall-through
     }
     Ok(secrets) => {
+      info!("Grok client secrets successfully upgraded...");
       let full_creds = GrokFullCredentials::from_cookies_and_client_secrets(cookies, secrets);
       grok_credential_manager.replace_full_credentials(full_creds.clone())?;
+      info!("Persisting grok credentials to disk...");
       grok_credential_manager.persist_to_disk()?;
       return Ok(full_creds)
     }

@@ -13,15 +13,6 @@ pub struct GrokCredentialHolder {
   /// Full credentials.
   /// NOT PERSISTED TO DISK.
   pub grok_full_credentials: Option<GrokFullCredentials>,
-
-  /// Email, user id, etc.
-  /// These can be persisted.
-  pub grok_user_data: Option<GrokUserData>,
-
-  /// These have a different lifecycle than the other pieces and are
-  /// subject to change when the website changes.
-  /// We won't persist these.
-  pub grok_client_secrets: Option<GrokClientSecrets>,
 }
 
 impl GrokCredentialHolder {
@@ -29,8 +20,6 @@ impl GrokCredentialHolder {
     Self {
       browser_cookies: None,
       grok_full_credentials: None,
-      grok_user_data: None,
-      grok_client_secrets: None,
     }
   }
 }
