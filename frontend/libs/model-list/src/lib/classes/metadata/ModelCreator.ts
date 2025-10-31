@@ -19,4 +19,5 @@ export enum ModelCreator {
   Alibaba = "Alibaba", // qwen and wanvideo
   Vidu = "Vidu",
   ArtCraft = "ArtCraft",
+  Grok = "Grok",
 }
