@@ -1,44 +1,44 @@
 import { Button } from "@storyteller/ui-button";
 import { invoke } from "@tauri-apps/api/core";
-//import { useEffect, useState } from "react";
-//import { MidjourneyGetCredentialInfo, MidjourneyGetCredentialInfoSuccess } from "@storyteller/tauri-api";
+import { useEffect, useState } from "react";
 import { faSpinnerThird } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRefreshAccountStateEvent } from "@storyteller/tauri-events";
 import { RefreshAccountStateEvent } from "@storyteller/tauri-events";
+import { GrokGetCredentialInfo, GrokGetCredentialInfoSuccess } from "@storyteller/tauri-api";
 
 export const GrokAccountBlock = () => {
-  //const [grokSession, setGrokSession] = useState<GrokGetCredentialInfoSuccess| undefined>(undefined);
-  //const [isCheckingGrokSession, setIsCheckingGrokSession] = useState(false);
+  const [grokSession, setGrokSession] = useState<GrokGetCredentialInfoSuccess| undefined>(undefined);
+  const [isCheckingGrokSession, setIsCheckingGrokSession] = useState(false);
 
-  //const fetchSession = async () => {
-  //  setIsCheckingGrokSession(true);
-  //  try {
-  //    const result = await MidjourneyGetCredentialInfo();
-  //    setGrokSession(result);
-  //  } catch (e) {
-  //    console.error("Error fetching Grok session", e);
-  //    setGrokSession(undefined);
-  //  } finally {
-  //    setIsCheckingGrokSession(false);
-  //  }
-  //};
+  const fetchSession = async () => {
+    setIsCheckingGrokSession(true);
+    try {
+      const result = await GrokGetCredentialInfo();
+      setGrokSession(result);
+    } catch (e) {
+      console.error("Error fetching Grok session", e);
+      setGrokSession(undefined);
+    } finally {
+      setIsCheckingGrokSession(false);
+    }
+  };
 
-  //useEffect(() => {
-  //  fetchSession();
-  //}, []);
+  useEffect(() => {
+    fetchSession();
+  }, []);
 
-  //useRefreshAccountStateEvent(async (event: RefreshAccountStateEvent) => {
-  //  fetchSession();
-  //});
+  useRefreshAccountStateEvent(async (event: RefreshAccountStateEvent) => {
+    fetchSession();
+  });
 
-  //const clearState = async() => {
-  //  try {
-  //    await invoke("midjourney_clear_credentials_command");
-  //  } catch (e) {
-  //    console.error("Error clearing Midjourney credentials", e);
-  //  }
-  //}
+  const clearState = async() => {
+    try {
+      await invoke("grok_clear_credentials_command");
+    } catch (e) {
+      console.error("Error clearing Grok credentials", e);
+    }
+  }
 
   const openLogin = async() => {
     try {
@@ -49,43 +49,40 @@ export const GrokAccountBlock = () => {
   }
 
   const handleGrokButton = async () => {
-    //if (midjourneySession?.payload?.can_clear_state) {
-    //  await clearState();
-    //  setMidjourneySession(undefined);
-    //} else {
-    //  await openLogin();
-    //}
-    await openLogin();
+    if (grokSession?.payload?.can_clear_state) {
+      await clearState();
+      setGrokSession(undefined);
+    } else {
+      await openLogin();
+    }
   };
 
   return(
     <div className="flex justify-between items-center">
       <span>Grok Account:</span>
-      {/*<pre>{midjourneySession?.payload?.maybe_email || "Not logged in"}</pre>*/}
-      <pre>Not logged in</pre>
+      <pre>{grokSession?.payload?.maybe_email || "Not logged in"}</pre>
       <Button
-        /*variant={
-          midjourneySession?.payload?.can_clear_state && !isCheckingMidjourneySession
+        variant={
+          grokSession?.payload?.can_clear_state && !isCheckingGrokSession
             ? "destructive"
-            : midjourneySession?.payload?.can_clear_state
+            : grokSession?.payload?.can_clear_state
             ? "primary"
             : "secondary"
-        }*/
+        }
         className="h-[30px]"
         onClick={handleGrokButton}
-        //disabled={isCheckingMidjourneySession}
+        disabled={isCheckingGrokSession}
       >
-        {/*isCheckingMidjourneySession ? (
+        {isCheckingGrokSession ? (
           <FontAwesomeIcon
             icon={faSpinnerThird}
             className="animate-spin text-sm"
           />
-        ) : midjourneySession?.payload?.can_clear_state ? (
+        ) : grokSession?.payload?.can_clear_state ? (
           "Disconnect"
         ) : (
           "Connect"
-        )*/}
-        Connect
+        )}
       </Button>
     </div>
   )

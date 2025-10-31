@@ -29,6 +29,8 @@ use crate::core::state::data_dir::app_data_root::AppDataRoot;
 use crate::core::state::provider_priority::ProviderPriorityStore;
 use crate::core::threads::discord_presence_thread::discord_presence_thread;
 use crate::core::threads::main_window_thread::main_window_thread::main_window_thread;
+use crate::services::grok::commands::grok_clear_credentials_command::grok_clear_credentials_command;
+use crate::services::grok::commands::grok_get_credential_info_command::grok_get_credential_info_command;
 use crate::services::grok::commands::grok_open_login_command::grok_open_login_command;
 use crate::services::grok::state::grok_credential_manager::GrokCredentialManager;
 use crate::services::midjourney::commands::midjourney_clear_credentials_command::midjourney_clear_credentials_command;
@@ -175,6 +177,8 @@ pub fn run() {
     get_app_preferences_command,
     get_provider_order_command,
     get_task_queue_command,
+    grok_clear_credentials_command,
+    grok_get_credential_info_command,
     grok_open_login_command,
     load_without_cors_command,
     mark_task_as_dismissed_command,
