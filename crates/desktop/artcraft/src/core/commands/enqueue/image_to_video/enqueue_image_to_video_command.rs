@@ -21,6 +21,8 @@ use log::{error, info, warn};
 use serde_derive::{Deserialize, Serialize};
 use tauri::{AppHandle, State};
 use tokens::tokens::media_files::MediaFileToken;
+use crate::core::events::generation_events::common::GenerationAction;
+use crate::core::events::generation_events::generation_enqueue_failure_event::GenerationEnqueueFailureEvent;
 use crate::services::grok::state::grok_credential_manager::GrokCredentialManager;
 
 /// This is used in the Tauri command bridge.
@@ -151,7 +153,7 @@ pub async fn enqueue_image_to_video_command(
       let mut error_message = "A server error occurred. Please try again. If it continues, please tell our staff about the problem.";
 
       match err {
-        GenerateError::BadInput(BadInputReason::NoModelSpecified)=> {
+        GenerateError::BadInput(BadInputReason::NoModelSpecified) => {
           status = CommandErrorStatus::BadRequest;
           error_type = EnqueueImageToVideoErrorType::ModelNotSpecified;
           error_message = "No model specified for video generation";
