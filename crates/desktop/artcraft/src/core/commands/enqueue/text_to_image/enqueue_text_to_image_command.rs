@@ -6,6 +6,7 @@ use crate::core::commands::enqueue::text_to_image::generic::handle_image_artcraf
 use crate::core::commands::enqueue::text_to_image::generic::handle_image_fal::handle_image_fal;
 use crate::core::commands::enqueue::text_to_image::gpt_image_1::handle_gpt_image_1::handle_gpt_image_1;
 use crate::core::commands::enqueue::text_to_image::gpt_image_1::handle_gpt_image_1_sora::handle_gpt_image_1_sora;
+use crate::core::commands::enqueue::text_to_image::grok::handle_grok::handle_grok;
 use crate::core::commands::enqueue::text_to_image::midjourney::handle_midjourney::handle_midjourney;
 use crate::core::commands::response::failure_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus};
 use crate::core::commands::response::shorthand::Response;
@@ -19,6 +20,8 @@ use crate::core::state::app_env_configs::app_env_configs::AppEnvConfigs;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
 use crate::core::state::provider_priority::{Provider, ProviderPriorityStore};
 use crate::core::state::task_database::TaskDatabase;
+use crate::services::grok::state::grok_credential_manager::GrokCredentialManager;
+use crate::services::grok::state::grok_image_prompt_queue::GrokImagePromptQueue;
 use crate::services::midjourney::state::midjourney_credential_manager::MidjourneyCredentialManager;
 use crate::services::sora::state::sora_credential_manager::SoraCredentialManager;
 use crate::services::sora::state::sora_task_queue::SoraTaskQueue;
@@ -48,6 +51,8 @@ pub enum ImageModel {
   FluxPro11Ultra,
   #[serde(rename = "gpt_image_1")]
   GptImage1,
+  #[serde(rename = "grok_image")]
+  GrokImage,
   #[serde(rename = "recraft_3")]
   Recraft3,
 
@@ -144,6 +149,8 @@ pub async fn enqueue_text_to_image_command(
   provider_priority_store: State<'_, ProviderPriorityStore>,
   task_database: State<'_, TaskDatabase>,
   mj_creds_manager: State<'_, MidjourneyCredentialManager>,
+  grok_creds_manager: State<'_, GrokCredentialManager>,
+  grok_image_prompt_queue: State<'_, GrokImagePromptQueue>,
   storyteller_creds_manager: State<'_, StorytellerCredentialManager>,
   sora_creds_manager: State<'_, SoraCredentialManager>,
   sora_task_queue: State<'_, SoraTaskQueue>,
@@ -158,6 +165,8 @@ pub async fn enqueue_text_to_image_command(
     &provider_priority_store,
     &task_database,
     &mj_creds_manager,
+    &grok_creds_manager,
+    &grok_image_prompt_queue,
     &storyteller_creds_manager,
     &app_env_configs,
     &sora_creds_manager,
@@ -226,6 +235,8 @@ pub async fn handle_request(
   provider_priority_store: &ProviderPriorityStore,
   task_database: &TaskDatabase,
   mj_creds_manager: &MidjourneyCredentialManager,
+  grok_creds_manager: &GrokCredentialManager,
+  grok_image_prompt_queue: &GrokImagePromptQueue,
   storyteller_creds_manager: &StorytellerCredentialManager,
   app_env_configs: &AppEnvConfigs,
   sora_creds_manager: &SoraCredentialManager,
@@ -240,6 +251,8 @@ pub async fn handle_request(
     &storyteller_creds_manager,
     &app_env_configs,
     &mj_creds_manager,
+    &grok_creds_manager,
+    &grok_image_prompt_queue,
     &sora_creds_manager,
     &sora_task_queue,
   ).await;
@@ -274,6 +287,8 @@ pub async fn dispatch_request(
   storyteller_creds_manager: &StorytellerCredentialManager,
   app_env_configs: &AppEnvConfigs,
   mj_creds_manager: &MidjourneyCredentialManager,
+  grok_creds_manager: &GrokCredentialManager,
+  grok_image_prompt_queue: &GrokImagePromptQueue,
   sora_creds_manager: &SoraCredentialManager,
   sora_task_queue: &SoraTaskQueue,
 ) -> Result<TaskEnqueueSuccess, GenerateError> {
@@ -304,6 +319,15 @@ pub async fn dispatch_request(
         storyteller_creds_manager,
         sora_creds_manager, 
         sora_task_queue,
+      ).await;
+    }
+    Some(ImageModel::GrokImage) => {
+      return handle_grok(
+        app,
+        request,
+        app_env_configs,
+        grok_creds_manager,
+        grok_image_prompt_queue,
       ).await;
     }
     Some(ImageModel::Midjourney) => {

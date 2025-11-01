@@ -27,7 +27,8 @@ use midjourney_client::endpoints::imagine::{imagine, ImagineItem, ImagineRequest
 use midjourney_client::utils::get_image_url::get_image_url;
 use midjourney_client::utils::image_downloader_client::ImageDownloaderClient;
 use once_cell::sync::Lazy;
-use sqlite_tasks::queries::list_tasks_by_provider_and_status::{list_tasks_by_provider_and_status, ListTasksByProviderAndStatusArgs, Task, TaskList};
+use sqlite_tasks::queries::list_tasks_by_provider_and_status::{list_tasks_by_provider_and_status, ListTasksByProviderAndStatusArgs, TaskList};
+use sqlite_tasks::queries::task::Task;
 use sqlite_tasks::queries::update_successful_task_status_with_metadata::{update_successful_task_status_with_metadata, UpdateSuccessfulTaskArgs};
 use sqlite_tasks::queries::update_task_status::{update_task_status, UpdateTaskArgs};
 use std::collections::{HashMap, HashSet};
@@ -362,7 +363,7 @@ async fn upload_midjourney_batch(
     task_id: &local_task.id,
     maybe_batch_token: Some(&batch_token),
     maybe_primary_media_file_token: maybe_primary_media_file_token.as_ref(),
-    maybe_primary_media_file_class: Some(TaskMediaFileClass::Image), // TODO: Just images for now.
+    maybe_primary_media_file_class: Some(TaskMediaFileClass::Image),
     maybe_primary_media_file_thumbnail_url_template: maybe_thumbnail_url_template.as_deref(),
     maybe_primary_media_file_cdn_url: maybe_cdn_url.as_deref(),
   }).await?;
