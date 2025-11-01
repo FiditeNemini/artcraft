@@ -1,5 +1,6 @@
 pub (crate) mod artcraft_2d;
 pub (crate) mod artcraft_3d;
+pub (crate) mod artcraft_website;
 pub (crate) mod development_only;
 pub (crate) mod fakeyou;
 pub (crate) mod legacy;
