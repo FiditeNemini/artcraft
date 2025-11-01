@@ -35,6 +35,18 @@ const ALL_MODELS: ModelConfig[] = [
   // Image models
   //////////////////////////////
   cfg({
+    id: "grok_image",
+    category: "image",
+    info: {
+      name: "Grok",
+      tauri_id: "grok_image",
+      creator: mc.Midjourney,
+    },
+    description: "Fast af",
+    badges: [{ label: "10 sec." }],
+    capabilities: { maxGenerationCount: 6, defaultGenerationCount: 6 },
+  }),
+  cfg({
     id: "midjourney",
     category: "image",
     info: {
