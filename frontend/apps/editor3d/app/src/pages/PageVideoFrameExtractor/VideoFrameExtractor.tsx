@@ -53,6 +53,7 @@ export const VideoFrameExtractor = () => {
   const [convertingFrames, setConvertingFrames] = useState<Set<string>>(
     new Set(),
   );
+  const [isLoadingFromGallery, setIsLoadingFromGallery] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -151,7 +152,18 @@ export const VideoFrameExtractor = () => {
   const handleGallerySelect = async (selectedItems: GalleryItem[]) => {
     const item = selectedItems[0];
     if (!item || !item.fullImage) {
+      toast.error("No video selected");
       return;
+    }
+
+    if (isLoadingFromGallery) {
+      return;
+    }
+
+    setIsLoadingFromGallery(true);
+
+    if (videoUrl && videoUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(videoUrl);
     }
 
     setIsPlaying(false);
@@ -162,24 +174,11 @@ export const VideoFrameExtractor = () => {
     setSavingFrames(new Set());
     setSavedFrames(new Set());
     setConvertingFrames(new Set());
-
-    try {
-      const response = await fetch(item.fullImage);
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
-
-      if (videoUrl && videoUrl.startsWith("blob:")) {
-        URL.revokeObjectURL(videoUrl);
-      }
-
-      setVideoUrl(blobUrl);
-    } catch (error) {
-      console.error("Failed to load video from library:", error);
-      setVideoUrl(item.fullImage);
-    }
+    setVideoUrl(item.fullImage);
 
     setIsGalleryModalOpen(false);
     setSelectedGalleryVideos([]);
+    setIsLoadingFromGallery(false);
   };
 
   const togglePlayPause = () => {
@@ -285,6 +284,7 @@ export const VideoFrameExtractor = () => {
     canvas.height = video.videoHeight;
 
     const frames: { id: string; url: string; timestamp: number }[] = [];
+    let corsError = false;
 
     for (let i = 0; i < numFrames; i++) {
       const timestamp = startTime + (i * frameDistance) / 1000;
@@ -306,6 +306,9 @@ export const VideoFrameExtractor = () => {
             });
           } catch (error) {
             console.error("Error extracting frame:", error);
+            if (error instanceof Error && error.name === "SecurityError") {
+              corsError = true;
+            }
           }
 
           video.removeEventListener("seeked", handleSeeked);
@@ -314,6 +317,8 @@ export const VideoFrameExtractor = () => {
 
         video.addEventListener("seeked", handleSeeked, { once: true });
       });
+
+      if (corsError) break;
     }
 
     video.currentTime = originalTime;
@@ -328,6 +333,20 @@ export const VideoFrameExtractor = () => {
 
     if (wasPlaying) {
       video.play();
+    }
+
+    if (corsError) {
+      toast.error(
+        "CORS error: Cannot extract frames from this video. Try uploading the video file directly instead.",
+      );
+      setIsExtracting(false);
+      return;
+    }
+
+    if (frames.length === 0) {
+      toast.error("Failed to extract any frames");
+      setIsExtracting(false);
+      return;
     }
 
     setExtractedFrames(frames);
@@ -547,6 +566,7 @@ export const VideoFrameExtractor = () => {
                     onClick={togglePlayPause}
                     preload="metadata"
                     playsInline
+                    crossOrigin="anonymous"
                   />
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4">
                     <div
@@ -878,8 +898,10 @@ export const VideoFrameExtractor = () => {
       <GalleryModal
         isOpen={!!isGalleryModalOpen}
         onClose={() => {
-          setIsGalleryModalOpen(false);
-          setSelectedGalleryVideos([]);
+          if (!isLoadingFromGallery) {
+            setIsGalleryModalOpen(false);
+            setSelectedGalleryVideos([]);
+          }
         }}
         mode="select"
         selectedItemIds={selectedGalleryVideos}
