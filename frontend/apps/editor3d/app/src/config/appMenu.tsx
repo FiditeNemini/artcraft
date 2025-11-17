@@ -16,7 +16,9 @@ export type AppId =
   | "EDIT"
   | "2D"
   | "3D"
-  | "VIDEO_FRAME_EXTRACTOR";
+  | "VIDEO_FRAME_EXTRACTOR"
+  | "VIDEO_WATERMARK_REMOVAL"
+  | "IMAGE_WATERMARK_REMOVAL";
 
 export interface AppDescriptor {
   id: AppId;
@@ -115,7 +117,7 @@ export const ALL_APPS: FullAppItem[] = [
   },
   {
     id: "video-watermark-removal",
-    label: "Video Watermark Removal",
+    label: "Video Watermark Remover",
     description: "Remove watermarks from videos",
     icon: faDroplet,
     category: "edit",
@@ -124,7 +126,7 @@ export const ALL_APPS: FullAppItem[] = [
   },
   {
     id: "image-watermark-removal",
-    label: "Image Watermark Removal",
+    label: "Image Watermark Remover",
     description: "Remove watermarks from images",
     icon: faDroplet,
     category: "edit",
@@ -173,7 +175,7 @@ export const getBadgeStyles = (badge?: string) => {
 export const goToApp = (action?: string) => {
   if (
     action &&
-    ["IMAGE", "VIDEO", "EDIT", "2D", "3D", "VIDEO_FRAME_EXTRACTOR"].includes(
+    ["IMAGE", "VIDEO", "EDIT", "2D", "3D", "VIDEO_FRAME_EXTRACTOR", "VIDEO_WATERMARK_REMOVAL", "IMAGE_WATERMARK_REMOVAL"].includes(
       action,
     )
   ) {
