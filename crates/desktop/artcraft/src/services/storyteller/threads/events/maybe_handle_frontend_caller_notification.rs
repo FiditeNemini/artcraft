@@ -210,7 +210,7 @@ async fn handle_object_generation(
 
   // NB: For now, we only generate one object (3d mesh) at a time.
   let event = ObjectGenerationCompleteEvent {
-    generated_video: Some(GeneratedObject {
+    generated_object: Some(GeneratedObject {
       media_token: MediaFileToken::new_from_str(&job_result.entity_token),
       cdn_url: job_result.media_links.cdn_url.clone(),
       maybe_thumbnail_template: media_links_to_thumbnail_template(&job_result.media_links)
