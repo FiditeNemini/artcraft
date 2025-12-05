@@ -1335,10 +1335,10 @@ class Editor {
       this.rawRenderer &&
       this.render_composer
     ) {
-      const then = performance.now();
+      //const then = performance.now();
       this.composer.render();
-      const now = performance.now();
-      console.log("Performance: ", now - then);
+      //const now = performance.now();
+      //console.log("Performance: ", now - then);
       //this.rawRenderer.render(this.activeScene.scene, this.render_camera!);
       // this.render_composer.render();
     } else if (this.renderer && this.render_camera && !this.rendering) {
