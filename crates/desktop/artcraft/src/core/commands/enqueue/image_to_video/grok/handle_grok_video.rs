@@ -72,7 +72,8 @@ pub async fn handle_grok_video(
     prompt: request.prompt.as_deref(),
     aspect_ratio: Some(aspect_ratio),
     wait_for_generation: false,
-    individual_request_timeout: Some(GROK_IMAGE_UPLOAD_TIMEOUT)
+    individual_request_timeout: Some(GROK_IMAGE_UPLOAD_TIMEOUT),
+    mode: None,
   }).await;
 
   let post_id = match upload_result {
