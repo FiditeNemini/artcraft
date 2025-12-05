@@ -53,6 +53,8 @@ import FindSurfaces from "./FindSurfaces.js";
 import Stats from "three/examples/jsm/libs/stats.module.js";
 import { CharacterAnimationEngine } from "./Engines/CharacterAnimationEngine";
 import { cameras, selectedCameraId } from "~/pages/PageEnigma/signals/camera";
+import { SparkRenderer } from "@sparkjsdev/spark";
+import { SSAOPass } from "three/examples/jsm/Addons.js";
 
 export type EditorInitializeConfig = {
   sceneToken: string;
@@ -89,6 +91,7 @@ class Editor {
   render_camera_aspect_ratio: CameraAspectRatio =
     CameraAspectRatio.HORIZONTAL_3_2;
   renderer: THREE.WebGLRenderer | undefined;
+  sparkRenderer: SparkRenderer | null = null;
   rawRenderer: THREE.WebGLRenderer | undefined;
   clock: THREE.Clock | undefined;
   canvReference: HTMLCanvasElement | null = null;
@@ -99,7 +102,7 @@ class Editor {
   outlinePass: OutlinePass | undefined;
   last_cam_pos: THREE.Vector3;
   last_cam_rot: THREE.Euler;
-  saoPass: SAOPass | undefined;
+  ssaoPass: SSAOPass | undefined;
   outputPass: OutputPass | undefined;
   renderOutputPass: OutputPass | undefined;
   bloomPass: UnrealBloomPass | undefined;
@@ -273,7 +276,7 @@ class Editor {
     // Recording params.
     this.render_timer = 0;
     this.fps_number = 60;
-    this.cap_fps = 120;
+    this.cap_fps = 60;
     // Timeline settings.
     this.can_playback = false;
     this.playback_location = 0;
@@ -502,8 +505,8 @@ class Editor {
       this.camera = new THREE.PerspectiveCamera(
         this.focalLengthToFov(mainCameraConfig.focalLength),
         width / height,
-        0.01,
-        200,
+        0.1,
+        2000,
       );
       this.camera.position.set(
         mainCameraConfig.position.x,
@@ -551,6 +554,11 @@ class Editor {
       canvas: this.canvReference,
       preserveDrawingBuffer: true,
     });
+
+    // this.sparkRenderer = new SparkRenderer({
+    //   renderer: this.renderer,
+    //   autoUpdate: true,
+    // });
 
     this.rawRenderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -666,6 +674,10 @@ class Editor {
 
     // Attach freecam state controller
     this.mouseOverEventHandler = this.mouseOverEventHandler.bind(this);
+
+    // Add spark renderer as a child of the camera
+    this.activeScene.scene.add(this.sparkRenderer);
+    this.camera?.add(this.sparkRenderer);
 
     const onloadCallback = () => {
       console.log("Setting Scene is loaded");
@@ -1145,26 +1157,19 @@ class Editor {
     this.composer.addPass(this.renderPass);
 
     this.outlinePass = new OutlinePass(
-      new THREE.Vector2(width, height),
+      new THREE.Vector2(width / 10, height / 10),
       this.activeScene.scene,
       this.camera,
     );
 
-    this.outlinePass.edgeStrength = 5.0;
-    this.outlinePass.edgeGlow = 0.1;
-    this.outlinePass.edgeThickness = 1.2;
-    this.outlinePass.pulsePeriod = 3;
-    this.outlinePass.usePatternTexture = false;
-    this.outlinePass.visibleEdgeColor.set(0x4b9fff);
+    // this.outlinePass.edgeStrength = 5.0;
+    // this.outlinePass.edgeGlow = 0.1;
+    // this.outlinePass.edgeThickness = 1.2;
+    // this.outlinePass.pulsePeriod = 3;
+    // this.outlinePass.usePatternTexture = false;
+    // this.outlinePass.visibleEdgeColor.set(0x4b9fff);
 
-    this.composer.addPass(this.outlinePass);
-
-    this.saoPass = new SAOPass(this.activeScene.scene, this.camera);
-    this.saoPass.params.saoBias = 4.1;
-    this.saoPass.params.saoIntensity = 1.0;
-    this.saoPass.params.saoScale = 32.0;
-    this.saoPass.params.saoKernelRadius = 5.0;
-    this.saoPass.params.saoMinResolution = 0.0;
+    // this.composer.addPass(this.outlinePass);
 
     this.bloomPass = new UnrealBloomPass(
       new THREE.Vector2(width, height),
@@ -1174,14 +1179,16 @@ class Editor {
     );
     this.bloomPass.strength = 0.25;
 
-    this.smaaPass = new SMAAPass(
-      width * this.renderer.getPixelRatio(),
-      height * this.renderer.getPixelRatio(),
-    );
+    // this.smaaPass = new SMAAPass(
+    //   width * this.renderer.getPixelRatio(),
+    //   height * this.renderer.getPixelRatio(),
+    // );
 
-    this.composer.addPass(this.saoPass);
-    this.composer.addPass(this.bloomPass);
-    //this.composer.addPass(this.smaaPass);
+    // this.composer.addPass(this.bloomPass);
+    // this.composer.addPass(this.smaaPass);
+
+    // this.ssaoPass = new SSAOPass(this.activeScene.scene, this.camera, width, height);
+    // this.composer.addPass(this.ssaoPass);
 
     this.outputPass = new OutputPass();
     this.composer.addPass(this.outputPass);
@@ -1328,7 +1335,10 @@ class Editor {
       this.rawRenderer &&
       this.render_composer
     ) {
+      const then = performance.now();
       this.composer.render();
+      const now = performance.now();
+      console.log("Performance: ", now - then);
       //this.rawRenderer.render(this.activeScene.scene, this.render_camera!);
       // this.render_composer.render();
     } else if (this.renderer && this.render_camera && !this.rendering) {
@@ -1337,7 +1347,7 @@ class Editor {
     } else if (this.rendering && this.renderer) {
       this.renderer.setSize(this.render_width, this.render_height);
     }
-    await this.recordScene();
+    // await this.recordScene();
   }
 
   async useCachedMediaTokens(): Promise<boolean> {

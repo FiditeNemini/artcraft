@@ -36,6 +36,7 @@ import {
 } from "@storyteller/ui-gallery-modal";
 import { twMerge } from "tailwind-merge";
 import { UploadModalImage } from "../../../../components/reusable/UploadModalImage";
+import { UploadModalSplat } from "~/components/reusable/UploadModalSplat";
 
 export const Controls3D = () => {
   useSignals();
@@ -46,6 +47,7 @@ export const Controls3D = () => {
   const [upload3DIsShowing, setUpload3DIsShowing] = useState(false);
   const [isAddAssetPopoverOpen, setIsAddAssetPopoverOpen] = useState(false);
   const [uploadImageIsShowing, setUploadImageIsShowing] = useState(false);
+  const [uploadSplatIsShowing, setUploadSplatIsShowing] = useState(false);
 
 
   useEffect(() => {
@@ -57,7 +59,8 @@ export const Controls3D = () => {
         !galleryModalVisibleViewMode.value &&
         !isAddAssetPopoverOpen &&
         !upload3DIsShowing &&
-        !uploadImageIsShowing;
+        !uploadImageIsShowing &&
+        !uploadSplatIsShowing;
 
       setShowEmptySceneTooltip(isSceneEmpty);
     };
@@ -78,6 +81,7 @@ export const Controls3D = () => {
     isAddAssetPopoverOpen,
     upload3DIsShowing,
     uploadImageIsShowing,
+    uploadSplatIsShowing,
   ]);
 
   const handleModeChange = (value: string) => {
@@ -169,6 +173,9 @@ export const Controls3D = () => {
         break;
       case "upload-image":
         setUploadImageIsShowing(true);
+        break;
+      case "upload-splat":
+        setUploadSplatIsShowing(true);
         break;
       default:
         break;
@@ -268,14 +275,24 @@ export const Controls3D = () => {
                         ),
                         action: "upload-image",
                       },
+                      {
+                        label: "Upload Splat",
+                        selected: false,
+                        icon: (
+                          <FontAwesomeIcon
+                            icon={faArrowUpFromBracket}
+                            className="h-4 w-4"
+                          />
+                        ),
+                        action: "upload-splat",
+                      },
                     ]}
                     onPanelAction={handleAddAssetAction}
                     showIconsInList
-                    buttonClassName={`h-9 w-9 rounded-[10px] text-lg ${
-                      showEmptySceneTooltip
-                        ? "bg-primary/90 hover:bg-primary/70"
-                        : "border-transparent bg-primary/90 hover:bg-primary/70"
-                    }`}
+                    buttonClassName={`h-9 w-9 rounded-[10px] text-lg ${showEmptySceneTooltip
+                      ? "bg-primary/90 hover:bg-primary/70"
+                      : "border-transparent bg-primary/90 hover:bg-primary/70"
+                      }`}
                     triggerIcon={
                       <FontAwesomeIcon icon={faPlus} className="text-xl" />
                     }
@@ -330,6 +347,17 @@ export const Controls3D = () => {
         onSuccess={() => setUploadImageIsShowing(false)}
         title="Upload an Image"
         titleIcon={faImages}
+      />
+
+      <UploadModalSplat
+        isOpen={uploadSplatIsShowing}
+        onClose={() => setUploadSplatIsShowing(false)}
+        onSuccess={(buffer, shouldFlip) => {
+          setUploadSplatIsShowing(false)
+          editorEngine?.timeline.addLocalSplat(buffer, shouldFlip);
+        }}
+        title="Upload an spz file"
+        titleIcon={faCube}
       />
     </>
   );
