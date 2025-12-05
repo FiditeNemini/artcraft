@@ -59,6 +59,9 @@
       "path": "../../analytics/google-analytics/tsconfig.lib.json"
     },
     {
+      "path": "../viewer-3d/tsconfig.lib.json"
+    },
+    {
       "path": "../loading-spinner/tsconfig.lib.json"
     },
     {

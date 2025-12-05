@@ -18,6 +18,9 @@
       "path": "../../analytics/google-analytics"
     },
     {
+      "path": "../viewer-3d"
+    },
+    {
       "path": "../loading-spinner"
     },
     {
