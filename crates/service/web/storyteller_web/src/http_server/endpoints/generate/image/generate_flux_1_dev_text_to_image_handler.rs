@@ -90,30 +90,28 @@ pub async fn generate_flux_1_dev_text_to_image_handler(
         CommonWebError::BadInputWithSimpleMessage("repeated idempotency token".to_string())
       })?;
 
+//  // TODO: This is test code
+//  let credits = match request.num_images {
+//    Some(GenerateFlux1DevTextToImageNumImages::One) => 100,
+//    Some(GenerateFlux1DevTextToImageNumImages::Two) => 200,
+//    Some(GenerateFlux1DevTextToImageNumImages::Three) => 300,
+//    Some(GenerateFlux1DevTextToImageNumImages::Four) => 400,
+//    None => 100,
+//  };
+//
+//  // TODO: This is test code
+//  let result = temporary_test_wallet_deduction(
+//    user_token,
+//    Some("todo-reference-token"),
+//    credits,
+//    &mut mysql_connection,
+//  ).await;
+//
+//  // TODO: This is test code
+//  if let Err(err) = result {
+//    warn!("Temporary wallet deduction failed: {:?}", err); // Infallible for now.
+//  }
 
-  // TODO: This is test code
-  let credits = match request.num_images {
-    Some(GenerateFlux1DevTextToImageNumImages::One) => 100,
-    Some(GenerateFlux1DevTextToImageNumImages::Two) => 200,
-    Some(GenerateFlux1DevTextToImageNumImages::Three) => 300,
-    Some(GenerateFlux1DevTextToImageNumImages::Four) => 400,
-    None => 100,
-  };
-
-  // TODO: This is test code
-  let result = temporary_test_wallet_deduction(
-    user_token,
-    Some("todo-reference-token"),
-    credits,
-    &mut mysql_connection,
-  ).await;
-
-  // TODO: This is test code
-  if let Err(err) = result {
-    warn!("Temporary wallet deduction failed: {:?}", err); // Infallible for now.
-  }
-  
-  
   const IS_MOD : bool = false;
 
   info!("Fal webhook URL: {}", server_state.fal.webhook_url);
