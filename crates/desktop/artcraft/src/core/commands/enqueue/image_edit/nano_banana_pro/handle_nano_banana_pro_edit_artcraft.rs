@@ -1,5 +1,5 @@
 use crate::core::commands::enqueue::generate_error::{BadInputReason, GenerateError};
-use crate::core::commands::enqueue::image_edit::enqueue_contextual_edit_image_command::{EditImageQuality, EditImageSize, EnqueueContextualEditImageCommand};
+use crate::core::commands::enqueue::image_edit::enqueue_edit_image_command::{EditImageQuality, EditImageResolution, EditImageSize, EnqueueEditImageCommand};
 use crate::core::commands::enqueue::task_enqueue_success::TaskEnqueueSuccess;
 use crate::core::events::basic_sendable_event_trait::BasicSendableEvent;
 use crate::core::events::generation_events::common::{GenerationAction, GenerationModel, GenerationServiceProvider};
@@ -26,11 +26,14 @@ use storyteller_client::endpoints::generate::image::edit::flux_pro_kontext_max_e
 use storyteller_client::endpoints::generate::image::edit::gemini_25_flash_edit_image::gemini_25_flash_edit_image;
 use storyteller_client::endpoints::generate::image::edit::gpt_image_1_edit_image::gpt_image_1_edit_image;
 use tauri::AppHandle;
+use artcraft_api_defs::generate::image::multi_function::nano_banana_pro_multi_function_image_gen::{NanoBananaProMultiFunctionImageGenAspectRatio, NanoBananaProMultiFunctionImageGenImageResolution, NanoBananaProMultiFunctionImageGenNumImages, NanoBananaProMultiFunctionImageGenRequest};
+use storyteller_client::endpoints::generate::image::multi_function::nano_banana_pro_multi_function_image_gen_image::nano_banana_pro_multi_function_image_gen;
+use crate::core::commands::enqueue::image_edit::enqueue_edit_image_command::ImageEditModel::NanoBanana;
 
 pub(super) const MAX_IMAGES: usize = 10;
 
-pub async fn handle_gemini_25_flash_edit_artcraft(
-  request: &EnqueueContextualEditImageCommand,
+pub async fn handle_nano_banana_pro_edit_artcraft(
+  request: &EnqueueEditImageCommand,
   app: &AppHandle,
   app_data_root: &AppDataRoot,
   app_env_configs: &AppEnvConfigs,
@@ -44,16 +47,16 @@ pub async fn handle_gemini_25_flash_edit_artcraft(
     },
   };
 
-  info!("Calling Artcraft gemini 2.5 flash (edit) ...");
+  info!("Calling Artcraft Nano Banana (edit) ...");
 
   let uuid_idempotency_token = generate_random_uuid();
   
   let num_images = match request.image_count {
     None => None,
-    Some(1) => Some(Gemini25FlashEditImageNumImages::One),
-    Some(2) => Some(Gemini25FlashEditImageNumImages::Two),
-    Some(3) => Some(Gemini25FlashEditImageNumImages::Three),
-    Some(4) => Some(Gemini25FlashEditImageNumImages::Four),
+    Some(1) => Some(NanoBananaProMultiFunctionImageGenNumImages::One),
+    Some(2) => Some(NanoBananaProMultiFunctionImageGenNumImages::Two),
+    Some(3) => Some(NanoBananaProMultiFunctionImageGenNumImages::Three),
+    Some(4) => Some(NanoBananaProMultiFunctionImageGenNumImages::Four),
     Some(other) => {
       return Err(GenerateError::BadInput(BadInputReason::InvalidNumberOfRequestedImages {
         min: 1,
@@ -62,6 +65,22 @@ pub async fn handle_gemini_25_flash_edit_artcraft(
       }));
     },
   };
+
+  let aspect_ratio = request.aspect_ratio
+      .map(|aspect_ratio| match aspect_ratio {
+        EditImageSize::Auto => None,
+        EditImageSize::Square => Some(NanoBananaProMultiFunctionImageGenAspectRatio::OneByOne),
+        EditImageSize::Wide => Some(NanoBananaProMultiFunctionImageGenAspectRatio::SixteenByNine),
+        EditImageSize::Tall => Some(NanoBananaProMultiFunctionImageGenAspectRatio::NineBySixteen),
+      })
+      .flatten();
+
+  let resolution = request.image_resolution
+      .map(|image_resolution| match image_resolution {
+        EditImageResolution::OneK => NanoBananaProMultiFunctionImageGenImageResolution::OneK,
+        EditImageResolution::TwoK => NanoBananaProMultiFunctionImageGenImageResolution::TwoK,
+        EditImageResolution::FourK => NanoBananaProMultiFunctionImageGenImageResolution::FourK,
+      });
 
   let mut media_tokens = Vec::with_capacity(10);
 
@@ -81,15 +100,16 @@ pub async fn handle_gemini_25_flash_edit_artcraft(
     }));
   }
 
-  let request = Gemini25FlashEditImageRequest {
+  let request = NanoBananaProMultiFunctionImageGenRequest {
     uuid_idempotency_token,
     prompt: Some(request.prompt.clone()),
     image_media_tokens: Some(media_tokens),
     num_images,
-    image_quality: None,
+    resolution,
+    aspect_ratio,
   };
 
-  let result = gemini_25_flash_edit_image(
+  let result = nano_banana_pro_multi_function_image_gen(
     &app_env_configs.storyteller_host,
     Some(&creds),
     request,
@@ -98,19 +118,19 @@ pub async fn handle_gemini_25_flash_edit_artcraft(
   let job_id = match result {
     Ok(enqueued) => {
       // TODO(bt,2025-07-05): Enqueue job token?
-      info!("Successfully enqueued Artcraft gpt-image-1. Job token: {}", 
+      info!("Successfully enqueued Artcraft Nano Banana. Job token: {}",
         enqueued.inference_job_token);
       enqueued.inference_job_token
     }
     Err(err) => {
-      error!("Failed to use Artcraft gpt-image-1: {:?}", err);
+      error!("Failed to use Artcraft Nano Banana: {:?}", err);
       return Err(GenerateError::from(err));
     }
   };
   
   Ok(TaskEnqueueSuccess {
     provider: GenerationProvider::Artcraft,
-    model: Some(GenerationModel::Gemini25Flash),
+    model: Some(GenerationModel::NanoBananaPro),
     provider_job_id: Some(job_id.to_string()),
     task_type: TaskType::ImageGeneration,
   })

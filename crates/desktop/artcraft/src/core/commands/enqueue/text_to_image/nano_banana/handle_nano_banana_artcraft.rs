@@ -1,5 +1,5 @@
 use crate::core::commands::enqueue::generate_error::{GenerateError, MissingCredentialsReason, ProviderFailureReason};
-use crate::core::commands::enqueue::image_edit::enqueue_contextual_edit_image_command::{EditImageQuality, EditImageSize};
+use crate::core::commands::enqueue::image_edit::enqueue_edit_image_command::{EditImageQuality, EditImageSize};
 use crate::core::commands::enqueue::task_enqueue_success::TaskEnqueueSuccess;
 use crate::core::commands::enqueue::text_to_image::enqueue_text_to_image_command::{EnqueueTextToImageRequest, TextToImageSize};
 use crate::core::events::basic_sendable_event_trait::BasicSendableEvent;
@@ -26,7 +26,7 @@ use storyteller_client::endpoints::generate::image::edit::gpt_image_1_edit_image
 use storyteller_client::endpoints::generate::image::generate_gpt_image_1_text_to_image::generate_gpt_image_1_text_to_image;
 use tauri::AppHandle;
 
-pub async fn handle_gemini_25_flash_artcraft(
+pub async fn handle_nano_banana_artcraft(
   request: &EnqueueTextToImageRequest,
   app_env_configs: &AppEnvConfigs,
   storyteller_creds_manager: &StorytellerCredentialManager,
@@ -39,7 +39,7 @@ pub async fn handle_gemini_25_flash_artcraft(
     },
   };
 
-  info!("Calling Artcraft gemini 2.5 flash ...");
+  info!("Calling Artcraft Nano Banana...");
 
   let uuid_idempotency_token = generate_random_uuid();
 
@@ -69,12 +69,12 @@ pub async fn handle_gemini_25_flash_artcraft(
   let job_id = match result {
     Ok(enqueued) => {
       // TODO(bt,2025-07-05): Enqueue job token?
-      info!("Successfully enqueued Artcraft gemini 2.5 flash. Job token: {}",
+      info!("Successfully enqueued Artcraft Nano Banana. Job token: {}",
         enqueued.inference_job_token);
       enqueued.inference_job_token
     }
     Err(err) => {
-      error!("Failed to use Artcraft gemini 2.5 flash: {:?}", err);
+      error!("Failed to use Artcraft Nano Banana: {:?}", err);
       return Err(GenerateError::ProviderFailure(ProviderFailureReason::StorytellerError(err)));
     }
   };

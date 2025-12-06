@@ -1,21 +1,31 @@
 use crate::core::commands::enqueue::generate_error::GenerateError;
-use crate::core::commands::enqueue::image_edit::enqueue_edit_image_command::EnqueueEditImageCommand;
 use crate::core::commands::enqueue::image_edit::gpt_image_1::handle_gpt_image_1_edit_artcraft::handle_gpt_image_1_edit_artcraft;
 use crate::core::commands::enqueue::image_edit::gpt_image_1::handle_gpt_image_1_edit_sora::handle_gpt_image_1_edit_sora;
 use crate::core::commands::enqueue::task_enqueue_success::TaskEnqueueSuccess;
+use crate::core::commands::enqueue::text_to_image::enqueue_text_to_image_command::{EnqueueTextToImageRequest, TextToImageSize};
+use crate::core::commands::enqueue::text_to_image::gpt_image_1::handle_gpt_image_1_artcraft::handle_gpt_image_1_artcraft;
+use crate::core::commands::enqueue::text_to_image::gpt_image_1::handle_gpt_image_1_sora::handle_gpt_image_1_sora;
+use crate::core::commands::enqueue::text_to_image::nano_banana::handle_nano_banana_artcraft::handle_nano_banana_artcraft;
+use crate::core::events::basic_sendable_event_trait::BasicSendableEvent;
+use crate::core::events::generation_events::common::{GenerationAction, GenerationModel, GenerationServiceProvider};
+use crate::core::events::generation_events::generation_enqueue_failure_event::GenerationEnqueueFailureEvent;
 use crate::core::state::app_env_configs::app_env_configs::AppEnvConfigs;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
 use crate::core::state::provider_priority::{Provider, ProviderPriorityStore};
 use crate::services::sora::state::sora_credential_manager::SoraCredentialManager;
 use crate::services::sora::state::sora_task_queue::SoraTaskQueue;
 use crate::services::storyteller::state::storyteller_credential_manager::StorytellerCredentialManager;
-use log::info;
+use enums::common::generation_provider::GenerationProvider;
+use enums::tauri::tasks::task_type::TaskType;
+use log::{error, info};
+use openai_sora_client::recipes::maybe_upgrade_or_renew_session::maybe_upgrade_or_renew_session;
+use openai_sora_client::recipes::simple_image_gen_with_session_auto_renew::{simple_image_gen_with_session_auto_renew, SimpleImageGenAutoRenewRequest};
+use openai_sora_client::requests::image_gen::common::{ImageSize, NumImages};
+use std::time::Duration;
 use tauri::AppHandle;
 
-pub(super) const MAX_IMAGES: usize = 10;
-
-pub async fn handle_gpt_image_1_edit(
-  request: &EnqueueEditImageCommand,
+pub async fn handle_nano_banana(
+  request: &EnqueueTextToImageRequest,
   app: &AppHandle,
   app_data_root: &AppDataRoot,
   app_env_configs: &AppEnvConfigs,
@@ -26,7 +36,7 @@ pub async fn handle_gpt_image_1_edit(
 ) -> Result<TaskEnqueueSuccess, GenerateError> {
 
   let priority = provider_priority_store.get_priority()?;
-  
+
   // TODO: Check if providers are available before proceeding.
 
   info!("Providers by priority: {:?}", priority);
@@ -34,34 +44,21 @@ pub async fn handle_gpt_image_1_edit(
   for provider in priority.iter() {
     match provider {
       Provider::Fal => {
-        // Fallthrough
-        // If in the future we support OpenAI API keys, it's worth considering whether we 
-        // send those requests ourselves, or if we use FAL as an intermediary. FAL makes 
-        // the API nicer to deal with, but the user needs an additional key.
-      }
-      Provider::Artcraft => {
-        info!("Dispatching gpt-image-1 (edit) via Artcraft...");
-        return handle_gpt_image_1_edit_artcraft(
-          request, 
-          app,
-          app_data_root,
-          app_env_configs, 
-          storyteller_creds_manager
-        ).await;
+        // Fallthrough (for now)
       }
       Provider::Sora => {
-        info!("Dispatching gpt-image-1 (edit) via Sora...");
-        return handle_gpt_image_1_edit_sora(
-          request, 
-          app,
-          app_data_root,
-          app_env_configs, 
-          sora_creds_manager,
-          sora_task_queue,
+        // Fallthrough
+      }
+      Provider::Artcraft => {
+        info!("Dispatching Nano Banana via Artcraft...");
+        return handle_nano_banana_artcraft(
+          request,
+          app_env_configs,
+          storyteller_creds_manager
         ).await;
       }
     }
   }
-  
+
   Err(GenerateError::NoProviderAvailable)
 }

@@ -2,6 +2,8 @@ import { ImageModel } from "../classes/ImageModel.js";
 import { ModelCreator } from "../classes/metadata/ModelCreator.js";
 import { ModelTag } from "../classes/metadata/ModelTag.js";
 
+// TODO: Some of the model configs, such as generation counts, are authoritatively controlled in `legacy/Models.ts`
+
 export const IMAGE_MODELS: ImageModel[] = [
   new ImageModel({
     id: "grok_image",
@@ -112,6 +114,24 @@ export const IMAGE_MODELS: ImageModel[] = [
     progressBarTime: 25000,
   }),
   new ImageModel({
+    id: "nano_banana_pro",
+    tauriId: "nano_banana_pro",
+    fullName: "Nano Banana Pro",
+    category: "image",
+    creator: ModelCreator.Google,
+    selectorName: "Nano Banana Pro",
+    selectorDescription: "Extremely powerful",
+    selectorBadges: ["30 sec."],
+    maxGenerationCount: 4,
+    defaultGenerationCount: 1,
+    canEditImages: true,
+    canUseImagePrompt: true,
+    maxImagePromptCount: 4,
+    canTextToImage: true,
+    tags: [ModelTag.InstructiveEdit],
+    progressBarTime: 25000,
+  }),
+  new ImageModel({
     id: "gpt_image_1",
     tauriId: "gpt_image_1",
     fullName: "GPT Image 1 (GPT-4o)",
@@ -120,7 +140,7 @@ export const IMAGE_MODELS: ImageModel[] = [
     selectorName: "GPT Image 1 (GPT-4o)",
     selectorDescription: "Slow, but super smart",
     selectorBadges: ["60 sec."],
-    maxGenerationCount: 1,
+    maxGenerationCount: 4,
     defaultGenerationCount: 1,
     tags: [ModelTag.InstructiveEdit],
     canEditImages: true,
@@ -150,13 +170,14 @@ export const IMAGE_MODELS: ImageModel[] = [
     fullName: "Flux Pro Inpaint",
     category: "image",
     creator: ModelCreator.BlackForestLabs,
-    selectorName: "Flux Pro",
+    selectorName: "Flux Pro (Inpainting)",
     selectorDescription: "Fast inpainting",
     selectorBadges: ["30 sec."],
     maxGenerationCount: 1, // NB: Fal only allows one image for some reason!
     defaultGenerationCount: 1, // NB: Fal only allows one image for some reason!
     canEditImages: true,
     usesInpaintingMask: true,
+    editingIsInpainting: true,
     canTextToImage: false,
     progressBarTime: 30000,
   }),
@@ -173,6 +194,7 @@ export const IMAGE_MODELS: ImageModel[] = [
     defaultGenerationCount: 4,
     canEditImages: true,
     usesInpaintingMask: true,
+    editingIsInpainting: true,
     canTextToImage: false,
     progressBarTime: 10000,
   }),

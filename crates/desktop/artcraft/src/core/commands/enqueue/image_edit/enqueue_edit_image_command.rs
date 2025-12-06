@@ -1,8 +1,9 @@
 use crate::core::commands::enqueue::common::notify_frontend_of_errors::notify_frontend_of_errors;
 use crate::core::commands::enqueue::generate_error::{BadInputReason, GenerateError};
 use crate::core::commands::enqueue::image_edit::flux_kontext::handle_flux_kontext_edit::handle_flux_kontext_edit;
-use crate::core::commands::enqueue::image_edit::gemini_25_flash::handle_gemini_25_flash_edit::handle_gemini_25_flash_edit;
 use crate::core::commands::enqueue::image_edit::gpt_image_1::handle_gpt_image_1_edit::handle_gpt_image_1_edit;
+use crate::core::commands::enqueue::image_edit::nano_banana::handle_nano_banana_edit::handle_nano_banana_edit;
+use crate::core::commands::enqueue::image_edit::nano_banana_pro::handle_nano_banana_pro_edit::handle_nano_banana_pro_edit;
 use crate::core::commands::enqueue::task_enqueue_success::TaskEnqueueSuccess;
 use crate::core::commands::response::failure_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus};
 use crate::core::commands::response::shorthand::{Response, ResponseOrErrorType};
@@ -36,8 +37,8 @@ use openai_sora_client::requests::image_gen::common::{ImageSize, NumImages};
 use serde_derive::{Deserialize, Serialize};
 use sqlite_tasks::queries::create_task::{create_task, CreateTaskArgs};
 use std::time::Duration;
-use storyteller_client::error::storyteller_error::StorytellerError;
 use storyteller_client::endpoints::media_files::get_media_file::get_media_file;
+use storyteller_client::error::storyteller_error::StorytellerError;
 use storyteller_client::utils::api_host::ApiHost;
 use tauri::{AppHandle, Manager, State};
 use tokens::tokens::media_files::MediaFileToken;
@@ -46,12 +47,18 @@ use tokens::tokens::media_files::MediaFileToken;
 /// Don't change the serializations without coordinating with the frontend.
 #[derive(Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "snake_case")]
-pub enum ContextualImageEditModel {
+pub enum ImageEditModel {
   #[serde(rename = "flux_pro_kontext_max")]
   FluxProKontextMax,
 
   #[serde(rename = "gemini_25_flash")]
   Gemini25Flash,
+
+  #[serde(rename = "nano_banana")]
+  NanoBanana,
+
+  #[serde(rename = "nano_banana_pro")]
+  NanoBananaPro,
 
   #[serde(rename = "gpt_image_1")]
   GptImage1,
@@ -64,9 +71,9 @@ pub enum ContextualImageEditModel {
 }
 
 #[derive(Deserialize, Debug)]
-pub struct EnqueueContextualEditImageCommand {
+pub struct EnqueueEditImageCommand {
   /// The model to use.
-  pub model: Option<ContextualImageEditModel>,
+  pub model: Option<ImageEditModel>,
 
   /// Images to use for the image edit.
   /// The first image is typically a 2D canvas or 3D stage, but doesn't have to be.
@@ -92,6 +99,9 @@ pub struct EnqueueContextualEditImageCommand {
 
   /// Image quality.
   pub image_quality: Option<EditImageQuality>,
+
+  /// Image resolution
+  pub image_resolution: Option<EditImageResolution>,
 
   /// OPTIONAL.
   /// Name of the frontend caller.
@@ -127,9 +137,20 @@ pub enum EditImageQuality {
   Low,
 }
 
+#[derive(Deserialize, Debug, Copy, Clone)]
+#[serde(rename_all = "snake_case")]
+pub enum EditImageResolution {
+  /// 1K - nano banana pro
+  OneK,
+  /// 2K - nano banana pro
+  TwoK,
+  /// 4K - nano banana pro
+  FourK,
+}
+
 #[derive(Serialize, Debug)]
 #[serde(rename_all = "snake_case")]
-pub enum EnqueueContextualEditImageErrorType {
+pub enum EnqueueEditImageErrorType {
   /// Caller didn't specify a model
   ModelNotSpecified,
 
@@ -153,15 +174,15 @@ pub enum EnqueueContextualEditImageErrorType {
 }
 
 #[derive(Serialize)]
-pub struct EnqueueContextualEditImageSuccessResponse {
+pub struct EnqueueEditImageSuccessResponse {
 }
 
-impl SerializeMarker for EnqueueContextualEditImageSuccessResponse {}
+impl SerializeMarker for EnqueueEditImageSuccessResponse {}
 
 #[tauri::command]
-pub async fn enqueue_contextual_edit_image_command(
+pub async fn enqueue_edit_image_command(
   app: AppHandle,
-  request: EnqueueContextualEditImageCommand,
+  request: EnqueueEditImageCommand,
   app_data_root: State<'_, AppDataRoot>,
   app_env_configs: State<'_, AppEnvConfigs>,
   provider_priority_store: State<'_, ProviderPriorityStore>,
@@ -169,9 +190,9 @@ pub async fn enqueue_contextual_edit_image_command(
   storyteller_creds_manager: State<'_, StorytellerCredentialManager>,
   sora_creds_manager: State<'_, SoraCredentialManager>,
   sora_task_queue: State<'_, SoraTaskQueue>,
-) -> ResponseOrErrorType<EnqueueContextualEditImageSuccessResponse, EnqueueContextualEditImageErrorType> {
+) -> ResponseOrErrorType<EnqueueEditImageSuccessResponse, EnqueueEditImageErrorType> {
 
-  info!("enqueue_contextual_edit_image_command called; image media tokens : {:?}, full request: {:?}",
+  info!("enqueue_edit_image_command called; image media tokens : {:?}, full request: {:?}",
     &request.image_media_tokens, &request);
 
   let result = handle_request(
@@ -219,13 +240,13 @@ pub async fn enqueue_contextual_edit_image_command(
       
       CreditsBalanceChangedEvent{}.send_infallible(&app);
 
-      Ok(EnqueueContextualEditImageSuccessResponse {}.into())
+      Ok(EnqueueEditImageSuccessResponse {}.into())
     }
   }
 }
 
 pub async fn handle_request(
-  request: &EnqueueContextualEditImageCommand,
+  request: &EnqueueEditImageCommand,
   app: &AppHandle,
   app_data_root: &AppDataRoot,
   app_env_configs: &AppEnvConfigs,
@@ -235,11 +256,11 @@ pub async fn handle_request(
   sora_creds_manager: &SoraCredentialManager,
   sora_task_queue: &SoraTaskQueue,
 ) -> Result<TaskEnqueueSuccess, GenerateError> {
-  let success_event= match request.model {
+  let mut success_event= match request.model {
     None => {
       return Err(GenerateError::no_model_specified())
     }
-    Some(ContextualImageEditModel::FluxProKontextMax) => {
+    Some(ImageEditModel::FluxProKontextMax) => {
       handle_flux_kontext_edit(
         request,
         app,
@@ -251,8 +272,8 @@ pub async fn handle_request(
         sora_task_queue,
       ).await?
     }
-    Some(ContextualImageEditModel::Gemini25Flash) => {
-      handle_gemini_25_flash_edit(
+    Some(ImageEditModel::Gemini25Flash | ImageEditModel::NanoBanana) => {
+      handle_nano_banana_edit(
         request,
         app,
         app_data_root,
@@ -263,7 +284,19 @@ pub async fn handle_request(
         sora_task_queue,
       ).await?
     }
-    Some(ContextualImageEditModel::GptImage1) => {
+    Some(ImageEditModel::NanoBananaPro) => {
+      handle_nano_banana_pro_edit(
+        request,
+        app,
+        app_data_root,
+        app_env_configs,
+        provider_priority_store,
+        storyteller_creds_manager,
+        sora_creds_manager,
+        sora_task_queue,
+      ).await?
+    }
+    Some(ImageEditModel::GptImage1) => {
       handle_gpt_image_1_edit(
         request,
         app,
@@ -276,7 +309,18 @@ pub async fn handle_request(
       ).await?
     }
   };
-  
+
+  match request.frontend_caller {
+    Some(TauriCommandCaller::ImageEditor) => {
+      // NB: Certain image generations enqueued in the inpainting editor are classed
+      // as "image_generation" and won't update the inpainting UI. This is a hack to
+      // temporarily fix the UI event binding.
+      // TODO: The frontend shouldn't require us to change the type to inpainting.
+      success_event.task_type = TaskType::ImageInpaintEdit;
+    }
+    _ => {} // fall-through
+  }
+
   let result = success_event
       .insert_into_task_database_with_frontend_payload(
         task_database,
@@ -294,31 +338,31 @@ pub async fn handle_request(
   Ok(success_event)
 }
 
-fn error_to_tauri_response(error: GenerateError) -> CommandErrorResponseWrapper<EnqueueContextualEditImageErrorType, ()> {
+fn error_to_tauri_response(error: GenerateError) -> CommandErrorResponseWrapper<EnqueueEditImageErrorType, ()> {
   let mut status = CommandErrorStatus::ServerError;
-  let mut error_type = EnqueueContextualEditImageErrorType::ServerError;
+  let mut error_type = EnqueueEditImageErrorType::ServerError;
   let mut error_message = "A server error occurred. Please try again. If it continues, please tell our staff about the problem.".to_string();
 
   match error {
     GenerateError::BadInput(BadInputReason::NoModelSpecified) => {
       status = CommandErrorStatus::BadRequest;
-      error_type = EnqueueContextualEditImageErrorType::ModelNotSpecified;
+      error_type = EnqueueEditImageErrorType::ModelNotSpecified;
       error_message = "No model specified for image generation".to_string();
     }
     GenerateError::NoProviderAvailable => {
       status = CommandErrorStatus::ServerError;
-      error_type = EnqueueContextualEditImageErrorType::NoProviderAvailable;
+      error_type = EnqueueEditImageErrorType::NoProviderAvailable;
       error_message = "No configured provider available for image generation".to_string();
     }
     GenerateError::BadInput(BadInputReason::InvalidNumberOfRequestedImages { min, max, requested }) => {
       status = CommandErrorStatus::BadRequest;
-      error_type = EnqueueContextualEditImageErrorType::BadRequest;
+      error_type = EnqueueEditImageErrorType::BadRequest;
       error_message = format!("Invalid number of images requested ({}). Must be between {} and {}", requested, min, max);
 
     }
     GenerateError::BadInput(BadInputReason::InvalidNumberOfInputImages{  min, max, provided }) => {
       status = CommandErrorStatus::BadRequest;
-      error_type = EnqueueContextualEditImageErrorType::BadRequest;
+      error_type = EnqueueEditImageErrorType::BadRequest;
       error_message = format!("Invalid number of input images ({}). Must be between {} and {}", provided, min, max);
     }
     _ => {} // Fall-through for now
