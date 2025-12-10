@@ -10,6 +10,7 @@ import {
   EnqueueTextToImage,
   EnqueueTextToImageRequest,
   EnqueueTextToImageSize,
+  EnqueueTextToImageResolution,
 } from "@storyteller/tauri-api";
 import {
   faMessageXmark,
@@ -17,6 +18,7 @@ import {
   faSparkles,
   faSpinnerThird,
   faCopy,
+  faExpand,
 } from "@fortawesome/pro-solid-svg-icons";
 import {
   faRectangle,
@@ -45,7 +47,7 @@ interface PromptBoxImageProps {
   onEnqueuePressed?: (
     prompt: string,
     count: number,
-    subscriberId: string
+    subscriberId: string,
   ) => void | Promise<void>;
   selectedModel?: ImageModel;
   imageMediaId?: string;
@@ -87,6 +89,8 @@ export const PromptBoxImage = ({
   const setUseSystemPrompt = usePromptImageStore((s) => s.setUseSystemPrompt);
   const aspectRatio = usePromptImageStore((s) => s.aspectRatio);
   const setAspectRatio = usePromptImageStore((s) => s.setAspectRatio);
+  const resolution = usePromptImageStore((s) => s.resolution);
+  const setResolution = usePromptImageStore((s) => s.setResolution);
   const generationCount = usePromptImageStore((s) => s.generationCount);
   const setGenerationCount = usePromptImageStore((s) => s.setGenerationCount);
   const [isEnqueueing, setIsEnqueueing] = useState(false);
@@ -107,23 +111,40 @@ export const PromptBoxImage = ({
   }, [isImageRowVisible, onImageRowVisibilityChange]);
   const [aspectRatioList, setAspectRatioList] = useState<PopoverItem[]>([
     {
-      label: "3:2",
-      selected: aspectRatio === "3:2",
+      label: "Wide",
+      selected: aspectRatio === "wide",
       icon: <FontAwesomeIcon icon={faRectangle} className="h-4 w-4" />,
     },
     {
-      label: "2:3",
-      selected: aspectRatio === "2:3",
+      label: "Tall",
+      selected: aspectRatio === "tall",
       icon: <FontAwesomeIcon icon={faRectangleVertical} className="h-4 w-4" />,
     },
     {
-      label: "1:1",
-      selected: aspectRatio === "1:1",
+      label: "Square",
+      selected: aspectRatio === "square",
       icon: <FontAwesomeIcon icon={faSquare} className="h-4 w-4" />,
     },
   ]);
+  const [resolutionList, setResolutionList] = useState<PopoverItem[]>([
+    {
+      label: "1K",
+      selected: resolution === "1k",
+      icon: <FontAwesomeIcon icon={faExpand} className="h-4 w-4" />,
+    },
+    {
+      label: "2K",
+      selected: resolution === "2k",
+      icon: <FontAwesomeIcon icon={faExpand} className="h-4 w-4" />,
+    },
+    {
+      label: "4K",
+      selected: resolution === "4k",
+      icon: <FontAwesomeIcon icon={faExpand} className="h-4 w-4" />,
+    },
+  ]);
   const [generationCountList, setGenerationCountList] = useState<PopoverItem[]>(
-    []
+    [],
   );
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -151,14 +172,14 @@ export const PromptBoxImage = ({
     const caps = getCapabilitiesForModel(selectedModel);
     const defaultCount = Math.min(
       Math.max(1, caps.defaultGenerationCount ?? 1),
-      caps.maxGenerationCount
+      caps.maxGenerationCount,
     );
 
     setGenerationCount(defaultCount);
 
     const items: PopoverItem[] = Array.from(
       { length: caps.maxGenerationCount },
-      (_, i) => i + 1
+      (_, i) => i + 1,
     ).map((count) => ({
       label: String(count),
       selected: count === defaultCount,
@@ -172,7 +193,7 @@ export const PromptBoxImage = ({
       prev.map((item) => ({
         ...item,
         selected: item.label === String(generationCount),
-      }))
+      })),
     );
   }, [generationCount]);
 
@@ -180,19 +201,32 @@ export const PromptBoxImage = ({
     setAspectRatioList((prev) =>
       prev.map((item) => ({
         ...item,
-        selected: item.label === aspectRatio,
-      }))
+        selected: item.label.toLowerCase() === aspectRatio,
+      })),
     );
   }, [aspectRatio]);
 
+  useEffect(() => {
+    setResolutionList((prev) =>
+      prev.map((item) => ({
+        ...item,
+        selected: item.label.toLowerCase() === resolution,
+      })),
+    );
+  }, [resolution]);
+
   const handleAspectRatioSelect = (selectedItem: PopoverItem) => {
-    setAspectRatio(selectedItem.label as any);
+    setAspectRatio(selectedItem.label.toLowerCase() as any);
     setAspectRatioList((prev) =>
       prev.map((item) => ({
         ...item,
         selected: item.label === selectedItem.label,
-      }))
+      })),
     );
+  };
+
+  const handleResolutionSelect = (selectedItem: PopoverItem) => {
+    setResolution(selectedItem.label.toLowerCase() as any);
   };
 
   const handleGenerationCountSelect = (selectedItem: PopoverItem) => {
@@ -202,7 +236,7 @@ export const PromptBoxImage = ({
       prev.map((item) => ({
         ...item,
         selected: item.label === selectedItem.label,
-      }))
+      })),
     );
   };
 
@@ -235,8 +269,8 @@ export const PromptBoxImage = ({
       return;
     }
 
-    console.debug("Selected model:", selectedModel)
-    console.debug("Prompt:", prompt)
+    console.debug("Selected model:", selectedModel);
+    console.debug("Prompt:", prompt);
 
     setIsEnqueueing(true);
 
@@ -253,11 +287,13 @@ export const PromptBoxImage = ({
 
     try {
       const aspectRatio = getCurrentAspectRatio();
+      const resolution = getCurrentResolution();
 
       const request: EnqueueTextToImageRequest = {
         prompt: prompt,
         model: selectedModel,
         aspect_ratio: aspectRatio,
+        image_resolution: resolution,
         number_images: generationCount,
         frontend_caller: "text_to_image",
         frontend_subscriber_id: subscriberId,
@@ -268,9 +304,9 @@ export const PromptBoxImage = ({
         !!referenceImages &&
         referenceImages.length > 0
       ) {
-        request.image_media_tokens = referenceImages.map(
-          (image) => image.mediaToken
-        );
+        request.image_media_tokens = referenceImages
+          .map((image) => image.mediaToken)
+          .filter((t) => t.length > 0);
       }
 
       const generateResponse = await EnqueueTextToImage(request);
@@ -294,14 +330,28 @@ export const PromptBoxImage = ({
 
   const getCurrentAspectRatio = (): EnqueueTextToImageSize => {
     const selected = aspectRatioList.find((item) => item.selected);
-    switch (selected?.label) {
-      case "3:2":
+    switch (selected?.label.toLowerCase()) {
+      case "wide":
         return EnqueueTextToImageSize.Wide;
-      case "2:3":
+      case "tall":
         return EnqueueTextToImageSize.Tall;
-      case "1:1":
+      case "square":
       default:
         return EnqueueTextToImageSize.Square;
+    }
+  };
+
+  const getCurrentResolution = (): EnqueueTextToImageResolution | undefined => {
+    const selected = resolutionList.find((item) => item.selected);
+    switch (selected?.label) {
+      case "1k":
+        return EnqueueTextToImageResolution.OneK;
+      case "2k":
+        return EnqueueTextToImageResolution.TwoK;
+      case "4k":
+        return EnqueueTextToImageResolution.FourK;
+      default:
+        return undefined;
     }
   };
 
@@ -331,7 +381,7 @@ export const PromptBoxImage = ({
             visible={true}
             maxImagePromptCount={Math.max(
               1,
-              selectedModel?.maxImagePromptCount ?? 1
+              selectedModel?.maxImagePromptCount ?? 1,
             )}
             allowUpload={true}
             referenceImages={referenceImages}
@@ -345,7 +395,7 @@ export const PromptBoxImage = ({
                   src={image.url}
                   alt="Reference preview"
                   className="w-full h-full object-contain"
-                />
+                />,
               );
               setIsModalOpen(true);
             }}
@@ -360,7 +410,7 @@ export const PromptBoxImage = ({
               "rounded-t-none",
             isFocused
               ? "ring-1 ring-primary border-primary"
-              : "ring-1 ring-transparent"
+              : "ring-1 ring-transparent",
           )}
         >
           <div className="flex justify-center gap-2">
@@ -375,7 +425,7 @@ export const PromptBoxImage = ({
                   variant="action"
                   className={twMerge(
                     "h-8 w-8 p-0 bg-transparent hover:bg-transparent group transition-all border-0 shadow-none",
-                    isImageRowVisible && "text-primary"
+                    isImageRowVisible && "text-primary",
                   )}
                   onClick={() => setShowImagePrompts((prev) => !prev)}
                 >
@@ -412,26 +462,47 @@ export const PromptBoxImage = ({
           </div>
           <div className="mt-2 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Tooltip
-                content="Aspect Ratio"
-                position="top"
-                className="z-50"
-                closeOnClick={true}
-              >
-                <PopoverMenu
-                  items={aspectRatioList}
-                  onSelect={handleAspectRatioSelect}
-                  mode="toggle"
-                  panelTitle="Aspect Ratio"
-                  showIconsInList
-                  triggerIcon={
-                    <FontAwesomeIcon
-                      icon={getCurrentResolutionIcon()}
-                      className="h-4 w-4"
-                    />
-                  }
-                />
-              </Tooltip>
+              {selectedModel?.canChangeAspectRatio && (
+                <Tooltip
+                  content="Aspect Ratio"
+                  position="top"
+                  className="z-50"
+                  closeOnClick={true}
+                >
+                  <PopoverMenu
+                    items={aspectRatioList}
+                    onSelect={handleAspectRatioSelect}
+                    mode="toggle"
+                    panelTitle="Aspect Ratio"
+                    showIconsInList
+                    triggerIcon={
+                      <FontAwesomeIcon
+                        icon={getCurrentResolutionIcon()}
+                        className="h-4 w-4"
+                      />
+                    }
+                  />
+                </Tooltip>
+              )}
+              {selectedModel?.canChangeResolution && (
+                <Tooltip
+                  content="Resolution"
+                  position="top"
+                  className="z-50"
+                  closeOnClick={true}
+                >
+                  <PopoverMenu
+                    items={resolutionList}
+                    onSelect={handleResolutionSelect}
+                    mode="toggle"
+                    panelTitle="Resolution"
+                    showIconsInList
+                    triggerIcon={
+                      <FontAwesomeIcon icon={faExpand} className="h-4 w-4" />
+                    }
+                  />
+                </Tooltip>
+              )}
               <Tooltip
                 content={
                   useSystemPrompt

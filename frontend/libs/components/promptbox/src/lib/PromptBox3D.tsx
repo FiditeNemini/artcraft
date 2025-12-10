@@ -9,6 +9,7 @@ import {
   faSpinnerThird,
   faMessageCheck,
   faMessageXmark,
+  faExpand,
 } from "@fortawesome/pro-solid-svg-icons";
 import {
   faRectangleWide,
@@ -40,6 +41,7 @@ import {
   CommandSuccessStatus,
   EnqueueEditImage,
   EnqueueEditImageSize,
+  EnqueueEditImageResolution,
 } from "@storyteller/tauri-api";
 import { usePrompt3DStore } from "./promptStore";
 import { gtagEvent } from "@storyteller/google-analytics";
@@ -104,25 +106,44 @@ export const PromptBox3D = ({
   const setPrompt = usePrompt3DStore((s) => s.setPrompt);
   const useSystemPrompt = usePrompt3DStore((s) => s.useSystemPrompt);
   const setUseSystemPrompt = usePrompt3DStore((s) => s.setUseSystemPrompt);
+  const resolution = usePrompt3DStore((s) => s.resolution);
+  const setResolution = usePrompt3DStore((s) => s.setResolution);
   const [isEnqueueing, setIsEnqueueing] = useState(false);
   const referenceImages = usePrompt3DStore((s) => s.referenceImages);
   const setReferenceImages = usePrompt3DStore((s) => s.setReferenceImages);
   const [showImagePrompts, setShowImagePrompts] = useState(false);
   const [aspectRatioList, setAspectRatioList] = useState<PopoverItem[]>([
     {
-      label: "3:2",
+      label: "Wide",
       selected: true,
       icon: <FontAwesomeIcon icon={faRectangle} className="h-4 w-4" />,
     },
     {
-      label: "2:3",
+      label: "Tall",
       selected: false,
       icon: <FontAwesomeIcon icon={faRectangleVertical} className="h-4 w-4" />,
     },
     {
-      label: "1:1",
+      label: "Square",
       selected: false,
       icon: <FontAwesomeIcon icon={faSquare} className="h-4 w-4" />,
+    },
+  ]);
+  const [resolutionList, setResolutionList] = useState<PopoverItem[]>([
+    {
+      label: "1K",
+      selected: resolution === "1k",
+      icon: <FontAwesomeIcon icon={faExpand} className="h-4 w-4" />,
+    },
+    {
+      label: "2K",
+      selected: resolution === "2k",
+      icon: <FontAwesomeIcon icon={faExpand} className="h-4 w-4" />,
+    },
+    {
+      label: "4K",
+      selected: resolution === "4k",
+      icon: <FontAwesomeIcon icon={faExpand} className="h-4 w-4" />,
     },
   ]);
   const [isCameraSettingsOpen, setIsCameraSettingsOpen] = useState(false);
@@ -138,19 +159,26 @@ export const PromptBox3D = ({
     }
   }, [prompt]);
 
+  useEffect(() => {
+    setResolutionList((prev) =>
+      prev.map((item) => ({
+        ...item,
+        selected: item.label.toLowerCase() === resolution,
+      }))
+    );
+  }, [resolution]);
+
   // Update aspect ratio list based on the current cameraAspectRatio signal
   useEffect(() => {
     setAspectRatioList((prev) =>
       prev.map((item) => ({
         ...item,
         selected:
-          (item.label === "16:9" &&
-            cameraAspectRatio.value === CameraAspectRatio.HORIZONTAL_16_9) ||
-          (item.label === "3:2" &&
+          (item.label === "Wide" &&
             cameraAspectRatio.value === CameraAspectRatio.HORIZONTAL_3_2) ||
-          (item.label === "2:3" &&
+          (item.label === "Tall" &&
             cameraAspectRatio.value === CameraAspectRatio.VERTICAL_2_3) ||
-          (item.label === "1:1" &&
+          (item.label === "Square" &&
             cameraAspectRatio.value === CameraAspectRatio.SQUARE_1_1),
       }))
     );
@@ -167,24 +195,25 @@ export const PromptBox3D = ({
 
     // Map the selected label to the corresponding CameraAspectRatio enum value
     let newRatio: CameraAspectRatio;
-    switch (selectedItem.label) {
-      case "16:9":
-        newRatio = CameraAspectRatio.HORIZONTAL_16_9;
-        break;
-      case "3:2":
+    switch (selectedItem.label.toLowerCase()) {
+      case "wide":
         newRatio = CameraAspectRatio.HORIZONTAL_3_2;
         break;
-      case "2:3":
+      case "tall":
         newRatio = CameraAspectRatio.VERTICAL_2_3;
         break;
-      case "1:1":
+      case "square":
         newRatio = CameraAspectRatio.SQUARE_1_1;
         break;
       default:
-        newRatio = CameraAspectRatio.HORIZONTAL_16_9;
+        newRatio = CameraAspectRatio.HORIZONTAL_3_2;
     }
 
     onAspectRatioSelect(newRatio);
+  };
+
+  const handleResolutionSelect = (selectedItem: PopoverItem) => {
+    setResolution(selectedItem.label.toLowerCase() as any);
   };
 
   // ImagePromptRow will handle uploads and gallery internally
@@ -335,6 +364,7 @@ export const PromptBox3D = ({
         console.log("snapshotResult", snapshotResult);
 
         const aspectRatio = getCurrentAspectRatio();
+        const resolution = getCurrentResolution();
 
         const generateResponse = await EnqueueEditImage({
           model: selectedImageModel,
@@ -344,6 +374,7 @@ export const PromptBox3D = ({
           prompt: prompt,
           image_count: 1,
           aspect_ratio: aspectRatio,
+          image_resolution: resolution,
         });
 
         console.log("generateResponse", generateResponse);
@@ -410,6 +441,20 @@ export const PromptBox3D = ({
       case CameraAspectRatio.SQUARE_1_1:
       default:
         return EnqueueEditImageSize.Square;
+    }
+  };
+
+  const getCurrentResolution = (): EnqueueEditImageResolution | undefined => {
+    const selected = resolutionList.find((item) => item.selected);
+    switch (selected?.label) {
+      case "1k":
+        return EnqueueEditImageResolution.OneK;
+      case "2k":
+        return EnqueueEditImageResolution.TwoK;
+      case "4k":
+        return EnqueueEditImageResolution.FourK;
+      default:
+        return undefined;
     }
   };
 
@@ -539,26 +584,47 @@ export const PromptBox3D = ({
           </div>
           <div className="mt-2 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Tooltip
-                content="Aspect ratio"
-                position="top"
-                className="z-50"
-                closeOnClick={true}
-              >
-                <PopoverMenu
-                  items={aspectRatioList}
-                  onSelect={handleAspectRatioSelect}
-                  mode="toggle"
-                  panelTitle="Aspect Ratio"
-                  showIconsInList
-                  triggerIcon={
-                    <FontAwesomeIcon
-                      icon={getCurrentAspectRatioIcon()}
-                      className="h-4 w-4"
-                    />
-                  }
-                />
-              </Tooltip>
+              {selectedImageModel?.canChangeAspectRatio && (
+                <Tooltip
+                  content="Aspect ratio"
+                  position="top"
+                  className="z-50"
+                  closeOnClick={true}
+                >
+                  <PopoverMenu
+                    items={aspectRatioList}
+                    onSelect={handleAspectRatioSelect}
+                    mode="toggle"
+                    panelTitle="Aspect Ratio"
+                    showIconsInList
+                    triggerIcon={
+                      <FontAwesomeIcon
+                        icon={getCurrentAspectRatioIcon()}
+                        className="h-4 w-4"
+                      />
+                    }
+                  />
+                </Tooltip>
+              )}
+              {selectedImageModel?.canChangeResolution && (
+                <Tooltip
+                  content="Resolution"
+                  position="top"
+                  className="z-50"
+                  closeOnClick={true}
+                >
+                  <PopoverMenu
+                    items={resolutionList}
+                    onSelect={handleResolutionSelect}
+                    mode="toggle"
+                    panelTitle="Resolution"
+                    showIconsInList
+                    triggerIcon={
+                      <FontAwesomeIcon icon={faExpand} className="h-4 w-4" />
+                    }
+                  />
+                </Tooltip>
+              )}
               <Tooltip
                 content="Camera"
                 position="top"

@@ -19,6 +19,7 @@ export const IMAGE_MODELS: ImageModel[] = [
     canUseImagePrompt: false,
     maxImagePromptCount: 6,
     progressBarTime: 10000,
+    canChangeAspectRatio: true,
   }),
   new ImageModel({
     id: "midjourney",
@@ -34,6 +35,7 @@ export const IMAGE_MODELS: ImageModel[] = [
     canUseImagePrompt: false,
     maxImagePromptCount: 6,
     progressBarTime: 45000,
+    canChangeAspectRatio: true,
   }),
   new ImageModel({
     id: "flux_pro_1_1_ultra",
@@ -49,6 +51,7 @@ export const IMAGE_MODELS: ImageModel[] = [
     canUseImagePrompt: true,
     maxImagePromptCount: 6,
     progressBarTime: 35000,
+    canChangeAspectRatio: true,
   }),
   new ImageModel({
     id: "flux_pro_1_1",
@@ -64,6 +67,7 @@ export const IMAGE_MODELS: ImageModel[] = [
     canUseImagePrompt: true,
     maxImagePromptCount: 6,
     progressBarTime: 10000,
+    canChangeAspectRatio: true,
   }),
   new ImageModel({
     id: "flux_1_dev",
@@ -79,6 +83,7 @@ export const IMAGE_MODELS: ImageModel[] = [
     canUseImagePrompt: true,
     maxImagePromptCount: 6,
     progressBarTime: 10000,
+    canChangeAspectRatio: true,
   }),
   new ImageModel({
     id: "flux_1_schnell",
@@ -94,6 +99,7 @@ export const IMAGE_MODELS: ImageModel[] = [
     canUseImagePrompt: true,
     maxImagePromptCount: 6,
     progressBarTime: 10000,
+    canChangeAspectRatio: true,
   }),
   new ImageModel({
     id: "gemini_25_flash",
@@ -112,6 +118,8 @@ export const IMAGE_MODELS: ImageModel[] = [
     canTextToImage: false,
     tags: [ModelTag.InstructiveEdit],
     progressBarTime: 25000,
+    // canChangeResolution: true,
+    canChangeAspectRatio: true,
   }),
   new ImageModel({
     id: "nano_banana_pro",
@@ -130,6 +138,8 @@ export const IMAGE_MODELS: ImageModel[] = [
     canTextToImage: true,
     tags: [ModelTag.InstructiveEdit],
     progressBarTime: 25000,
+    canChangeResolution: true,
+    canChangeAspectRatio: true,
   }),
   new ImageModel({
     id: "gpt_image_1",
@@ -147,6 +157,7 @@ export const IMAGE_MODELS: ImageModel[] = [
     canUseImagePrompt: true,
     maxImagePromptCount: 6,
     progressBarTime: 60000,
+    canChangeAspectRatio: true,
   }),
   new ImageModel({
     id: "flux_pro_kontext_max",
@@ -163,6 +174,7 @@ export const IMAGE_MODELS: ImageModel[] = [
     canTextToImage: false,
     tags: [ModelTag.InstructiveEdit],
     progressBarTime: 20000,
+    canChangeAspectRatio: true,
   }),
   new ImageModel({
     id: "flux_pro_inpaint",
@@ -180,6 +192,7 @@ export const IMAGE_MODELS: ImageModel[] = [
     editingIsInpainting: true,
     canTextToImage: false,
     progressBarTime: 30000,
+    canChangeAspectRatio: true,
   }),
   new ImageModel({
     id: "flux_dev_juggernaut_inpaint",
@@ -197,11 +210,12 @@ export const IMAGE_MODELS: ImageModel[] = [
     editingIsInpainting: true,
     canTextToImage: false,
     progressBarTime: 10000,
+    canChangeAspectRatio: true,
   }),
 ];
 
 export const IMAGE_MODELS_BY_ID: Map<string, ImageModel> = new Map(
-  IMAGE_MODELS.map((model) => [model.id, model])
+  IMAGE_MODELS.map((model) => [model.id, model]),
 );
 
 if (IMAGE_MODELS_BY_ID.size !== IMAGE_MODELS.length) {

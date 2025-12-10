@@ -17,6 +17,7 @@ import {
   faSpinnerThird,
   faFrame,
   faCopy,
+  faExpand,
 } from "@fortawesome/pro-solid-svg-icons";
 import {
   faRectangleVertical,
@@ -30,6 +31,7 @@ import { PromptsApi } from "@storyteller/api";
 import {
   EnqueueEditImage,
   EnqueueEditImageSize,
+  EnqueueEditImageResolution,
 } from "@storyteller/tauri-api";
 import { usePrompt2DStore } from "./promptStore";
 import { gtagEvent } from "@storyteller/google-analytics";
@@ -38,7 +40,7 @@ import { ImageModel } from "@storyteller/model-list";
 import { ImagePromptRow } from "./ImagePromptRow";
 import { twMerge } from "tailwind-merge";
 
-export type AspectRatio = "1:1" | "3:2" | "2:3";
+export type AspectRatio = "wide" | "tall" | "square";
 
 interface PromptBox2DProps {
   uploadImage: ({
@@ -82,6 +84,8 @@ export const PromptBox2D = ({
   const setUseSystemPrompt = usePrompt2DStore((s) => s.setUseSystemPrompt);
   const aspectRatio = usePrompt2DStore((s) => s.aspectRatio);
   const setAspectRatio = usePrompt2DStore((s) => s.setAspectRatio);
+  const resolution = usePrompt2DStore((s) => s.resolution);
+  const setResolution = usePrompt2DStore((s) => s.setResolution);
   const generationCount = usePrompt2DStore((s) => s.generationCount);
   const setGenerationCount = usePrompt2DStore((s) => s.setGenerationCount);
 
@@ -91,24 +95,42 @@ export const PromptBox2D = ({
   const [showImagePrompts, setShowImagePrompts] = useState(false);
   const [aspectRatioList, setAspectRatioList] = useState<PopoverItem[]>([
     {
-      label: "3:2",
-      selected: aspectRatio === "3:2",
+      label: "Wide",
+      selected: aspectRatio === "wide",
       icon: <FontAwesomeIcon icon={faRectangle} className="h-4 w-4" />,
     },
     {
-      label: "2:3",
-      selected: aspectRatio === "2:3",
+      label: "Tall",
+      selected: aspectRatio === "tall",
       icon: <FontAwesomeIcon icon={faRectangleVertical} className="h-4 w-4" />,
     },
     {
-      label: "1:1",
-      selected: aspectRatio === "1:1",
+      label: "Square",
+      selected: aspectRatio === "square",
       icon: <FontAwesomeIcon icon={faSquare} className="h-4 w-4" />,
     },
   ]);
 
+  const [resolutionList, setResolutionList] = useState<PopoverItem[]>([
+    {
+      label: "1K",
+      selected: resolution === "1k",
+      icon: <FontAwesomeIcon icon={faExpand} className="h-4 w-4" />,
+    },
+    {
+      label: "2K",
+      selected: resolution === "2k",
+      icon: <FontAwesomeIcon icon={faExpand} className="h-4 w-4" />,
+    },
+    {
+      label: "4K",
+      selected: resolution === "4k",
+      icon: <FontAwesomeIcon icon={faExpand} className="h-4 w-4" />,
+    },
+  ]);
+
   const [generationCountList, setGenerationCountList] = useState<PopoverItem[]>(
-    []
+    [],
   );
 
   // Update generation count options from selected model capabilities
@@ -116,7 +138,7 @@ export const PromptBox2D = ({
     const caps = getCapabilitiesForModel(selectedImageModel);
     const items: PopoverItem[] = Array.from(
       { length: caps.maxGenerationCount },
-      (_, i) => i + 1
+      (_, i) => i + 1,
     ).map((count) => ({
       label: String(count),
       selected: count === generationCount,
@@ -126,7 +148,7 @@ export const PromptBox2D = ({
     // Clamp selection to allowed range
     if (generationCount < 1 || generationCount > caps.maxGenerationCount) {
       setGenerationCount(
-        Math.min(Math.max(1, generationCount), caps.maxGenerationCount)
+        Math.min(Math.max(1, generationCount), caps.maxGenerationCount),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -138,9 +160,18 @@ export const PromptBox2D = ({
       prev.map((item) => ({
         ...item,
         selected: item.label === String(generationCount),
-      }))
+      })),
     );
   }, [generationCount]);
+
+  useEffect(() => {
+    setResolutionList((prev) =>
+      prev.map((item) => ({
+        ...item,
+        selected: item.label.toLowerCase() === resolution,
+      })),
+    );
+  }, [resolution]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isImageRowVisible =
@@ -156,14 +187,19 @@ export const PromptBox2D = ({
   });
 
   const handleAspectRatioSelect = (selectedItem: PopoverItem) => {
-    onAspectRatioChange?.(selectedItem.label as AspectRatio);
-    setAspectRatio(selectedItem.label as AspectRatio);
+    const value = selectedItem.label.toLowerCase() as AspectRatio;
+    onAspectRatioChange?.(value);
+    setAspectRatio(value);
     setAspectRatioList((prev) =>
       prev.map((item) => ({
         ...item,
         selected: item.label === selectedItem.label,
-      }))
+      })),
     );
+  };
+
+  const handleResolutionSelect = (selectedItem: PopoverItem) => {
+    setResolution(selectedItem.label.toLowerCase() as any);
   };
 
   // Image prompt row replaces legacy upload/gallery UI
@@ -175,7 +211,7 @@ export const PromptBox2D = ({
       prev.map((item) => ({
         ...item,
         selected: item.label === selectedItem.label,
-      }))
+      })),
     );
   };
 
@@ -234,15 +270,19 @@ export const PromptBox2D = ({
     console.log("Snapshot media token:", snapshotMediaToken.data);
 
     const aspectRatio = getCurrentAspectRatio();
+    const resolution = getCurrentResolution();
 
     const generateResponse = await EnqueueEditImage({
       model: selectedImageModel,
       scene_image_media_token: snapshotMediaToken.data!,
-      image_media_tokens: referenceImages.map((image) => image.mediaToken),
+      image_media_tokens: referenceImages
+        .map((image) => image.mediaToken)
+        .filter((t) => t.length > 0),
       disable_system_prompt: !useSystemPrompt,
       prompt: prompt,
       image_count: generationCount,
       aspect_ratio: aspectRatio,
+      image_resolution: resolution,
     });
 
     console.log("generateResponse", generateResponse);
@@ -256,7 +296,7 @@ export const PromptBox2D = ({
     let image = getCanvasRenderBitmap();
     if (image === undefined) {
       toast.error(
-        "Error: Unable to generate image. Please check the input and try again."
+        "Error: Unable to generate image. Please check the input and try again.",
       );
       return;
     }
@@ -290,7 +330,9 @@ export const PromptBox2D = ({
       disableSystemPrompt: !useSystemPrompt,
       prompt: prompt,
       snapshotMediaToken: snapshotMediaToken.data,
-      additionalImages: referenceImages.map((image) => image.mediaToken),
+      additionalImages: referenceImages
+        .map((image) => image.mediaToken)
+        .filter((t) => t.length > 0),
     });
 
     if (response.success === true) {
@@ -325,7 +367,7 @@ export const PromptBox2D = ({
         "(4) Enqueuing with prompt:",
         prompt,
         "and reference images:",
-        referenceImages
+        referenceImages,
       );
 
       const isDesktop = IsDesktopApp();
@@ -339,7 +381,7 @@ export const PromptBox2D = ({
     } catch (error) {
       console.error("Error during image generation:", error);
       toast.error(
-        "An error occurred while generating the image. Please try again."
+        "An error occurred while generating the image. Please try again.",
       );
     } finally {
       await new Promise((resolve) => setTimeout(resolve, 100));
@@ -356,14 +398,28 @@ export const PromptBox2D = ({
 
   const getCurrentAspectRatio = (): EnqueueEditImageSize => {
     const selected = aspectRatioList.find((item) => item.selected);
-    switch (selected?.label) {
-      case "3:2":
+    switch (selected?.label.toLowerCase()) {
+      case "wide":
         return EnqueueEditImageSize.Wide;
-      case "2:3":
+      case "tall":
         return EnqueueEditImageSize.Tall;
-      case "1:1":
+      case "square":
       default:
         return EnqueueEditImageSize.Square;
+    }
+  };
+
+  const getCurrentResolution = (): EnqueueEditImageResolution | undefined => {
+    const selected = resolutionList.find((item) => item.selected);
+    switch (selected?.label) {
+      case "1k":
+        return EnqueueEditImageResolution.OneK;
+      case "2k":
+        return EnqueueEditImageResolution.TwoK;
+      case "4k":
+        return EnqueueEditImageResolution.FourK;
+      default:
+        return undefined;
     }
   };
 
@@ -394,7 +450,7 @@ export const PromptBox2D = ({
             visible={true}
             maxImagePromptCount={Math.max(
               1,
-              selectedImageModel?.maxImagePromptCount ?? 1
+              selectedImageModel?.maxImagePromptCount ?? 1,
             )}
             allowUpload={true}
             referenceImages={referenceImages}
@@ -406,7 +462,7 @@ export const PromptBox2D = ({
                   src={image.url}
                   alt="Reference preview"
                   className="w-full h-full object-contain"
-                />
+                />,
               );
               setIsModalOpen(true);
             }}
@@ -417,7 +473,7 @@ export const PromptBox2D = ({
             "glass w-[730px] rounded-xl p-4",
             selectedImageModel?.canUseImagePrompt &&
               isImageRowVisible &&
-              "rounded-t-none"
+              "rounded-t-none",
           )}
         >
           <div className="flex justify-center gap-2">
@@ -432,7 +488,7 @@ export const PromptBox2D = ({
                   variant="action"
                   className={twMerge(
                     "h-8 w-8 p-0 bg-transparent hover:bg-transparent group transition-all border-0 shadow-none",
-                    isImageRowVisible && "text-primary"
+                    isImageRowVisible && "text-primary",
                   )}
                   onClick={() => setShowImagePrompts((prev) => !prev)}
                 >
@@ -469,26 +525,47 @@ export const PromptBox2D = ({
           </div>
           <div className="mt-2 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Tooltip
-                content="Aspect ratio"
-                position="top"
-                className="z-50"
-                closeOnClick={true}
-              >
-                <PopoverMenu
-                  items={aspectRatioList}
-                  onSelect={handleAspectRatioSelect}
-                  mode="toggle"
-                  panelTitle="Aspect Ratio"
-                  showIconsInList
-                  triggerIcon={
-                    <FontAwesomeIcon
-                      icon={getCurrentAspectRatioIcon()}
-                      className="h-4 w-4"
-                    />
-                  }
-                />
-              </Tooltip>
+              {selectedImageModel?.canChangeAspectRatio && (
+                <Tooltip
+                  content="Aspect ratio"
+                  position="top"
+                  className="z-50"
+                  closeOnClick={true}
+                >
+                  <PopoverMenu
+                    items={aspectRatioList}
+                    onSelect={handleAspectRatioSelect}
+                    mode="toggle"
+                    panelTitle="Aspect Ratio"
+                    showIconsInList
+                    triggerIcon={
+                      <FontAwesomeIcon
+                        icon={getCurrentAspectRatioIcon()}
+                        className="h-4 w-4"
+                      />
+                    }
+                  />
+                </Tooltip>
+              )}
+              {selectedImageModel?.canChangeResolution && (
+                <Tooltip
+                  content="Resolution"
+                  position="top"
+                  className="z-50"
+                  closeOnClick={true}
+                >
+                  <PopoverMenu
+                    items={resolutionList}
+                    onSelect={handleResolutionSelect}
+                    mode="toggle"
+                    panelTitle="Resolution"
+                    showIconsInList
+                    triggerIcon={
+                      <FontAwesomeIcon icon={faExpand} className="h-4 w-4" />
+                    }
+                  />
+                </Tooltip>
+              )}
               <Tooltip
                 content={
                   useSystemPrompt

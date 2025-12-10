@@ -1,6 +1,13 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import Konva from "konva"; // just for types
-import { EnqueueEditImage, EnqueueImageInpaint } from "@storyteller/tauri-api";
+import {
+  EnqueueEditImage,
+  EnqueueImageInpaint,
+  EnqueueEditImageSize,
+  EnqueueEditImageResolution,
+} from "@storyteller/tauri-api";
+import { PromptsApi } from "@storyteller/api";
+import { RefImage, usePromptEditStore } from "@storyteller/ui-promptbox";
 import { ContextMenuContainer } from "../PageDraw/components/ui/ContextMenu";
 import { useCopyPasteHotkeys } from "../PageDraw/hooks/useCopyPasteHotkeys";
 import { useDeleteHotkeys } from "../PageDraw/hooks/useDeleteHotkeys";
@@ -58,6 +65,7 @@ const PageEdit = () => {
   const historyImageBundles = useEditStore(
     (state) => state.historyImageBundles,
   );
+  const referenceImages = usePromptEditStore((s) => s.referenceImages);
 
   // Pass store actions directly as callbacks
   useDeleteHotkeys({ onDelete: store.deleteSelectedItems });
@@ -146,17 +154,16 @@ const PageEdit = () => {
     // Top toolbar (MarkerToolControlBar): ~140px from top (toolbar + padding)
     // Bottom prompt box: ~200px from bottom (can vary with reference images)
     // Mode selector above prompt: ~60px
-    const topToolbarHeight =
+    const hasTopToolbar =
       store.activeTool === "marker" ||
       store.activeTool === "eraser" ||
-      store.activeTool === "edit"
-        ? 140
-        : 0;
+      store.activeTool === "edit";
+    const topToolbarHeight = hasTopToolbar ? 140 : 80;
 
     // Check if model supports masking or is nano banana (has mode selector)
     const hasModeSelectorUI =
       selectedImageModel?.usesInpaintingMask ||
-      selectedImageModel?.id === "gemini_25_flash";
+      selectedImageModel?.isNanoBananaModel();
     const bottomUIHeight = hasModeSelectorUI ? 260 : 200;
     const totalVerticalReserved = topToolbarHeight + bottomUIHeight;
 
@@ -269,8 +276,54 @@ const PageEdit = () => {
     return new Uint8Array(arrayBuffer);
   };
 
+  const getCompositeCanvasFile = async (): Promise<File | null> => {
+    if (
+      !stageRef.current ||
+      !leftPanelRef.current ||
+      !baseImageKonvaRef.current ||
+      !store.baseImageBitmap
+    ) {
+      return null;
+    }
+
+    const rect = baseImageKonvaRef.current;
+    const width = rect.width();
+    const height = rect.height();
+
+    const canvas = new OffscreenCanvas(width, height);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+
+    ctx.drawImage(store.baseImageBitmap, 0, 0, width, height);
+
+    const markerLayerCanvas = leftPanelRef.current.toCanvas({
+      x: stageRef.current.x(),
+      y: stageRef.current.y(),
+      width: rect.width() * stageRef.current.scaleX(),
+      height: rect.height() * stageRef.current.scaleY(),
+      pixelRatio: 1 / stageRef.current.scaleX(),
+    });
+    const fittedMarkerCanvas = normalizeCanvas(
+      markerLayerCanvas,
+      width,
+      height,
+    );
+    ctx.drawImage(fittedMarkerCanvas, 0, 0, width, height);
+
+    const blob = await canvas.convertToBlob({ type: "image/png" });
+    const uuid = crypto.randomUUID();
+    return new File([blob], `${uuid}.png`, { type: "image/png" });
+  };
+
   const handleGenerate = useCallback(
-    async (prompt: string) => {
+    async (
+      prompt: string,
+      options?: {
+        aspectRatio?: string;
+        resolution?: string;
+        images?: RefImage[];
+      },
+    ) => {
       const editedImageToken = store.baseImageInfo?.mediaToken;
 
       if (!editedImageToken) {
@@ -278,7 +331,39 @@ const PageEdit = () => {
         return;
       }
 
-      const arrayBuffer = await getMaskArrayBuffer();
+      // Helper to map aspect ratio string to enum
+      const mapAspectRatio = (
+        ratio?: string,
+      ): EnqueueEditImageSize | undefined => {
+        switch (ratio) {
+          case "auto":
+            return EnqueueEditImageSize.Auto;
+          case "wide":
+            return EnqueueEditImageSize.Wide;
+          case "tall":
+            return EnqueueEditImageSize.Tall;
+          case "square":
+            return EnqueueEditImageSize.Square;
+          default:
+            return undefined;
+        }
+      };
+
+      // Helper to map resolution string to enum
+      const mapResolution = (
+        res?: string,
+      ): EnqueueEditImageResolution | undefined => {
+        switch (res) {
+          case "1k":
+            return EnqueueEditImageResolution.OneK;
+          case "2k":
+            return EnqueueEditImageResolution.TwoK;
+          case "4k":
+            return EnqueueEditImageResolution.FourK;
+          default:
+            return undefined;
+        }
+      };
 
       const subscriberId: string =
         crypto?.randomUUID?.() ??
@@ -288,6 +373,7 @@ const PageEdit = () => {
         let result;
 
         if (selectedImageModel?.editingIsInpainting) {
+          const arrayBuffer = await getMaskArrayBuffer();
           result = await EnqueueImageInpaint({
             model: selectedImageModel,
             image_media_token: editedImageToken,
@@ -297,17 +383,51 @@ const PageEdit = () => {
             frontend_caller: "image_editor",
             frontend_subscriber_id: subscriberId,
           });
-        } else {
+        } else if (selectedImageModel?.isNanoBananaModel()) {
+          const compositeFile = await getCompositeCanvasFile();
+          if (!compositeFile) {
+            console.error("Failed to create composite canvas");
+            return;
+          }
+          const api = new PromptsApi();
+          const snapshotResult = await api.uploadSceneSnapshot({
+            screenshot: compositeFile,
+          });
+          if (!snapshotResult.data) {
+            console.error("Failed to upload scene snapshot");
+            return;
+          }
+          const imgs = options?.images || [];
           result = await EnqueueEditImage({
             model: selectedImageModel,
-            image_media_tokens: [editedImageToken],
-            disable_system_prompt: true, // No meaning yet
+            scene_image_media_token: snapshotResult.data,
+            image_media_tokens: imgs
+              .map((img) => img.mediaToken)
+              .filter((t) => t.length > 0),
             prompt: prompt,
             image_count: generationCount,
             frontend_caller: "image_editor",
             frontend_subscriber_id: subscriberId,
-            //scene_image_media_token,
-            //aspect_ratio: aspectRatio,
+            aspect_ratio: mapAspectRatio(options?.aspectRatio),
+            image_resolution: mapResolution(options?.resolution),
+          });
+        } else {
+          const imgs = options?.images || [];
+          result = await EnqueueEditImage({
+            model: selectedImageModel,
+            image_media_tokens: [
+              editedImageToken,
+              ...imgs
+                .filter((img) => img.mediaToken !== editedImageToken)
+                .map((img) => img.mediaToken),
+            ].filter((t) => t.length > 0),
+            disable_system_prompt: true,
+            prompt: prompt,
+            image_count: generationCount,
+            frontend_caller: "image_editor",
+            frontend_subscriber_id: subscriberId,
+            aspect_ratio: mapAspectRatio(options?.aspectRatio),
+            image_resolution: mapResolution(options?.resolution),
           });
         }
 
@@ -324,7 +444,13 @@ const PageEdit = () => {
         throw error;
       }
     },
-    [generationCount, selectedImageModel, store.baseImageInfo?.mediaToken],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      generationCount,
+      selectedImageModel,
+      store.baseImageInfo?.mediaToken,
+      referenceImages,
+    ],
   );
 
   const isNanoBananaModel = selectedImageModel?.isNanoBananaModel();
