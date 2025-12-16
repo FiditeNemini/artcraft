@@ -579,9 +579,9 @@ export const RemoveBackground = () => {
                 </div>
               </div>
             ) : (
-              <div className="flex h-full w-full max-w-[1400px] flex-col items-center gap-4">
+              <div className="flex h-full w-full max-w-[1400px] flex-col items-center">
                 {(activeImage || isProcessing) && (
-                  <div className="flex gap-3">
+                  <div className="flex shrink-0 gap-3 pb-4">
                     <Button
                       variant="action"
                       icon={faEye}
@@ -616,92 +616,95 @@ export const RemoveBackground = () => {
                   </div>
                 )}
 
-                <div
-                  className="relative overflow-hidden rounded-2xl border border-ui-panel-border shadow-xl"
-                  style={imageContainerStyle}
-                >
-                  {isProcessing && (
-                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
-                      {currentOriginalUrl && (
-                        <img
-                          src={currentOriginalUrl}
-                          alt="Processing"
-                          className="absolute inset-0 h-full w-full object-contain opacity-30"
-                        />
-                      )}
-                      <div className="relative z-10 flex flex-col items-center gap-4">
-                        <div className="relative">
-                          <div className="h-16 w-16 animate-spin rounded-full border-4 border-primary-500/30 border-t-primary-500" />
-                          <FontAwesomeIcon
-                            icon={faWandMagicSparkles}
-                            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl text-primary-400"
+                <div className="flex flex-1 items-center justify-center">
+                  <div
+                    className="relative overflow-hidden rounded-2xl border border-ui-panel-border shadow-xl"
+                    style={imageContainerStyle}
+                  >
+                    {isProcessing && (
+                      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
+                        {currentOriginalUrl && (
+                          <img
+                            src={currentOriginalUrl}
+                            alt="Processing"
+                            className="absolute inset-0 h-full w-full object-contain opacity-30"
                           />
+                        )}
+                        <div className="relative z-10 flex flex-col items-center gap-4">
+                          <div className="relative">
+                            <div className="h-16 w-16 animate-spin rounded-full border-4 border-primary-500/30 border-t-primary-500" />
+                            <FontAwesomeIcon
+                              icon={faWandMagicSparkles}
+                              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl text-primary-400"
+                            />
+                          </div>
+                          <span className="text-lg font-semibold text-white">
+                            Removing Background...
+                          </span>
                         </div>
-                        <span className="text-lg font-semibold text-white">
-                          Removing Background...
-                        </span>
                       </div>
-                    </div>
-                  )}
-                  {activeImage && (
-                    <>
-                      <div
-                        className="absolute inset-0"
-                        style={{
-                          backgroundImage: `
+                    )}
+                    {activeImage && (
+                      <>
+                        <div
+                          className="absolute inset-0"
+                          style={{
+                            backgroundImage: `
                             linear-gradient(45deg, #1a1a1a 25%, transparent 25%),
                             linear-gradient(-45deg, #1a1a1a 25%, transparent 25%),
                             linear-gradient(45deg, transparent 75%, #1a1a1a 75%),
                             linear-gradient(-45deg, transparent 75%, #1a1a1a 75%)
                           `,
-                          backgroundSize: "16px 16px",
-                          backgroundPosition: "0 0, 0 8px, 8px -8px, -8px 0px",
-                          backgroundColor: "#2a2a2a",
-                        }}
-                      />
+                            backgroundSize: "16px 16px",
+                            backgroundPosition:
+                              "0 0, 0 8px, 8px -8px, -8px 0px",
+                            backgroundColor: "#2a2a2a",
+                          }}
+                        />
 
-                      <img
-                        src={activeImage.processedUrl}
-                        alt="Background Removed"
-                        className="absolute inset-0 h-full w-full object-contain"
-                      />
-
-                      <div
-                        ref={clipLayerRef}
-                        className={twMerge(
-                          "absolute inset-0",
-                          animationComplete &&
-                            "transition-[clip-path] duration-300",
-                        )}
-                        style={{
-                          clipPath: `inset(0 0 0 ${revealProgressRef.current}%)`,
-                        }}
-                      >
                         <img
-                          src={activeImage.originalUrl}
-                          alt="Original"
+                          src={activeImage.processedUrl}
+                          alt="Background Removed"
                           className="absolute inset-0 h-full w-full object-contain"
                         />
-                      </div>
 
-                      <div
-                        ref={progressBarRef}
-                        className="absolute bottom-0 top-0 w-1 bg-primary-500 shadow-lg shadow-primary-500/50"
-                        style={{
-                          left: `${revealProgressRef.current}%`,
-                          transform: "translateX(-50%)",
-                          display:
-                            animationComplete ||
-                            revealProgressRef.current >= 100
-                              ? "none"
-                              : "block",
-                        }}
-                      />
-                    </>
-                  )}
+                        <div
+                          ref={clipLayerRef}
+                          className={twMerge(
+                            "absolute inset-0",
+                            animationComplete &&
+                              "transition-[clip-path] duration-300",
+                          )}
+                          style={{
+                            clipPath: `inset(0 0 0 ${revealProgressRef.current}%)`,
+                          }}
+                        >
+                          <img
+                            src={activeImage.originalUrl}
+                            alt="Original"
+                            className="absolute inset-0 h-full w-full object-contain"
+                          />
+                        </div>
+
+                        <div
+                          ref={progressBarRef}
+                          className="absolute bottom-0 top-0 w-1 bg-primary-500 shadow-lg shadow-primary-500/50"
+                          style={{
+                            left: `${revealProgressRef.current}%`,
+                            transform: "translateX(-50%)",
+                            display:
+                              animationComplete ||
+                              revealProgressRef.current >= 100
+                                ? "none"
+                                : "block",
+                          }}
+                        />
+                      </>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-3 rounded-xl border border-ui-panel-border bg-ui-background p-2">
+                <div className="mt-auto flex shrink-0 items-center gap-3 rounded-xl border border-ui-panel-border bg-ui-background p-2">
                   <input
                     type="file"
                     ref={fileInputRef}
