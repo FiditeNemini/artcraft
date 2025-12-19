@@ -9,7 +9,8 @@
 // const MAC_VERSION = "2025.09.24"; // Works! Good release.
 // const MAC_VERSION = "2025.09.27";
 //export const MAC_VERSION = "2025.10.04"; // Sora 2
-export const MAC_VERSION = "2025.12.01"; // Grok
+//export const MAC_VERSION = "2025.12.01"; // Grok
+export const MAC_VERSION = "2025.12.19"; // WorldLabs v1
 
 // Current Windows version (update this when a new version is released)
 // If a rollback is necessary, roll back to the last known good date.
@@ -21,7 +22,8 @@ export const MAC_VERSION = "2025.12.01"; // Grok
 // const WINDOWS_VERSION = "2025.09.23";
 // const WINDOWS_VERSION = "2025.09.24"; // Works! Good release.
 // const WINDOWS_VERSION = "2025.09.27";
-export const WINDOWS_VERSION = "2025.12.01"; // Grok
+//export const WINDOWS_VERSION = "2025.12.01"; // Grok
+export const WINDOWS_VERSION = "2025.12.19"; // WorldLabs v1
 
 const R2_BASE = "https://pub-3b58c874772a4e04b9c291815224128c.r2.dev";
 
