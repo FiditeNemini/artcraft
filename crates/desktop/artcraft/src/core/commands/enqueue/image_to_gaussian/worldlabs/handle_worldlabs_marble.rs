@@ -2,6 +2,7 @@ use crate::core::commands::enqueue::generate_error::{BadInputReason, GenerateErr
 use crate::core::commands::enqueue::image_to_gaussian::enqueue_image_to_gaussian_command::EnqueueImageToGaussianRequest;
 use crate::core::commands::enqueue::task_enqueue_success::TaskEnqueueSuccess;
 use crate::core::commands::enqueue::text_to_image::enqueue_text_to_image_command::{EnqueueTextToImageRequest, TextToImageSize};
+use crate::core::events::functional_events::show_provider_login_modal_event::ShowProviderLoginModalEvent;
 use crate::core::events::generation_events::common::GenerationModel;
 use crate::core::state::app_env_configs::app_env_configs::AppEnvConfigs;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
@@ -35,7 +36,8 @@ pub async fn handle_worldlabs_marble(
     Some(cookies) => cookies,
     None => {
       error!("No WorldLabs cookies!");
-      return Err(GenerateError::MissingCredentials(MissingCredentialsReason::NeedsWorldLabsCredentials));
+      ShowProviderLoginModalEvent::send_for_provider(GenerationProvider::WorldLabs, &app);
+      return Err(GenerateError::needs_worldlabs_credentials());
     }
   };
 
@@ -43,11 +45,19 @@ pub async fn handle_worldlabs_marble(
     Some(bearer) => bearer,
     None => {
       error!("No WorldLabs bearer token!");
-      return Err(GenerateError::MissingCredentials(MissingCredentialsReason::NeedsWorldLabsCredentials));
+      ShowProviderLoginModalEvent::send_for_provider(GenerationProvider::WorldLabs, &app);
+      return Err(GenerateError::needs_worldlabs_credentials());
     }
   };
 
-  let job_id = generate_random_uuid();
+  let world_labs_refresh = match worldlabs_creds_manager.maybe_copy_refresh_token()? {
+    Some(bearer) => bearer,
+    None => {
+      error!("No WorldLabs refresh token!");
+      ShowProviderLoginModalEvent::send_for_provider(GenerationProvider::WorldLabs, &app);
+      return Err(GenerateError::needs_worldlabs_credentials());
+    }
+  };
 
   let maybe_prompt = request.prompt
       .as_deref()
@@ -66,6 +76,7 @@ pub async fn handle_worldlabs_marble(
   let response = upload_image_and_create_world_with_retry(UploadImageAndCreateWorldWithRetryArgs {
     cookies: &world_labs_cookies,
     bearer_token: &world_labs_bearer,
+    refresh_token: &world_labs_refresh,
     individual_request_timeout: None,
     file: FileBytesOrPath::Path(file_path),
   }).await?;
@@ -75,6 +86,16 @@ pub async fn handle_worldlabs_marble(
 
   info!("Run ID: {:?}", run_id);
   info!("World ID: {:?}", world_id);
+  
+  if let Some(new_access) = response.maybe_new_access_tokens {
+    info!("New access tokens were generated; saving.");
+    worldlabs_creds_manager.replace_bearer_and_refresh_token(
+      new_access.bearer_token,
+      new_access.refresh_token
+    )?;
+
+    worldlabs_creds_manager.persist_to_disk()?;
+  }
 
   Ok(TaskEnqueueSuccess {
     provider: GenerationProvider::WorldLabs,
