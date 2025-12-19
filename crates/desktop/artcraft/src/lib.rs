@@ -8,6 +8,7 @@ use crate::core::commands::app_preferences::update_app_preference_command::updat
 use crate::core::commands::enqueue::image_bg_removal::enqueue_image_bg_removal_command::enqueue_image_bg_removal_command;
 use crate::core::commands::enqueue::image_edit::enqueue_edit_image_command::enqueue_edit_image_command;
 use crate::core::commands::enqueue::image_inpaint::enqueue_image_inpaint_command::enqueue_image_inpaint_command;
+use crate::core::commands::enqueue::image_to_gaussian::enqueue_image_to_gaussian_command::enqueue_image_to_gaussian_command;
 use crate::core::commands::enqueue::image_to_object::enqueue_image_to_3d_object_command::enqueue_image_to_3d_object_command;
 use crate::core::commands::enqueue::image_to_video::enqueue_image_to_video_command::enqueue_image_to_video_command;
 use crate::core::commands::enqueue::text_to_image::enqueue_text_to_image_command::enqueue_text_to_image_command;
@@ -32,8 +33,8 @@ use crate::core::threads::main_window_thread::main_window_thread::main_window_th
 use crate::services::grok::commands::grok_clear_credentials_command::grok_clear_credentials_command;
 use crate::services::grok::commands::grok_get_credential_info_command::grok_get_credential_info_command;
 use crate::services::grok::commands::grok_open_login_command::grok_open_login_command;
-use crate::services::grok::state::grok_image_prompt_queue::GrokImagePromptQueue;
 use crate::services::grok::state::grok_credential_manager::GrokCredentialManager;
+use crate::services::grok::state::grok_image_prompt_queue::GrokImagePromptQueue;
 use crate::services::midjourney::commands::midjourney_clear_credentials_command::midjourney_clear_credentials_command;
 use crate::services::midjourney::commands::midjourney_get_credential_info_command::midjourney_get_credential_info_command;
 use crate::services::midjourney::commands::midjourney_open_login_command::midjourney_open_login_command;
@@ -55,6 +56,12 @@ use crate::services::storyteller::commands::stripe_customer_portal::storyteller_
 use crate::services::storyteller::commands::stripe_customer_portal::storyteller_open_customer_portal_switch_plan_command::storyteller_open_customer_portal_switch_plan_command;
 use crate::services::storyteller::commands::stripe_customer_portal::storyteller_open_customer_portal_update_payment_method_command::storyteller_open_customer_portal_update_payment_method_command;
 use crate::services::storyteller::state::storyteller_credential_manager::StorytellerCredentialManager;
+use crate::services::worldlabs::commands::worldlabs_clear_credentials_command::worldlabs_clear_credentials_command;
+use crate::services::worldlabs::commands::worldlabs_get_credential_info_command::worldlabs_get_credential_info_command;
+use crate::services::worldlabs::commands::worldlabs_open_login_command::worldlabs_open_login_command;
+use crate::services::worldlabs::commands::worldlabs_receive_bearer_command::worldlabs_receive_bearer_command;
+use crate::services::worldlabs::state::worldlabs_bearer_bridge::WorldlabsBearerBridge;
+use crate::services::worldlabs::state::worldlabs_credential_manager::WorldlabsCredentialManager;
 use log::error;
 
 use tauri_plugin_dialog;
@@ -108,6 +115,12 @@ pub fn run() {
   let grok_prompt_queue = GrokImagePromptQueue::new();
   let grok_prompt_queue_2 = grok_prompt_queue.clone();
 
+  let worldlabs_creds_manager = WorldlabsCredentialManager::initialize_from_disk_infallible(&app_data_root);
+  let worldlabs_creds_manager_2 = worldlabs_creds_manager.clone();
+
+  let worldlabs_bearer_bridge = WorldlabsBearerBridge::empty();
+  let worldlabs_bearer_bridge_2 = worldlabs_bearer_bridge.clone();
+
   println!("Initializing backend runtime...");
 
   let builder = tauri::Builder::default()
@@ -147,6 +160,8 @@ pub fn run() {
           midjourney_creds_manager_2,
           grok_creds_manager_2,
           grok_prompt_queue_2,
+          worldlabs_bearer_bridge_2,
+          worldlabs_creds_manager_2,
         ).await;
 
         if let Err(err) = result {
@@ -166,7 +181,9 @@ pub fn run() {
     .manage(midjourney_creds_manager)
     .manage(sora_creds_manager)
     .manage(sora_task_queue)
-    .manage(storyteller_creds_manager_3);
+    .manage(storyteller_creds_manager_3)
+    .manage(worldlabs_bearer_bridge)
+    .manage(worldlabs_creds_manager);
 
   // TODO: Break this out into another module, because RustRover/IntelliJ lags with these macros.
   //  My first attempt at naively doing this didn't work because the macros can't find their codegen'd targets.
@@ -176,6 +193,7 @@ pub fn run() {
     enqueue_image_bg_removal_command,
     enqueue_image_inpaint_command,
     enqueue_image_to_3d_object_command,
+    enqueue_image_to_gaussian_command,
     enqueue_image_to_video_command,
     enqueue_text_to_image_command,
     flip_image,
@@ -207,6 +225,10 @@ pub fn run() {
     storyteller_open_subscription_purchase_command,
     storyteller_purge_credentials_command,
     update_app_preferences_command,
+    worldlabs_clear_credentials_command,
+    worldlabs_get_credential_info_command,
+    worldlabs_open_login_command,
+    worldlabs_receive_bearer_command,
   ]);
 
   builder.run(tauri::generate_context!("tauri.conf.json"))
