@@ -11,7 +11,7 @@ use crate::state::server_state::ServerState;
 use crate::util::lookup::lookup_image_urls_as_optional_list::lookup_image_urls_as_optional_list;
 use actix_web::web::Json;
 use actix_web::{web, HttpRequest};
-use artcraft_api_defs::generate::image::multi_function::nano_banana_pro_multi_function_image_gen::{NanoBananaProMultiFunctionImageGenAspectRatio, NanoBananaProMultiFunctionImageGenImageResolution, NanoBananaProMultiFunctionImageGenNumImages, NanoBananaProMultiFunctionImageGenRequest, NanoBananaProMultiFunctionImageGenResponse};
+use artcraft_api_defs::generate::image::multi_function::bytedance_seedream_v4p5_multi_function_image_gen::{BytedanceSeedreamV4p5MultiFunctionImageGenImageSize, BytedanceSeedreamV4p5MultiFunctionImageGenNumImages, BytedanceSeedreamV4p5MultiFunctionImageGenRequest, BytedanceSeedreamV4p5MultiFunctionImageGenResponse};
 use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::prompt_context_items::prompt_context_semantic_type::PromptContextSemanticType;
 use enums::by_table::prompts::prompt_type::PromptType;
@@ -19,8 +19,8 @@ use enums::common::generation_provider::GenerationProvider;
 use enums::common::model_type::ModelType;
 use enums::common::visibility::Visibility;
 use fal_client::creds::open_ai_api_key::OpenAiApiKey;
-use fal_client::requests::webhook::image::edit::enqueue_nano_banana_pro_edit_image_webhook::{enqueue_nano_banana_pro_image_edit_webhook, EnqueueNanoBananaProEditImageArgs, EnqueueNanoBananaProEditImageAspectRatio, EnqueueNanoBananaProEditImageNumImages, EnqueueNanoBananaProEditImageResolution};
-use fal_client::requests::webhook::image::text::enqueue_nano_banana_pro_text_to_image_webhook::{enqueue_nano_banana_pro_text_to_image_webhook, EnqueueNanoBananaProTextToImageArgs, EnqueueNanoBananaProTextToImageAspectRatio, EnqueueNanoBananaProTextToImageNumImages, EnqueueNanoBananaProTextToImageResolution};
+use fal_client::requests::webhook::image::edit::enqueue_bytedance_seedream_v4p5_edit_image_webhook::{enqueue_bytedance_seedream_v4p5_edit_image_webhook, EnqueueBytedanceSeedreamV4p5EditImageArgs, EnqueueBytedanceSeedreamV4p5EditImageNumImages, EnqueueBytedanceSeedreamV4p5EditImageSize};
+use fal_client::requests::webhook::image::text::enqueue_bytedance_seedream_v4p5_text_to_image_webhook::{enqueue_bytedance_seedream_v4p5_text_to_image_webhook, EnqueueBytedanceSeedreamV4p5TextToImageArgs, EnqueueBytedanceSeedreamV4p5TextToImageNumImages, EnqueueBytedanceSeedreamV4p5TextToImageSize};
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{error, info, warn};
 use mysql_queries::queries::generic_inference::fal::insert_generic_inference_job_for_fal_queue::insert_generic_inference_job_for_fal_queue;
@@ -36,23 +36,23 @@ use sqlx::{Acquire, MySql};
 use tokens::tokens::media_files::MediaFileToken;
 use utoipa::ToSchema;
 
-/// Nano Banana Pro Multi-Function (generate + edit)
+/// Bytedance Seedream 4.5 Multi-Function (generate + edit)
 #[utoipa::path(
   post,
   tag = "Generate Images (Multi-Function)",
-  path = "/v1/generate/image/multi_function/nano_banana_pro",
+  path = "/v1/generate/image/multi_function/bytedance_seedream_v4p5",
   responses(
-    (status = 200, description = "Success", body = NanoBananaProMultiFunctionImageGenResponse),
+    (status = 200, description = "Success", body = BytedanceSeedreamV4p5MultiFunctionImageGenResponse),
   ),
   params(
-    ("request" = NanoBananaProMultiFunctionImageGenRequest, description = "Payload for Request"),
+    ("request" = BytedanceSeedreamV4p5MultiFunctionImageGenRequest, description = "Payload for Request"),
   )
 )]
-pub async fn nano_banana_pro_multi_function_image_gen_handler(
+pub async fn bytedance_seedream_v4p5_multi_function_image_gen_handler(
   http_request: HttpRequest,
-  request: Json<NanoBananaProMultiFunctionImageGenRequest>,
+  request: Json<BytedanceSeedreamV4p5MultiFunctionImageGenRequest>,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<Json<NanoBananaProMultiFunctionImageGenResponse>, CommonWebError> {
+) -> Result<Json<BytedanceSeedreamV4p5MultiFunctionImageGenResponse>, CommonWebError> {
   
   payments_error_test(&request.prompt.as_deref().unwrap_or(""))?;
   
@@ -112,99 +112,89 @@ pub async fn nano_banana_pro_multi_function_image_gen_handler(
   let fal_result;
 
   if let Some(input_image_urls) = image_urls.as_deref() {
-    info!("nano banana pro edit image");
+    info!("edit image case");
 
     let num_images = match request.num_images {
-      Some(NanoBananaProMultiFunctionImageGenNumImages::One) => EnqueueNanoBananaProEditImageNumImages::One,
-      Some(NanoBananaProMultiFunctionImageGenNumImages::Two) => EnqueueNanoBananaProEditImageNumImages::Two,
-      Some(NanoBananaProMultiFunctionImageGenNumImages::Three) => EnqueueNanoBananaProEditImageNumImages::Three,
-      Some(NanoBananaProMultiFunctionImageGenNumImages::Four) => EnqueueNanoBananaProEditImageNumImages::Four,
-      None => EnqueueNanoBananaProEditImageNumImages::One, // Default to One
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenNumImages::One) => EnqueueBytedanceSeedreamV4p5EditImageNumImages::One,
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenNumImages::Two) => EnqueueBytedanceSeedreamV4p5EditImageNumImages::Two,
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenNumImages::Three) => EnqueueBytedanceSeedreamV4p5EditImageNumImages::Three,
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenNumImages::Four) => EnqueueBytedanceSeedreamV4p5EditImageNumImages::Four,
+      None => EnqueueBytedanceSeedreamV4p5EditImageNumImages::One, // Default to One
     };
 
-    let resolution = match request.resolution {
-      Some(NanoBananaProMultiFunctionImageGenImageResolution::OneK) => EnqueueNanoBananaProEditImageResolution::OneK,
-      Some(NanoBananaProMultiFunctionImageGenImageResolution::TwoK) => EnqueueNanoBananaProEditImageResolution::TwoK,
-      Some(NanoBananaProMultiFunctionImageGenImageResolution::FourK) => EnqueueNanoBananaProEditImageResolution::FourK,
-      None => EnqueueNanoBananaProEditImageResolution::OneK,
+    let image_size = match request.image_size {
+      // Square
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenImageSize::Square) => EnqueueBytedanceSeedreamV4p5EditImageSize::Square,
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenImageSize::SquareHd) => EnqueueBytedanceSeedreamV4p5EditImageSize::SquareHd,
+      // Tall
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenImageSize::PortraitFourThree) => EnqueueBytedanceSeedreamV4p5EditImageSize::PortraitFourThree,
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenImageSize::PortraitSixteenNine) => EnqueueBytedanceSeedreamV4p5EditImageSize::PortraitSixteenNine,
+      // Wide
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenImageSize::LandscapeFourThree) => EnqueueBytedanceSeedreamV4p5EditImageSize::LandscapeFourThree,
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenImageSize::LandscapeSixteenNine) => EnqueueBytedanceSeedreamV4p5EditImageSize::LandscapeSixteenNine,
+      // Auto
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenImageSize::Auto2k) => EnqueueBytedanceSeedreamV4p5EditImageSize::Auto2k,
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenImageSize::Auto4k) => EnqueueBytedanceSeedreamV4p5EditImageSize::Auto4k,
+      None => EnqueueBytedanceSeedreamV4p5EditImageSize::SquareHd,
     };
 
-    let aspect_ratio = match request.aspect_ratio {
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::OneByOne) => EnqueueNanoBananaProEditImageAspectRatio::OneByOne,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::FiveByFour) => EnqueueNanoBananaProEditImageAspectRatio::FiveByFour,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::FourByThree) => EnqueueNanoBananaProEditImageAspectRatio::FourByThree,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::ThreeByTwo) => EnqueueNanoBananaProEditImageAspectRatio::ThreeByTwo,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::SixteenByNine) => EnqueueNanoBananaProEditImageAspectRatio::SixteenByNine,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::TwentyOneByNine) => EnqueueNanoBananaProEditImageAspectRatio::TwentyOneByNine,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::FourByFive) => EnqueueNanoBananaProEditImageAspectRatio::FourByFive,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::ThreeByFour) => EnqueueNanoBananaProEditImageAspectRatio::ThreeByFour,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::TwoByThree) => EnqueueNanoBananaProEditImageAspectRatio::TwoByThree,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::NineBySixteen) => EnqueueNanoBananaProEditImageAspectRatio::NineBySixteen,
-      None => EnqueueNanoBananaProEditImageAspectRatio::OneByOne,
-    };
-
-    let args = EnqueueNanoBananaProEditImageArgs {
+    let args = EnqueueBytedanceSeedreamV4p5EditImageArgs {
       prompt: request.prompt.as_deref().unwrap_or(""),
       image_urls: input_image_urls.to_owned(),
-      num_images,
-      resolution: Some(resolution),
-      aspect_ratio: Some(aspect_ratio),
+      num_images: Some(num_images),
+      image_size: Some(image_size),
+      max_images: None,
       webhook_url: &server_state.fal.webhook_url,
       api_key: &server_state.fal.api_key,
     };
 
-    fal_result = enqueue_nano_banana_pro_image_edit_webhook(args)
+    fal_result = enqueue_bytedance_seedream_v4p5_edit_image_webhook(args)
         .await
         .map_err(|err| {
-          warn!("Error calling enqueue_nano_banana_pro_image_edit_webhook: {:?}", err);
+          warn!("Error calling enqueue_bytedance_seedream_v4p5_edit_image_webhook: {:?}", err);
           CommonWebError::ServerError
         })?;
 
   } else {
-    info!("nano banana pro text-to-image");
+    info!("text-to-image case");
 
     let num_images = match request.num_images {
-      Some(NanoBananaProMultiFunctionImageGenNumImages::One) => EnqueueNanoBananaProTextToImageNumImages::One,
-      Some(NanoBananaProMultiFunctionImageGenNumImages::Two) => EnqueueNanoBananaProTextToImageNumImages::Two,
-      Some(NanoBananaProMultiFunctionImageGenNumImages::Three) => EnqueueNanoBananaProTextToImageNumImages::Three,
-      Some(NanoBananaProMultiFunctionImageGenNumImages::Four) => EnqueueNanoBananaProTextToImageNumImages::Four,
-      None => EnqueueNanoBananaProTextToImageNumImages::One, // Default to One
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenNumImages::One) => EnqueueBytedanceSeedreamV4p5TextToImageNumImages::One,
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenNumImages::Two) => EnqueueBytedanceSeedreamV4p5TextToImageNumImages::Two,
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenNumImages::Three) => EnqueueBytedanceSeedreamV4p5TextToImageNumImages::Three,
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenNumImages::Four) => EnqueueBytedanceSeedreamV4p5TextToImageNumImages::Four,
+      None => EnqueueBytedanceSeedreamV4p5TextToImageNumImages::One, // Default to One
     };
 
-    let resolution = match request.resolution {
-      Some(NanoBananaProMultiFunctionImageGenImageResolution::OneK) => EnqueueNanoBananaProTextToImageResolution::OneK,
-      Some(NanoBananaProMultiFunctionImageGenImageResolution::TwoK) => EnqueueNanoBananaProTextToImageResolution::TwoK,
-      Some(NanoBananaProMultiFunctionImageGenImageResolution::FourK) => EnqueueNanoBananaProTextToImageResolution::FourK,
-      None => EnqueueNanoBananaProTextToImageResolution::OneK,
+    let image_size = match request.image_size {
+      // Square
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenImageSize::Square) => EnqueueBytedanceSeedreamV4p5TextToImageSize::Square,
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenImageSize::SquareHd) => EnqueueBytedanceSeedreamV4p5TextToImageSize::SquareHd,
+      // Tall
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenImageSize::PortraitFourThree) => EnqueueBytedanceSeedreamV4p5TextToImageSize::PortraitFourThree,
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenImageSize::PortraitSixteenNine) => EnqueueBytedanceSeedreamV4p5TextToImageSize::PortraitSixteenNine,
+      // Wide
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenImageSize::LandscapeFourThree) => EnqueueBytedanceSeedreamV4p5TextToImageSize::LandscapeFourThree,
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenImageSize::LandscapeSixteenNine) => EnqueueBytedanceSeedreamV4p5TextToImageSize::LandscapeSixteenNine,
+      // Auto
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenImageSize::Auto2k) => EnqueueBytedanceSeedreamV4p5TextToImageSize::Auto2k,
+      Some(BytedanceSeedreamV4p5MultiFunctionImageGenImageSize::Auto4k) => EnqueueBytedanceSeedreamV4p5TextToImageSize::Auto4k,
+      None => EnqueueBytedanceSeedreamV4p5TextToImageSize::SquareHd,
     };
 
-    let aspect_ratio = match request.aspect_ratio {
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::OneByOne) => EnqueueNanoBananaProTextToImageAspectRatio::OneByOne,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::FiveByFour) => EnqueueNanoBananaProTextToImageAspectRatio::FiveByFour,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::FourByThree) => EnqueueNanoBananaProTextToImageAspectRatio::FourByThree,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::ThreeByTwo) => EnqueueNanoBananaProTextToImageAspectRatio::ThreeByTwo,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::SixteenByNine) => EnqueueNanoBananaProTextToImageAspectRatio::SixteenByNine,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::TwentyOneByNine) => EnqueueNanoBananaProTextToImageAspectRatio::TwentyOneByNine,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::FourByFive) => EnqueueNanoBananaProTextToImageAspectRatio::FourByFive,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::ThreeByFour) => EnqueueNanoBananaProTextToImageAspectRatio::ThreeByFour,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::TwoByThree) => EnqueueNanoBananaProTextToImageAspectRatio::TwoByThree,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::NineBySixteen) => EnqueueNanoBananaProTextToImageAspectRatio::NineBySixteen,
-      None => EnqueueNanoBananaProTextToImageAspectRatio::OneByOne,
-    };
-
-    let args = EnqueueNanoBananaProTextToImageArgs {
+    let args = EnqueueBytedanceSeedreamV4p5TextToImageArgs {
       prompt: request.prompt.as_deref().unwrap_or(""),
-      num_images,
-      resolution: Some(resolution),
-      aspect_ratio: Some(aspect_ratio),
+      num_images: Some(num_images),
+      image_size: Some(image_size),
+      max_images: None,
       webhook_url: &server_state.fal.webhook_url,
       api_key: &server_state.fal.api_key,
     };
 
-    fal_result = enqueue_nano_banana_pro_text_to_image_webhook(args)
+    fal_result = enqueue_bytedance_seedream_v4p5_text_to_image_webhook(args)
         .await
         .map_err(|err| {
-          warn!("Error calling enqueue_nano_banana_pro_text_to_image_webhook: {:?}", err);
+          warn!("Error calling enqueue_bytedance_seedream_v4p5_text_to_image_webhook: {:?}", err);
           CommonWebError::ServerError
         })?;
   }
@@ -234,7 +224,7 @@ pub async fn nano_banana_pro_multi_function_image_gen_handler(
     maybe_creator_user_token: maybe_user_session
         .as_ref()
         .map(|s| &s.user_token),
-    maybe_model_type: Some(ModelType::NanoBananaPro),
+    maybe_model_type: Some(ModelType::Seedream4p5),
     maybe_generation_provider: Some(GenerationProvider::Artcraft),
     maybe_positive_prompt: request.prompt.as_deref(),
     maybe_negative_prompt: None,
@@ -302,7 +292,7 @@ pub async fn nano_banana_pro_multi_function_image_gen_handler(
         CommonWebError::ServerError
       })?;
 
-  Ok(Json(NanoBananaProMultiFunctionImageGenResponse {
+  Ok(Json(BytedanceSeedreamV4p5MultiFunctionImageGenResponse {
     success: true,
     inference_job_token: job_token,
   }))
