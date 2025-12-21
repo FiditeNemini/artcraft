@@ -28,7 +28,7 @@ export const getProviderIcon = (
   );
 };
 
-export const getProviderDisplayName = (provider: Provider): string => {
+export const getProviderDisplayName = (provider: Provider | string): string => {
   switch (provider) {
     case Provider.ArtCraft:
       return "ArtCraft";
@@ -36,6 +36,8 @@ export const getProviderDisplayName = (provider: Provider): string => {
       return "Fal";
     case Provider.Sora:
       return "Sora / ChatGPT";
+    case "worldlabs":
+      return "World Labs";
     default:
       return provider;
   }

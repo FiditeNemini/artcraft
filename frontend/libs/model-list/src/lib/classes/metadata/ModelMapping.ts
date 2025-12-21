@@ -20,6 +20,7 @@ export const MODEL_TYPE_TO_CREATOR: Record<string, ModelCreator> = {
   veo_2: ModelCreator.Google,
   recraft_3: ModelCreator.Recraft,
   hunyuan_3d: ModelCreator.Tencent,
+  worldlabs_gaussian: ModelCreator.WorldLabs,
   grok_image: ModelCreator.Grok,
   grok_video: ModelCreator.Grok,
   midjourney: ModelCreator.Midjourney,
@@ -36,7 +37,7 @@ const normalizeModelKey = (modelType: string): string =>
   modelType.toLowerCase().replace(/\./g, "_").trim();
 
 export const getModelCreatorIcon = (
-  modelType: string
+  modelType: string,
 ): React.ReactNode | null => {
   const creator = MODEL_TYPE_TO_CREATOR[normalizeModelKey(modelType)];
   if (!creator) return null;
@@ -89,6 +90,8 @@ export const getModelCreatorName = (modelType: string): string | null => {
       return "Krea";
     case ModelCreator.Grok:
       return "Grok";
+    case ModelCreator.WorldLabs:
+      return "World Labs";
     default:
       return creator;
   }
@@ -117,6 +120,7 @@ export const getModelDisplayName = (modelType: string): string => {
     hunyuan_3d_2p0: "Hunyuan 3D 2.0",
     hunyuan_3d_2p1: "Hunyuan 3D 2.1",
     hunyuan_3d: "Hunyuan 3D",
+    worldlabs_gaussian: "World Labs Marble",
     flux_pro_kontext_max: "Flux Pro Kontext Max",
 
     // Catch-all bucket for Midjourney.
@@ -145,6 +149,7 @@ export const getProviderDisplayName = (provider: string): string => {
     grok: "Grok",
     midjourney: "Midjourney",
     sora: "Sora",
+    worldlabs: "World Labs",
   };
 
   return displayNames[provider] || provider;
@@ -153,7 +158,7 @@ export const getProviderDisplayName = (provider: string): string => {
 // Get provider icon (string-based provider)
 export const getProviderIconByName = (
   provider: string,
-  className = "h-4 w-4 invert"
+  className = "h-4 w-4 invert",
 ): React.ReactNode | null => {
   const providerToCreator: Record<string, ModelCreator> = {
     artcraft: ModelCreator.ArtCraft,
@@ -161,6 +166,7 @@ export const getProviderIconByName = (
     grok: ModelCreator.Grok,
     midjourney: ModelCreator.Midjourney,
     sora: ModelCreator.OpenAi,
+    worldlabs: ModelCreator.WorldLabs,
   };
   const creator = providerToCreator[provider?.toLowerCase?.() ?? ""];
   if (!creator) return null;
