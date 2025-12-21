@@ -93,6 +93,10 @@ interface GalleryModalProps {
     url: string,
     media_id?: string
   ) => Promise<void> | void;
+  onMake3DWorldClicked?: (
+    url: string,
+    media_id?: string
+  ) => Promise<void> | void;
 }
 
 export const GalleryModal = React.memo(
@@ -110,6 +114,7 @@ export const GalleryModal = React.memo(
     onEditClicked,
     onTurnIntoVideoClicked,
     onRemoveBackgroundClicked,
+    onMake3DWorldClicked,
   }: GalleryModalProps) => {
     const [loading, setLoading] = useState(false);
     // Lightbox state is now handled via signals
@@ -751,6 +756,7 @@ export const GalleryModal = React.memo(
             onEditClicked={onEditClicked}
             onTurnIntoVideoClicked={onTurnIntoVideoClicked}
             onRemoveBackgroundClicked={onRemoveBackgroundClicked}
+            onMake3DWorldClicked={onMake3DWorldClicked}
           />
         )}
       </>

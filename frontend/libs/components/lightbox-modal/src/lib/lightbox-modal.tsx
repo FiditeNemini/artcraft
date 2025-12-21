@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import {
   faCube,
   faDownToLine,
+  faGlobe,
   faPencil,
   faVideo,
   faWandMagicSparkles,
@@ -73,6 +74,10 @@ interface LightboxModalProps {
     url: string,
     media_id?: string,
   ) => Promise<void> | void;
+  onMake3DWorldClicked?: (
+    url: string,
+    media_id?: string,
+  ) => Promise<void> | void;
   batchImageToken?: string;
 }
 
@@ -96,6 +101,7 @@ export function LightboxModal({
   onEditClicked,
   onTurnIntoVideoClicked,
   onRemoveBackgroundClicked,
+  onMake3DWorldClicked,
   batchImageToken,
 }: LightboxModalProps) {
   // NB(bt,2025-06-14): We add ?cors=1 to the image url to prevent caching "sec-fetch-mode: no-cors" from
@@ -365,7 +371,7 @@ export function LightboxModal({
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        className="rounded-xl bg-ui-modal h-[760px] w-[1000px] max-w-screen min-w-[1000px] min-h-[600px] p-4"
+        className="rounded-xl bg-ui-modal h-[760px] w-[1200px] max-w-screen min-w-[1000px] min-h-[600px] p-4"
         draggable
         allowBackgroundInteraction={true}
         showClose={true}
@@ -380,9 +386,9 @@ export function LightboxModal({
         </Modal.DragHandle>
 
         {/* content grid */}
-        <div className="grid h-full grid-cols-3 gap-6">
-          {/* image panel */}
-          <div className="col-span-2 relative flex h-full items-center justify-center overflow-hidden rounded-l-xl bg-black/30">
+        <div className="flex h-full gap-4">
+          {/* image panel - flexible width */}
+          <div className="relative flex h-full flex-1 items-center justify-center overflow-hidden rounded-l-xl bg-black/30">
             {!selectedImageUrl ? (
               <div className="flex h-full w-full items-center justify-center bg-black/30">
                 <span className="text-base-fg/60">Image not available</span>
@@ -495,8 +501,8 @@ export function LightboxModal({
               )}
           </div>
 
-          {/* info + actions */}
-          <div className="flex h-full flex-col col-span-1">
+          {/* info + actions - fixed width */}
+          <div className="flex h-full w-[280px] shrink-0 flex-col">
             <div className="flex-1 space-y-5 text-base-fg">
               {/* <div className="text-xl font-medium">
               {title || "Image Generation"}
@@ -659,175 +665,175 @@ export function LightboxModal({
             </div>
 
             {/* buttons with spacing */}
-            {(onAddToSceneClicked && actionUrl) || actionUrl
-              ? (() => {
-                  const visibleButtons = [
-                    onEditClicked && actionUrl && derivedMediaClass === "image",
-                    onTurnIntoVideoClicked &&
-                      actionUrl &&
-                      derivedMediaClass === "image",
-                    onRemoveBackgroundClicked &&
-                      actionUrl &&
-                      derivedMediaClass === "image",
-                    onAddToSceneClicked && actionUrl,
-                    derivedMediaClass === "image",
-                    onDownloadClicked && actionUrl,
-                  ].filter(Boolean).length;
+            {actionUrl && (
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                {onEditClicked &&
+                  actionUrl &&
+                  derivedMediaClass === "image" && (
+                    <Button
+                      className="w-full"
+                      variant="primary"
+                      icon={faPencil}
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        gtagEvent("edit_image_clicked");
+                        await onEditClicked(actionUrl, selectedMediaToken);
+                      }}
+                    >
+                      Edit Image
+                    </Button>
+                  )}
 
-                  const buttonClass =
-                    visibleButtons === 1 ? "w-full col-span-2" : "w-full";
+                {onTurnIntoVideoClicked &&
+                  actionUrl &&
+                  derivedMediaClass === "image" && (
+                    <Button
+                      className="w-full"
+                      variant="primary"
+                      icon={faVideo}
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        gtagEvent("turn_into_video_clicked");
+                        await onTurnIntoVideoClicked(
+                          actionUrl,
+                          selectedMediaToken,
+                        );
+                      }}
+                    >
+                      Make Video
+                    </Button>
+                  )}
 
-                  return (
-                    <div className="mt-15 mb-15 grid grid-cols-2 gap-2">
-                      {selectedMediaToken && (
-                        <Button
-                          className="w-full col-span-2"
-                          icon={shareCopied ? faCheck : faLink}
-                          variant="secondary"
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            gtagEvent("share_link_copied");
-                            const shareUrl = `https://getartcraft.com/media/${selectedMediaToken}`;
-                            try {
-                              await navigator.clipboard.writeText(shareUrl);
-                              toast.success("Share link copied");
-                              setShareCopied(true);
-                              if (shareCopiedTimeoutRef.current) {
-                                window.clearTimeout(
-                                  shareCopiedTimeoutRef.current,
-                                );
-                              }
-                              shareCopiedTimeoutRef.current = window.setTimeout(
-                                () => {
-                                  setShareCopied(false);
-                                  shareCopiedTimeoutRef.current = null;
-                                },
-                                1500,
-                              );
-                            } catch (err) {
-                              toast.error("Unable to copy link");
-                            }
-                          }}
-                        >
-                          {shareCopied
-                            ? "Share link copied"
-                            : "Copy Share Link"}
-                        </Button>
-                      )}
-                      {onEditClicked &&
-                        actionUrl &&
-                        derivedMediaClass === "image" && (
-                          <Button
-                            className={buttonClass}
-                            icon={faPencil}
-                            onClick={async (e) => {
-                              e.stopPropagation();
-                              gtagEvent("edit_image_clicked");
-                              await onEditClicked(
-                                actionUrl,
-                                selectedMediaToken,
-                              );
-                            }}
-                          >
-                            Edit Image
-                          </Button>
-                        )}
+                {onRemoveBackgroundClicked &&
+                  actionUrl &&
+                  derivedMediaClass === "image" && (
+                    <Button
+                      className="w-full"
+                      variant="secondary"
+                      icon={faWandMagicSparkles}
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        gtagEvent("remove_background_clicked");
+                        await onRemoveBackgroundClicked(
+                          actionUrl,
+                          selectedMediaToken,
+                        );
+                        onClose();
+                        onCloseGallery();
+                      }}
+                    >
+                      Remove BG
+                    </Button>
+                  )}
 
-                      {onTurnIntoVideoClicked &&
-                        actionUrl &&
-                        derivedMediaClass === "image" && (
-                          <Button
-                            className={buttonClass}
-                            icon={faVideo}
-                            onClick={async (e) => {
-                              e.stopPropagation();
-                              gtagEvent("turn_into_video_clicked");
-                              await onTurnIntoVideoClicked(
-                                actionUrl,
-                                selectedMediaToken,
-                              );
-                            }}
-                          >
-                            Turn into Video
-                          </Button>
-                        )}
+                {derivedMediaClass === "image" && (
+                  <Button
+                    className="w-full"
+                    variant="secondary"
+                    icon={faCube}
+                    onClick={async (e) => {
+                      gtagEvent("image_to_3d_clicked");
+                      await EnqueueImageTo3dObject({
+                        image_media_token: selectedMediaToken,
+                        model: EnqueueImageTo3dObjectModel.Hunyuan3d2_0,
+                        frontend_caller: "mini_app",
+                      });
+                    }}
+                  >
+                    Make 3D
+                  </Button>
+                )}
 
-                      {onRemoveBackgroundClicked &&
-                        actionUrl &&
-                        derivedMediaClass === "image" && (
-                          <Button
-                            className={buttonClass}
-                            icon={faWandMagicSparkles}
-                            onClick={async (e) => {
-                              e.stopPropagation();
-                              gtagEvent("remove_background_clicked");
-                              await onRemoveBackgroundClicked(
-                                actionUrl,
-                                selectedMediaToken,
-                              );
-                              onClose();
-                              onCloseGallery();
-                            }}
-                          >
-                            Remove BG
-                          </Button>
-                        )}
+                {onMake3DWorldClicked &&
+                  actionUrl &&
+                  derivedMediaClass === "image" && (
+                    <Button
+                      className="w-full"
+                      variant="secondary"
+                      icon={faGlobe}
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        gtagEvent("image_to_3d_world_clicked");
+                        await onMake3DWorldClicked(
+                          actionUrl,
+                          selectedMediaToken,
+                        );
+                        onClose();
+                        onCloseGallery();
+                      }}
+                    >
+                      Make 3D World
+                    </Button>
+                  )}
 
-                      {onAddToSceneClicked && actionUrl && (
-                        <Button
-                          className={buttonClass}
-                          variant="secondary"
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            gtagEvent("add_to_scene_clicked");
-                            await onAddToSceneClicked(
-                              actionUrl,
-                              selectedMediaToken,
-                            );
-                            onClose();
-                            onCloseGallery();
-                          }}
-                        >
-                          Add to Current Scene
-                        </Button>
-                      )}
+                {onDownloadClicked && actionUrl && (
+                  <Button
+                    className={
+                      derivedMediaClass === "image"
+                        ? "w-full"
+                        : "w-full col-span-2"
+                    }
+                    variant="secondary"
+                    icon={faDownToLine}
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      gtagEvent("download_clicked");
+                      await onDownloadClicked(actionUrl, mediaClass);
+                    }}
+                  >
+                    Download
+                  </Button>
+                )}
 
-                      {derivedMediaClass === "image" && (
-                        <Button
-                          icon={faCube}
-                          className={buttonClass}
-                          variant="secondary"
-                          onClick={async (e) => {
-                            gtagEvent("image_to_3d_clicked");
-                            await EnqueueImageTo3dObject({
-                              image_media_token: selectedMediaToken,
-                              model: EnqueueImageTo3dObjectModel.Hunyuan3d2_0,
-                              frontend_caller: "mini_app",
-                            });
-                          }}
-                        >
-                          Make 3D Model
-                        </Button>
-                      )}
+                {onAddToSceneClicked && actionUrl && (
+                  <Button
+                    className="w-full"
+                    variant="secondary"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      gtagEvent("add_to_scene_clicked");
+                      await onAddToSceneClicked(actionUrl, selectedMediaToken);
+                      onClose();
+                      onCloseGallery();
+                    }}
+                  >
+                    Add to Scene
+                  </Button>
+                )}
 
-                      {onDownloadClicked && actionUrl && (
-                        <Button
-                          className={buttonClass}
-                          icon={faDownToLine}
-                          variant="secondary"
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            gtagEvent("download_clicked");
-                            await onDownloadClicked(actionUrl, mediaClass);
-                          }}
-                        >
-                          Download
-                        </Button>
-                      )}
-                    </div>
-                  );
-                })()
-              : null}
+                {selectedMediaToken && (
+                  <Button
+                    className="w-full col-span-2"
+                    variant="secondary"
+                    icon={shareCopied ? faCheck : faLink}
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      gtagEvent("share_link_copied");
+                      const shareUrl = `https://getartcraft.com/media/${selectedMediaToken}`;
+                      try {
+                        await navigator.clipboard.writeText(shareUrl);
+                        toast.success("Share link copied");
+                        setShareCopied(true);
+                        if (shareCopiedTimeoutRef.current) {
+                          window.clearTimeout(shareCopiedTimeoutRef.current);
+                        }
+                        shareCopiedTimeoutRef.current = window.setTimeout(
+                          () => {
+                            setShareCopied(false);
+                            shareCopiedTimeoutRef.current = null;
+                          },
+                          1500,
+                        );
+                      } catch (err) {
+                        toast.error("Unable to copy link");
+                      }
+                    }}
+                  >
+                    {shareCopied ? "Link Copied!" : "Copy Share Link"}
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </Modal>

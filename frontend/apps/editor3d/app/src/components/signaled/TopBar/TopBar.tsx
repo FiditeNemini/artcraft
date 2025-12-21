@@ -62,6 +62,7 @@ import { usePromptVideoStore, RefImage } from "@storyteller/ui-promptbox";
 import { APP_DESCRIPTORS } from "~/config/appMenu";
 import { AppsQuickMenu } from "./AppsQuickMenu";
 import { useRemoveBackgroundStore } from "~/pages/PageRemoveBackground/RemoveBackgroundStore";
+import { useImageTo3DWorldStore } from "~/pages/PageImageTo3DWorld/ImageTo3DWorldStore";
 
 interface Props {
   pageName: string;
@@ -233,6 +234,25 @@ export const TopBar = ({ pageName }: Props) => {
     try {
       useRemoveBackgroundStore.getState().setPendingExternalUrl(url);
       useTabStore.getState().setActiveTab("REMOVE_BACKGROUND");
+      galleryModalVisibleViewMode.value = false;
+      galleryModalVisibleDuringDrag.value = false;
+      galleryModalLightboxVisible.value = false;
+    } catch (e) {
+      // no-op
+    }
+  };
+
+  const handleMake3DWorldFromGallery = async (
+    url: string,
+    mediaId?: string,
+  ) => {
+    try {
+      if (mediaId) {
+        useImageTo3DWorldStore
+          .getState()
+          .setPendingExternalImage(url, mediaId);
+      }
+      useTabStore.getState().setActiveTab("IMAGE_TO_3D_WORLD");
       galleryModalVisibleViewMode.value = false;
       galleryModalVisibleDuringDrag.value = false;
       galleryModalLightboxVisible.value = false;
@@ -542,6 +562,7 @@ export const TopBar = ({ pageName }: Props) => {
         onEditClicked={handleEditFromGallery}
         onTurnIntoVideoClicked={handleTurnIntoVideoFromGallery}
         onRemoveBackgroundClicked={handleRemoveBackgroundFromGallery}
+        onMake3DWorldClicked={handleMake3DWorldFromGallery}
       />
 
       <ProviderSetupModal />

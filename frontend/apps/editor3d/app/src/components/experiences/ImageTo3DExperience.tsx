@@ -21,9 +21,7 @@ import { GalleryItem, GalleryModal } from "@storyteller/ui-gallery-modal";
 import {
   EnqueueImageTo3dObject,
   EnqueueImageTo3dObjectModel,
-  EnqueueImageTo3dWorld,
   EnqueueImageToGaussian,
-  EnqueueImageTo3dWorldModel,
 } from "@storyteller/tauri-api";
 import { toast } from "react-hot-toast";
 import { v4 as uuidv4 } from "uuid";
@@ -32,7 +30,7 @@ import { addObject } from "../../pages/PageEnigma/signals/objectGroup/addObject"
 import { set3DPageMounted } from "../../pages/PageEnigma/Editor/editor";
 import { AssetType } from "~/enums";
 import type { MediaItem } from "../../pages/PageEnigma/models";
-import { GAUSSIAN_MODELS } from "libs/model-list/src/lib/lists/GaussianModels";
+import { GAUSSIAN_MODELS } from "@storyteller/model-list";
 
 type Mode = "image" | "text";
 type Variant = "object" | "world";
@@ -89,6 +87,12 @@ export const ImageTo3DExperience = ({
   const worldResults = useImageTo3DWorldStore((s) => s.results);
   const worldStartGeneration = useImageTo3DWorldStore((s) => s.startGeneration);
   const worldReset = useImageTo3DWorldStore((s) => s.reset);
+  const pendingExternalImage = useImageTo3DWorldStore(
+    (s) => s.pendingExternalImage,
+  );
+  const clearPendingExternalImage = useImageTo3DWorldStore(
+    (s) => s.clearPendingExternalImage,
+  );
 
   const results = variant === "object" ? objectResults : worldResults;
   const resetResults = variant === "object" ? objectReset : worldReset;
@@ -99,6 +103,15 @@ export const ImageTo3DExperience = ({
   const [selectedGalleryImages, setSelectedGalleryImages] = useState<string[]>(
     [],
   );
+
+  useEffect(() => {
+    if (variant === "world" && pendingExternalImage) {
+      setUploadedPreview(pendingExternalImage.url);
+      setUploadedMediaToken(pendingExternalImage.mediaToken);
+      setUploadedName("Library Image");
+      clearPendingExternalImage();
+    }
+  }, [variant, pendingExternalImage, clearPendingExternalImage]);
 
   useEffect(() => {
     const onResize = () => setVh(window.innerHeight);
@@ -244,7 +257,9 @@ export const ImageTo3DExperience = ({
               frontend_subscriber_id: subscriberId,
             })
           : await EnqueueImageToGaussian({
-              image_media_tokens: uploadedMediaToken ? [uploadedMediaToken] : undefined,
+              image_media_tokens: uploadedMediaToken
+                ? [uploadedMediaToken]
+                : undefined,
               model: GAUSSIAN_MODELS[0],
               frontend_caller: "mini_app",
               frontend_subscriber_id: subscriberId,

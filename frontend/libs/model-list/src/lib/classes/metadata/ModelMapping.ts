@@ -18,6 +18,9 @@ export const MODEL_TYPE_TO_CREATOR: Record<string, ModelCreator> = {
   seedance_1p0_lite: ModelCreator.Bytedance,
   sora_2: ModelCreator.OpenAi,
   veo_2: ModelCreator.Google,
+  gemini_25_flash: ModelCreator.Google,
+  nano_banana: ModelCreator.Google,
+  nano_banana_pro: ModelCreator.Google,
   recraft_3: ModelCreator.Recraft,
   hunyuan_3d: ModelCreator.Tencent,
   worldlabs_gaussian: ModelCreator.WorldLabs,
@@ -122,6 +125,9 @@ export const getModelDisplayName = (modelType: string): string => {
     hunyuan_3d: "Hunyuan 3D",
     worldlabs_gaussian: "World Labs Marble",
     flux_pro_kontext_max: "Flux Pro Kontext Max",
+    gemini_25_flash: "Nano Banana",
+    nano_banana: "Nano Banana",
+    nano_banana_pro: "Nano Banana Pro",
 
     // Catch-all bucket for Midjourney.
     midjourney: "Midjourney",

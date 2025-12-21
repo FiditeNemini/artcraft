@@ -18,8 +18,14 @@ export type ImageTo3DWorldResult = {
 
 export const worldCoverImageCache = new Map<string, string>();
 
+export interface PendingExternalImage {
+  url: string;
+  mediaToken: string;
+}
+
 type ImageTo3DWorldState = {
   results: ImageTo3DWorldResult[];
+  pendingExternalImage: PendingExternalImage | null;
   startGeneration: (
     mode: "image" | "text",
     note: string,
@@ -32,12 +38,15 @@ type ImageTo3DWorldState = {
     maybeSubscriberId?: string,
   ) => void;
   uploadCoverFromPreview: (mediaToken: string) => Promise<void>;
+  setPendingExternalImage: (url: string, mediaToken: string) => void;
+  clearPendingExternalImage: () => void;
   reset: () => void;
 };
 
 export const useImageTo3DWorldStore = create<ImageTo3DWorldState>(
   (set, get) => ({
     results: [],
+    pendingExternalImage: null,
     startGeneration: (
       mode: "image" | "text",
       note: string,
@@ -188,7 +197,13 @@ export const useImageTo3DWorldStore = create<ImageTo3DWorldState>(
         );
       }
     },
-    reset: () => set({ results: [] }),
+    setPendingExternalImage: (url: string, mediaToken: string) => {
+      set({ pendingExternalImage: { url, mediaToken } });
+    },
+    clearPendingExternalImage: () => {
+      set({ pendingExternalImage: null });
+    },
+    reset: () => set({ results: [], pendingExternalImage: null }),
   }),
 );
 
