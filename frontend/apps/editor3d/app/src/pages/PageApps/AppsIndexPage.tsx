@@ -1,7 +1,6 @@
 import { faGrid2 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { twMerge } from "tailwind-merge";
-import { TopBar } from "~/components";
 import {
   GENERATE_APPS,
   EDIT_APPS,
@@ -16,9 +15,8 @@ export const AppsIndexPage = () => {
   ];
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-ui-background text-base-fg">
-      <TopBar pageName="Apps" loginSignUpPressed={() => {}} />
-      <main className="mx-auto h-full max-w-6xl overflow-y-auto px-5 pb-12 pt-[120px]">
+    <div className="fixed inset-0 overflow-hidden bg-ui-background pt-[56px] text-base-fg">
+      <main className="mx-auto h-full max-w-6xl overflow-y-auto px-5 pb-12 pt-16">
         <div className="flex w-full flex-col items-start gap-2 pb-4">
           <div className="mb-6 flex items-center gap-4">
             <FontAwesomeIcon icon={faGrid2} className="text-2xl opacity-70" />
