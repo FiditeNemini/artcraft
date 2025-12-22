@@ -75,21 +75,28 @@ export const loadPreviewOnCanvas = ({
   ) {
     imagePlaneLoader({ file, scene, camera, renderer, statusCallback });
   } else if (file.name.endsWith(".spz")) {
-    file.arrayBuffer().then((arrayBuffer) => {
-      splatMesh = new SplatMesh({
-        fileBytes: arrayBuffer, fileType: SplatFileType.SPZ,
-        onLoad: () => { scene.add(splatMesh!) }
-      });
+    file
+      .arrayBuffer()
+      .then((arrayBuffer) => {
+        splatMesh = new SplatMesh({
+          fileBytes: arrayBuffer,
+          fileType: SplatFileType.SPZ,
+          onLoad: () => {
+            scene.add(splatMesh!);
+          },
+        });
 
-      if (file.name.split(".")[0].endsWith("ceramic")) {
-        splatMesh.rotateX(Math.PI);
-      }
-    }).catch((loaderError) => {
-      statusCallback({
-        type: "SPLAT Loader Error",
-        message: String(loaderError),
+        if (file.name.split(".")[0].endsWith("ceramic")) {
+          splatMesh.rotateX(Math.PI);
+          splatMesh.rotateZ(Math.PI);
+        }
+      })
+      .catch((loaderError) => {
+        statusCallback({
+          type: "SPLAT Loader Error",
+          message: String(loaderError),
+        });
       });
-    });
   } else if (file.name.endsWith(".vmd")) {
     statusCallback({
       type: "Preview Error",

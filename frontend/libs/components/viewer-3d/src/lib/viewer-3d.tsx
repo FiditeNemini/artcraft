@@ -77,7 +77,7 @@ export function Viewer3D({
       const hemisphereLight = new THREE.HemisphereLight(
         0xffffff,
         0x888888,
-        1.2
+        1.2,
       );
       scene.add(hemisphereLight);
 
@@ -240,7 +240,7 @@ export function Viewer3D({
         cameraRef.current.position.set(
           Math.sin(angle) * cameraDistance,
           modelHeight * 0.5 + cameraDistance * 0.35,
-          Math.cos(angle) * cameraDistance
+          Math.cos(angle) * cameraDistance,
         );
         controlsRef.current.target.set(0, modelHeight * 0.4, 0);
         controlsRef.current.update();
@@ -273,20 +273,35 @@ export function Viewer3D({
           }
         }, 100);
       }
-    }
+    };
 
     if (modelUrl.endsWith(".spz")) {
       console.log("[Viewer3D] .spz format detected");
       new SplatMesh({
-        url: modelUrl, onLoad: (mesh) => {
+        url: modelUrl,
+        onLoad: (mesh) => {
+          mesh.rotation.z = Math.PI;
+          mesh.position.y = 1;
           scene.add(mesh);
+          loadedModelRef.current = mesh;
           setIsModelLoaded(true);
-          // onModelLoaded(mesh);
-          console.log("Splat loaded")
-        }
+
+          if (cameraRef.current && controlsRef.current) {
+            const angle = Math.PI / 4;
+            const cameraDistance = 1.2;
+            cameraRef.current.position.set(
+              Math.sin(angle) * cameraDistance,
+              1.0,
+              Math.cos(angle) * cameraDistance,
+            );
+            controlsRef.current.target.set(0, 1, 0);
+            controlsRef.current.update();
+          }
+
+          console.log("Splat loaded");
+        },
       });
     } else {
-
       const loader = new GLTFLoader();
       loader.load(
         modelUrl,
@@ -298,7 +313,7 @@ export function Viewer3D({
         (progress) => {
           console.log(
             "[Viewer3D] Loading progress:",
-            ((progress.loaded / progress.total) * 100).toFixed(2) + "%"
+            ((progress.loaded / progress.total) * 100).toFixed(2) + "%",
           );
         },
         (error) => {
@@ -306,7 +321,7 @@ export function Viewer3D({
           if (cubeRef.current) {
             cubeRef.current.visible = true;
           }
-        }
+        },
       );
     }
 
@@ -328,9 +343,23 @@ export function Viewer3D({
   const showViewer = modelUrl && isModelLoaded;
   const showSpinner = !showViewer;
 
+  const stopPropagation = (
+    e: React.MouseEvent | React.WheelEvent | React.PointerEvent,
+  ) => {
+    e.stopPropagation();
+  };
+
   return (
     <div
       className={`relative h-full w-full overflow-hidden rounded-xl bg-[#282828] ${className}`}
+      onMouseDown={stopPropagation}
+      onMouseMove={stopPropagation}
+      onMouseUp={stopPropagation}
+      onWheel={stopPropagation}
+      onPointerDown={stopPropagation}
+      onPointerMove={stopPropagation}
+      onPointerUp={stopPropagation}
+      onContextMenu={stopPropagation}
     >
       {showSpinner && (
         <div className="absolute inset-0 z-10 flex items-center justify-center">

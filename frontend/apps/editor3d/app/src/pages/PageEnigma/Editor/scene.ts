@@ -598,9 +598,7 @@ class Scene {
         obj.userData["media_file_type"] = MediaFileType.Image;
       }
       return obj;
-    } else if (
-      url.includes(".spz")
-    ) {
+    } else if (url.includes(".spz")) {
       return await this.loadSplatWithPlaceholder(
         media_id,
         name,
@@ -654,12 +652,15 @@ class Scene {
     const key = media_id + name + generateUUID();
     await this.placeholder_manager.add(key, `Loading: ${name}`, position);
 
-    const splat: SplatMesh = await this.load_splat_wrapped_no_cors(url, async () => {
-      if (this.placeholder_manager === undefined) {
-        throw Error("Place holder Manager is undefined");
-      }
-      await this.placeholder_manager.remove(key);
-    }).catch(async (error) => {
+    const splat: SplatMesh = await this.load_splat_wrapped_no_cors(
+      url,
+      async () => {
+        if (this.placeholder_manager === undefined) {
+          throw Error("Place holder Manager is undefined");
+        }
+        await this.placeholder_manager.remove(key);
+      },
+    ).catch(async (error) => {
       if (this.placeholder_manager !== undefined) {
         await this.placeholder_manager.remove(key);
       }
@@ -667,6 +668,7 @@ class Scene {
       throw error;
     });
 
+    splat.rotation.z = Math.PI;
     splat.userData["media_id"] = media_id;
     splat.userData["media_file_type"] = MediaFileType.SPZ;
 
@@ -858,11 +860,11 @@ class Scene {
   }
 
   /**
-     * Load a full media_url via Tauri (without browser cors)
-     * @param media_url
-     * @param onComplete
-     * @returns
-     */
+   * Load a full media_url via Tauri (without browser cors)
+   * @param media_url
+   * @param onComplete
+   * @returns
+   */
   private async load_splat_wrapped_no_cors(
     media_url: string,
     onComplete: () => void,
@@ -878,10 +880,11 @@ class Scene {
       }
 
       new SplatMesh({
-        fileBytes: buffer, onLoad: (mesh) => {
+        fileBytes: buffer,
+        onLoad: (mesh) => {
           resolve(mesh);
           onComplete();
-        }
+        },
       });
     });
   }
