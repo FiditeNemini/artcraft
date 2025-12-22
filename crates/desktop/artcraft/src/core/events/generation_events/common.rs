@@ -70,12 +70,18 @@ pub enum GenerationModel {
   Kling21Master,
   #[serde(rename = "kling_2.1_pro")]
   Kling21Pro,
+  #[serde(rename = "kling_2p5_turbo_pro")]
+  Kling2p5TurboPro,
+  #[serde(rename = "kling_2p6_pro")]
+  Kling2p6Pro,
   #[serde(rename = "recraft_3")]
   Recraft3,
   #[serde(rename = "sora")]
   Sora,
   #[serde(rename = "sora_2")]
   Sora2,
+  #[serde(rename = "sora_2_pro")]
+  Sora2Pro,
   #[serde(rename = "seedance_1.0_lite")]
   Seedance10Lite,
   #[serde(rename = "veo_2")]
@@ -84,6 +90,10 @@ pub enum GenerationModel {
   Veo3,
   #[serde(rename = "veo_3_fast")]
   Veo3Fast,
+  #[serde(rename = "veo_3p1")]
+  Veo3p1,
+  #[serde(rename = "veo_3p1_fast")]
+  Veo3p1Fast,
 }
 
 #[derive(Debug, Copy, Clone, Serialize)]
