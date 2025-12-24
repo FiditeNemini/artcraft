@@ -1084,7 +1084,7 @@ class Scene {
     // Create visual infinite grid
     const size1 = 0.5; // Primary grid
     const size2 = 2.5; // Secondary grid
-    const color = new THREE.Color(0x444444);
+    const color = new THREE.Color(0xffffff);
     const distance = 80;
 
     this.gridHelper = new InfiniteGridHelper(size1, size2, color, distance);

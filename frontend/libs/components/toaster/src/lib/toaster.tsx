@@ -15,7 +15,7 @@ export function Toaster({
   offsetBottom = 12,
   offsetLeft = 12,
   offsetRight = 12,
-  zIndex = 9,
+  zIndex = 15,
 }: ToasterProps) {
   return (
     <RHToaster

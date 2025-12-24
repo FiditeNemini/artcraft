@@ -77,9 +77,9 @@ export class InfiniteGridHelper extends THREE.Mesh {
                     float g1 = getGrid(uSize1);
                     float g2 = getGrid(uSize2);
                     
-                    float grid = mix(g2 * 0.3, g1, g1);
+                    float grid = mix(g2 * 0.1, g1, g1);
                     
-                    gl_FragColor = vec4(uColor.rgb, grid * fadeOut);
+                    gl_FragColor = vec4(uColor.rgb, grid * fadeOut * 0.04);
                     gl_FragColor.a = mix(0.5 * gl_FragColor.a, gl_FragColor.a, g2);
                     
                     if (gl_FragColor.a <= 0.0) discard;
@@ -88,6 +88,9 @@ export class InfiniteGridHelper extends THREE.Mesh {
       extensions: {
         derivatives: true,
       },
+      blending: THREE.AdditiveBlending,
+      depthTest: true,
+      depthWrite: false,
     });
 
     super(geometry, material);

@@ -18,7 +18,7 @@ export function Viewer3D({
   previewUrl,
   isActive,
   className = "",
-  showGrid = true,
+  showGrid = false,
   onThumbnailCapture,
 }: Viewer3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -93,7 +93,9 @@ export function Viewer3D({
       frontLight.position.set(0, 4, 10);
       scene.add(frontLight);
 
-      const gridHelper = new THREE.GridHelper(10, 10, 0x444444, 0x333333);
+      const gridHelper = new THREE.GridHelper(10, 10, 0xffffff, 0xffffff);
+      gridHelper.material.opacity = 0.05;
+      gridHelper.material.transparent = true;
       gridHelper.visible = showGrid;
       scene.add(gridHelper);
       gridRef.current = gridHelper;

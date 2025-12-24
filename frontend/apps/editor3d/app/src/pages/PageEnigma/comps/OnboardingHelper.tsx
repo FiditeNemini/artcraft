@@ -13,6 +13,7 @@ export const OnboardingHelper = () => {
 
   useEffect(() => {
     // Check if the helper was dismissed
+    /*
     const dismissedData = localStorage.getItem(STORAGE_KEY);
     if (dismissedData) {
       const { timestamp } = JSON.parse(dismissedData);
@@ -24,6 +25,7 @@ export const OnboardingHelper = () => {
         localStorage.removeItem(STORAGE_KEY);
       }
     }
+    */
   }, []);
 
   const handleClose = () => {
@@ -61,7 +63,7 @@ export const OnboardingHelper = () => {
 
   return (
     <Transition
-      show={isVisible && !(actionPerformed && keyPressed)}
+      show={isVisible && !actionPerformed && !keyPressed}
       enter="transition-opacity duration-500"
       enterFrom="opacity-0"
       enterTo="opacity-100"
@@ -69,26 +71,29 @@ export const OnboardingHelper = () => {
       leaveFrom="opacity-100"
       leaveTo="opacity-0"
     >
-      <div className="glass pointer-events-none absolute left-1/2 top-48 z-10 flex -translate-x-1/2 transform items-center justify-center gap-2 rounded-2xl border-2 border-brand-primary !bg-brand-primary/10 px-5 py-4">
-        <div className="flex items-center">
-          <p className="pr-3 text-lg font-semibold">Hold</p>
-          <Mouse button="left" />
-          <p className="text-lg font-semibold">and drag</p>
-        </div>
-        <div className="flex items-center gap-2">
+      <div className="glass pointer-events-none absolute left-1/2 bottom-56 z-10 flex -translate-x-1/2 flex-col items-center justify-center gap-1 rounded-xl border border-brand-primary !bg-brand-primary/10 px-3 pr-4 py-2">
+        <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <Plus />
-            <KeyGroup>
-              <Key button="W" />
-              <Key button="A" />
-              <Key button="S" />
-              <Key button="D" />
-            </KeyGroup>
+            <div className="scale-75 origin-center -mx-3">
+              <KeyGroup>
+                <Key button="W" />
+                <Key button="A" />
+                <Key button="S" />
+                <Key button="D" />
+              </KeyGroup>
+            </div>
+            <p className="text-sm font-semibold">Move</p>
+          </div>
+          <div className="h-4 w-[1px] bg-white/20" />
+          <div className="flex items-center gap-2">
+            <div className="scale-75 origin-center -mx-1">
+              <Mouse button="left" />
+            </div>
+            <p className="text-sm font-semibold">Look</p>
           </div>
         </div>
-        <p className="text-lg font-semibold">to move around the scene</p>
-        <div className="pointer-events-auto ml-2">
-          <CloseButton onClick={handleClose} />
+        <div className="pointer-events-auto absolute -top-2 -right-2">
+          <CloseButton onClick={handleClose} className="h-5 w-5 bg-black/50 hover:bg-black/80 rounded-full border border-white/10" />
         </div>
       </div>
     </Transition>
