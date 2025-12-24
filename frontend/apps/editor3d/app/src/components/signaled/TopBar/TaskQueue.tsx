@@ -7,6 +7,8 @@ import {
   faXmark,
   faTrashAlt,
   faTasks,
+  faBroom,
+  faBomb,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Modal } from "@storyteller/ui-modal";
 import {
@@ -195,9 +197,79 @@ export const TaskQueue = () => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [unreadCompletedIds, setUnreadCompletedIds] = useState<string[]>([]);
   const prevCompletedIdsRef = useRef<Set<string>>(new Set());
-  // confirmation modal state for destructive actions
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [afterConfirm, setAfterConfirm] = useState<(() => void) | null>(null);
+  // Confirmation state
+  const [confirmationConfig, setConfirmationConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: React.ReactNode;
+    primaryActionText: string;
+    primaryActionIcon: any;
+    primaryActionBtnClassName: string;
+    onConfirm: () => Promise<void>;
+  }>({
+    isOpen: false,
+    title: "",
+    message: null,
+    primaryActionText: "",
+    primaryActionIcon: faTrashAlt,
+    primaryActionBtnClassName: "",
+    onConfirm: async () => {},
+  });
+
+  const handleClearCompleted = (onSuccess?: () => void) => {
+    setConfirmationConfig({
+      isOpen: true,
+      title: "Clear completed tasks?",
+      message: (
+        <span className="text-sm text-white/80">
+          This will remove all completed tasks from the task queue.
+        </span>
+      ),
+      primaryActionText: "Clear completed",
+      primaryActionIcon: faBroom,
+      primaryActionBtnClassName: "bg-green-500/10 hover:bg-green-500/20 text-green-500",
+      onConfirm: async () => {
+        await dismissCompleted();
+        if (onSuccess) onSuccess();
+      },
+    });
+  };
+
+  const handleClearStale = () => {
+    setConfirmationConfig({
+      isOpen: true,
+      title: "Clear stale tasks?",
+      message: (
+        <span className="text-sm text-white/80">
+          This will remove all stale/stuck in-progress tasks from the queue.
+        </span>
+      ),
+      primaryActionText: "Clear stale",
+      primaryActionIcon: faTrashAlt,
+      primaryActionBtnClassName: "bg-orange-500/10 hover:bg-orange-500/20 text-orange-500",
+      onConfirm: async () => {
+        await dismissStale();
+      },
+    });
+  };
+
+  const handleRemoveAll = () => {
+    setConfirmationConfig({
+      isOpen: true,
+      title: "Remove all tasks?",
+      message: (
+        <span className="text-sm text-white/80">
+          This will remove ALL tasks (completed and in-progress) from the queue. This cannot be undone.
+        </span>
+      ),
+      primaryActionText: "Nuke all",
+      primaryActionIcon: faBomb,
+      primaryActionBtnClassName: "bg-red-500/10 hover:bg-red-500/20 text-red-500",
+      onConfirm: async () => {
+        await dismissAll();
+      },
+    });
+  };
 
   // Use currently selected models for image and video pages to drive fake progress.
   const selectedImageModel = useSelectedImageModel(ModelPage.TextToImage);
@@ -440,6 +512,38 @@ export const TaskQueue = () => {
     }
   };
 
+  const dismissStale = async () => {
+    const staleIds = inProgress.filter((t) => t.canDismiss).map((t) => t.id);
+    try {
+      await Promise.all(staleIds.map((id) => MarkTaskAsDismissed(id)));
+      setInProgress((prev) => prev.filter((t) => !staleIds.includes(t.id)));
+      taskDurationRef.current.forEach((_, id) => {
+        if (staleIds.includes(id)) {
+          taskDurationRef.current.delete(id);
+        }
+      });
+    } catch (_) {
+      // ignore
+    }
+  };
+
+  const dismissAll = async () => {
+    const allIds = [
+      ...completed.map((t) => t.id),
+      ...inProgress.map((t) => t.id),
+    ];
+    try {
+      await Promise.all(allIds.map((id) => MarkTaskAsDismissed(id)));
+    } catch (_) {
+      // ignore
+    } finally {
+      setCompleted([]);
+      setInProgress([]);
+      setUnreadCompletedIds([]);
+      taskDurationRef.current.clear();
+    }
+  };
+
   return (
     <>
       <Tooltip content="Task Queue" position="bottom" closeOnClick={true}>
@@ -553,19 +657,16 @@ export const TaskQueue = () => {
                         Show all
                       </Button>
                       <Tooltip
-                        content="Clear all"
+                        content="Clear completed"
                         position="bottom"
                         closeOnClick={true}
                       >
                         <Button
-                          className="flex h-9 w-9 items-center justify-center rounded-md bg-red/20 text-white hover:bg-red/40"
-                          aria-label="Clear all"
-                          onClick={() => {
-                            setAfterConfirm(() => () => close());
-                            setConfirmOpen(true);
-                          }}
+                          className="flex h-9 w-9 items-center justify-center rounded-md bg-green-500/10 text-green-500 hover:bg-green-500/20"
+                          aria-label="Clear completed"
+                          onClick={() => handleClearCompleted(() => close())}
                         >
-                          <FontAwesomeIcon icon={faTrashAlt} />
+                          <FontAwesomeIcon icon={faBroom} />
                         </Button>
                       </Tooltip>
                     </div>
@@ -576,7 +677,6 @@ export const TaskQueue = () => {
           </PopoverMenu>
         </div>
       </Tooltip>
-
       <Modal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
@@ -585,19 +685,31 @@ export const TaskQueue = () => {
       >
         <div className="flex h-full flex-col">
           <div className="rounded-t-xl border-ui-panel-border bg-ui-panel">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-3">
               <h2 className="text-lg font-semibold">Task Queue</h2>
               <div className="flex items-center gap-2">
-                <Button
-                  className="flex h-9 items-center justify-center bg-red/20 px-3 text-white hover:bg-red/40"
-                  onClick={() => {
-                    setAfterConfirm(() => null);
-                    setConfirmOpen(true);
-                  }}
+                 <Button
+                  className="flex h-9 items-center justify-center bg-green-500/10 px-3 text-green-500 hover:bg-green-500/20"
+                  onClick={() => handleClearCompleted()}
                 >
-                  <FontAwesomeIcon icon={faTrashAlt} className="mr-1" />
-                  Clear all
+                  <FontAwesomeIcon icon={faBroom} className="mr-1.5" />
+                  Clear completed
                 </Button>
+                <Button
+                  className="flex h-9 items-center justify-center bg-orange-500/10 px-3 text-orange-500 hover:bg-orange-500/20"
+                  onClick={() => handleClearStale()}
+                >
+                  <FontAwesomeIcon icon={faTrashAlt} className="mr-1.5" />
+                  Clear stale
+                </Button>
+                <Button
+                  className="flex h-9 items-center justify-center bg-red-500/10 px-3 text-red-500 hover:bg-red-500/20"
+                  onClick={() => handleRemoveAll()}
+                >
+                  <FontAwesomeIcon icon={faBomb} className="mr-1.5" />
+                  Remove all
+                </Button>
+                <div className="mr-2 h-4 w-[1px] bg-base-fg/10" />
                 <CloseButton onClick={() => setModalOpen(false)} />
               </div>
             </div>
@@ -667,24 +779,20 @@ export const TaskQueue = () => {
 
       {/* Confirm clear completed modal */}
       <ActionReminderModal
-        isOpen={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-        title="Clear all tasks?"
-        message={
-          <span className="text-sm text-white/80">
-            This will remove all completed tasks from the task queue.
-          </span>
+        isOpen={confirmationConfig.isOpen}
+        onClose={() =>
+          setConfirmationConfig((prev) => ({ ...prev, isOpen: false }))
         }
+        title={confirmationConfig.title}
+        message={confirmationConfig.message}
         onPrimaryAction={async () => {
-          await dismissCompleted();
-          setConfirmOpen(false);
-          if (afterConfirm) afterConfirm();
-          setAfterConfirm(null);
+          await confirmationConfig.onConfirm();
+          setConfirmationConfig((prev) => ({ ...prev, isOpen: false }));
         }}
-        primaryActionText="Clear completed"
+        primaryActionText={confirmationConfig.primaryActionText}
         secondaryActionText="Cancel"
-        primaryActionIcon={faTrashAlt}
-        primaryActionBtnClassName="bg-red hover:bg-red/80"
+        primaryActionIcon={confirmationConfig.primaryActionIcon}
+        primaryActionBtnClassName={confirmationConfig.primaryActionBtnClassName}
       />
     </>
   );
