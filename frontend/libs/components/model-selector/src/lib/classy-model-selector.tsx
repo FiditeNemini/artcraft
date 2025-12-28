@@ -152,22 +152,26 @@ export function ClassyModelSelector({
             DEFAULT_PROVIDER_OPTIONS)
           : DEFAULT_PROVIDER_OPTIONS;
 
+        const hasMultipleProviders = allowedProviders.length >= 2;
+
         return {
           ...item,
           selected: item.model === selectedModel,
-          hoverTooltip: (close: () => void) => (
-            <ProviderTooltipContent
-              page={page}
-              modelId={modelId}
-              model={item.model as Model | undefined}
-              modelLabel={item.label}
-              allowedProviders={allowedProviders}
-              onFinished={close}
-            />
-          ),
+          hoverTooltip: hasMultipleProviders
+            ? (close: () => void) => (
+                <ProviderTooltipContent
+                  page={page}
+                  modelId={modelId}
+                  model={item.model as Model | undefined}
+                  modelLabel={item.label}
+                  allowedProviders={allowedProviders}
+                  onFinished={close}
+                />
+              )
+            : undefined,
           tooltipDelayMs: providerTooltipDelayMs,
           trailing:
-            item.model !== selectedModel
+            item.model !== selectedModel && hasMultipleProviders
               ? (() => {
                   const prov = modelId
                     ? selectedProvidersByModel[modelId]
@@ -183,7 +187,9 @@ export function ClassyModelSelector({
                 })()
               : undefined,
           selectedRight:
-            item.model === selectedModel && selectedProvider ? (
+            item.model === selectedModel &&
+            selectedProvider &&
+            hasMultipleProviders ? (
               <div className="mr-1 rounded-md p-1.5 bg-primary/60 group-hover:bg-primary/80 transition-colors">
                 <span className="text-base-fg/70 group-hover:text-base-fg/90 text-lg">
                   {getProviderIcon(selectedProvider)}

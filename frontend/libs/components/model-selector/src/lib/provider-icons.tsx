@@ -7,6 +7,8 @@ const PROVIDER_TO_CREATOR: Partial<Record<Provider, ModelCreator>> = {
   [Provider.ArtCraft]: ModelCreator.ArtCraft,
   [Provider.Fal]: ModelCreator.Fal,
   [Provider.Sora]: ModelCreator.OpenAi,
+  [Provider.Grok]: ModelCreator.Grok,
+  [Provider.Midjourney]: ModelCreator.Midjourney,
 };
 
 export const getProviderIcon = (
@@ -36,6 +38,10 @@ export const getProviderDisplayName = (provider: Provider | string): string => {
       return "Fal";
     case Provider.Sora:
       return "Sora / ChatGPT";
+    case Provider.Grok:
+      return "Grok";
+    case Provider.Midjourney:
+      return "Midjourney";
     case "worldlabs":
       return "World Labs";
     default:

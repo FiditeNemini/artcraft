@@ -6,7 +6,6 @@ import {
   faCog,
   faVolumeHigh,
   faCircleInfo,
-  faRoute,
   faCreditCard,
   faPalette,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -58,11 +57,11 @@ export const SettingsModal = ({
     { id: "accounts" as const, label: "Accounts", icon: faUser },
     { id: "billing" as const, label: "Plan & Credits", icon: faCreditCard },
 
-    {
+    /* {
       id: "provider_priority" as const,
       label: "Provider Priority",
       icon: faRoute,
-    },
+    }, */
     { id: "appearance" as const, label: "Appearance", icon: faPalette },
     { id: "alerts" as const, label: "Alerts", icon: faVolumeHigh },
     { id: "about" as const, label: "About", icon: faCircleInfo },
