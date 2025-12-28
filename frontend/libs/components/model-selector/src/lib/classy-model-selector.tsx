@@ -10,7 +10,7 @@ import { getProviderDisplayName, getProviderIcon } from "./provider-icons";
 import { Model } from "@storyteller/model-list";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleCheck, faChevronUp } from "@fortawesome/pro-solid-svg-icons";
-import { PROVIDER_LOOKUP_BY_PAGE } from "./provider-lookup";
+import { GenerationProvider } from "@storyteller/api-enums";
 
 interface ClassyModelSelectorProps {
   items: Omit<PopoverItem, "selected">[];
@@ -26,7 +26,7 @@ interface ClassyModelSelectorProps {
   maxListHeight?: number | string;
 }
 
-const DEFAULT_PROVIDER_OPTIONS: Provider[] = [Provider.ArtCraft];
+const DEFAULT_PROVIDER_OPTIONS: GenerationProvider[] = [GenerationProvider.Artcraft];
 
 function ProviderTooltipContent({
   page,
@@ -40,7 +40,7 @@ function ProviderTooltipContent({
   modelId?: string;
   model?: Model;
   modelLabel?: string;
-  allowedProviders: Provider[];
+  allowedProviders: GenerationProvider[];
   onFinished?: () => void;
 }) {
   const { setSelectedModel, setSelectedProvider } =
@@ -126,10 +126,7 @@ export function ClassyModelSelector({
       const modelId = item.model?.id;
       if (!modelId) continue;
       if (selectedProvidersByModel[modelId]) continue;
-      const allowed =
-        providersByModel?.[modelId] ??
-        PROVIDER_LOOKUP_BY_PAGE[page]?.[modelId] ??
-        DEFAULT_PROVIDER_OPTIONS;
+      const allowed = item.model?.getProviders() || DEFAULT_PROVIDER_OPTIONS;
       if (allowed.length > 0) {
         setSelectedProvider(page, modelId, allowed[0]);
       }
@@ -146,11 +143,7 @@ export function ClassyModelSelector({
     () =>
       items.map((item) => {
         const modelId = item.model?.id;
-        const allowedProviders: Provider[] = modelId
-          ? (providersByModel?.[modelId] ??
-            PROVIDER_LOOKUP_BY_PAGE[page]?.[modelId] ??
-            DEFAULT_PROVIDER_OPTIONS)
-          : DEFAULT_PROVIDER_OPTIONS;
+        const allowedProviders = item.model?.getProviders() || DEFAULT_PROVIDER_OPTIONS;
 
         const hasMultipleProviders = allowedProviders.length >= 2;
 
