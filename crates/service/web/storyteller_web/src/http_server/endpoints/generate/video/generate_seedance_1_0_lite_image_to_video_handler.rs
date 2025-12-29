@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use crate::billing::wallets::attempt_wallet_deduction::attempt_wallet_deduction_else_common_web_error;
 use crate::http_server::common_responses::common_web_error::CommonWebError;
 use crate::http_server::common_responses::media::media_links_builder::MediaLinksBuilder;
 use crate::http_server::endpoints::generate::common::payments_error_test::payments_error_test;
@@ -10,27 +11,30 @@ use crate::util::lookup::fetch_all_required_media_files::fetch_all_required_medi
 use crate::util::traits::into_media_links_trait::IntoMediaLinks;
 use actix_web::web::Json;
 use actix_web::{web, HttpRequest};
-use artcraft_api_defs::generate::video::generate_seedance_1_0_lite_image_to_video::GenerateSeedance10LiteDuration;
 use artcraft_api_defs::generate::video::generate_seedance_1_0_lite_image_to_video::GenerateSeedance10LiteImageToVideoRequest;
 use artcraft_api_defs::generate::video::generate_seedance_1_0_lite_image_to_video::GenerateSeedance10LiteImageToVideoResponse;
 use artcraft_api_defs::generate::video::generate_seedance_1_0_lite_image_to_video::GenerateSeedance10LiteResolution;
+use artcraft_api_defs::generate::video::generate_seedance_1_0_lite_image_to_video::{GenerateSeedance10LiteAspectRatio, GenerateSeedance10LiteDuration};
 use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::prompts::prompt_type::PromptType;
 use enums::common::generation_provider::GenerationProvider;
 use enums::common::model_type::ModelType;
 use enums::common::visibility::Visibility;
-use fal_client::requests::webhook::video::enqueue_seedance_1_lite_image_to_video_webhook::enqueue_seedance_1_lite_image_to_video_webhook;
-use fal_client::requests::webhook::video::enqueue_seedance_1_lite_image_to_video_webhook::Seedance1LiteDuration;
-use fal_client::requests::webhook::video::enqueue_seedance_1_lite_image_to_video_webhook::{Seedance1LiteArgs, Seedance1LiteResolution};
+use fal_client::requests::traits::fal_request_cost_calculator_trait::FalRequestCostCalculator;
+use fal_client::requests::webhook::video::image::enqueue_seedance_1_lite_image_to_video_webhook::Seedance1LiteDuration;
+use fal_client::requests::webhook::video::image::enqueue_seedance_1_lite_image_to_video_webhook::{enqueue_seedance_1_lite_image_to_video_webhook, Seedance1LiteAspectRatio};
+use fal_client::requests::webhook::video::image::enqueue_seedance_1_lite_image_to_video_webhook::{Seedance1LiteArgs, Seedance1LiteResolution};
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{error, info, warn};
 use mysql_queries::queries::generic_inference::fal::insert_generic_inference_job_for_fal_queue::insert_generic_inference_job_for_fal_queue;
 use mysql_queries::queries::generic_inference::fal::insert_generic_inference_job_for_fal_queue::FalCategory;
 use mysql_queries::queries::generic_inference::fal::insert_generic_inference_job_for_fal_queue::InsertGenericInferenceForFalArgs;
+use mysql_queries::queries::generic_inference::fal::insert_generic_inference_job_for_fal_queue_with_apriori_job_token::{insert_generic_inference_job_for_fal_queue_with_apriori_job_token, InsertGenericInferenceForFalWithAprioriJobTokenArgs};
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use mysql_queries::queries::media_files::get::get_media_file::{get_media_file, get_media_file_with_connection};
 use mysql_queries::queries::prompts::insert_prompt::{insert_prompt, InsertPromptArgs};
 use sqlx::Acquire;
+use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use utoipa::ToSchema;
 
 /// Seedance 1.0 Lite Image to Video
@@ -70,15 +74,12 @@ pub async fn generate_seedance_1_0_lite_image_to_video_handler(
       .avt_cookie_manager
       .get_avt_token_from_request(&http_request);
 
-  // TODO: Limit usage for new accounts. Billing, free credits metering, etc.
-
-  //let user_session = match maybe_user_session {
-  //  Some(session) => session,
-  //  None => {
-  //    warn!("not logged in");
-  //    return Err(RemoveImageBackgroundError::NotAuthorized);
-  //  }
-  //};
+  let user_token = match maybe_user_session.as_ref() {
+    Some(session) => &session.user_token,
+    None => {
+      return Err(CommonWebError::NotAuthorized);
+    }
+  };
 
   let start_frame_media_file_token = match &request.media_file_token {
     Some(token) => token,
@@ -145,6 +146,8 @@ pub async fn generate_seedance_1_0_lite_image_to_video_handler(
 
   info!("Fal webhook URL: {}", server_state.fal.webhook_url);
   
+  let apriori_job_token = InferenceJobToken::generate();
+  
   let prompt = request.prompt
       .as_deref()
       .map(|prompt| prompt.trim())
@@ -161,7 +164,19 @@ pub async fn generate_seedance_1_0_lite_image_to_video_handler(
     Some(GenerateSeedance10LiteDuration::TenSeconds) => Seedance1LiteDuration::TenSeconds,
     None => Seedance1LiteDuration::FiveSeconds, 
   };
-  
+
+  let aspect_ratio = request.aspect_ratio
+      .as_ref()
+      .map(|ar| match ar {
+        GenerateSeedance10LiteAspectRatio::Auto => Seedance1LiteAspectRatio::Auto,
+        GenerateSeedance10LiteAspectRatio::TwentyOneByNine => Seedance1LiteAspectRatio::TwentyOneByNine,
+        GenerateSeedance10LiteAspectRatio::SixteenByNine => Seedance1LiteAspectRatio::SixteenByNine,
+        GenerateSeedance10LiteAspectRatio::FourByThree => Seedance1LiteAspectRatio::FourByThree,
+        GenerateSeedance10LiteAspectRatio::Square => Seedance1LiteAspectRatio::Square,
+        GenerateSeedance10LiteAspectRatio::ThreeByFour => Seedance1LiteAspectRatio::ThreeByFour,
+        GenerateSeedance10LiteAspectRatio::NineBySixteen => Seedance1LiteAspectRatio::NineBySixteen,
+      });
+
   let args = Seedance1LiteArgs {
     image_url: start_frame_url,
     end_frame_image_url: maybe_end_frame_url,
@@ -170,9 +185,21 @@ pub async fn generate_seedance_1_0_lite_image_to_video_handler(
     duration,
     resolution,
     prompt,
+    aspect_ratio,
     camera_fixed: false, // TODO: Parameterize
     seed: None, // TODO: Parameterize
   };
+  
+  let cost = args.calculate_cost_in_cents();
+
+  info!("Charging wallet: {}", cost);
+
+  attempt_wallet_deduction_else_common_web_error(
+    user_token,
+    Some(apriori_job_token.as_str()),
+    cost,
+    &mut mysql_connection,
+  ).await?;
 
   let fal_result = enqueue_seedance_1_lite_image_to_video_webhook(args)
       .await
@@ -224,7 +251,8 @@ pub async fn generate_seedance_1_0_lite_image_to_video_handler(
     }
   };
 
-  let db_result = insert_generic_inference_job_for_fal_queue(InsertGenericInferenceForFalArgs {
+  let db_result = insert_generic_inference_job_for_fal_queue_with_apriori_job_token(InsertGenericInferenceForFalWithAprioriJobTokenArgs {
+    apriori_job_token: &apriori_job_token,
     uuid_idempotency_token: &request.uuid_idempotency_token,
     maybe_external_third_party_id: &external_job_id,
     fal_category: FalCategory::VideoGeneration,
