@@ -92,28 +92,27 @@ pub async fn generate_flux_pro_11_text_to_image_handler(
       })?;
 
 
-  // TODO: This is test code
-  let credits = match request.num_images {
-    Some(GenerateFluxPro11TextToImageNumImages::One) => 25,
-    Some(GenerateFluxPro11TextToImageNumImages::Two) => 50,
-    Some(GenerateFluxPro11TextToImageNumImages::Three) => 75,
-    Some(GenerateFluxPro11TextToImageNumImages::Four) => 100,
-    None => 100,
-  };
+  //// TODO: This is test code
+  //let credits = match request.num_images {
+  //  Some(GenerateFluxPro11TextToImageNumImages::One) => 25,
+  //  Some(GenerateFluxPro11TextToImageNumImages::Two) => 50,
+  //  Some(GenerateFluxPro11TextToImageNumImages::Three) => 75,
+  //  Some(GenerateFluxPro11TextToImageNumImages::Four) => 100,
+  //  None => 100,
+  //};
 
-  // TODO: This is test code
-  let result = temporary_test_wallet_deduction(
-    user_token,
-    Some("todo-reference-token"),
-    credits,
-    &mut mysql_connection,
-  ).await;
+  //// TODO: This is test code
+  //let result = temporary_test_wallet_deduction(
+  //  user_token,
+  //  Some("todo-reference-token"),
+  //  credits,
+  //  &mut mysql_connection,
+  //).await;
 
-  // TODO: This is test code
-  if let Err(err) = result {
-    warn!("Temporary wallet deduction failed: {:?}", err); // Infallible for now.
-  }
-
+  //// TODO: This is test code
+  //if let Err(err) = result {
+  //  warn!("Temporary wallet deduction failed: {:?}", err); // Infallible for now.
+  //}
 
   const IS_MOD : bool = false;
   

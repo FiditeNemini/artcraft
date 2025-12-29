@@ -1,11 +1,13 @@
 use std::sync::Arc;
 
+use crate::billing::wallets::temporary_test_wallet_deduction::temporary_test_wallet_deduction;
 use crate::http_server::common_responses::common_web_error::CommonWebError;
 use crate::http_server::endpoints::generate::common::payments_error_test::payments_error_test;
 use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use crate::state::server_state::ServerState;
 use actix_web::web::Json;
 use actix_web::{web, HttpRequest};
+use artcraft_api_defs::generate::image::generate_flux_pro_11_text_to_image::GenerateFluxPro11TextToImageNumImages;
 use artcraft_api_defs::generate::image::generate_flux_pro_11_ultra_text_to_image::GenerateFluxPro11UltraTextToImageResponse;
 use artcraft_api_defs::generate::image::generate_flux_pro_11_ultra_text_to_image::{GenerateFluxPro11UltraTextToImageAspectRatio, GenerateFluxPro11UltraTextToImageNumImages, GenerateFluxPro11UltraTextToImageRequest};
 use enums::by_table::prompts::prompt_type::PromptType;
@@ -23,8 +25,6 @@ use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_
 use mysql_queries::queries::prompts::insert_prompt::{insert_prompt, InsertPromptArgs};
 use sqlx::Acquire;
 use utoipa::ToSchema;
-use artcraft_api_defs::generate::image::generate_flux_pro_11_text_to_image::GenerateFluxPro11TextToImageNumImages;
-use crate::billing::wallets::temporary_test_wallet_deduction::temporary_test_wallet_deduction;
 
 /// Flux Pro 1.1 Ultra
 #[utoipa::path(
@@ -91,29 +91,27 @@ pub async fn generate_flux_pro_11_ultra_text_to_image_handler(
         CommonWebError::BadInputWithSimpleMessage("invalid idempotency token".to_string())
       })?;
 
+  // // TODO: This is test code
+  // let credits = match request.num_images {
+  //   Some(GenerateFluxPro11UltraTextToImageNumImages::One) => 25,
+  //   Some(GenerateFluxPro11UltraTextToImageNumImages::Two) => 50,
+  //   Some(GenerateFluxPro11UltraTextToImageNumImages::Three) => 75,
+  //   Some(GenerateFluxPro11UltraTextToImageNumImages::Four) => 100,
+  //   None => 100,
+  // };
 
-  // TODO: This is test code
-  let credits = match request.num_images {
-    Some(GenerateFluxPro11UltraTextToImageNumImages::One) => 25,
-    Some(GenerateFluxPro11UltraTextToImageNumImages::Two) => 50,
-    Some(GenerateFluxPro11UltraTextToImageNumImages::Three) => 75,
-    Some(GenerateFluxPro11UltraTextToImageNumImages::Four) => 100,
-    None => 100,
-  };
+  // // TODO: This is test code
+  // let result = temporary_test_wallet_deduction(
+  //   user_token,
+  //   Some("todo-reference-token"),
+  //   credits,
+  //   &mut mysql_connection,
+  // ).await;
 
-  // TODO: This is test code
-  let result = temporary_test_wallet_deduction(
-    user_token,
-    Some("todo-reference-token"),
-    credits,
-    &mut mysql_connection,
-  ).await;
-
-  // TODO: This is test code
-  if let Err(err) = result {
-    warn!("Temporary wallet deduction failed: {:?}", err); // Infallible for now.
-  }
-
+  // // TODO: This is test code
+  // if let Err(err) = result {
+  //   warn!("Temporary wallet deduction failed: {:?}", err); // Infallible for now.
+  // }
 
   const IS_MOD : bool = false;
   
