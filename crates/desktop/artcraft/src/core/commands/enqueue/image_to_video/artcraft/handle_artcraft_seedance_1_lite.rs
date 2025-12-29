@@ -41,6 +41,7 @@ pub (super) async fn handle_artcraft_seedance_1_lite(
     end_frame_image_media_token: request.end_frame_image_media_token.clone(),
     duration: Some(GenerateSeedance10LiteDuration::TenSeconds), // TODO: Parameterize
     resolution: Some(GenerateSeedance10LiteResolution::SevenTwentyP), // TODO: Parameterize
+    aspect_ratio: None, // TODO: Parameterize
   };
   
   let result = generate_seedance_1_0_lite_image_to_video(
