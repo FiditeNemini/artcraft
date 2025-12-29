@@ -96,7 +96,7 @@ const TextToImage = ({ imageMediaId, imageUrl }: TextToImageProps) => {
 
   // Show the batches in reverse order, with the newest items at top.
   // Like Midjourney instead of a "chat history" style.
-  const inverseBatch = batches.toReversed();
+  const inverseBatch = [...batches].reverse();
 
   return (
     <div

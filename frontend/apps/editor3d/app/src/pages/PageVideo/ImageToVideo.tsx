@@ -100,7 +100,7 @@ const ImageToVideo = ({ imageMediaId, imageUrl }: ImageToVideoProps) => {
     config: { tension: 200, friction: 28, mass: 1.1 },
   });
 
-  // const inverseBatch = batches.toReversed();
+  // const inverseBatch = [...batches].reverse();
 
   return (
     <div
