@@ -7,7 +7,8 @@ use rand::random_range;
 /// Our Discord App ID. Not sure if this is a secret.
 const DISCORD_APP_ID : &str = "1366596912593113138";
 
-const DISCORD_ARTCRAFT_LOGO : &str = "https://getartcraft.com/discord-status-icons/artcraft-a-512x512.png";
+const DISCORD_ARTCRAFT_LOGO_SPIN : &str = "https://getartcraft.com/discord-status-icons/artcraft-a-spin-512x512.webp";
+const DISCORD_ARTCRAFT_LOGO_STATIC : &str = "https://getartcraft.com/discord-status-icons/artcraft-a-512x512.png";
 const DISCORD_KITSUNE_MASK_LOGO : &str = "https://getartcraft.com/discord-status-icons/kitsune-mask-512x512.png";
 const DISCORD_LINK_SPIN: &str = "https://getartcraft.com/discord-status-icons/link-spin-200x216.webp";
 
@@ -50,8 +51,10 @@ async fn discord_main_loop(mut client: DiscordIpcClient) -> AnyhowResult<()> {
 
 fn get_random_discord_icon() -> &'static str {
   let value = random_range(0..10u8);
-  if value < 7 {
-    DISCORD_ARTCRAFT_LOGO
+  if value < 6 {
+    DISCORD_ARTCRAFT_LOGO_SPIN
+  } else if value < 7 {
+    DISCORD_ARTCRAFT_LOGO_STATIC
   } else if value < 8 {
     DISCORD_KITSUNE_MASK_LOGO
   } else {
