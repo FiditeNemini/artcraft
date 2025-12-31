@@ -92,6 +92,7 @@ const getAspectRatioIcon = (aspectRatio: CommonAspectRatio) : IconDefinition => 
     case CommonAspectRatio.Square:
       return faSquare;
 
+    case CommonAspectRatio.Wide:
     case CommonAspectRatio.WideFiveByFour:
     case CommonAspectRatio.WideFourByThree:
     case CommonAspectRatio.WideThreeByTwo:
@@ -101,6 +102,7 @@ const getAspectRatioIcon = (aspectRatio: CommonAspectRatio) : IconDefinition => 
       return faRectangleWide;
 
     // Tall
+    case CommonAspectRatio.Tall:
     case CommonAspectRatio.TallFourByFive:
     case CommonAspectRatio.TallThreeByFour:
     case CommonAspectRatio.TallTwoByThree:
@@ -123,27 +125,34 @@ const getAspectRatioTextLabel = (aspectRatio: CommonAspectRatio) : string => {
 
     // Wide
     case CommonAspectRatio.WideFiveByFour:
-      return "5:4";
+      return "5:4 (Wide)";
     case CommonAspectRatio.WideFourByThree:
-      return "4:3";
+      return "4:3 (Wide)";
     case CommonAspectRatio.WideThreeByTwo:
-      return "3:2";
+      return "3:2 (Wide)";
     case CommonAspectRatio.WideSixteenByNine:
-      return "16:9";
+      return "16:9 (Wide)";
     case CommonAspectRatio.WideTwentyOneByNine:
-      return "21:9";
+      return "21:9 (Wide)";
 
     // Tall
     case CommonAspectRatio.TallFourByFive:
-      return "4:5";
+      return "4:5 (Tall)";
     case CommonAspectRatio.TallThreeByFour:
-      return "3:4";
+      return "3:4 (Tall)";
     case CommonAspectRatio.TallTwoByThree:
-      return "2:3";
+      return "2:3 (Tall)";
     case CommonAspectRatio.TallNineBySixteen:
-      return "9:16";
+      return "9:16 (Tall)";
     case CommonAspectRatio.TallNineByTwentyOne:
-      return "9:21";
+      return "9:21 (Tall)";
+
+
+    // Semantic cases
+    case CommonAspectRatio.Wide:
+      return "Wide";
+    case CommonAspectRatio.Tall:
+      return "Tall";
 
     default:
       return "Square"; // Fail open-ish
@@ -155,16 +164,16 @@ const popOverLabelToAspectRatio = (label: string, model: ImageModel): CommonAspe
   switch (label) {
     case "Auto": return CommonAspectRatio.Auto;
     case "Square": return CommonAspectRatio.Square;
-    case "5:4": return CommonAspectRatio.WideFiveByFour;
-    case "4:3": return CommonAspectRatio.WideFourByThree;
-    case "3:2": return CommonAspectRatio.WideThreeByTwo;
-    case "16:9": return CommonAspectRatio.WideSixteenByNine;
-    case "21:9": return CommonAspectRatio.WideTwentyOneByNine;
-    case "4:5": return CommonAspectRatio.TallFourByFive;
-    case "3:4": return CommonAspectRatio.TallThreeByFour;
-    case "2:3": return CommonAspectRatio.TallTwoByThree;
-    case "9:16": return CommonAspectRatio.TallNineBySixteen;
-    case "9:21": return CommonAspectRatio.TallNineByTwentyOne;
+    case "5:4 (Wide)": return CommonAspectRatio.WideFiveByFour;
+    case "4:3 (Wide)": return CommonAspectRatio.WideFourByThree;
+    case "3:2 (Wide)": return CommonAspectRatio.WideThreeByTwo;
+    case "16:9 (Wide)": return CommonAspectRatio.WideSixteenByNine;
+    case "21:9 (Wide)": return CommonAspectRatio.WideTwentyOneByNine;
+    case "4:5 (Tall)": return CommonAspectRatio.TallFourByFive;
+    case "3:4 (Tall)": return CommonAspectRatio.TallThreeByFour;
+    case "2:3 (Tall)": return CommonAspectRatio.TallTwoByThree;
+    case "9:16 (Tall)": return CommonAspectRatio.TallNineBySixteen;
+    case "9:21 (Tall)": return CommonAspectRatio.TallNineByTwentyOne;
   }
   // If we can't find it, return the model's default aspect ratio or Square as fallback
   return model.defaultAspectRatio || CommonAspectRatio.Square;
