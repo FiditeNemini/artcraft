@@ -3,6 +3,7 @@ import { Model, ModelKind } from "./Model.js";
 import { ModelCategory } from "../legacy/ModelConfig.js";
 import { ModelTag } from "./metadata/ModelTag.js";
 import { GenerationProvider } from "@storyteller/api-enums";
+import { CommonAspectRatio } from "./properties/CommonAspectRatio.js";
 
 export class ImageModel extends Model {
   // Typescript type discriminator property
@@ -43,6 +44,14 @@ export class ImageModel extends Model {
   // Whether the model supports changing aspect ratio
   readonly canChangeAspectRatio: boolean;
 
+  // Aspect ratios supported by this model
+  // (This is a new field that will take time to roll out and replace the old aspect ratios)
+  readonly aspectRatios: CommonAspectRatio[];
+
+  // Aspect ratio to use as default when nothing is selected.
+  // Otherwise, use `aspectRatios[0]` as default.
+  readonly defaultAspectRatio?: CommonAspectRatio;
+
   constructor(args: {
     id: string;
     tauriId: string;
@@ -65,6 +74,8 @@ export class ImageModel extends Model {
     tags?: ModelTag[];
     progressBarTime?: number;
     providers?: GenerationProvider[];
+    aspectRatios?: CommonAspectRatio[];
+    defaultAspectRatio?: CommonAspectRatio;
   }) {
     if (args.maxGenerationCount < 1) {
       throw new Error("maxGenerationCount must be at least 1");
@@ -88,6 +99,8 @@ export class ImageModel extends Model {
     this.canTextToImage = args.canTextToImage === false ? false : true; // Default to true !
     this.canChangeResolution = args.canChangeResolution ?? false;
     this.canChangeAspectRatio = args.canChangeAspectRatio ?? false;
+    this.aspectRatios = args.aspectRatios ?? [];
+    this.defaultAspectRatio = args.defaultAspectRatio ?? (args.aspectRatios && args.aspectRatios.length > 0 ? args.aspectRatios[0] : undefined);
   }
 
   // If the model is a "Nano Banana"-type model, we may want to enable certain features. 
@@ -103,5 +116,13 @@ export class ImageModel extends Model {
       default:
         return false;
     }
+  }
+
+  // Rolling out new aspect ratio controls to models.
+  // If we have them set on the model, we can use the new UI controls.
+  supportsNewAspectRatio(): boolean {
+    return this.canChangeAspectRatio 
+      && this.aspectRatios 
+      && this.aspectRatios.length > 0;
   }
 }

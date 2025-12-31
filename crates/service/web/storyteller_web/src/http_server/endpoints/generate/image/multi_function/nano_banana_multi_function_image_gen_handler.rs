@@ -11,7 +11,8 @@ use crate::state::server_state::ServerState;
 use crate::util::lookup::lookup_image_urls_as_optional_list::lookup_image_urls_as_optional_list;
 use actix_web::web::Json;
 use actix_web::{web, HttpRequest};
-use artcraft_api_defs::generate::image::multi_function::nano_banana_pro_multi_function_image_gen::{NanoBananaProMultiFunctionImageGenAspectRatio, NanoBananaProMultiFunctionImageGenImageResolution, NanoBananaProMultiFunctionImageGenNumImages, NanoBananaProMultiFunctionImageGenRequest, NanoBananaProMultiFunctionImageGenResponse};
+use artcraft_api_defs::generate::image::edit::gemini_25_flash_edit_image::{Gemini25FlashEditImageNumImages, Gemini25FlashEditImageRequest};
+use artcraft_api_defs::generate::image::multi_function::nano_banana_multi_function_image_gen::{NanoBananaMultiFunctionImageGenAspectRatio, NanoBananaMultiFunctionImageGenNumImages, NanoBananaMultiFunctionImageGenRequest, NanoBananaMultiFunctionImageGenResponse};
 use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::prompt_context_items::prompt_context_semantic_type::PromptContextSemanticType;
 use enums::by_table::prompts::prompt_type::PromptType;
@@ -19,8 +20,10 @@ use enums::common::generation_provider::GenerationProvider;
 use enums::common::model_type::ModelType;
 use enums::common::visibility::Visibility;
 use fal_client::creds::open_ai_api_key::OpenAiApiKey;
+use fal_client::requests::webhook::image::edit::enqueue_gemini_25_flash_edit_webhook::{enqueue_gemini_25_flash_edit_webhook, Gemini25FlashEditArgs, Gemini25FlashEditAspectRatio, Gemini25FlashEditNumImages};
 use fal_client::requests::webhook::image::edit::enqueue_nano_banana_pro_edit_image_webhook::{enqueue_nano_banana_pro_image_edit_webhook, EnqueueNanoBananaProEditImageArgs, EnqueueNanoBananaProEditImageAspectRatio, EnqueueNanoBananaProEditImageNumImages, EnqueueNanoBananaProEditImageResolution};
-use fal_client::requests::webhook::image::text::enqueue_nano_banana_pro_text_to_image_webhook::{enqueue_nano_banana_pro_text_to_image_webhook, EnqueueNanoBananaProTextToImageArgs, EnqueueNanoBananaProTextToImageAspectRatio, EnqueueNanoBananaProTextToImageNumImages, EnqueueNanoBananaProTextToImageResolution};
+use fal_client::requests::webhook::image::text::enqueue_gemini_25_flash_text_to_image_webhook::{enqueue_gemini_25_flash_text_to_image_webhook, Gemini25FlashTextToImageArgs, Gemini25FlashTextToImageAspectRatio, Gemini25FlashTextToImageNumImages};
+use fal_client::requests::webhook::image::text::enqueue_nano_banana_pro_text_to_image_webhook::{enqueue_nano_banana_pro_text_to_image_webhook, EnqueueNanoBananaProTextToImageArgs, EnqueueNanoBananaProTextToImageNumImages, EnqueueNanoBananaProTextToImageResolution};
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{error, info, warn};
 use mysql_queries::queries::generic_inference::fal::insert_generic_inference_job_for_fal_queue::insert_generic_inference_job_for_fal_queue;
@@ -36,23 +39,23 @@ use sqlx::{Acquire, MySql};
 use tokens::tokens::media_files::MediaFileToken;
 use utoipa::ToSchema;
 
-/// Nano Banana Pro Multi-Function (generate + edit)
+/// Nano Banana Multi-Function (generate + edit)
 #[utoipa::path(
   post,
   tag = "Generate Images (Multi-Function)",
-  path = "/v1/generate/image/multi_function/nano_banana_pro",
+  path = "/v1/generate/image/multi_function/nano_banana",
   responses(
-    (status = 200, description = "Success", body = NanoBananaProMultiFunctionImageGenResponse),
+    (status = 200, description = "Success", body = NanoBananaMultiFunctionImageGenResponse),
   ),
   params(
-    ("request" = NanoBananaProMultiFunctionImageGenRequest, description = "Payload for Request"),
+    ("request" = NanoBananaMultiFunctionImageGenRequest, description = "Payload for Request"),
   )
 )]
-pub async fn nano_banana_pro_multi_function_image_gen_handler(
+pub async fn nano_banana_multi_function_image_gen_handler(
   http_request: HttpRequest,
-  request: Json<NanoBananaProMultiFunctionImageGenRequest>,
+  request: Json<NanoBananaMultiFunctionImageGenRequest>,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<Json<NanoBananaProMultiFunctionImageGenResponse>, CommonWebError> {
+) -> Result<Json<NanoBananaMultiFunctionImageGenResponse>, CommonWebError> {
   
   payments_error_test(&request.prompt.as_deref().unwrap_or(""))?;
   
@@ -112,101 +115,85 @@ pub async fn nano_banana_pro_multi_function_image_gen_handler(
   let fal_result;
 
   if let Some(input_image_urls) = image_urls.as_deref() {
-    info!("nano banana pro edit image");
+    info!("nano banana edit image");
 
     let num_images = match request.num_images {
-      Some(NanoBananaProMultiFunctionImageGenNumImages::One) => EnqueueNanoBananaProEditImageNumImages::One,
-      Some(NanoBananaProMultiFunctionImageGenNumImages::Two) => EnqueueNanoBananaProEditImageNumImages::Two,
-      Some(NanoBananaProMultiFunctionImageGenNumImages::Three) => EnqueueNanoBananaProEditImageNumImages::Three,
-      Some(NanoBananaProMultiFunctionImageGenNumImages::Four) => EnqueueNanoBananaProEditImageNumImages::Four,
-      None => EnqueueNanoBananaProEditImageNumImages::One, // Default to One
-    };
-
-    let resolution = match request.resolution {
-      Some(NanoBananaProMultiFunctionImageGenImageResolution::OneK) => EnqueueNanoBananaProEditImageResolution::OneK,
-      Some(NanoBananaProMultiFunctionImageGenImageResolution::TwoK) => EnqueueNanoBananaProEditImageResolution::TwoK,
-      Some(NanoBananaProMultiFunctionImageGenImageResolution::FourK) => EnqueueNanoBananaProEditImageResolution::FourK,
-      None => EnqueueNanoBananaProEditImageResolution::OneK,
+      Some(NanoBananaMultiFunctionImageGenNumImages::One) => Gemini25FlashEditNumImages::One,
+      Some(NanoBananaMultiFunctionImageGenNumImages::Two) => Gemini25FlashEditNumImages::Two,
+      Some(NanoBananaMultiFunctionImageGenNumImages::Three) => Gemini25FlashEditNumImages::Three,
+      Some(NanoBananaMultiFunctionImageGenNumImages::Four) => Gemini25FlashEditNumImages::Four,
+      None => Gemini25FlashEditNumImages::One, // Default to One
     };
 
     let aspect_ratio = match request.aspect_ratio {
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::Auto) => EnqueueNanoBananaProEditImageAspectRatio::Auto,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::OneByOne) => EnqueueNanoBananaProEditImageAspectRatio::OneByOne,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::FiveByFour) => EnqueueNanoBananaProEditImageAspectRatio::FiveByFour,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::FourByThree) => EnqueueNanoBananaProEditImageAspectRatio::FourByThree,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::ThreeByTwo) => EnqueueNanoBananaProEditImageAspectRatio::ThreeByTwo,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::SixteenByNine) => EnqueueNanoBananaProEditImageAspectRatio::SixteenByNine,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::TwentyOneByNine) => EnqueueNanoBananaProEditImageAspectRatio::TwentyOneByNine,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::FourByFive) => EnqueueNanoBananaProEditImageAspectRatio::FourByFive,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::ThreeByFour) => EnqueueNanoBananaProEditImageAspectRatio::ThreeByFour,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::TwoByThree) => EnqueueNanoBananaProEditImageAspectRatio::TwoByThree,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::NineBySixteen) => EnqueueNanoBananaProEditImageAspectRatio::NineBySixteen,
-      None => EnqueueNanoBananaProEditImageAspectRatio::OneByOne,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::Auto) => Gemini25FlashEditAspectRatio::Auto,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::OneByOne) => Gemini25FlashEditAspectRatio::OneByOne,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::FiveByFour) => Gemini25FlashEditAspectRatio::FiveByFour,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::FourByThree) => Gemini25FlashEditAspectRatio::FourByThree,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::ThreeByTwo) => Gemini25FlashEditAspectRatio::ThreeByTwo,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::SixteenByNine) => Gemini25FlashEditAspectRatio::SixteenByNine,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::TwentyOneByNine) => Gemini25FlashEditAspectRatio::TwentyOneByNine,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::FourByFive) => Gemini25FlashEditAspectRatio::FourByFive,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::ThreeByFour) => Gemini25FlashEditAspectRatio::ThreeByFour,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::TwoByThree) => Gemini25FlashEditAspectRatio::TwoByThree,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::NineBySixteen) => Gemini25FlashEditAspectRatio::NineBySixteen,
+      None => Gemini25FlashEditAspectRatio::OneByOne,
     };
 
-    let args = EnqueueNanoBananaProEditImageArgs {
+    let args = Gemini25FlashEditArgs {
       prompt: request.prompt.as_deref().unwrap_or(""),
       image_urls: input_image_urls.to_owned(),
       num_images,
-      resolution: Some(resolution),
       aspect_ratio: Some(aspect_ratio),
       webhook_url: &server_state.fal.webhook_url,
       api_key: &server_state.fal.api_key,
     };
 
-    fal_result = enqueue_nano_banana_pro_image_edit_webhook(args)
+    fal_result = enqueue_gemini_25_flash_edit_webhook(args)
         .await
         .map_err(|err| {
-          warn!("Error calling enqueue_nano_banana_pro_image_edit_webhook: {:?}", err);
+          warn!("Error calling enqueue_gemini_25_flash_edit_webhook : {:?}", err);
           CommonWebError::ServerError
         })?;
 
   } else {
-    info!("nano banana pro text-to-image");
+    info!("nano banana text-to-image");
 
     let num_images = match request.num_images {
-      Some(NanoBananaProMultiFunctionImageGenNumImages::One) => EnqueueNanoBananaProTextToImageNumImages::One,
-      Some(NanoBananaProMultiFunctionImageGenNumImages::Two) => EnqueueNanoBananaProTextToImageNumImages::Two,
-      Some(NanoBananaProMultiFunctionImageGenNumImages::Three) => EnqueueNanoBananaProTextToImageNumImages::Three,
-      Some(NanoBananaProMultiFunctionImageGenNumImages::Four) => EnqueueNanoBananaProTextToImageNumImages::Four,
-      None => EnqueueNanoBananaProTextToImageNumImages::One, // Default to One
-    };
-
-    let resolution = match request.resolution {
-      Some(NanoBananaProMultiFunctionImageGenImageResolution::OneK) => EnqueueNanoBananaProTextToImageResolution::OneK,
-      Some(NanoBananaProMultiFunctionImageGenImageResolution::TwoK) => EnqueueNanoBananaProTextToImageResolution::TwoK,
-      Some(NanoBananaProMultiFunctionImageGenImageResolution::FourK) => EnqueueNanoBananaProTextToImageResolution::FourK,
-      None => EnqueueNanoBananaProTextToImageResolution::OneK,
+      Some(NanoBananaMultiFunctionImageGenNumImages::One) => Gemini25FlashTextToImageNumImages::One,
+      Some(NanoBananaMultiFunctionImageGenNumImages::Two) => Gemini25FlashTextToImageNumImages::Two,
+      Some(NanoBananaMultiFunctionImageGenNumImages::Three) => Gemini25FlashTextToImageNumImages::Three,
+      Some(NanoBananaMultiFunctionImageGenNumImages::Four) => Gemini25FlashTextToImageNumImages::Four,
+      None => Gemini25FlashTextToImageNumImages::One, // Default to One
     };
 
     let aspect_ratio = match request.aspect_ratio {
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::Auto) => EnqueueNanoBananaProTextToImageAspectRatio::OneByOne, // NB: "auto" is only for edit image, not text-to-image !
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::OneByOne) => EnqueueNanoBananaProTextToImageAspectRatio::OneByOne,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::FiveByFour) => EnqueueNanoBananaProTextToImageAspectRatio::FiveByFour,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::FourByThree) => EnqueueNanoBananaProTextToImageAspectRatio::FourByThree,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::ThreeByTwo) => EnqueueNanoBananaProTextToImageAspectRatio::ThreeByTwo,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::SixteenByNine) => EnqueueNanoBananaProTextToImageAspectRatio::SixteenByNine,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::TwentyOneByNine) => EnqueueNanoBananaProTextToImageAspectRatio::TwentyOneByNine,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::FourByFive) => EnqueueNanoBananaProTextToImageAspectRatio::FourByFive,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::ThreeByFour) => EnqueueNanoBananaProTextToImageAspectRatio::ThreeByFour,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::TwoByThree) => EnqueueNanoBananaProTextToImageAspectRatio::TwoByThree,
-      Some(NanoBananaProMultiFunctionImageGenAspectRatio::NineBySixteen) => EnqueueNanoBananaProTextToImageAspectRatio::NineBySixteen,
-      None => EnqueueNanoBananaProTextToImageAspectRatio::OneByOne,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::Auto) => Gemini25FlashTextToImageAspectRatio::OneByOne, // NB: "auto" is only for edit image, not text-to-image !
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::OneByOne) => Gemini25FlashTextToImageAspectRatio::OneByOne,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::FiveByFour) => Gemini25FlashTextToImageAspectRatio::FiveByFour,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::FourByThree) => Gemini25FlashTextToImageAspectRatio::FourByThree,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::ThreeByTwo) => Gemini25FlashTextToImageAspectRatio::ThreeByTwo,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::SixteenByNine) => Gemini25FlashTextToImageAspectRatio::SixteenByNine,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::TwentyOneByNine) => Gemini25FlashTextToImageAspectRatio::TwentyOneByNine,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::FourByFive) => Gemini25FlashTextToImageAspectRatio::FourByFive,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::ThreeByFour) => Gemini25FlashTextToImageAspectRatio::ThreeByFour,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::TwoByThree) => Gemini25FlashTextToImageAspectRatio::TwoByThree,
+      Some(NanoBananaMultiFunctionImageGenAspectRatio::NineBySixteen) => Gemini25FlashTextToImageAspectRatio::NineBySixteen,
+      None => Gemini25FlashTextToImageAspectRatio::OneByOne,
     };
 
-    let args = EnqueueNanoBananaProTextToImageArgs {
+    let args = Gemini25FlashTextToImageArgs {
       prompt: request.prompt.as_deref().unwrap_or(""),
       num_images,
-      resolution: Some(resolution),
       aspect_ratio: Some(aspect_ratio),
       webhook_url: &server_state.fal.webhook_url,
       api_key: &server_state.fal.api_key,
     };
 
-    fal_result = enqueue_nano_banana_pro_text_to_image_webhook(args)
+    fal_result = enqueue_gemini_25_flash_text_to_image_webhook(args)
         .await
         .map_err(|err| {
-          warn!("Error calling enqueue_nano_banana_pro_text_to_image_webhook: {:?}", err);
+          warn!("Error calling enqueue_gemini_25_flash_text_to_image_webhook: {:?}", err);
           CommonWebError::ServerError
         })?;
   }
@@ -236,7 +223,7 @@ pub async fn nano_banana_pro_multi_function_image_gen_handler(
     maybe_creator_user_token: maybe_user_session
         .as_ref()
         .map(|s| &s.user_token),
-    maybe_model_type: Some(ModelType::NanoBananaPro),
+    maybe_model_type: Some(ModelType::NanoBanana),
     maybe_generation_provider: Some(GenerationProvider::Artcraft),
     maybe_positive_prompt: request.prompt.as_deref(),
     maybe_negative_prompt: None,
@@ -304,7 +291,7 @@ pub async fn nano_banana_pro_multi_function_image_gen_handler(
         CommonWebError::ServerError
       })?;
 
-  Ok(Json(NanoBananaProMultiFunctionImageGenResponse {
+  Ok(Json(NanoBananaMultiFunctionImageGenResponse {
     success: true,
     inference_job_token: job_token,
   }))

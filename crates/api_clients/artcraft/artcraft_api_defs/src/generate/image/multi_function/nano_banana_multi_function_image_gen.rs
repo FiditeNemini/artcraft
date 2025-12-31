@@ -3,10 +3,10 @@ use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use utoipa::ToSchema;
 
-pub const NANO_BANANA_PRO_MULTI_FUNCTION_IMAGE_GEN_PATH: &str = "/v1/generate/image/multi_function/nano_banana_pro";
+pub const NANO_BANANA_MULTI_FUNCTION_IMAGE_GEN_PATH: &str = "/v1/generate/image/multi_function/nano_banana";
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
-pub struct NanoBananaProMultiFunctionImageGenRequest {
+pub struct NanoBananaMultiFunctionImageGenRequest {
   /// Idempotency token to prevent duplicate requests.
   pub uuid_idempotency_token: String,
 
@@ -19,18 +19,15 @@ pub struct NanoBananaProMultiFunctionImageGenRequest {
   pub image_media_tokens: Option<Vec<MediaFileToken>>,
 
   /// Number of images to generate. Default is one.
-  pub num_images: Option<NanoBananaProMultiFunctionImageGenNumImages>,
-
-  /// Resolution of the image to generate. Default is OneK (1K).
-  pub resolution: Option<NanoBananaProMultiFunctionImageGenImageResolution>,
+  pub num_images: Option<NanoBananaMultiFunctionImageGenNumImages>,
 
   /// Aspect ratio of the images to generate. Default is "1:1"
-  pub aspect_ratio: Option<NanoBananaProMultiFunctionImageGenAspectRatio>,
+  pub aspect_ratio: Option<NanoBananaMultiFunctionImageGenAspectRatio>,
 }
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
-pub enum NanoBananaProMultiFunctionImageGenNumImages {
+pub enum NanoBananaMultiFunctionImageGenNumImages {
   One, // Default
   Two,
   Three,
@@ -39,15 +36,7 @@ pub enum NanoBananaProMultiFunctionImageGenNumImages {
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
-pub enum NanoBananaProMultiFunctionImageGenImageResolution {
-  OneK,
-  TwoK,
-  FourK,
-}
-
-#[derive(Copy, Clone, Debug, Serialize, Deserialize, ToSchema)]
-#[serde(rename_all = "snake_case")]
-pub enum NanoBananaProMultiFunctionImageGenAspectRatio {
+pub enum NanoBananaMultiFunctionImageGenAspectRatio {
   // Auto (only for image editing)
   Auto, // Default for image editing.
   // Square
@@ -67,7 +56,7 @@ pub enum NanoBananaProMultiFunctionImageGenAspectRatio {
 
 
 #[derive(Serialize, Deserialize, ToSchema)]
-pub struct NanoBananaProMultiFunctionImageGenResponse {
+pub struct NanoBananaMultiFunctionImageGenResponse {
   pub success: bool,
   pub inference_job_token: InferenceJobToken,
 }
