@@ -1,9 +1,9 @@
 import { faMagicWandSparkles, faRectangle, faRectangleVertical, faRectangleWide, faSquare, IconDefinition } from "@fortawesome/pro-regular-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { PopoverItem, PopoverMenu } from "libs/components/popover/src/lib/popover"
-import Tooltip from "libs/components/tooltip/src/lib/tooltip"
-import { ImageModel } from "libs/model-list/src/lib/classes/ImageModel"
-import { CommonAspectRatio } from "libs/model-list/src/lib/classes/properties/CommonAspectRatio"
+import { PopoverItem, PopoverMenu } from "@storyteller/ui-popover"
+import { Tooltip } from "@storyteller/ui-tooltip"
+import { ImageModel } from "@storyteller/model-list"
+import { CommonAspectRatio } from "@storyteller/model-list"
 
 
 interface AspectRatioPickerProps {

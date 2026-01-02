@@ -1,4 +1,4 @@
-import { faBookCopy, faCopy } from "@fortawesome/pro-solid-svg-icons"
+import { faCopy } from "@fortawesome/pro-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { PopoverMenu, PopoverItem } from "@storyteller/ui-popover";
 import { Tooltip } from "@storyteller/ui-tooltip";

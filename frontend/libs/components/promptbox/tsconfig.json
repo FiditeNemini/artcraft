@@ -9,6 +9,9 @@
       "path": "../camera-settings-modal"
     },
     {
+      "path": "../../api-enums"
+    },
+    {
       "path": "../../model-list"
     },
     {
@@ -18,31 +21,31 @@
       "path": "../../tauri-api"
     },
     {
-      "path": "../gallery-modal"
-    },
-    {
       "path": "../../tauri-utils"
     },
     {
       "path": "../modal"
     },
     {
-      "path": "../button"
-    },
-    {
-      "path": "../tooltip"
-    },
-    {
       "path": "../popover"
     },
     {
-      "path": "../../api"
+      "path": "../toaster"
     },
     {
       "path": "../../common"
     },
     {
-      "path": "../toaster"
+      "path": "../../api"
+    },
+    {
+      "path": "../gallery-modal"
+    },
+    {
+      "path": "../tooltip"
+    },
+    {
+      "path": "../button"
     },
     {
       "path": "./tsconfig.lib.json"

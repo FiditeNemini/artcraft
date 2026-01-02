@@ -51,6 +51,9 @@
     },
     {
       "path": "../../common/tsconfig.lib.json"
+    },
+    {
+      "path": "../pricing-modal/tsconfig.lib.json"
     }
   ]
 }
