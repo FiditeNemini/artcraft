@@ -50,6 +50,7 @@ export const IMAGE_MODELS: ImageModel[] = [
     maxImagePromptCount: 6,
     progressBarTime: 45000,
     canChangeAspectRatio: true,
+    // TODO: Rust client doesn't support aspect ratios for MidJourney yet.
   }),
   new ImageModel({
     id: "flux_pro_1_1_ultra",
@@ -66,6 +67,18 @@ export const IMAGE_MODELS: ImageModel[] = [
     maxImagePromptCount: 6,
     progressBarTime: 35000,
     canChangeAspectRatio: true,
+    defaultAspectRatio: CommonAspectRatio.Square,
+    aspectRatios: [
+      CommonAspectRatio.Square,
+      CommonAspectRatio.WideThreeByTwo,
+      CommonAspectRatio.WideFourByThree,
+      CommonAspectRatio.WideSixteenByNine,
+      CommonAspectRatio.WideTwentyOneByNine,
+      CommonAspectRatio.TallTwoByThree,
+      CommonAspectRatio.TallThreeByFour,
+      CommonAspectRatio.TallNineBySixteen,
+      CommonAspectRatio.TallNineByTwentyOne,
+    ],
   }),
   new ImageModel({
     id: "flux_pro_1_1",
@@ -82,6 +95,14 @@ export const IMAGE_MODELS: ImageModel[] = [
     maxImagePromptCount: 6,
     progressBarTime: 10000,
     canChangeAspectRatio: true,
+    defaultAspectRatio: CommonAspectRatio.Square,
+    aspectRatios: [
+      CommonAspectRatio.Square,
+      CommonAspectRatio.WideFourByThree,
+      CommonAspectRatio.WideSixteenByNine,
+      CommonAspectRatio.TallThreeByFour,
+      CommonAspectRatio.TallNineBySixteen,
+    ],
   }),
   new ImageModel({
     id: "flux_1_dev",
@@ -98,6 +119,15 @@ export const IMAGE_MODELS: ImageModel[] = [
     maxImagePromptCount: 6,
     progressBarTime: 10000,
     canChangeAspectRatio: true,
+    defaultAspectRatio: CommonAspectRatio.Square,
+    aspectRatios: [
+      CommonAspectRatio.Square,
+      CommonAspectRatio.SquareHd,
+      CommonAspectRatio.WideFourByThree,
+      CommonAspectRatio.WideSixteenByNine,
+      CommonAspectRatio.TallThreeByFour,
+      CommonAspectRatio.TallNineBySixteen,
+    ],
   }),
   new ImageModel({
     id: "flux_1_schnell",
@@ -114,6 +144,15 @@ export const IMAGE_MODELS: ImageModel[] = [
     maxImagePromptCount: 6,
     progressBarTime: 10000,
     canChangeAspectRatio: true,
+    defaultAspectRatio: CommonAspectRatio.Square,
+    aspectRatios: [
+      CommonAspectRatio.Square,
+      CommonAspectRatio.SquareHd,
+      CommonAspectRatio.WideFourByThree,
+      CommonAspectRatio.WideSixteenByNine,
+      CommonAspectRatio.TallThreeByFour,
+      CommonAspectRatio.TallNineBySixteen,
+    ],
   }),
   new ImageModel({
     id: "nano_banana",
@@ -246,6 +285,17 @@ export const IMAGE_MODELS: ImageModel[] = [
     maxImagePromptCount: 6,
     progressBarTime: 60000,
     canChangeAspectRatio: true,
+    defaultAspectRatio: CommonAspectRatio.SquareHd,
+    aspectRatios: [
+      CommonAspectRatio.Auto2k,
+      CommonAspectRatio.Auto4k,
+      CommonAspectRatio.Square,
+      CommonAspectRatio.SquareHd,
+      CommonAspectRatio.WideFourByThree,
+      CommonAspectRatio.WideSixteenByNine,
+      CommonAspectRatio.TallThreeByFour,
+      CommonAspectRatio.TallNineBySixteen,
+    ]
   }),
   new ImageModel({
     id: "seedream_4p5",
@@ -264,6 +314,17 @@ export const IMAGE_MODELS: ImageModel[] = [
     maxImagePromptCount: 6,
     progressBarTime: 60000,
     canChangeAspectRatio: true,
+    defaultAspectRatio: CommonAspectRatio.SquareHd,
+    aspectRatios: [
+      CommonAspectRatio.Auto2k,
+      CommonAspectRatio.Auto4k,
+      CommonAspectRatio.Square,
+      CommonAspectRatio.SquareHd,
+      CommonAspectRatio.WideFourByThree,
+      CommonAspectRatio.WideSixteenByNine,
+      CommonAspectRatio.TallThreeByFour,
+      CommonAspectRatio.TallNineBySixteen,
+    ]
   }),
   new ImageModel({
     id: "flux_pro_kontext_max",

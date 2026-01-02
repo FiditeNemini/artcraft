@@ -8,22 +8,35 @@ use serde_derive::{Deserialize, Serialize};
 pub enum CommonAspectRatio {
   // Auto (eg. for image editing to use the source; used by Nano Banana Pro edit image, but not text-to-image)
   Auto,
+
   // Square
   Square,
+
   // Wide
-  WideFiveByFour,
-  WideFourByThree,
   WideThreeByTwo,
+  WideFourByThree,
+  WideFiveByFour,
   WideSixteenByNine,
   WideTwentyOneByNine,
+
   // Tall
-  TallFourByFive,
-  TallThreeByFour,
   TallTwoByThree,
+  TallThreeByFour,
+  TallFourByFive,
   TallNineBySixteen,
   TallNineByTwentyOne,
+
   // Imprecise semantic values that we probably remap to other meanings
   // on a model-by-model basis.
   Wide,
   Tall,
+
+  // Auto values that bake in resolution
+  // These are from the Seedream models
+  Auto2k,
+  Auto4k,
+
+  // Defined aspect ratios that bake in resolution
+  // These are from the Seedream models
+  SquareHd,
 }
