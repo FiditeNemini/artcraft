@@ -16,44 +16,12 @@ interface CreditPack {
 }
 
 const creditPacks: CreditPack[] = [
-  { id: "artcraft_1000", total: 1000, base: 1000, bonus: 0, priceUsd: 5 },
-  { id: "artcraft_2500", total: 2500, base: 2500, bonus: 0, priceUsd: 10 },
-  { id: "c_020", total: 1320, base: 1320, bonus: 0, priceUsd: 20 },
-  {
-    id: "c_050",
-    total: 3500,
-    base: 3300,
-    bonus: 200,
-    priceUsd: 50,
-  },
-  {
-    id: "c_100",
-    total: 7500,
-    base: 6600,
-    bonus: 900,
-    priceUsd: 100,
-  },
-  {
-    id: "c_200",
-    total: 16000,
-    base: 13200,
-    bonus: 2800,
-    priceUsd: 200,
-  },
-  {
-    id: "c_600",
-    total: 48000,
-    base: 39600,
-    bonus: 8400,
-    priceUsd: 600,
-  },
-  {
-    id: "c_1200",
-    total: 96000,
-    base: 79200,
-    bonus: 16800,
-    priceUsd: 1200,
-  },
+  { id: "artcraft_1000", total: 1000, base: 1000, bonus: 0, priceUsd: 10 },
+  { id: "artcraft_2500", total: 2500, base: 2500, bonus: 0, priceUsd: 25 },
+  { id: "artcraft_5000", total: 5000, base: 5000, bonus: 0, priceUsd: 50 },
+  { id: "artcraft_10000", total: 10000, base: 10000, bonus: 0, priceUsd: 100 },
+  //{ id: "artcraft_25000", total: 25000, base: 25000, bonus: 0, priceUsd: 250 },
+  //{ id: "artcraft_50000", total: 50000, base: 50000, bonus: 0, priceUsd: 500 },
 ];
 
 interface CreditsModalProps {
