@@ -60,6 +60,20 @@ export const AboutSettingsPane = (args: AboutSettingsPaneProps) => {
           <div>{appInfo?.os_platform} ({appInfo?.os_version})</div>
         </div>
 
+        <div className="space-y-1">
+          <Label>
+            Artcraft Data Directory
+          </Label>
+          <div>{appInfo?.artcraft_root_directory}</div>
+        </div>
+
+        <div className="space-y-1">
+          <Label>
+            Downloads Directory
+          </Label>
+          <div>{appInfo?.download_directory}</div>
+        </div>
+
       </div>
     </>
   );
