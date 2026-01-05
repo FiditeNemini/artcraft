@@ -16,6 +16,14 @@ pub enum ArtcraftCreditsPackSlug {
   Artcraft1000,
   #[serde(rename= "artcraft_2500")]
   Artcraft2500,
+  #[serde(rename= "artcraft_5000")]
+  Artcraft5000,
+  #[serde(rename= "artcraft_10000")]
+  Artcraft10000,
+  #[serde(rename= "artcraft_25000")]
+  Artcraft25000,
+  #[serde(rename= "artcraft_50000")]
+  Artcraft50000,
 }
 
 impl_enum_display_and_debug_using_to_str!(ArtcraftCreditsPackSlug);
@@ -29,6 +37,10 @@ impl ArtcraftCreditsPackSlug {
     match self {
       Self::Artcraft1000 => "artcraft_1000",
       Self::Artcraft2500 => "artcraft_2500",
+      Self::Artcraft5000 => "artcraft_5000",
+      Self::Artcraft10000 => "artcraft_10000",
+      Self::Artcraft25000 => "artcraft_25000",
+      Self::Artcraft50000 => "artcraft_50000",
     }
   }
 
@@ -36,6 +48,10 @@ impl ArtcraftCreditsPackSlug {
     match s {
       "artcraft_1000" => Ok(Self::Artcraft1000),
       "artcraft_2500" => Ok(Self::Artcraft2500),
+      "artcraft_5000" => Ok(Self::Artcraft5000),
+      "artcraft_10000" => Ok(Self::Artcraft10000),
+      "artcraft_25000" => Ok(Self::Artcraft25000),
+      "artcraft_50000" => Ok(Self::Artcraft50000),
       _ => Err(format!("invalid artcraft_credits_pack_slug: {:?}", s)),
     }
   }
@@ -46,6 +62,10 @@ impl ArtcraftCreditsPackSlug {
     BTreeSet::from([
       Self::Artcraft1000,
       Self::Artcraft2500,
+      Self::Artcraft5000,
+      Self::Artcraft10000,
+      Self::Artcraft25000,
+      Self::Artcraft50000,
     ])
   }
 }
@@ -62,26 +82,43 @@ mod tests {
     fn test_serialization() {
       assert_serialization(ArtcraftCreditsPackSlug::Artcraft1000, "artcraft_1000");
       assert_serialization(ArtcraftCreditsPackSlug::Artcraft2500, "artcraft_2500");
+      assert_serialization(ArtcraftCreditsPackSlug::Artcraft5000, "artcraft_5000");
+      assert_serialization(ArtcraftCreditsPackSlug::Artcraft10000, "artcraft_10000");
+      assert_serialization(ArtcraftCreditsPackSlug::Artcraft25000, "artcraft_25000");
+      assert_serialization(ArtcraftCreditsPackSlug::Artcraft50000, "artcraft_50000");
     }
 
     #[test]
     fn to_str() {
       assert_eq!(ArtcraftCreditsPackSlug::Artcraft1000.to_str(), "artcraft_1000");
       assert_eq!(ArtcraftCreditsPackSlug::Artcraft2500.to_str(), "artcraft_2500");
+      assert_eq!(ArtcraftCreditsPackSlug::Artcraft5000.to_str(), "artcraft_5000");
+      assert_eq!(ArtcraftCreditsPackSlug::Artcraft10000.to_str(), "artcraft_10000");
+      assert_eq!(ArtcraftCreditsPackSlug::Artcraft25000.to_str(), "artcraft_25000");
+      assert_eq!(ArtcraftCreditsPackSlug::Artcraft50000.to_str(), "artcraft_50000");
     }
 
     #[test]
     fn from_str() {
       assert_eq!(ArtcraftCreditsPackSlug::from_str("artcraft_1000").unwrap(), ArtcraftCreditsPackSlug::Artcraft1000);
       assert_eq!(ArtcraftCreditsPackSlug::from_str("artcraft_2500").unwrap(), ArtcraftCreditsPackSlug::Artcraft2500);
+      assert_eq!(ArtcraftCreditsPackSlug::from_str("artcraft_5000").unwrap(), ArtcraftCreditsPackSlug::Artcraft5000);
+      assert_eq!(ArtcraftCreditsPackSlug::from_str("artcraft_10000").unwrap(), ArtcraftCreditsPackSlug::Artcraft10000);
+      assert_eq!(ArtcraftCreditsPackSlug::from_str("artcraft_25000").unwrap(), ArtcraftCreditsPackSlug::Artcraft25000);
+      assert_eq!(ArtcraftCreditsPackSlug::from_str("artcraft_50000").unwrap(), ArtcraftCreditsPackSlug::Artcraft50000);
+
     }
 
     #[test]
     fn all_variants() {
       let mut variants = ArtcraftCreditsPackSlug::all_variants();
-      assert_eq!(variants.len(), 2);
+      assert_eq!(variants.len(), 6);
       assert_eq!(variants.pop_first(), Some(ArtcraftCreditsPackSlug::Artcraft1000));
       assert_eq!(variants.pop_first(), Some(ArtcraftCreditsPackSlug::Artcraft2500));
+      assert_eq!(variants.pop_first(), Some(ArtcraftCreditsPackSlug::Artcraft5000));
+      assert_eq!(variants.pop_first(), Some(ArtcraftCreditsPackSlug::Artcraft10000));
+      assert_eq!(variants.pop_first(), Some(ArtcraftCreditsPackSlug::Artcraft25000));
+      assert_eq!(variants.pop_first(), Some(ArtcraftCreditsPackSlug::Artcraft50000));
       assert_eq!(variants.pop_first(), None);
     }
   }

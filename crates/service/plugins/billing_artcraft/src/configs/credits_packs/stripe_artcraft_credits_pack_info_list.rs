@@ -36,3 +36,31 @@ pub const ARTCRAFT_2500_PRODUCTION : StripeArtcraftCreditsPackInfo = StripeArtcr
   price_id: "price_1S3gf8IaZEzwFveen76Xc0kK",
   purchase_credits_amount: 2500,
 };
+
+pub const ARTCRAFT_5000_PRODUCTION : StripeArtcraftCreditsPackInfo = StripeArtcraftCreditsPackInfo {
+  slug: ArtcraftCreditsPackSlug::Artcraft5000,
+  product_id: "prod_TjdjC6GkmVLXwN",
+  price_id: "price_1SmARZIaZEzwFveeJIJL0dd5",
+  purchase_credits_amount: 5000,
+};
+
+pub const ARTCRAFT_10000_PRODUCTION : StripeArtcraftCreditsPackInfo = StripeArtcraftCreditsPackInfo {
+  slug: ArtcraftCreditsPackSlug::Artcraft10000,
+  product_id: "prod_TjdkUT4XxSdYzH",
+  price_id: "price_1SmASkIaZEzwFvee7VFPSysj",
+  purchase_credits_amount: 10000,
+};
+
+pub const ARTCRAFT_25000_PRODUCTION : StripeArtcraftCreditsPackInfo = StripeArtcraftCreditsPackInfo {
+  slug: ArtcraftCreditsPackSlug::Artcraft25000,
+  product_id: "prod_TjdmfG4teDPYH7",
+  price_id: "price_1SmAUbIaZEzwFveeLr0Cze7Z",
+  purchase_credits_amount: 25000,
+};
+
+pub const ARTCRAFT_50000_PRODUCTION : StripeArtcraftCreditsPackInfo = StripeArtcraftCreditsPackInfo {
+  slug: ArtcraftCreditsPackSlug::Artcraft50000,
+  product_id: "prod_TjdmokIOsymE5c",
+  price_id: "price_1SmAVQIaZEzwFveeDkAn7V2m",
+  purchase_credits_amount: 50000,
+};
