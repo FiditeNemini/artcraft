@@ -7,6 +7,7 @@ import {
 import {
   faDiscord,
   faGithub,
+  faYoutube
 } from "@fortawesome/free-brands-svg-icons";
 import { OpenUrl } from "@storyteller/tauri-api";
 import { Modal } from "@storyteller/ui-modal";
@@ -14,7 +15,6 @@ import { defaultTutorials, TutorialItem } from "./tutorials.js";
 import { useTutorialModalStore } from "./help-menu-store";
 import { Button } from "@storyteller/ui-button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faYoutube } from "@fortawesome/free-brands-svg-icons";
 import { PopoverMenu, PopoverItem } from "@storyteller/ui-popover";
 
 export type HelpMenuButtonProps = {
