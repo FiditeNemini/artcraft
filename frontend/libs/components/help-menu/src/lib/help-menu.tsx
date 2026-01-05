@@ -1,24 +1,35 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { faBook, faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faBook,
+  faChevronLeft,
+  faCircleQuestion,
+} from "@fortawesome/pro-solid-svg-icons";
+import {
+  faDiscord,
+  faGithub,
+} from "@fortawesome/free-brands-svg-icons";
+import { OpenUrl } from "@storyteller/tauri-api";
 import { Modal } from "@storyteller/ui-modal";
 import { defaultTutorials, TutorialItem } from "./tutorials.js";
-import { useTutorialModalStore } from "./tutorial-modal-store";
+import { useTutorialModalStore } from "./help-menu-store";
 import { Button } from "@storyteller/ui-button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faYoutube } from "@fortawesome/free-brands-svg-icons";
+import { PopoverMenu, PopoverItem } from "@storyteller/ui-popover";
 
-export type TutorialModalButtonProps = {
+export type HelpMenuButtonProps = {
   items?: TutorialItem[];
   panelTitle?: string;
   className?: string;
   onOpenChange?: (open: boolean) => void;
 };
 
-export function TutorialModalButton({
+export function HelpMenuButton({
   items,
   panelTitle = "Tutorials",
   className,
   onOpenChange,
-}: TutorialModalButtonProps) {
+}: HelpMenuButtonProps) {
   const [open, setOpen] = useState(false);
   const tutorials = useMemo(() => items ?? defaultTutorials, [items]);
   const view = useTutorialModalStore((s) => s.view);
@@ -28,13 +39,59 @@ export function TutorialModalButton({
   const getProgress = useTutorialModalStore((s) => s.getProgress);
   const setProgress = useTutorialModalStore((s) => s.setProgress);
 
-  const handleOpen = () => {
+  const handleOpenTutorials = () => {
     setOpen(true);
     onOpenChange?.(true);
   };
+
   const handleClose = () => {
     setOpen(false);
     onOpenChange?.(false);
+  };
+
+  // Menu items for the popover
+  const menuItems: PopoverItem[] = [
+    {
+      label: "Tutorials",
+      selected: false,
+      icon: <FontAwesomeIcon icon={faBook} className="text-base" />,
+      action: "tutorials",
+    },
+    {
+      label: "Discord",
+      selected: false,
+      icon: <FontAwesomeIcon icon={faDiscord} className="text-base" />,
+      action: "discord",
+    },
+    {
+      label: "GitHub",
+      selected: false,
+      icon: <FontAwesomeIcon icon={faGithub} className="text-base" />,
+      action: "github",
+    },
+    {
+      label: "ArtCraft Studios",
+      selected: false,
+      icon: <FontAwesomeIcon icon={faYoutube} className="text-base" />,
+      action: "artcraft",
+    },
+  ];
+
+  const handleMenuSelect = (item: PopoverItem) => {
+    switch (item.action) {
+      case "tutorials":
+        handleOpenTutorials();
+        break;
+      case "discord":
+        OpenUrl("https://discord.com/invite/75svZP2Vje");
+        break;
+      case "github":
+        OpenUrl("https://github.com/storytold/artcraft");
+        break;
+      case "artcraft":
+        OpenUrl("https://www.youtube.com/@OfficialArtCraftStudios");
+        break;
+    }
   };
 
   // ------------------------------------------------------
@@ -138,17 +195,18 @@ export function TutorialModalButton({
 
   return (
     <div className={className}>
-      <Button
-        aria-label="Open tutorials"
-        onClick={handleOpen}
-        variant="action"
-        title={view === "grid" ? "Tutorials" : selected?.title ?? "Tutorials"}
-      >
-        <span className="inline-flex items-center gap-2">
-          <FontAwesomeIcon icon={faBook} className="text-base-fg" />
-          <span className="text-base-fg">Tutorials</span>
-        </span>
-      </Button>
+      <PopoverMenu
+        items={menuItems}
+        onSelect={handleMenuSelect}
+        showIconsInList
+        position="top"
+        align="end"
+        triggerIcon={
+          <FontAwesomeIcon icon={faCircleQuestion} className="text-base-fg" />
+        }
+        triggerLabel="Help"
+        buttonClassName="h-9"
+      />
 
       <Modal
         isOpen={open}
@@ -217,4 +275,4 @@ export function TutorialModalButton({
   );
 }
 
-export default TutorialModalButton;
+export default HelpMenuButton;
