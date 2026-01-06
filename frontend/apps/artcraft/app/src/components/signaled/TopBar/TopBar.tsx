@@ -469,7 +469,7 @@ export const TopBar = ({ pageName }: Props) => {
                         }}
                         icon={faGem}
                       >
-                        Upgrade
+                        Support
                       </Button>
                     </div>
                   </div>
@@ -483,7 +483,7 @@ export const TopBar = ({ pageName }: Props) => {
                   onClick={toggleSubscriptionModal}
                   className="h-[38px] shadow-md shadow-primary-500/50 transition-all duration-300 hover:shadow-md hover:shadow-primary-500/75"
                 >
-                  Upgrade
+                  Support
                 </Button>
               )}
 

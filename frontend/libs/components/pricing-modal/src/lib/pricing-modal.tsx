@@ -20,7 +20,7 @@ const pricingConfig = {
   header: {
     title: "Subscribe to ArtCraft",
     subtitle:
-      "Support ArtCraft development and get generation credits without having to add 3rd party services.",
+      "Support ArtCraft development and get generation credits without having to add 3rd party services. We directly invest your support into building a powerful tool you own forever.",
   },
   yearlyDiscount: 20,
 };

@@ -179,7 +179,7 @@ export function LoginModal({
         return (
           <div className="flex flex-col items-center justify-end flex-1">
             <p className="text-xl text-white max-w-lg text-center leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
-              Create stunning art, videos, with the power of AI.
+              It's in your toolbox forever now.
             </p>
           </div>
         );
