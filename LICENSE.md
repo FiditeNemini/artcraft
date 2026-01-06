@@ -57,21 +57,21 @@ hyperscaler systems and code (AWS, GCP, YouTube, etc.) remain closed source. The
 machinery surrounding it - systems, user behaviors, funnels, at-scale moneymakers - is totally closed.
 
 Practical answer: OSI licenses make it exceptionally challenging to grow big things commercially. And many of 
-the licenses leave room for hyperscalers to reach in and cherrypick pieces for themselves that they can better 
+the licenses leave room for hyperscalers to reach in and cherry-pick pieces for themselves that they can better 
 commercialize than the original authors.
 
 Then there's completely open source software that doesn't even attempt to be a business. 
 
-We love software like Blender, but (1) we want/need jobs, (2) we want to build something at scale, and (3) this will 
-eventually become much more capital intensive than just writing code. We one day want to train novel models that work 
-directly in conjunction with the user interface. 
+We love software like Blender, but (1) developing ArtCraft is our full-time job, (2) we want to build something at scale
+that is much bigger than what you presently see, and (3) this will eventually become much more capital intensive than 
+just writing code - we want to train novel models that work directly in conjunction with the user interface. 
 
-If and when we do get to scale, we intend to keep every bit of our work in the open. Available for use, inspection, 
-learning, fitting onto consumer GPU hardware, and more. 
+If and when we do get to scale, we intend to keep every bit of our work in the open, including the models. Available 
+for use, inspection, learning, fitting onto consumer GPU hardware, and more. 
 
 Not having a way to make money is unfortunately what killed Stability.ai. Stability.ai walked so that others could 
 eventually run. (Black Forest Labs, et al.) We're not egotistical enough to count ourselves in that party yet, but we 
-believe in the original Stability.ai ethos and that their model can work with a few tweaks.
+believe in the original Stability.ai ethos and that their model can work with a few tweaks. 
 
 We want to build big and incredible tools the world hasn't seen before. We want to keep them free and entirely source 
 available. You don't have to pay us, but if you do, all of your investment goes right back into the engineering 
