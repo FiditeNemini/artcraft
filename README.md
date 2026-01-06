@@ -6,8 +6,6 @@ This is Adobe Photoshop for everyone, and we're giving away the source code!
 
 ![Crafting with ArtCraft](https://github.com/storytold/github-media/blob/main/ship-editing.gif)
 
-https://github.com/user-attachments/assets/0809de0e-4ae2-4b92-b148-7f31b6db11b6
-
 - [developer documentation](./_docs)
 - [tools, scripts, misc](./script)
 - [license](./LICENSE.md)
