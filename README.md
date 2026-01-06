@@ -10,3 +10,9 @@ This is Adobe Photoshop for everyone, and we're giving away the source code!
 - [tools, scripts, misc](./script)
 - [license](./LICENSE.md)
 - [roadmap](./ROADMAP.md)
+
+[![discord](https://raw.githubusercontent.com/CLorant/readme-social-icons/main/large/colored/discord.svg)](https://discord.gg/artcraft)
+[![youtube](https://raw.githubusercontent.com/CLorant/readme-social-icons/main/large/colored/youtube.svg)](https://www.youtube.com/@OfficialArtCraftStudios)
+[![x](https://raw.githubusercontent.com/CLorant/readme-social-icons/main/large/colored/linkedin.svg)](https://www.linkedin.com/company/artcraft-ai)
+[![x](https://raw.githubusercontent.com/CLorant/readme-social-icons/main/large/colored/twitter-x.svg)](https://x.com/get_artcraft)
+
