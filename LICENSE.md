@@ -26,8 +26,8 @@ What you *can't do* with ArtCraft:
 > 4. You cannot use the ArtCraft name, logo, or mascot characters to promote your business without permission.
 
 This license means you can see what we're doing and not be at risk of having the rug pulled out from under 
-you (eg. if our founders die or our business collapses). It also gives you a really great way to customize the 
-software or lend a hand in reporting (or even fixing) bugs.
+you (eg. if our founders die, if our business collapses, if zombies or space aliens invade). It also gives 
+you a really great way to customize the software or lend a hand in reporting (or even fixing) bugs.
 
 Our desire is to support artists, designers, and filmmakers. We want to help you build your own creative studios
 and businesses. We want to give you creative software you can use forever.
