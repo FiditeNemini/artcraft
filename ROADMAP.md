@@ -3,6 +3,8 @@ ArtCraft Roadmap
 
 ## 2026 Goals (non-exhaustive)
 
+Product
+
 - Make ArtCraft better and more useful than model aggregation websites (our #1 goal).
   We don't dislike those websites; we just set a high standard for ourselves.
 
@@ -15,16 +17,26 @@ ArtCraft Roadmap
 - Build purpose-specific image models, eg. for relighting scenes and reposing characters
   and props.
 
+Studio
+
 - Build our content studio. Make lots of narrative shorts and at least one 
-  feature-length AI film in 2026. Theatrical distribution, but also lots of social 
-  media content. (We are creators, and we want to employ more creators!)
+  feature-length AI film by the year's end. Theatrical distribution, but also lots
+  of social media content. (We are creators, and we want to employ more creators!)
 
-- Architecture: remove dependence on ArtCraft hosted services.
+- Host festivals and competitions, including in-person meetups and screenings.
 
-- Architecture: more Rust, more speed.
+Architecture
+
+- Remove dependence on ArtCraft hosted services.
+
+- More Rust, more speed.
+
+- Code cleanup, more/better tests, CI, ... 
  
-- Community: build a safe community free of "anti-AI" trolls. A community of AI filmmakers 
-  and creators
+Community
+
+- Build a safe community free of negativity and anti-AI stigma. A community of filmmakers 
+  and artists.
 
 ## Loftier Goals
 
@@ -32,4 +44,4 @@ ArtCraft Roadmap
   Why? Because the future could be bleak without it. How, you might ask? Get in touch if 
   you're curious.
 
-- Don't Be Evil (tm)
+- Don't Be Evil™
