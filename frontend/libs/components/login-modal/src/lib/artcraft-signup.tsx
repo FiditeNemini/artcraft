@@ -78,7 +78,7 @@ export const ArtCraftSignUp = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-full">
+    <div className="flex flex-col items-center justify-center flex-1 min-h-0">
       <h2 className="text-3xl font-bold mb-3 text-center">
         {isSignUp ? "Sign up for ArtCraft" : "Log in to ArtCraft"}
       </h2>

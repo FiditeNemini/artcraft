@@ -4,8 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import {
-  CheckSoraSession,
-  SoraSessionState,
   useSoraLoginListener,
 } from "@storyteller/tauri-api";
 import { ArtCraftSignUp } from "./artcraft-signup";
@@ -16,8 +14,6 @@ const SIGNUP_SOURCE_ARTCRAFT = "artcraft";
 
 interface LoginModalProps {
   onClose?: () => void;
-  videoSrc2D?: string;
-  videoSrc3D?: string;
   onOpenChange?: (isOpen: boolean) => void;
   onArtCraftAuthSuccess?: (userInfo: any) => void;
   isSignUp?: boolean;
@@ -25,8 +21,6 @@ interface LoginModalProps {
 
 export function LoginModal({
   onClose,
-  videoSrc2D,
-  videoSrc3D,
   onOpenChange,
   onArtCraftAuthSuccess,
   isSignUp: initialIsSignUp = true,
@@ -34,7 +28,7 @@ export function LoginModal({
   const { isOpen, recheckTrigger, closeModal } = useLoginModalStore();
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoggedInArtCraft, setIsLoggedInArtCraft] = useState(false);
+  const [_isLoggedInArtCraft, setIsLoggedInArtCraft] = useState(false);
   const [isSignUp, setIsSignUp] = useState(initialIsSignUp);
   const [errorMessage, setErrorMessage] = useState("");
   const artCraftFormRef = useRef<HTMLFormElement>(null);
@@ -44,12 +38,6 @@ export function LoginModal({
   // Now we have 3 steps: Welcome, Sign up/Login, and Success
   const uiTotalSteps = 3;
   const uiCurrentStep = showSuccess ? 3 : showDiscord ? 2 : step;
-
-  const initSession = async () => {
-    const result = await CheckSoraSession();
-    const sessionExists = result.state === SoraSessionState.Valid;
-    return sessionExists;
-  };
 
   const checkArtCraftLogin = async () => {
     const usersApi = new UsersApi();
@@ -133,7 +121,7 @@ export function LoginModal({
   const renderStepContent = () => {
     if (showSuccess) {
       return (
-        <div className="flex flex-col items-center justify-center h-full">
+        <div className="flex flex-col items-center justify-center flex-1 min-h-0">
           <h2 className="text-3xl font-bold mb-2 text-center">
             Thank you for signing in!
           </h2>
@@ -155,7 +143,7 @@ export function LoginModal({
 
     if (showDiscord) {
       return (
-        <div className="flex flex-col items-center justify-center h-full">
+        <div className="flex flex-col items-center justify-center flex-1 min-h-0">
           <h2 className="text-3xl font-bold mb-2 text-center">
             Join Our Community
           </h2>
@@ -189,47 +177,10 @@ export function LoginModal({
     switch (step) {
       case 1:
         return (
-          <div className="flex flex-col items-center justify-center h-full">
-            <h2 className="text-3xl font-bold mb-2 text-center">
-              Welcome to ArtCraft
-            </h2>
-            <p className="text-white/70 mb-6 text-center">
-              Here's what you can do...
+          <div className="flex flex-col items-center justify-end flex-1">
+            <p className="text-xl text-white max-w-lg text-center leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+              Create stunning art, videos, with the power of AI.
             </p>
-            <div className="grid grid-cols-2 gap-6 h-full grow">
-              <div className="h-full">
-                <div className="aspect-[4/3] w-full overflow-hidden bg-black/20 rounded-t-lg">
-                  <video
-                    className="object-cover w-full h-full"
-                    autoPlay
-                    muted
-                    loop
-                    controls={false}
-                  >
-                    <source src={videoSrc2D} type="video/mp4" />
-                  </video>
-                </div>
-                <p className="text-center px-1.5 py-2 text-white/90 bg-black/20 rounded-b-lg font-medium text-sm">
-                  2D Canvas
-                </p>
-              </div>
-              <div>
-                <div className="aspect-[4/3] w-full overflow-hidden bg-black/20 rounded-t-lg">
-                  <video
-                    className="object-cover w-full h-full"
-                    autoPlay
-                    muted
-                    loop
-                    controls={false}
-                  >
-                    <source src={videoSrc3D} type="video/mp4" />
-                  </video>
-                </div>
-                <p className="text-center px-1.5 py-2 text-white/90 bg-black/20 rounded-b-lg font-medium text-sm">
-                  3D Scene Editor
-                </p>
-              </div>
-            </div>
           </div>
         );
       case 2:
@@ -324,7 +275,7 @@ export function LoginModal({
     }
 
     return (
-      <div className="flex items-end justify-center gap-2.5 mt-10 grow">
+      <div className="flex items-center justify-center gap-2.5 mt-6">
         {step === 2 && (
           <Button variant="secondary" onClick={handleBack} disabled={isLoading}>
             Back
@@ -369,18 +320,38 @@ export function LoginModal({
               className="relative h-[660px] max-w-4xl w-full rounded-xl bg-[#2C2C2C] text-white shadow-lg border border-white/5"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex flex-col gap-4 p-8 h-full">
-                {!showSuccess && (
-                  <>
-                    <span className="text-sm text-center opacity-60 font-medium">
-                      Step {uiCurrentStep} of {uiTotalSteps}
-                    </span>
-                    {renderProgress()}
-                  </>
-                )}
-                {renderStepContent()}
-                {renderFooterButtons()}
-              </div>
+                <div className="flex flex-col gap-4 p-8 h-full relative overflow-hidden">
+                  {step === 1 && !showSuccess && !showDiscord && (
+                    <div className="absolute inset-0 z-0">
+                      <video
+                        className="w-full h-full object-cover"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                      >
+                        <source
+                          src="/resources/videos/artcraft-intro.mp4"
+                          type="video/mp4"
+                        />
+                      </video>
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#2C2C2C] via-transparent to-[#2C2C2C]/80" />
+                    </div>
+                  )}
+
+                  <div className="relative z-10 flex flex-col h-full">
+                    {!showSuccess && (
+                      <>
+                        <span className="text-sm text-center opacity-60 font-medium">
+                          Step {uiCurrentStep} of {uiTotalSteps}
+                        </span>
+                        {renderProgress()}
+                      </>
+                    )}
+                    {renderStepContent()}
+                    {renderFooterButtons()}
+                  </div>
+                </div>
             </div>
           </TransitionChild>
         </div>
