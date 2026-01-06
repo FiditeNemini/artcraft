@@ -1,50 +1,10 @@
-storyteller-rust
-================
-
-Our Artcraft monorepo, which serves our desktop application, backend infrastructure, and more.
-
-```
-                 ."-,.__
-                 `.     `.  ,
-              .--'  .._,'"-' `.
-             .    .'         `'
-             `.   /          ,'
-               `  '--.   ,-"'
-                `"`   |  \
-                   -. \, |
-                    `--Y.'      ___.
-                         \     L._, \
-               _.,        `.   <  <\                _
-             ,' '           `, `.   | \            ( `
-          ../, `.            `  |    .\`.           \ \_
-         ,' ,..  .           _.,'    ||\l            )  '".
-        , ,'   \           ,'.-.`-._,'  |           .  _._`.
-      ,' /      \ \        `' ' `--/   | \          / /   ..\
-    .'  /        \ .         |\__ - _ ,'` `        / /     `.`.
-    |  '          ..         `-...-"  |  `-'      / /        . `.
-    | /           |L__           |    |          / /          `. `.
-   , /            .   .          |    |         / /             ` `
-  / /          ,. ,`._ `-_       |    |  _   ,-' /               ` \
- / .           \"`_/. `-_ \_,.  ,'    +-' `-'  _,        ..,-.    \`.
-.  '         .-f    ,'   `    '.       \__.---'     _   .'   '     \ \
-' /          `.'    l     .' /          \..      ,_|/   `.  ,'`     L`
-|'      _.-""` `.    \ _,'  `            \ `.___`.'"`-.  , |   |    | \
-||    ,'      `. `.   '       _,...._        `  |    `/ '  |   '     .|
-||  ,'          `. ;.,.---' ,'       `.   `.. `-'  .-' /_ .'    ;_   ||
-|| '              V      / /           `   | `   ,'   ,' '.    !  `. ||
-||/            _,-------7 '              . |  `-'    l         /    `||
-. |          ,' .-   ,' ||               | .-.        `.      .'     ||
- `'        ,'    `".'    |               |    `.        '. -.'       `'
-          /      ,'      |               |,'    \-.._,.'/'
-          .     /        .               .       \    .''
-        .`.    |         `.             /         :_,'.'
-          \ `...\   _     ,'-.        .'         /_.-'              S T O R Y T E L L E R
-           `-.__ `,  `'   .  _.>----''.  _  __  /                 Turning memes into dreams
-                .'        /"'          |  "'   '_                     
-               /_|.-'\ ,".             '.'`__'-( \
-                 / ,"'"\,'               `/  `-.|" 
-```
+ArtCraft
+========
+ArtCraft is the IDE for interactive AI image and video creation.
+We turn prompting into *crafting*, so your ideas become a form of tangible expression and computing.
+This is Adobe Photoshop for everyone, and we're giving away the source code!
 
 - [developer documentation](./_docs)
-- [server API reference](https://storyteller-docs.netlify.app/)
 - [tools, scripts, misc](./script)
+- [license](./LICENSE.md)
+- [roadmap](./ROADMAP.md)
