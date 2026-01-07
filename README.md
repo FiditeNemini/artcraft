@@ -12,6 +12,22 @@ This is Adobe Photoshop for everyone, and we're giving away the source code!
 - Or you can grab a [more recent Windows and MacOS build directly](https://github.com/storytold/artcraft/releases)
 - Linux requires building from source for now
 
+## Models and Providers Supported within Artcraft
+
+| Provider | Features                                                                                                                                                                |
+|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Artcraft | Nano Banana, Nano Banana Pro, GPT-Image-1 / 1.5, Seedream 4 / 4.5, Flux 1.1 / Kontext, Veo 2 / 3 / 3.1, Kling 1.6 / 2.1 / 2.5 / 2.6, Seedance, Sora 2 / Pro, Hunyuan 3d |
+| Grok | Grok Imagine, Grok Video                                                                                                                                                |
+| Midjourney | Image Gen (all versions)                                                                                                                                                |
+| Sora | Sora 1, Sora 2, GPT-Image-1                                                                                                                                             |
+| WorldLabs | Marble (Gaussian Splat World Generation)                                                                                                                                |
+
+We're going to be adding the following providers soon: Kling (via Kling website accounts), Google (via API keys), 
+Runway (via website account), Luma (via website account).
+
+We're potentially interested in adding other aggregators for those who already have subscriptions and credits at 
+those providers, for example: OpenArt, FreePik, etc.
+
 ## Documentation
 
 - [developer documentation](./_docs)
