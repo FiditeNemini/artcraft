@@ -8,7 +8,8 @@ This is Adobe Photoshop for everyone, and we're giving away the source code!
 
 ## Downloads
 
-- [Download for Windows and MacOS](https://github.com/storytold/artcraft/releases)
+- [Visit our website for the stable Windows and MacOS releases](https://getartcraft.com/)
+- Or you can grab a [more recent Windows and MacOS build directly](https://github.com/storytold/artcraft/releases)
 - Linux requires building from source for now
 
 ## Documentation
