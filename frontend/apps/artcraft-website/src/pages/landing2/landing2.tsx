@@ -29,7 +29,7 @@ const fadeUpVariants = {
     transition: {
       duration: 0.6,
       delay: 0.2,
-      ease: "easeOut",
+      ease: "easeOut" as const,
       staggerChildren: 0.1,
     },
   },
@@ -102,7 +102,7 @@ const Landing = () => {
 
             {/* Subtitle */}
             <motion.p
-              className="text-base mt-4 sm:text-xl md:text-2xl lg:text-2xl text-white/70 mb-8 sm:mb-12 max-w-2xl mx-auto font-medium drop-shadow-[0_2px_12px_rgba(80,80,255,0.10)]"
+              className="text-base mt-4 sm:text-xl md:text-2xl lg:text-2xl text-white/70 mb-8 sm:mb-14 max-w-2xl mx-auto font-medium drop-shadow-[0_2px_12px_rgba(80,80,255,0.10)]"
               initial="hidden"
               animate="visible"
               variants={fadeUpVariants}
@@ -113,7 +113,7 @@ const Landing = () => {
 
             {/* CTA Buttons */}
             <motion.div
-              className="flex flex-col sm:flex-row items-center justify-center gap-2.5 md:gap-4 mb-10 sm:mb-16 w-full max-w-xs sm:max-w-none mx-auto"
+              className="relative flex flex-col sm:flex-row items-center justify-center gap-2.5 md:gap-4 mb-10 sm:mb-16 w-fit max-w-xs sm:max-w-none mx-auto"
               initial="hidden"
               animate="visible"
               variants={fadeUpVariants}
@@ -145,6 +145,7 @@ const Landing = () => {
                   </Button>
                 </>
               )}
+              <img src="/images/try-free.png" alt="Try Free" draggable={false} className="absolute -left-[45%] -top-5 h-40 pointer-events-none select-none hidden md:block" />
             </motion.div>
 
             {/* Glassy Video Mockup */}
