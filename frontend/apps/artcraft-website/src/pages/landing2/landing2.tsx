@@ -326,11 +326,16 @@ const Landing = () => {
                   It's Open Source
                 </h3>
                 <p className="text-white/80 text-sm sm:text-base lg:text-lg mb-4 sm:mb-6 leading-relaxed flex-1">
-                  We'll be releasing the code behind our desktop app, server,
-                  models, and infrastructure as{" "}
-                  <span className="text-primary-400 font-semibold">
-                    open source!
-                  </span>
+                  Our desktop app's code and infrastructure are all{" "}
+                  <a 
+                    href="https://github.com/storytold/artcraft" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary-400 font-semibold hover:text-primary-300 underline underline-offset-2 transition-colors"
+                  >
+                    open source on GitHub.
+                  </a>{" "}
+                  Join us and contribute!
                 </p>
                 <div className="flex justify-center items-center h-full p-4 lg:p-6 select-none">
                   <img
