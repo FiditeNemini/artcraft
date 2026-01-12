@@ -48,6 +48,7 @@ const navigation = {
       href: SOCIAL_LINKS.GITHUB,
       icon: (props: any) => <FontAwesomeIcon icon={faGithubAlt} {...props} />,
     },
+    
   ],
 };
 
