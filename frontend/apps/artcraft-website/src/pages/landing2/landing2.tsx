@@ -2,7 +2,7 @@ import { DiscordButton } from "../../components/discord-button";
 import { motion } from "framer-motion";
 import { Button } from "@storyteller/ui-button";
 import { isMobile } from "react-device-detect";
-import { faWindows, faApple } from "@fortawesome/free-brands-svg-icons";
+import { faWindows, faApple, faGithub } from "@fortawesome/free-brands-svg-icons";
 import {
   faVolumeMute,
   faVolumeHigh,
@@ -44,10 +44,10 @@ const fadeUpVariants = {
 const Landing = () => {
   const videos = [
     {
-      src: "https://www.youtube.com/embed/H4NFXGMuwpY?si=U2_m5Ic1YBn6176D",
+      src: "https://www.youtube.com/embed/oqoCWdOwr2U?si=ILMPk8hGHo9hP8RU",
     },
     {
-      src: "https://www.youtube.com/embed/pGn-1BKo3nY?si=q4dm0ICb6wF1JW8N",
+      src: "https://www.youtube.com/embed/H4NFXGMuwpY?si=wPuQl5cJOu1v8MJu",
     },
     {
       src: "https://www.youtube.com/embed/7x7IZkHiGD8?si=tL8nK4CULigpfHQR",
@@ -716,26 +716,54 @@ const Landing = () => {
         </motion.div>
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-[1400px] pt-10 sm:pt-20 md:pt-32 pb-12 sm:pb-24 md:pb-40 lg:pb-56 sm:px-8 lg:px-32 overflow-visible px-4">
+      <div className="relative z-10 mx-auto w-full max-w-[1400px] pt-10 sm:pt-20 md:pt-32 pb-12 sm:pb-24 md:pb-40 lg:pb-56 sm:px-8 overflow-visible px-4">
         {/* Gradient Orb for Section */}
         <div className="absolute right-[-300px] bottom-[-100px] w-[800px] h-[800px] rounded-full bg-gradient-to-br from-blue-700 via-[#00AABA] to-pink-500 opacity-10 blur-[160px] z-0 pointer-events-none" />
-        {/* Discord CTA Section */}
-        <motion.div
-          className="flex flex-col items-center justify-center text-center p-4 sm:p-8 md:p-24 py-10 sm:py-20 rounded-[24px] sm:rounded-[40px] bg-gradient-to-br from-primary/30 to-primary/50 backdrop-blur-lg border-[3px] sm:border-[6px] border-primary/70 shadow-2xl shadow-primary/30"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUpVariants}
-        >
-          <h2 className="relative mb-4 sm:mb-8 font-bold text-2xl sm:text-4xl lg:text-5xl max-w-3xl !leading-tight">
-            Why haven't you joined our Discord yet?
-          </h2>
-          <p className="text-base sm:text-lg text-gray-200 mb-6 sm:mb-10 max-w-2xl leading-relaxed">
-            Connect with other creators, share your work, get feedback, and stay
-            updated with the latest features and updates.
-          </p>
-          <DiscordButton />
-        </motion.div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+            {/* Discord CTA Section */}
+            <motion.div
+              className="flex flex-col items-center justify-center text-center p-8 sm:p-12 lg:p-16 rounded-[24px] sm:rounded-[40px] bg-gradient-to-br from-primary/30 to-primary/50 backdrop-blur-lg border-[3px] sm:border-[6px] border-primary/70 shadow-2xl shadow-primary/30"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUpVariants}
+            >
+              <h2 className="relative mb-4 sm:mb-6 font-bold text-2xl sm:text-3xl lg:text-4xl max-w-lg !leading-tight">
+                Join the Discord
+              </h2>
+              <p className="text-base sm:text-lg text-gray-200 mb-6 sm:mb-8 max-w-md leading-relaxed">
+                Connect with other creators, share your work, get feedback, and stay updated.
+              </p>
+              <DiscordButton />
+            </motion.div>
+
+            {/* GitHub CTA Section */}
+            <motion.div
+              className="flex flex-col items-center justify-center text-center p-8 sm:p-12 rounded-[24px] sm:rounded-[40px] bg-[#161b22] backdrop-blur-lg border-[3px] sm:border-[6px] border-[#30363d] shadow-2xl"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUpVariants}
+            >
+              <h2 className="relative mb-4 sm:mb-6 font-bold text-2xl sm:text-3xl lg:text-4xl max-w-lg !leading-tight text-white">
+                We're Open Source
+              </h2>
+              <p className="text-base sm:text-lg text-[#8b949e] mb-6 sm:mb-8 max-w-md leading-relaxed">
+                 Help us build the future of creative tools. Contribute code, report bugs, or just star the repo.
+              </p>
+              <Button
+                className="text-md px-6 py-3 font-semibold rounded-xl shadow-lg gap-3 bg-white text-black hover:bg-gray-200"
+                as="link"
+                href="https://github.com/storytold/artcraft"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FontAwesomeIcon icon={faGithub} className="text-xl"/>
+                Star on GitHub
+              </Button>
+            </motion.div>
+        </div>
       </div>
 
       <Footer />
