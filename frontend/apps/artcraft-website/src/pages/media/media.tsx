@@ -4,7 +4,8 @@ import dayjs from "dayjs";
 import { Button } from "@storyteller/ui-button";
 import { LoadingSpinner } from "@storyteller/ui-loading-spinner";
 import { toast } from "@storyteller/ui-toaster";
-import { MediaFilesApi, PromptsApi } from "@storyteller/api";
+import { MediaFilesApi, PromptsApi, UserInfo } from "@storyteller/api";
+import { Gravatar } from "@storyteller/ui-gravatar";
 import { twMerge } from "tailwind-merge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -15,6 +16,7 @@ import {
   faPencil,
   faCircleInfo,
   faImage,
+  faUser,
 } from "@fortawesome/pro-solid-svg-icons";
 import {
   addCorsParam,
@@ -52,6 +54,7 @@ interface MediaData {
   isLoaded: boolean;
   width?: number;
   height?: number;
+  creator: UserInfo | null;
 }
 
 interface PromptData {
@@ -131,6 +134,7 @@ export default function MediaPage() {
     createdAt: null,
     isVideo: false,
     isLoaded: false,
+    creator: null,
   });
   const [mediaRecordLoading, setMediaRecordLoading] = useState(true);
 
@@ -162,6 +166,7 @@ export default function MediaPage() {
             isLoaded: isSameUrl ? prev.isLoaded : false,
             width: isSameUrl ? prev.width : undefined,
             height: isSameUrl ? prev.height : undefined,
+            creator: file.maybe_creator_user || null,
           };
         });
 
@@ -183,11 +188,11 @@ export default function MediaPage() {
           setPromptData(EMPTY_PROMPT_DATA);
         }
       } else {
-        setMedia({ url: null, token: null, createdAt: null, isVideo: false, isLoaded: false });
+        setMedia({ url: null, token: null, createdAt: null, isVideo: false, isLoaded: false, creator: null });
         toast.error("Media not found");
       }
     } catch {
-      setMedia({ url: null, token: null, createdAt: null, isVideo: false, isLoaded: false });
+      setMedia({ url: null, token: null, createdAt: null, isVideo: false, isLoaded: false, creator: null });
       toast.error("Failed to load media");
     } finally {
       setMediaRecordLoading(false);
@@ -303,6 +308,13 @@ export default function MediaPage() {
             <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-6">
               {mediaRecordLoading ? (
                 <div className="space-y-6 animate-pulse">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 bg-white/10 rounded-xl" />
+                    <div className="space-y-1.5">
+                      <div className="h-4 w-24 bg-white/10 rounded" />
+                      <div className="h-3 w-12 bg-white/10 rounded" />
+                    </div>
+                  </div>
                   <div className="space-y-2">
                     <div className="h-4 w-20 bg-white/10 rounded" />
                     <div className="h-4 w-40 bg-white/10 rounded" />
@@ -322,6 +334,29 @@ export default function MediaPage() {
                 </div>
               ) : (
                 <>
+                  {media.creator && (
+                    <div className="flex items-center gap-3 pb-2">
+                      {media.creator.core_info ? (
+                        <Gravatar
+                          size={36}
+                          username={media.creator.username}
+                          email_hash={media.creator.email_gravatar_hash}
+                          avatarIndex={media.creator.core_info.default_avatar.image_index}
+                          backgroundIndex={media.creator.core_info.default_avatar.color_index}
+                          className="rounded-xl border-white/10"
+                        />
+                      ) : (
+                        <div className="h-9 w-9 shrink-0 flex items-center justify-center rounded-xl bg-white/10 text-white/50 border border-white/5">
+                          <FontAwesomeIcon icon={faUser} />
+                        </div>
+                      )}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-white text-sm font-semibold leading-none">{media.creator.display_name}</span>
+                        <span className="text-white/60 text-xs font-medium">Author</span>
+                      </div>
+                    </div>
+                  )}
+
                   {media.createdAt && (
                     <div className="space-y-1.5 hidden">
                       <div className="text-sm font-medium text-white/90">
