@@ -226,11 +226,7 @@ export default function MediaPage() {
 
   const shareButtonIcon = shareCopy.copied ? faCheck : faLink;
 
-  const getResolutionLabel = (width?: number) => {
-    if (!width) return null;
-    if (width >= 1000) return `${Math.round(width / 1024)}K`;
-    return null;
-  };
+
 
   return (
     <div className="relative min-h-screen w-full p-4 pt-16 bg-dots flex items-start lg:items-center justify-center">
@@ -410,10 +406,7 @@ export default function MediaPage() {
                           </div>
                           
                           <div className="flex flex-col rounded-xl bg-black/20 border border-white/5 overflow-hidden">
-                            <InfoRow 
-                              label="Feature" 
-                              value={media.isVideo ? 'Create Video' : 'Create Image'} 
-                            />
+
 
                             {promptData.modelType && (
                               <InfoRow
@@ -440,18 +433,10 @@ export default function MediaPage() {
                             )}
 
                             {media.width && media.height && (
-                              <>
-                                {getResolutionLabel(media.width) && (
-                                  <InfoRow
-                                    label="Resolution"
-                                    value={getResolutionLabel(media.width)}
-                                  />
-                                )}
-                                <InfoRow
-                                  label="Size"
-                                  value={`${media.width} × ${media.height}`}
-                                  />
-                              </>
+                              <InfoRow
+                                label="Size"
+                                value={`${media.width} × ${media.height}`}
+                              />
                             )}
                             
                             {media.createdAt && (
