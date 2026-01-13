@@ -14,6 +14,7 @@ import {
   faUser,
   faTools,
   faShapes,
+  faEraser,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Footer from "../../components/footer";
@@ -55,37 +56,43 @@ const Landing = () => {
       icon: faMapMarkerAlt,
       title: "Image to Location",
       description: "Placing virtual actors into physical environments establishes single-location consistency. You can film multiple shots within a room without having things disappear.",
-      src: "https://github.com/user-attachments/assets/21f103e3-cc19-4882-a630-9caa1b76ae31"
+      src: "/videos/features/WorldLabs_Demo_2.webm"
     },
     {
       icon: faCube,
       title: "3D Image Compositing",
       description: "Use images (backdrops, foreground elements, props, etc.) in scenes with depth and blend them naturally together. Just a couple of images usually leads to great compositions.",
-      src: "https://github.com/user-attachments/assets/f93a616f-571d-474e-bcc0-53736de7303d"
+      src: "/videos/features/Panel.webm"
     },
     {
       icon: faLayerGroup,
       title: "2D Image Compositing",
       description: "Use images, background removal, layers, and simple drawing tools to precisely compose a scene.",
-      src: "https://github.com/user-attachments/assets/d6f99391-e496-4c62-9e37-29734ba5f899"
+      src: "/videos/features/Editor.webm"
     },
     {
       icon: faShapes,
       title: "Image to 3D Mesh",
       description: "It's almost impossible to lay out complicated objects or block complicated scenes; turning images into 3D helps position elements exactingly and intentionally.",
-      src: "https://github.com/user-attachments/assets/600a405c-e360-48c1-9b42-6e657ae6243b"
+      src: "/videos/features/Make_3D.webm"
     },
     {
       icon: faTools,
       title: "Mixed Asset Crafting",
       description: "You can use image cutouts, worlds, and simple 3D meshes all together to precisely and intentionally lay out your scenes.",
-      src: "https://raw.githubusercontent.com/storytold/github-media/main/ship-editing.gif"
+      src: "/videos/features/Leo.webm"
     },
     {
       icon: faUser,
       title: "Character Posing",
       description: "You can dynamically pose your characters to achieve the precise character, scene, and camera blocking before calling \"action\".",
-      src: "https://github.com/user-attachments/assets/52a8e983-7c8f-42d2-be8b-25296ab9ed57"
+      src: "/videos/features/Pose_Second_Version.webm"
+    },
+    {
+      icon: faEraser,
+      title: "Background Removal",
+      description: "Instantly remove backgrounds from images to create assets for your scenes. Clean, precise, and ready for compositing.",
+      src: "/videos/features/Background.webm"
     }
   ];
 
@@ -373,11 +380,13 @@ const Landing = () => {
                   ref={mobileMediaRef}
                   className="absolute inset-0"
                 >
-                  <img
+                  <video
                     src={features[activeFeature].src}
-                    alt={features[activeFeature].title}
                     className="w-full h-full object-cover select-none"
-                    draggable={false}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
                   />
                   <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
                 </div>
@@ -440,12 +449,13 @@ const Landing = () => {
                           className="absolute inset-0 w-full h-full bg-[#050505] shadow-2xl origin-bottom"
                           style={{ zIndex: index, transform: index === 0 ? 'translateY(0%)' : 'translateY(110%)' }}
                         >
-                          <img 
+                          <video 
                             src={feature.src}
-                            alt={feature.title}
                             className="w-full h-full object-cover"
-                            draggable={false}
-                            loading="lazy"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
                           />
                           {/* Gradient overlay */}
                           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
