@@ -99,51 +99,59 @@ const Landing = () => {
 
   // GSAP ScrollTrigger setup for page animations
   useLayoutEffect(() => {
+    const mm = gsap.matchMedia();
     const ctx = gsap.context(() => {
       // Animate elements with data-animate attribute on scroll
-      const elements = gsap.utils.toArray<HTMLElement>("[data-animate]");
-      
-      // Set initial state immediately to avoid FOUC
-      gsap.set(elements, { autoAlpha: 0, y: 20 });
-
-      elements.forEach((el) => {
-        gsap.to(el, {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.8,
-          ease: "power1.out",
-          scrollTrigger: {
-            trigger: el,
-            start: "top 90%",
-            toggleActions: "play none none none",
-          }
+      // ONLY on non-mobile devices to ensure performance and prevent content loading issues
+      if (!isMobile) {
+        const elements = gsap.utils.toArray<HTMLElement>("[data-animate]");
+        
+        gsap.set(elements, { autoAlpha: 0, y: 20 });
+  
+        elements.forEach((el) => {
+          gsap.to(el, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power1.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 90%",
+              toggleActions: "play none none none",
+            }
+          });
         });
-      });
+      }
 
-      // Feature section pinning and active state
-      ScrollTrigger.create({
-        trigger: ".right-column",
-        start: "top top",
-        endTrigger: ".left-column",
-        end: "bottom bottom",
-        pin: true,
-        pinSpacing: false,
-        invalidateOnRefresh: true,
-      });
-
-      featureRefs.current.forEach((el, index) => {
-        if (!el) return;
+      // Feature section pinning and active state - Desktop Only (lg breakpoint)
+      mm.add("(min-width: 1024px)", () => {
         ScrollTrigger.create({
-          trigger: el,
-          start: "top 40%", // Trigger when top of element hits 60% viewport height
-          end: "bottom 40%", 
-          onEnter: () => setActiveFeature(index),
-          onEnterBack: () => setActiveFeature(index),
+          trigger: ".right-column",
+          start: "top top",
+          endTrigger: ".left-column",
+          end: "bottom bottom",
+          pin: true,
+          pinSpacing: false,
+          invalidateOnRefresh: true,
+        });
+  
+        featureRefs.current.forEach((el, index) => {
+          if (!el) return;
+          ScrollTrigger.create({
+            trigger: el,
+            start: "top 40%",
+            end: "bottom 40%", 
+            onEnter: () => setActiveFeature(index),
+            onEnterBack: () => setActiveFeature(index),
+          });
         });
       });
     }, mainRef);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      mm.revert();
+    };
   }, []);
 
   // GSAP animation for card stack (desktop feature images)
@@ -391,66 +399,69 @@ const Landing = () => {
             </div>
 
             {/* Desktop Sticky Scroll Layout */}
-            <div className="hidden lg:flex flex-row relative items-start" ref={containerRef}>
-              {/* Left Column: Scrolling Text */}
-              <div className="w-[40%] flex flex-col relative z-20 left-column py-[10vh]">
-                {features.map((feature, index) => (
-                  <div
-                    key={index}
-                    ref={(el) => { featureRefs.current[index] = el; }}
-                    className="min-h-[80vh] flex flex-col justify-center pr-8 xl:pr-16"
-                  >
-                    <div className="max-w-lg">
-                      <div className={`w-12 h-12 mb-6 rounded-2xl flex items-center justify-center text-2xl transition-all duration-500 ${
-                         activeFeature === index ? "bg-primary text-white shadow-lg shadow-primary/30 scale-110" : "bg-white/10 text-white/50"
-                      }`}>
-                         <FontAwesomeIcon icon={feature.icon} />
+            {!isMobile && (
+              <div className="hidden lg:flex flex-row relative items-start" ref={containerRef}>
+                {/* Left Column: Scrolling Text */}
+                <div className="w-[40%] flex flex-col relative z-20 left-column py-[10vh]">
+                  {features.map((feature, index) => (
+                    <div
+                      key={index}
+                      ref={(el) => { featureRefs.current[index] = el; }}
+                      className="min-h-[80vh] flex flex-col justify-center pr-8 xl:pr-16"
+                    >
+                      <div className="max-w-lg">
+                        <div className={`w-12 h-12 mb-6 rounded-2xl flex items-center justify-center text-2xl transition-all duration-500 ${
+                          activeFeature === index ? "bg-primary text-white shadow-lg shadow-primary/30 scale-110" : "bg-white/10 text-white/50"
+                        }`}>
+                          <FontAwesomeIcon icon={feature.icon} />
+                        </div>
+                        <h3 className={`text-3xl xl:text-4xl font-bold mb-6 transition-all duration-500 ${
+                          activeFeature === index ? "text-white" : "text-white/40"
+                        }`}>
+                          {feature.title}
+                        </h3>
+                        <p className={`text-xl leading-relaxed transition-all duration-500 ${
+                          activeFeature === index ? "text-white/80" : "text-white/30"
+                        }`}>
+                          {feature.description}
+                        </p>
                       </div>
-                      <h3 className={`text-3xl xl:text-4xl font-bold mb-6 transition-all duration-500 ${
-                         activeFeature === index ? "text-white" : "text-white/40"
-                      }`}>
-                        {feature.title}
-                      </h3>
-                      <p className={`text-xl leading-relaxed transition-all duration-500 ${
-                         activeFeature === index ? "text-white/80" : "text-white/30"
-                      }`}>
-                        {feature.description}
-                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Right Column: Sticky Image */}
+                <div className="w-[60%] h-screen flex items-center justify-center pl-4 py-8 z-10 right-column">
+                  <div className="relative w-full aspect-[4/3] max-h-[80vh] rounded-[32px] overflow-hidden shadow-2xl border-[4px] border-white/5 bg-[#050505]">
+                    {features.map((feature, index) => (
+                        <div
+                          key={index}
+                          ref={(el) => { cardRefs.current[index] = el; }}
+                          className="absolute inset-0 w-full h-full bg-[#050505] shadow-2xl origin-bottom"
+                          style={{ zIndex: index, transform: index === 0 ? 'translateY(0%)' : 'translateY(110%)' }}
+                        >
+                          <img 
+                            src={feature.src}
+                            alt={feature.title}
+                            className="w-full h-full object-cover"
+                            draggable={false}
+                            loading="lazy"
+                          />
+                          {/* Gradient overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                        </div>
+                    ))}
+                    
+                    {/* Decorative Elements */}
+                    <div className="absolute top-4 right-4 px-4 py-2 bg-black/40 backdrop-blur-md rounded-full border border-white/10 z-20">
+                        <span className="text-white/80 text-sm font-medium tracking-wide">
+                          {activeFeature + 1} / {features.length}
+                        </span>
                     </div>
                   </div>
-                ))}
-              </div>
-
-              {/* Right Column: Sticky Image */}
-              <div className="w-[60%] h-screen flex items-center justify-center pl-4 py-8 z-10 right-column">
-                <div className="relative w-full aspect-[4/3] max-h-[80vh] rounded-[32px] overflow-hidden shadow-2xl border-[4px] border-white/5 bg-[#050505]">
-                   {features.map((feature, index) => (
-                      <div
-                        key={index}
-                        ref={(el) => { cardRefs.current[index] = el; }}
-                        className="absolute inset-0 w-full h-full bg-[#050505] shadow-2xl origin-bottom"
-                        style={{ zIndex: index, transform: index === 0 ? 'translateY(0%)' : 'translateY(110%)' }}
-                      >
-                         <img 
-                           src={feature.src}
-                           alt={feature.title}
-                           className="w-full h-full object-cover"
-                           draggable={false}
-                         />
-                         {/* Gradient overlay */}
-                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
-                      </div>
-                   ))}
-                   
-                   {/* Decorative Elements */}
-                   <div className="absolute top-4 right-4 px-4 py-2 bg-black/40 backdrop-blur-md rounded-full border border-white/10 z-20">
-                      <span className="text-white/80 text-sm font-medium tracking-wide">
-                        {activeFeature + 1} / {features.length}
-                      </span>
-                   </div>
                 </div>
               </div>
-            </div>
+            )}
          </div>
       </div>
 
