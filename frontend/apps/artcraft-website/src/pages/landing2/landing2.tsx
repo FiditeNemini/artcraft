@@ -23,6 +23,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ModelBadgeGrid from "../../components/model-badge-grid";
 import Seo from "../../components/seo";
 import { DOWNLOAD_LINKS } from "../../config/downloads";
+import { OwnershipComparison } from "../../components/ownership-comparison/ownership-comparison";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -722,6 +723,8 @@ const Landing = () => {
           </div>
         </div>
       </div>
+      
+      <OwnershipComparison />
 
       <div className="relative z-10 mx-auto w-full max-w-screen py-10 sm:py-20 md:py-32 sm:px-8 lg:px-32 overflow-visible px-4">
         {/* Gradient Orb for Section */}
@@ -732,12 +735,15 @@ const Landing = () => {
           data-animate
         >
           <div className="text-center">
-            <h1 className="md:mb-8 text-2xl sm:text-4xl md:text-6xl font-bold">
+            <h1 className="md:mb-8 text-3xl sm:text-4xl md:text-6xl font-bold mb-4">
               Made using{" "}
               <span className="relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-[5px] md:after:h-[12px] after:bg-primary/60 after:mb-1">
                 ArtCraft
               </span>
             </h1>
+            <p className="md:text-xl text-lg text-white/80 max-w-2xl mx-auto">
+          Check out the videos below!
+        </p>
           </div>
           <div className="grid gap-6 sm:gap-8 xl:grid-cols-3">
             {videos.map((video, index) => (

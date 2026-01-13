@@ -13,7 +13,7 @@ export const DiscordButton = ({
 }: DiscordButtonProps) => {
   const sizeClasses = small
     ? "px-4 py-2 text-sm rounded-xl"
-    : "text-lg px-4 py-2 md:px-6 md:py-3 md:text-xl rounded-xl";
+    : "text-md px-4 py-2 md:px-6 md:py-3 rounded-xl";
 
   return (
     <Button
