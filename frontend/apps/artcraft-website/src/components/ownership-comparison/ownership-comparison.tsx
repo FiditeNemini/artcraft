@@ -9,7 +9,7 @@ export const OwnershipComparison = () => {
     <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-12 md:py-32 overflow-visible">
        
       <div className="text-center mb-12 sm:mb-16 relative" data-animate>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-32 bg-[#ef4444]/20 blur-[80px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-32 bg-[#ef4444]/20 blur-[40px] md:blur-[80px] pointer-events-none transform-gpu" />
         <h2 className="relative text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 !leading-tight">
            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff7979] to-[#ff7979]">Stop Renting </span>
            <br className="sm:hidden" />
@@ -26,7 +26,7 @@ export const OwnershipComparison = () => {
             <div className="absolute inset-0 bg-[radial-gradient(#ffffff05_1px,transparent_1px)] [background-size:16px_16px] opacity-20 pointer-events-none" />
             <div className="absolute inset-0 bg-[#ef4444]/5" />
             
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-[#ef4444]/5 blur-[100px] rounded-full" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-[#ef4444]/5 blur-[50px] md:blur-[100px] rounded-full transform-gpu" />
 
             <div className="relative z-10 flex flex-col items-center text-center max-w-md w-full my-auto">
                
@@ -76,7 +76,7 @@ export const OwnershipComparison = () => {
              <div className="absolute inset-0 bg-[radial-gradient(#00AABA15_1px,transparent_1px)] [background-size:20px_20px] opacity-20 pointer-events-none" />
              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-100" />
              
-             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-primary/10 blur-[90px] rounded-full opacity-100 scale-110" />
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-primary/10 blur-[45px] md:blur-[90px] rounded-full opacity-100 scale-110 transform-gpu" />
 
              <div className="relative z-10 flex flex-col items-center text-center max-w-md w-full my-auto">
                 

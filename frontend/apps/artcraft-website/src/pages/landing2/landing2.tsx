@@ -208,10 +208,10 @@ const Landing = () => {
       <main className="relative mb-8 md:mb-16 pt-24 sm:pt-24 min-h-[400px] sm:min-h-[600px] md:min-h-[700px] flex items-center justify-center px-2 sm:px-4 md:px-0">
         {/* Glowing Gradient Orb Background */}
         <div
-          className="absolute inset-0 flex items-center justify-center pointer-events-none z-0"
+          className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden"
           data-animate
         >
-          <div className="w-[900px] h-[900px] rounded-full bg-gradient-to-br from-blue-700 via-blue-500 to-[#00AABA] opacity-40 blur-[120px]"></div>
+          <div className="w-[900px] h-[900px] rounded-full bg-gradient-to-br from-blue-700 via-blue-500 to-[#00AABA] opacity-40 blur-[80px] md:blur-[120px] transform-gpu"></div>
         </div>
 
         <div className="relative z-10 px-2 sm:px-4 md:px-6 py-8 w-full flex flex-col items-center justify-center">
@@ -281,7 +281,7 @@ const Landing = () => {
               data-animate
             >
               <div
-                className="relative rounded-[20px] sm:rounded-[32px] overflow-hidden bg-white/10 backdrop-blur-xl shadow-2xl p-2 sm:p-4 aspect-[16/9] w-full mx-auto transition-transform duration-300"
+                className="relative rounded-[20px] sm:rounded-[32px] overflow-hidden bg-white/10 backdrop-blur-md md:backdrop-blur-xl shadow-2xl p-2 sm:p-4 aspect-[16/9] w-full mx-auto transition-transform duration-300 transform-gpu"
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
               >
@@ -326,7 +326,7 @@ const Landing = () => {
 
       <div className="relative z-10 py-12 md:py-24 px-4 sm:px-8 lg:px-12 max-w-[1400px] mx-auto overflow-visible">
          {/* Gradient Orb for Section */}
-         <div className="absolute left-[-200px] top-[-100px] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#00AABA] via-blue-500 to-blue-700 opacity-15 blur-[120px] z-0 pointer-events-none" />
+         <div className="absolute left-[-200px] top-[-100px] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#00AABA] via-blue-500 to-blue-700 opacity-15 blur-[80px] md:blur-[120px] z-0 pointer-events-none transform-gpu" />
 
          {/* Title Area */}
          <div className="relative z-10 mb-6 md:-mb-12 min-[1980px]:-mb-48 pointer-events-none">
@@ -467,7 +467,7 @@ const Landing = () => {
 
       <div className="relative flex overflow-visible xl:items-center xl:pt-0 px-2 sm:px-4 md:px-0 md:-mt-36 min-[1980px]:-mt-64">
         {/* Gradient Orb for Section */}
-        <div className="absolute left-[-200px] top-[-100px] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#00AABA] via-blue-500 to-blue-700 opacity-15 blur-[120px] z-0 pointer-events-none" />
+        <div className="absolute left-[-200px] top-[-100px] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#00AABA] via-blue-500 to-blue-700 opacity-15 blur-[80px] md:blur-[120px] z-0 pointer-events-none transform-gpu" />
         <div
           className="w-full flex flex-col items-center justify-center text-center pt-16 sm:pt-24 md:pt-32 px-2 sm:px-6 md:px-10"
           data-animate
@@ -497,7 +497,7 @@ const Landing = () => {
 
       <div className="relative z-10 mx-auto w-full max-w-[1200px] sm:px-4 md:px-16 lg:px-12 xl:px-32 pb-8 sm:pb-16 md:pb-24 lg:pb-32 overflow-visible px-4">
         {/* Gradient Orb for Section */}
-        <div className="absolute right-[-250px] top-[-150px] w-[700px] h-[700px] rounded-full bg-gradient-to-br from-blue-700 via-[#00AABA] to-pink-500 opacity-[0.1] blur-[140px] z-0 pointer-events-none" />
+        <div className="absolute right-[-250px] top-[-150px] w-[700px] h-[700px] rounded-full bg-gradient-to-br from-blue-700 via-[#00AABA] to-pink-500 opacity-[0.1] blur-[100px] md:blur-[140px] z-0 pointer-events-none transform-gpu" />
         <div
           className="items-center gap-8 sm:gap-12 md:gap-16 mb-8 sm:mb-12 p-2 sm:p-4 bg-white/10 backdrop-blur-md rounded-[24px] sm:rounded-[40px] shadow-xl"
           data-animate
@@ -524,7 +524,7 @@ const Landing = () => {
 
       <div className="relative flex overflow-visible xl:items-center xl:pt-0 mb-4 md:mb-12 px-2 sm:px-4 md:px-0">
         {/* Gradient Orb for Section */}
-        <div className="absolute left-[-200px] top-[-100px] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#00AABA] via-blue-500 to-blue-700 opacity-15 blur-[120px] z-0 pointer-events-none" />
+        <div className="absolute left-[-200px] top-[-100px] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#00AABA] via-blue-500 to-blue-700 opacity-15 blur-[80px] md:blur-[120px] z-0 pointer-events-none transform-gpu" />
         <div
           className="w-full flex flex-col items-center justify-center text-center pt-16 sm:pt-24 md:pt-32 px-2 sm:px-6 md:px-10"
           data-animate
@@ -555,7 +555,7 @@ const Landing = () => {
       {/* Bento Box Grid Section */}
       <div className="overflow-visible pb-10 sm:pb-20 md:pb-28 lg:pb-32 relative px-4">
         {/* Gradient Orbs for Section */}
-        <div className="absolute right-[-150px] top-[-100px] w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#00AABA] via-blue-500 to-blue-700 opacity-10 blur-[110px] z-0 pointer-events-none" />
+        <div className="absolute right-[-150px] top-[-100px] w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#00AABA] via-blue-500 to-blue-700 opacity-10 blur-[80px] md:blur-[110px] z-0 pointer-events-none transform-gpu" />
 
         <div
           className="mx-auto max-w-[88rem] md:px-6 lg:px-8"
@@ -739,7 +739,7 @@ const Landing = () => {
 
       <div className="relative z-10 mx-auto w-full max-w-screen py-10 sm:py-20 md:py-32 sm:px-8 lg:px-32 overflow-visible px-4">
         {/* Gradient Orb for Section */}
-        <div className="absolute left-[-250px] top-[-150px] w-[700px] h-[700px] rounded-full bg-gradient-to-br from-[#00AABA] via-blue-500 to-blue-700 opacity-[0.07] blur-[150px] z-0 pointer-events-none" />
+        <div className="absolute left-[-250px] top-[-150px] w-[700px] h-[700px] rounded-full bg-gradient-to-br from-[#00AABA] via-blue-500 to-blue-700 opacity-[0.07] blur-[100px] md:blur-[150px] z-0 pointer-events-none transform-gpu" />
         {/* Videos Section */}
         <div
           className="space-y-12"
