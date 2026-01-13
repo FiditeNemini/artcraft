@@ -9,13 +9,16 @@
       "path": "../../libs/common"
     },
     {
-      "path": "../../libs/api"
+      "path": "../../libs/components/gravatar"
     },
     {
       "path": "../../libs/components/toaster"
     },
     {
       "path": "../../libs/components/loading-spinner"
+    },
+    {
+      "path": "../../libs/api"
     },
     {
       "path": "../../libs/components/button"
