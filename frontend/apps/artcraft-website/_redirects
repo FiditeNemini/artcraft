@@ -13,4 +13,4 @@
 /faq/* /index.html 200
 
 # Redirects for growth measurement
-/reddit / 301
+/reddit /?utm_source=reddit 301
