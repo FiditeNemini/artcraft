@@ -12,4 +12,5 @@
 /faq/ /index.html 200
 /faq/* /index.html 200
 
-
+# Redirects for growth measurement
+/reddit / 301
