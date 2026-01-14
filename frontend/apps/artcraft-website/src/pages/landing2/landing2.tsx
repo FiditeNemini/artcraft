@@ -80,7 +80,7 @@ const Landing = () => {
       icon: faTools,
       title: "Mixed Asset Crafting",
       description: "You can use image cutouts, worlds, and simple 3D meshes all together to precisely and intentionally lay out your scenes.",
-      src: "/videos/features/Leo.webm"
+      src: "/videos/features/Mixed.webm"
     },
     {
       icon: faUser,
