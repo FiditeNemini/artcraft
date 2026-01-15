@@ -2,7 +2,7 @@ use crate::core::state::os_platform::OsPlatform;
 use chrono::{DateTime, Utc};
 
 // TODO: Centrally configure version.
-const ARTCRAFT_VERSION: &str = "0.0.1";
+const ARTCRAFT_VERSION: &str = "0.2.0";
 
 #[derive(Clone, Debug)]
 pub struct ArtcraftPlatformInfo {
