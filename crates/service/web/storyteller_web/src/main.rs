@@ -147,6 +147,8 @@ async fn main() -> AnyhowResult<()> {
 
   let pool = connect_to_database().await?;
 
+  info!("Connected to database.");
+
   let firehose_publisher = FirehosePublisher {
     mysql_pool: pool.clone(), // NB: Pool is clone/sync/send-safe
   };
@@ -155,6 +157,8 @@ async fn main() -> AnyhowResult<()> {
     mysql_pool: pool.clone(), // NB: Pool is clone/sync/send-safe
     firehose_publisher: firehose_publisher.clone(), // NB: Also safe
   };
+
+  info!("Connected to redis...");
 
   let redis_manager = RedisConnectionManager::new(
     common_env.redis_0_connection_string.clone())?;
