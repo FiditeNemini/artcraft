@@ -27,7 +27,7 @@ use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use log::error;
 use mysql_queries::queries::generic_inference::web::get_inference_job_status::get_inference_job_status;
 use mysql_queries::queries::generic_inference::web::job_status::GenericInferenceJobStatus;
-use r2d2_redis::redis::{Commands, RedisResult};
+use redis::{Commands, RedisResult};
 use redis_common::redis_keys::RedisKeys;
 use server_environment::ServerEnvironment;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
@@ -37,7 +37,7 @@ use utoipa::ToSchema;
 /// maintained a keepalive. This prevents wasted work when users who are unlikely to return
 /// navigate away. Premium users have accounts and can always return to the site, so they
 /// typically do not require keepalive.
-const JOB_KEEPALIVE_TTL_SECONDS : usize = 60 * 3;
+const JOB_KEEPALIVE_TTL_SECONDS : u64 = 60 * 3;
 
 /// For the URL PathInfo
 #[derive(Deserialize, ToSchema)]
