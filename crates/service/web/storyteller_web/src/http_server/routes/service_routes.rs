@@ -1,6 +1,6 @@
 use crate::http_server::endpoints::misc::default_route_404::default_route_404;
 use crate::http_server::endpoints::misc::detect_locale_handler::detect_locale_handler;
-use crate::http_server::endpoints::misc::root_index::get_root_index;
+use crate::http_server::endpoints::misc::get_root_handler::get_root_handler;
 use crate::http_server::endpoints::service::health_check_handler::get_health_check_handler;
 use crate::http_server::endpoints::service::public_info_handler::get_public_info_handler;
 use crate::http_server::endpoints::service::status_alert_handler::status_alert_handler;
@@ -44,7 +44,7 @@ where
             .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(web::resource("/")
-          .route(web::get().to(get_root_index))
+          .route(web::get().to(get_root_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
       .default_service( web::route().to(default_route_404))
