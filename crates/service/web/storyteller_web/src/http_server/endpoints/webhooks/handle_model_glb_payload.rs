@@ -205,7 +205,7 @@ async fn try_to_attach_thumbnail(
       .public_bucket_directory_hash(&public_upload_path)
       .media_file_class(MediaFileClass::Image)
       .media_file_type(media_file_type)
-      //.media_file_origin_category(MediaFileOriginCategory::Inference)
+      .media_file_origin_category(MediaFileOriginCategory::Processed)
       //.maybe_engine_category(Some(MediaFileEngineCategory::Object))
       //.media_file_origin_product_category(MediaFileOriginProductCategory::Unknown)
       .mime_type(mime_type)
