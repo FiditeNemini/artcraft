@@ -31,7 +31,7 @@ use tokens::tokens::app_session::AppSessionToken;
 
 // TODO: Configure this with the build and increment.
 const CLIENT_NAME : &str = "artcraft";
-const CLIENT_VERSION : &str = "0.2.0";
+const CLIENT_VERSION : &str = "0.3.0";
 
 const ERROR_SLEEP_MILLIS : u64 = 1_000 * 60 * 3; // 3 minutes;
 
