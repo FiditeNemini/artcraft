@@ -110,9 +110,6 @@
       "path": "../../libs/components/close-button"
     },
     {
-      "path": "../../libs/model-list"
-    },
-    {
       "path": "../../libs/components/model-selector"
     },
     {
@@ -138,6 +135,9 @@
     },
     {
       "path": "../../libs/components/list-dropdown"
+    },
+    {
+      "path": "../../libs/model-list"
     },
     {
       "path": "../../libs/components/gallery-modal"
