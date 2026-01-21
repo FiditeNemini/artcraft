@@ -1,5 +1,6 @@
 pub mod core;
 pub mod services;
+pub mod version;
 
 use tauri::Manager;
 

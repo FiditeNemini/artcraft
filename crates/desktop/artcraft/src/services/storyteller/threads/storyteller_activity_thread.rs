@@ -1,6 +1,7 @@
 use crate::core::events::basic_sendable_event_trait::BasicSendableEvent;
 use crate::core::state::app_env_configs::app_env_configs::AppEnvConfigs;
 use crate::core::state::artcraft_platform_info::ArtcraftPlatformInfo;
+use crate::core::state::artcraft_usage_tracker::artcraft_usage_tracker::ArtcraftUsageTracker;
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
 use crate::core::state::data_dir::trait_data_subdir::DataSubdir;
 use crate::core::state::os_platform::OsPlatform;
@@ -29,11 +30,8 @@ use storyteller_client::error::api_error::ApiError;
 use storyteller_client::error::storyteller_error::StorytellerError;
 use tauri::AppHandle;
 use tokens::tokens::app_session::AppSessionToken;
-use crate::core::state::artcraft_usage_tracker::artcraft_usage_tracker::ArtcraftUsageTracker;
 
-// TODO: Configure this with the build and increment.
 const CLIENT_NAME : &str = "artcraft";
-const CLIENT_VERSION : &str = "0.3.0";
 
 const ERROR_SLEEP_MILLIS : u64 = 1_000 * 60 * 3; // 3 minutes;
 
