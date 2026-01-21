@@ -3,35 +3,31 @@ use std::sync::Arc;
 use crate::http_server::common_responses::common_web_error::CommonWebError;
 use crate::state::server_state::ServerState;
 use actix_helpers::extractors::get_request_user_agent::get_request_user_agent;
-use actix_web::web::{Json, Query};
+use actix_web::web::Json;
 use actix_web::{web, HttpRequest};
 use artcraft_api_defs::analytics::log_active_user::{LogAppActiveUserRequest, LogAppActiveUserResponse};
 use enums::common::payments_namespace::PaymentsNamespace;
-use errors::AnyhowResult;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{info, warn};
 use mysql_queries::queries::analytics_active_users::upsert_analytics_app_active_user::UpsertAnalyticsAppActiveUser;
 use mysql_queries::queries::analytics_active_users::upsert_analytics_app_session::UpsertAnalyticsAppSession;
 use tokens::tokens::app_session::AppSessionToken;
-use utoipa::ToSchema;
 
 const CLIENT_WAIT_FOR_RETRY_MILLIS: u64 = 1_000 * 60 * 1; // Every minute
 
-/// Log an active app user - user must be logged in.
+/// Log an active app user (JSON body version) - user must be logged in.
 #[utoipa::path(
   post,
   tag = "Analytics",
-  path = "/v1/analytics/active_user",
+  path = "/v1/analytics/active_user_v2",
+  request_body = LogAppActiveUserRequest,
   responses(
     (status = 200, description = "Success", body = LogAppActiveUserSuccessResponse),
   ),
-  params(
-    ("request" = LogAppActiveUserRequest, description = "Payload for Request"),
-  )
 )]
-pub async fn log_app_active_user_handler(
+pub async fn log_app_active_user_json_handler(
   http_request: HttpRequest,
-  request: Query<LogAppActiveUserRequest>,
+  request: Json<LogAppActiveUserRequest>,
   server_state: web::Data<Arc<ServerState>>,
 ) -> Result<Json<LogAppActiveUserResponse>, CommonWebError>
 {
@@ -49,8 +45,8 @@ pub async fn log_app_active_user_handler(
       .user_token;
 
   let ip_address = get_request_ip(&http_request);
-  
-  info!("Logging active user: {:?}", request);
+
+  info!("Logging active user (JSON): {:?}", request);
 
   let app_version = {
     let user_agent = get_request_user_agent(&http_request);
@@ -103,10 +99,10 @@ pub async fn log_app_active_user_handler(
   };
 
   upsert.upsert_with_connection(&mut mysql_connection).await?;
-  
+
   if let Some(token) = request.maybe_app_session_token.as_ref() {
     validate_app_session_token_format(token)?;
-    
+
     let upsert = UpsertAnalyticsAppSession{
       app_session_token: token,
       namespace: PaymentsNamespace::Artcraft,
@@ -116,24 +112,24 @@ pub async fn log_app_active_user_handler(
       os_platform: request.maybe_os_platform.as_deref(),
       os_version: request.maybe_os_version.as_deref(),
       session_duration_seconds: request.maybe_session_duration_seconds,
-      total_generation_count: 0,
-      image_generation_count: 0,
-      video_generation_count: 0,
-      object_generation_count: 0,
-      text_to_image_count: 0,
-      image_to_image_count: 0,
-      text_to_video_count: 0,
-      image_to_video_count: 0,
-      text_to_object_count: 0,
-      image_to_object_count: 0,
-      image_page_prompt_count: 0,
-      video_page_prompt_count: 0,
-      edit_page_prompt_count: 0,
-      stage_page_prompt_count: 0,
-      object_page_prompt_count: 0,
-      other_page_prompt_count: 0,
+      total_generation_count: request.total_generation_count.unwrap_or(0),
+      image_generation_count: request.image_generation_count.unwrap_or(0),
+      video_generation_count: request.video_generation_count.unwrap_or(0),
+      object_generation_count: request.object_generation_count.unwrap_or(0),
+      text_to_image_count: request.text_to_image_count.unwrap_or(0),
+      image_to_image_count: request.image_to_image_count.unwrap_or(0),
+      text_to_video_count: request.text_to_video_count.unwrap_or(0),
+      image_to_video_count: request.image_to_video_count.unwrap_or(0),
+      text_to_object_count: request.text_to_object_count.unwrap_or(0),
+      image_to_object_count: request.image_to_object_count.unwrap_or(0),
+      image_page_prompt_count: request.image_page_prompt_count.unwrap_or(0),
+      video_page_prompt_count: request.video_page_prompt_count.unwrap_or(0),
+      edit_page_prompt_count: request.edit_page_prompt_count.unwrap_or(0),
+      stage_page_prompt_count: request.stage_page_prompt_count.unwrap_or(0),
+      object_page_prompt_count: request.object_page_prompt_count.unwrap_or(0),
+      other_page_prompt_count: request.other_page_prompt_count.unwrap_or(0),
     };
-  
+
     upsert.upsert_with_connection(&mut mysql_connection).await?;
   }
 
@@ -148,6 +144,6 @@ fn validate_app_session_token_format(app_session_token: &AppSessionToken) -> Res
     warn!("App session token has invalid prefix: {}", app_session_token.as_str());
     return Err(CommonWebError::BadInputWithSimpleMessage("Invalid app session token format".to_string()));
   }
-  
+
   Ok(())
 }
