@@ -34,6 +34,8 @@
 
 
 export const DOWNLOAD_LINKS = {
-  WINDOWS: 'https://github.com/storytold/artcraft/releases/download/artcraft-windows-v0.2.0/ArtCraft_0.2.0_x64-setup.exe',
-  MACOS: 'https://github.com/storytold/artcraft/releases/download/artcraft-v0.2.0/ArtCraft_0.2.0_universal.dmg',
+  // WINDOWS: 'https://github.com/storytold/artcraft/releases/download/artcraft-windows-v0.2.0/ArtCraft_0.2.0_x64-setup.exe',
+  WINDOWS: 'https://github.com/storytold/artcraft/releases/download/artcraft-windows-v0.4.0/ArtCraft_0.4.0_x64-setup.exe',
+  // MACOS: 'https://github.com/storytold/artcraft/releases/download/artcraft-v0.2.0/ArtCraft_0.2.0_universal.dmg',
+  MACOS: 'https://github.com/storytold/artcraft/releases/download/artcraft-v0.4.0/ArtCraft_0.4.0_universal.dmg',
 } as const;
