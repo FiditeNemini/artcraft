@@ -3,15 +3,16 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
 import * as path from 'path';
+import { isExternal } from '../shared-vite-config';
 
 export default defineConfig(() => ({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/libs/tauri-events',
   plugins: [
-    react(), 
-    dts({ 
-      entryRoot: 'src', 
-      tsconfigPath: path.join(__dirname, 'tsconfig.lib.json') 
+    react(),
+    dts({
+      entryRoot: 'src',
+      tsconfigPath: path.join(__dirname, 'tsconfig.lib.json')
     })
   ],
   // Uncomment this if you are using workers.
@@ -38,12 +39,8 @@ export default defineConfig(() => ({
     },
     rollupOptions: {
       // External packages that should not be bundled into your library.
-      external: [
-        'react',
-        'react-dom',
-        'react/jsx-runtime',
-        'react-hot-toast',
-      ]
+      // Uses shared config plus react-hot-toast
+      external: isExternal
     },
   },
   test: {
