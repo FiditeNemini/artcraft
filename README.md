@@ -1,7 +1,5 @@
 <p align="center">
-  <video width="100%" controls autoplay>
-    <source src="https://github.com/storytold/github-media/raw/refs/heads/main/artcraft_website_v2.mp4" type="video/mp4">
-  </video>
+  <video src="https://github.com/storytold/github-media/raw/refs/heads/main/artcraft_website_v2.mp4" width="100%" autoplay loop controls>
 </p>
 
 ---
