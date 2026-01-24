@@ -1,5 +1,5 @@
 <p align="center">
-  <video src="https://github.com/storytold/github-media/raw/refs/heads/main/artcraft_website_v2.mp4" width="100%" autoplay loop controls>
+  <video src="https://github.com/user-attachments/assets/b4e24c27-d87d-4fd1-8599-dc0d0b8af48d" width="100%" autoplay="true" loop controls>
 </p>
 
 ---
