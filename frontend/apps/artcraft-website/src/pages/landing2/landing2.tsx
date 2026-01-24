@@ -28,6 +28,9 @@ import { OwnershipComparison } from "../../components/ownership-comparison/owner
 
 gsap.registerPlugin(ScrollTrigger);
 
+//const HERO_VIDEO_URL = "https://pub-f7441936e5804042a1ea2bdc92e4dc71.r2.dev/artcraft_commercial.mp4";
+const HERO_VIDEO_URL = "https://pub-f7441936e5804042a1ea2bdc92e4dc71.r2.dev/artcraft_website_v2.mp4";
+
 // Versions and links are now centralized in downloads config - BFlat
 const MAC_LINK = DOWNLOAD_LINKS.MACOS;
 const WINDOWS_LINK = DOWNLOAD_LINKS.WINDOWS;
@@ -301,10 +304,10 @@ const Landing = () => {
                    preload="none"
                    poster="/images/hero-poster.jpg"
                    className="w-full h-full object-cover rounded-2xl bg-white"
-                   src="https://pub-f7441936e5804042a1ea2bdc92e4dc71.r2.dev/artcraft_commercial.mp4"
+                   src={HERO_VIDEO_URL}
                 >
                   <source
-                    src="https://pub-f7441936e5804042a1ea2bdc92e4dc71.r2.dev/artcraft_commercial.mp4"
+                    src={HERO_VIDEO_URL}
                     type="video/mp4"
                   />
                   Your browser does not support the video tag.
