@@ -1,6 +1,6 @@
 <p align="center">
   <video width="100%" controls autoplay>
-    <source src="https://pub-f7441936e5804042a1ea2bdc92e4dc71.r2.dev/artcraft_website_v2.mp4" type="video/mp4">
+    <source src="https://github.com/storytold/github-media/raw/refs/heads/main/artcraft_website_v2.mp4" type="video/mp4">
   </video>
 </p>
 
