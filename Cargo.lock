@@ -10216,19 +10216,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "shared_service_components"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "errors",
- "log",
- "openai_sora_client",
- "r2d2_redis",
- "reqwest 0.12.23",
- "workspace-build-acceleration",
-]
-
-[[package]]
 name = "shlex"
 version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
