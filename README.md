@@ -7,6 +7,7 @@
   <a href="https://discord.gg/artcraft"><img alt="Discord" src="https://img.shields.io/discord/1359579021108842617?style=for-the-badge&label=discord&color=ffffff&logo=discord&logoColor=ffffff" /></a>
   <a href="https://www.youtube.com/@OfficialArtCraftStudios"><img alt="YouTube" src="https://img.shields.io/youtube/channel/subscribers/UCdjY4VG0ntoGwFsKZO4sVWA?style=for-the-badge&logo=YouTube" /></a>
   <a href="https://x.com/intent/follow?screen_name=get_artcraft"><img alt="X" src="https://img.shields.io/twitter/follow/get_artcraft?style=for-the-badge&label=follow&logo=x&logoColor=ffffff&color=ffffff" /></a>
+  <a href="https://www.linkedin.com/company/artcraft-ai"><img alt="LinkedIn" src="https://img.shields.io/badge/linkedin--0A66C2?style=for-the-badge"></a>
 </p>
 
 ---
@@ -78,11 +79,4 @@ those providers, for example: OpenArt, FreePik, etc.
 - [tools, scripts, misc](./script)
 - [license](./LICENSE.md)
 - [roadmap](./ROADMAP.md)
-
-## Social 
-
-[![discord](https://raw.githubusercontent.com/CLorant/readme-social-icons/main/large/colored/discord.svg)](https://discord.gg/artcraft)
-[![youtube](https://raw.githubusercontent.com/CLorant/readme-social-icons/main/large/colored/youtube.svg)](https://www.youtube.com/@OfficialArtCraftStudios)
-[![x](https://raw.githubusercontent.com/CLorant/readme-social-icons/main/large/colored/linkedin.svg)](https://www.linkedin.com/company/artcraft-ai)
-[![x](https://raw.githubusercontent.com/CLorant/readme-social-icons/main/large/colored/twitter-x.svg)](https://x.com/get_artcraft)
 
