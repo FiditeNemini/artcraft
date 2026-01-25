@@ -10,6 +10,8 @@ import {
   faPaintBrush,
   faXmark,
   faTrashXmark,
+  faEraser,
+  faSendBack,
 } from "@fortawesome/pro-solid-svg-icons";
 import {
   faShapes,
@@ -22,7 +24,7 @@ import "../../App.css";
 import { HsvaColorPicker, HsvaColor } from "react-colorful";
 import { hsvaToHex } from "@uiw/color-convert";
 import SliderWithIndicator from "./SliderWithIndicator";
-import { useSceneStore } from "../../stores/SceneState";
+import { ActiveTool, useSceneStore } from "../../stores/SceneState";
 import { Tooltip } from "@storyteller/ui-tooltip";
 import {
   showActionReminder,
@@ -51,9 +53,9 @@ export interface SideToolbarProps {
   onPaintBrush: (hex: string, size: number, opacity: number) => void;
   onCanvasBackground: (hex: string) => void;
   onUploadImage: () => void;
-  onDelete: () => void;
-  activeToolId: string;
+  activeToolId: ActiveTool;
   className?: string;
+  supportsMaskTool?: boolean;
 }
 
 const SideToolbar: React.FC<SideToolbarProps> = ({
@@ -63,7 +65,7 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
   onPaintBrush,
   onCanvasBackground,
   onUploadImage,
-  onDelete,
+  supportsMaskTool = false,
   activeToolId,
   className = "",
 }) => {
@@ -270,11 +272,19 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
       popout: BrushPopout,
     },
     {
-      id: "delete",
-      label: "Delete",
-      icon: <FontAwesomeIcon icon={faTrash} className="h-5 w-5" />,
+      id: "inpaint",
+      label: "Mask",
+      icon: <FontAwesomeIcon icon={faSendBack} className="h-5 w-5" />,
       onClick: () => {
-        onDelete();
+        store.setActiveTool("inpaint");
+      },
+    },
+    {
+      id: "erase",
+      label: "Eraser",
+      icon: <FontAwesomeIcon icon={faEraser} className="h-5 w-5" />,
+      onClick: () => {
+        store.setActiveTool("eraser");
       },
     },
     { id: "separator-3", type: "separator" },
@@ -377,6 +387,7 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
       )}
 
       {tools.map((tool) => {
+
         if (tool.type === "separator") {
           return <div key={tool.id} className="my-1 h-px w-8 bg-white/15" />;
         }
@@ -387,7 +398,9 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
           (id === "add-shape" && activeToolId === "shape");
         const btnStyle = active
           ? "bg-primary/30 border-2 !border-primary text-white"
-          : "hover:bg-white/10 text-white";
+          : (id === "inpaint" && !supportsMaskTool)
+            ? "opacity-50 cursor-not-allowed hover:bg-transparent hover:border-transparent hover:text-white/50"
+            : "hover:bg-white/10 text-white";
 
         let displayIcon = icon;
         if (id === "draw") {
@@ -415,12 +428,14 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
           );
         }
 
+        const tooltipLabel = (id === "inpaint" && !supportsMaskTool) ? label + " (Model unsupported)" : label;
+
         return (
           <div key={id} className="relative">
             {/* Hide tooltip for brush tool when active and popover is open */}
             {!(id === "draw" && active && open === id) && (
               <Tooltip
-                content={label}
+                content={tooltipLabel}
                 position="right"
                 closeOnClick={true}
                 className="ms-1 rounded-md px-3 py-1"
@@ -464,6 +479,7 @@ const SideToolbar: React.FC<SideToolbarProps> = ({
                       onClick?.();
                     }}
                     className={`${baseBtn} ${btnStyle}`}
+                    disabled={id === "inpaint" && !supportsMaskTool}
                   >
                     {displayIcon}
                   </button>

@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { Node, NodeType } from "../Node";
 import { EnqueueImageBgRemoval } from "libs/tauri-api/src/lib/enqueue/EnqueueImageBgRemovalCommand";
+import { ImageBundle } from "~/pages/PageEdit/HistoryStack";
+import { BaseSelectorImage } from "~/pages/PageEdit/BaseImageSelector";
 
 // Add LineNode type
 export type LineNode = {
@@ -55,6 +57,7 @@ export const convertFileToBase64 = (file: File): Promise<string> => {
 export type ActiveTool =
   | "select"
   | "draw"
+  | "inpaint"
   | "eraser"
   | "backgroundColor"
   | "shape";
@@ -175,6 +178,7 @@ interface SceneState {
     dy: number,
     shouldSaveState?: boolean,
   ) => void;
+  clearLineNodes: () => void;
 
   // Add a specific method for file uploads
   createImageFromFile: (
@@ -253,6 +257,17 @@ interface SceneState {
   // Add aspect ratio action
   setAspectRatioType: (type: AspectRatioType) => void;
   getAspectRatioDimensions: () => { width: number; height: number };
+
+  // For the history stack
+  historyImageBundles: ImageBundle[];
+  clearHistoryImages: () => void;
+  addHistoryImageBundle: (bundle: ImageBundle) => void;
+  removeHistoryImage: (image: BaseSelectorImage) => void;
+
+  // Base image state
+  baseImageInfo: BaseSelectorImage | null;
+  baseImageBitmap: HTMLImageElement | null;
+  setBaseImageInfo: (image: BaseSelectorImage | null) => void;
 }
 
 export const generateId = (): string => {
@@ -292,6 +307,13 @@ export const useSceneStore = create<SceneState>((set, get, store) => ({
   // Cursor initial state
   cursorPosition: null,
   cursorVisible: false,
+
+  // Base image initial state
+  baseImageInfo: null,
+  baseImageBitmap: null,
+
+  // History stack state
+  historyImageBundles: [],
 
   // Add initial aspect ratio state
   aspectRatioType: AspectRatioType.NONE,
@@ -1542,6 +1564,15 @@ export const useSceneStore = create<SceneState>((set, get, store) => ({
   },
 
   getAspectRatioDimensions: () => {
+    // First we check the base image info if it exists
+    // Otherwise we use default landscape
+    const baseImageInfo = get().baseImageBitmap;
+
+    // If base image exists, use its dimensions
+    if (baseImageInfo) {
+      return { width: baseImageInfo.width, height: baseImageInfo.height };
+    }
+
     const { aspectRatioType } = get();
     switch (aspectRatioType) {
       case AspectRatioType.PORTRAIT:
@@ -1553,5 +1584,61 @@ export const useSceneStore = create<SceneState>((set, get, store) => ({
       default:
         return { width: 1024, height: 683 }; // Default to landscape
     }
+  },
+
+  setBaseImageInfo: (image: BaseSelectorImage | null) => {
+    set({ baseImageInfo: image });
+
+    if (!image) {
+      return;
+    }
+
+    // Load the image bitmap as well
+    const imgBitmap = new Image();
+    imgBitmap.onload = () => {
+      set({ baseImageBitmap: imgBitmap });
+    };
+    imgBitmap.onerror = (event) => {
+      console.error("Failed to load base image, discarding", event);
+      set({ baseImageInfo: null, baseImageBitmap: null });
+      imgBitmap.onload = null;
+      imgBitmap.onerror = null;
+    };
+    imgBitmap.crossOrigin = "anonymous";
+    const isDataUrl =
+      typeof image.url === "string" && image.url.startsWith("data:");
+    imgBitmap.src = isDataUrl ? image.url : image.url + "?basecanvasimg";
+  },
+
+  clearLineNodes() {
+    set({ lineNodes: [] });
+  },
+
+  clearHistoryImages: () => {
+    set({ historyImageBundles: [] });
+  },
+
+  addHistoryImageBundle(bundle) {
+    set((state) => ({
+      historyImageBundles: [...state.historyImageBundles, bundle],
+    }));
+  },
+
+  removeHistoryImage(image) {
+    console.log("Removing history image:", image);
+    set((state) => {
+      const updatedBundles = state.historyImageBundles
+        .map((bundle) => {
+          return {
+            ...bundle,
+            images: bundle.images.filter(
+              (img) => img.mediaToken !== image.mediaToken,
+            ),
+          };
+        })
+        .filter((bundle) => bundle.images.length > 0); // Remove empty bundles
+      console.log("Updated history image bundles:", updatedBundles);
+      return { historyImageBundles: updatedBundles };
+    });
   },
 }));

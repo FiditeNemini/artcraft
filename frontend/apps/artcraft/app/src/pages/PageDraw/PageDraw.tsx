@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from "react";
-import { PaintSurface } from "./PaintSurface";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { DRAW_LAYER_ID, INPAINT_LAYER_ID, PaintSurface } from "./PaintSurface";
 import "./App.css";
 import PromptEditor from "./PromptEditor/PromptEditor";
 import SideToolbar from "./components/ui/SideToolbar";
@@ -8,22 +8,26 @@ import { useUndoRedoHotkeys } from "./hooks/useUndoRedoHotkeys";
 import { useDeleteHotkeys } from "./hooks/useDeleteHotkeys";
 import { useCopyPasteHotkeys } from "./hooks/useCopyPasteHotkeys";
 import Konva from "konva";
-import { setCanvasRenderBitmap } from "../../signals/canvasRenderBitmap";
-import { captureStageImageBitmap } from "./hooks/useUpdateSnapshot";
+import { captureStageEditsBitmap } from "./hooks/useUpdateSnapshot";
 import { ContextMenuContainer } from "./components/ui/ContextMenu";
 import { ImageModel } from "@storyteller/model-list";
 import {
   CANVAS_2D_PAGE_MODEL_LIST,
   ClassyModelSelector,
   ModelPage,
-  //ProviderSelector,
-  //PROVIDER_LOOKUP_BY_PAGE,
   useSelectedImageModel,
   useSelectedProviderForModel,
 } from "@storyteller/ui-model-selector";
-import { useCanvasBgRemovedEvent } from "@storyteller/tauri-api";
+import { EnqueueEditImage, EnqueueEditImageRequest, EnqueueEditImageResolution, EnqueueEditImageSize, EnqueueImageInpaint, EnqueueImageInpaintRequest, useCanvasBgRemovedEvent } from "@storyteller/tauri-api";
 import { HelpMenuButton } from "@storyteller/ui-help-menu";
 import { GenerationProvider } from "@storyteller/api-enums";
+import { HistoryStack, ImageBundle } from "../PageEdit/HistoryStack";
+import { BaseImageSelector, BaseSelectorImage } from "../PageEdit/BaseImageSelector";
+import { normalizeCanvas } from "~/Helpers/CanvasHelpers";
+import { EncodeImageBitmapToBase64 } from "./utilities/EncodeImageBitmapToBase64";
+import { RefImage, usePrompt2DStore } from "@storyteller/ui-promptbox";
+import { PromptsApi } from "@storyteller/api";
+import toast from "react-hot-toast";
 
 const PAGE_ID: ModelPage = ModelPage.Canvas2D;
 
@@ -59,12 +63,34 @@ const PageDraw = () => {
   const stageRef = useRef<Konva.Stage>({} as Konva.Stage);
   const transformerRefs = useRef<{ [key: string]: Konva.Transformer }>({});
   const store = useSceneStore();
+  const promptStoreProvider = usePrompt2DStore;
+  const generationCount = promptStoreProvider((state) => state.generationCount);
+  const setGenerationCount = promptStoreProvider((state) => state.setGenerationCount);
+  const useSystemPrompt = promptStoreProvider((state) => state.useSystemPrompt);
+  const referenceImages = promptStoreProvider((state) => state.referenceImages);
+  const prompt = promptStoreProvider((state) => state.prompt);
+
+  const baseImageKonvaRef = useRef<Konva.Image>({} as Konva.Image);
+  const baseImageUrl = store.baseImageInfo?.url;
+  const [pendingGenerations, setPendingGenerations] = useState<
+    { id: string; count: number }[]
+  >([]);
+  const addHistoryImageBundle = useSceneStore(
+    (state) => state.addHistoryImageBundle,
+  );
+  const removeHistoryImage = useSceneStore((state) => state.removeHistoryImage);
+  const historyImageBundles = useSceneStore(
+    (state) => state.historyImageBundles,
+  );
 
   const selectedImageModel: ImageModel | undefined =
     useSelectedImageModel(PAGE_ID);
 
-  const selectedProvider : GenerationProvider | undefined = 
+  const selectedProvider: GenerationProvider | undefined =
     useSelectedProviderForModel(PAGE_ID, selectedImageModel?.id);
+
+  const supportsMaskedInpainting =
+    selectedImageModel?.usesInpaintingMask ?? false;
 
   useDeleteHotkeys({ onDelete: store.deleteSelectedItems });
   useUndoRedoHotkeys({ undo: store.undo, redo: store.redo });
@@ -93,6 +119,46 @@ const PageDraw = () => {
       event.image_cdn_url,
     );
   });
+
+  // Create a function to use the left layer ref and download the bitmap from it
+  const getMaskArrayBuffer = async (): Promise<Uint8Array> => {
+    if (
+      !stageRef.current ||
+      !baseImageKonvaRef.current
+    ) {
+      console.error("Stage or left panel ref is not available");
+      throw new Error("Stage or left panel or base image ref is not available");
+    }
+
+    const layer = stageRef.current.getLayers().find((l) => l.id() === INPAINT_LAYER_ID)!;
+
+    // Get the canvas area that's covered by the image/rectangle
+    const rect = baseImageKonvaRef.current;
+    const layerCrop = layer.toCanvas({
+      x: stageRef.current.x(),
+      y: stageRef.current.y(),
+      width: rect.width() * stageRef.current.scaleX(),
+      height: rect.height() * stageRef.current.scaleY(),
+      pixelRatio: 1 / stageRef.current.scaleX(),
+    });
+
+    // Using the pixelRatio scaling may result in off-by-one rounding errors,
+    // So we re-fit the image to a canvas of precise size.
+    const fittedCanvas = normalizeCanvas(
+      layerCrop,
+      rect.width(),
+      rect.height(),
+    );
+
+    // Convert colored canvas to alpha mask
+    // NOTE: This isn't needed because the tauri backend uses the alpha channel anyway
+    // drawAlphaMask(fittedCanvas, rect.width(), rect.height());
+
+    const blob = await fittedCanvas.convertToBlob({ type: "image/png" });
+    const arrayBuffer = await blob.arrayBuffer();
+
+    return new Uint8Array(arrayBuffer);
+  };
 
   // Listen for gallery drag and drop events
   useEffect(() => {
@@ -180,23 +246,279 @@ const PageDraw = () => {
     }
   };
 
-  const onEnqueuedPressed = async () => {
-    const { width, height } = store.getAspectRatioDimensions();
+  const handleTauriEnqueue = async (image: ImageBitmap, aspectRatio: EnqueueEditImageSize | undefined, resolution: EnqueueEditImageResolution | undefined, subscriberId: string) => {
+    if (image === undefined) {
+      console.log("image is undefined");
+      return;
+    }
 
-    // takes snap shot and then a global variable in the engine will invoke the inference.
-    const image = await captureStageImageBitmap(
-      stageRef,
-      transformerRefs,
+    const api = new PromptsApi();
+    const base64Bitmap = await EncodeImageBitmapToBase64(image);
+
+    const byteString = atob(base64Bitmap);
+    const mimeString = "image/png";
+
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+
+    const uuid = crypto.randomUUID(); // Generate a new UUID
+    const file = new File([ab], `${uuid}.png`, { type: mimeString });
+
+    const snapshotMediaToken = await api.uploadSceneSnapshot({
+      screenshot: file,
+    });
+
+    if (snapshotMediaToken.data === undefined) {
+      toast.error("Error: Unable to upload scene snapshot Please try again.");
+      return;
+    }
+
+    console.log("useSystemPrompt", useSystemPrompt);
+    console.log("Snapshot media token:", snapshotMediaToken.data);
+
+    const request: EnqueueEditImageRequest = {
+      model: selectedImageModel,
+      scene_image_media_token: snapshotMediaToken.data!,
+      image_media_tokens: referenceImages
+        .map((image) => image.mediaToken)
+        .filter((t) => t.length > 0),
+      disable_system_prompt: !useSystemPrompt,
+      prompt: prompt,
+      image_count: generationCount,
+      aspect_ratio: aspectRatio,
+      image_resolution: resolution,
+      frontend_caller: "image_editor",
+      frontend_subscriber_id: subscriberId,
+    };
+
+    if (selectedProvider) {
+      request.provider = selectedProvider;
+    }
+
+    const generateResponse = await EnqueueEditImage(request);
+    console.log("generateResponse", generateResponse);
+    return generateResponse;
+  }
+
+  const getCompositeCanvasFile = useCallback(async (): Promise<File | null> => {
+    if (
+      !stageRef.current ||
+      !baseImageKonvaRef.current ||
+      !store.baseImageBitmap
+    ) {
+      return null;
+    }
+
+    const editsLayer = stageRef.current.getLayers().find((l) => l.id() === DRAW_LAYER_ID);
+
+    if (!editsLayer) {
+      console.error("Edits layer not found");
+      return null;
+    }
+
+    const rect = baseImageKonvaRef.current;
+    const width = rect.width();
+    const height = rect.height();
+
+    const canvas = new OffscreenCanvas(width, height);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+
+    ctx.drawImage(store.baseImageBitmap, 0, 0, width, height);
+
+    const markerLayerCanvas = editsLayer.toCanvas({
+      x: stageRef.current.x(),
+      y: stageRef.current.y(),
+      width: rect.width() * stageRef.current.scaleX(),
+      height: rect.height() * stageRef.current.scaleY(),
+      pixelRatio: 1 / stageRef.current.scaleX(),
+    });
+    const fittedMarkerCanvas = normalizeCanvas(
+      markerLayerCanvas,
       width,
       height,
     );
-    if (!image) {
-      console.error("Failed to capture stage image");
-      return;
-    } else {
-      setCanvasRenderBitmap(image);
-    }
-  };
+    ctx.drawImage(fittedMarkerCanvas, 0, 0, width, height);
+
+    const blob = await canvas.convertToBlob({ type: "image/png" });
+    const uuid = crypto.randomUUID();
+    return new File([blob], `${uuid}.png`, { type: "image/png" });
+  }, [store.baseImageBitmap]);
+
+  const handleGenerate = useCallback(
+    async (
+      prompt: string,
+      options?: {
+        aspectRatio?: string;
+        resolution?: string;
+        images?: RefImage[];
+        selectedProvider?: GenerationProvider;
+      },
+    ) => {
+      const editedImageToken = store.baseImageInfo?.mediaToken;
+
+      if (!editedImageToken) {
+        console.error("Base image is not available");
+        return;
+      }
+
+      // Helper to map aspect ratio string to enum
+      const mapAspectRatio = (
+        ratio?: string,
+      ): EnqueueEditImageSize | undefined => {
+        switch (ratio) {
+          case "auto":
+            return EnqueueEditImageSize.Auto;
+          case "wide":
+            return EnqueueEditImageSize.Wide;
+          case "tall":
+            return EnqueueEditImageSize.Tall;
+          case "square":
+            return EnqueueEditImageSize.Square;
+          default:
+            return undefined;
+        }
+      };
+
+      // Helper to map resolution string to enum
+      const mapResolution = (
+        res?: string,
+      ): EnqueueEditImageResolution | undefined => {
+        switch (res) {
+          case "1k":
+            return EnqueueEditImageResolution.OneK;
+          case "2k":
+            return EnqueueEditImageResolution.TwoK;
+          case "4k":
+            return EnqueueEditImageResolution.FourK;
+          default:
+            return undefined;
+        }
+      };
+
+      const { width, height } = store.getAspectRatioDimensions();
+      const subscriberId: string =
+        crypto?.randomUUID?.() ??
+        `inpaint-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+      // takes snap shot and then a global variable in the engine will invoke the inference.
+      const image = await captureStageEditsBitmap(
+        stageRef,
+        transformerRefs,
+        width,
+        height,
+      );
+
+      if (!image) {
+        console.error("Failed to capture stage edits image");
+        return;
+      }
+
+      try {
+        let result;
+
+        if (selectedImageModel?.editingIsInpainting) {
+          // CASE 1 - INPAINTING (Only a few models do this!)
+          const arrayBuffer = await getMaskArrayBuffer();
+          const request: EnqueueImageInpaintRequest = {
+            model: selectedImageModel,
+            image_media_token: editedImageToken,
+            mask_image_raw_bytes: arrayBuffer,
+            prompt: prompt,
+            image_count: generationCount,
+            frontend_caller: "image_editor",
+            frontend_subscriber_id: subscriberId,
+          };
+
+          if (options?.selectedProvider) {
+            request.provider = options.selectedProvider;
+          }
+
+          result = await EnqueueImageInpaint(request);
+        } else if (selectedImageModel?.isNanoBananaModel()) {
+          // CASE 2 - NANO BANANA
+          const compositeFile = await getCompositeCanvasFile();
+
+          if (!compositeFile) {
+            console.error("Failed to create composite canvas");
+            return;
+          }
+
+          const api = new PromptsApi();
+          const snapshotResult = await api.uploadSceneSnapshot({
+            screenshot: compositeFile,
+          });
+
+          if (!snapshotResult.data) {
+            console.error("Failed to upload scene snapshot");
+            return;
+          }
+
+          const imgs = options?.images || [];
+          const request: EnqueueEditImageRequest = {
+            model: selectedImageModel,
+            scene_image_media_token: snapshotResult.data,
+            image_media_tokens: imgs
+              .map((img) => img.mediaToken)
+              .filter((t) => t.length > 0),
+            prompt: prompt,
+            image_count: generationCount,
+            frontend_caller: "image_editor",
+            frontend_subscriber_id: subscriberId,
+            aspect_ratio: mapAspectRatio(options?.aspectRatio),
+            image_resolution: mapResolution(options?.resolution),
+          };
+          if (options?.selectedProvider) {
+            request.provider = options.selectedProvider;
+          }
+          // if (selectedImageModel?.supportsNewAspectRatio()) {
+          //   request.common_aspect_ratio = commonAspectRatio;
+          // }
+          result = await EnqueueEditImage(request);
+        } else {
+          // CASE 3 - DEFAULT
+          const imgs = options?.images || [];
+          const request: EnqueueEditImageRequest = {
+            model: selectedImageModel,
+            image_media_tokens: [
+              editedImageToken,
+              ...imgs
+                .filter((img) => img.mediaToken !== editedImageToken)
+                .map((img) => img.mediaToken),
+            ].filter((t) => t.length > 0),
+            disable_system_prompt: true,
+            prompt: prompt,
+            image_count: generationCount,
+            frontend_caller: "image_editor",
+            frontend_subscriber_id: subscriberId,
+            aspect_ratio: mapAspectRatio(options?.aspectRatio),
+            image_resolution: mapResolution(options?.resolution),
+          };
+          if (options?.selectedProvider) {
+            request.provider = options.selectedProvider;
+          }
+          // if (selectedImageModel?.supportsNewAspectRatio()) {
+          //   request.common_aspect_ratio = commonAspectRatio;
+          // }
+          result = await EnqueueEditImage(request);
+        }
+        if (result?.status === "success") {
+          setPendingGenerations((prev) => [
+            ...prev,
+            { id: subscriberId as string, count: generationCount },
+          ]);
+        }
+      } catch (error) {
+        setPendingGenerations((prev) =>
+          prev.filter((p) => p.id !== subscriberId),
+        );
+        throw error;
+      }
+    }, [generationCount, getCompositeCanvasFile, selectedImageModel, store]);
 
   const onFitPressed = async () => {
     // Get the stage and its container dimensions
@@ -237,6 +559,13 @@ const PageDraw = () => {
     stage.batchDraw();
   };
 
+  // When the model inpainting support changes, we need to auto-change the tool so it's not set to inpainting
+  useEffect(() => {
+    if (!supportsMaskedInpainting && store.activeTool === "inpaint") {
+      store.setActiveTool("select");
+    }
+  }, [store, supportsMaskedInpainting]);
+
   // Auto-fit canvas to screen on initial load
   useEffect(() => {
     const autoFitCanvas = async () => {
@@ -266,25 +595,77 @@ const PageDraw = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Display image selector on launch, otherwise hide it
+  // Also show loading state if info is set but image is loading
+  if (!store.baseImageInfo || !store.baseImageBitmap) {
+    return (
+      <div
+        className={
+          "bg-ui-panel-gradient flex h-[calc(100vh-56px)] w-full items-center justify-center p-8"
+        }
+      >
+        <div className="w-full max-w-5xl">
+          <div className="aspect-video overflow-hidden rounded-2xl border border-ui-panel-border bg-ui-background shadow-lg">
+            <BaseImageSelector
+              onImageSelect={(image: BaseSelectorImage) => {
+                addHistoryImageBundle({ images: [image] });
+                store.setBaseImageInfo(image);
+              }}
+              showLoading={
+                store.baseImageInfo !== null && store.baseImageInfo === null
+              }
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="fixed inset-0 -z-10 bg-ui-background" />
       <div
-        className={`preserve-aspect-ratio fixed bottom-0 left-1/2 z-10 -translate-x-1/2 transform ${
-          isSelecting ? "pointer-events-none" : "pointer-events-auto"
-        }`}
+        className={`preserve-aspect-ratio fixed right-4 top-1/2 z-10 -translate-y-1/2 transform ${isSelecting ? "pointer-events-none" : "pointer-events-auto"
+          }`}
+      >
+        <HistoryStack
+          onClear={() => {
+            store.RESET();
+            setPendingGenerations([]);
+          }}
+          imageBundles={historyImageBundles}
+          pendingPlaceholders={pendingGenerations}
+          blurredBackgroundUrl={baseImageUrl}
+          onImageSelect={(baseImage) => {
+            store.clearLineNodes();
+            store.setNodes([]);
+            store.setBaseImageInfo(baseImage);
+          }}
+          onImageRemove={(baseImage) => {
+            if (
+              pendingGenerations.length === 0 &&
+              store.historyImageBundles.length === 1 &&
+              store.historyImageBundles[0].images.length <= 1
+            ) {
+              store.RESET();
+            } else {
+              removeHistoryImage(baseImage);
+            }
+          }}
+          onNewImageBundle={(newBundle: ImageBundle) => {
+            addHistoryImageBundle(newBundle);
+          }}
+          onResolvePending={(id: string) =>
+            setPendingGenerations((prev) => prev.filter((p) => p.id !== id))
+          }
+          selectedImageToken={store.baseImageInfo?.mediaToken}
+        />
+      </div>
+      <div
+        className={`preserve-aspect-ratio fixed bottom-0 left-1/2 z-10 -translate-x-1/2 transform ${isSelecting ? "pointer-events-none" : "pointer-events-auto"
+          }`}
       >
         <PromptEditor
-          initialPrompt=""
-          onPromptChange={(prompt: string) => {
-            console.log("Prompt changed:", prompt);
-          }}
-          onRandomize={() => {
-            console.log("Randomize clicked");
-          }}
-          onVary={() => {
-            console.log("Vary clicked");
-          }}
           onAspectRatioChange={async (ratio: string) => {
             const ratioToType = (ratio: string): AspectRatioType => {
               switch (ratio) {
@@ -305,8 +686,13 @@ const PageDraw = () => {
             await new Promise((resolve) => requestAnimationFrame(resolve));
             onFitPressed();
           }}
-          onEnqueuePressed={onEnqueuedPressed}
+          usePrompt2DStore={promptStoreProvider}
+          EncodeImageBitmapToBase64={EncodeImageBitmapToBase64}
+          onGenerateClick={handleGenerate}
           onFitPressed={onFitPressed}
+          isDisabled={false}
+          generationCount={generationCount}
+          onGenerationCountChange={setGenerationCount}
           //selectedModelInfo={selectedModelInfo}
           selectedImageModel={selectedImageModel}
           selectedProvider={selectedProvider}
@@ -374,9 +760,7 @@ const PageDraw = () => {
           input.value = "";
           input.click();
         }}
-        onDelete={(): void => {
-          store.RESET();
-        }}
+        supportsMaskTool={supportsMaskedInpainting}
         activeToolId={store.activeTool}
         currentShape={store.currentShape}
       />
@@ -446,6 +830,8 @@ const PageDraw = () => {
             onSelectionChange={setIsSelecting}
             stageRef={stageRef}
             transformerRefs={transformerRefs}
+            baseImageRef={baseImageKonvaRef}
+            showMaskLayer={supportsMaskedInpainting}
           />
         </ContextMenuContainer>
       </div>
@@ -455,7 +841,7 @@ const PageDraw = () => {
           page={PAGE_ID}
           panelTitle="Select Model"
           panelClassName="min-w-[300px]"
-          buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-white/80 hover:text-white"
+          buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-base-fg opacity-80 hover:opacity-100"
           showIconsInList
           triggerLabel="Model"
         />
