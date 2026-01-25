@@ -2,6 +2,13 @@
   <video src="https://github.com/user-attachments/assets/b4e24c27-d87d-4fd1-8599-dc0d0b8af48d" width="100%" autoplay="true" loop controls>
 </p>
 
+<p align="center">The IDE for artists.</p>
+<p align="center">
+  <a href="https://discord.gg/artcraft"><img alt="Discord" src="https://img.shields.io/discord/1359579021108842617?style=for-the-badge&label=discord&color=ffffff&logo=discord&logoColor=ffffff" /></a>
+  <a href="https://www.youtube.com/@OfficialArtCraftStudios"><img alt="YouTube" src="https://img.shields.io/youtube/channel/subscribers/UCdjY4VG0ntoGwFsKZO4sVWA?style=for-the-badge&logo=YouTube" /></a>
+  <a href="https://x.com/intent/follow?screen_name=get_artcraft"><img alt="X" src="https://img.shields.io/twitter/follow/get_artcraft?style=for-the-badge&label=follow&logo=x&logoColor=ffffff&color=ffffff" /></a>
+</p>
+
 ---
 
 ArtCraft
