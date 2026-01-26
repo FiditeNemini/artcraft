@@ -11,7 +11,6 @@ import {
   faSparkles,
   faSpinnerThird,
   faFrame,
-  faCopy,
   faPen,
   faEraser,
   faUndo,
@@ -25,13 +24,14 @@ import { ButtonIconSelect } from "@storyteller/ui-button-icon-select";
 import { PopoverMenu, PopoverItem } from "@storyteller/ui-popover";
 import { Tooltip } from "@storyteller/ui-tooltip";
 import { useEffect, useRef, useState } from "react";
-import { CommonAspectRatio, ImageModel, getCapabilitiesForModel } from "@storyteller/model-list";
+import { CommonAspectRatio, ImageModel } from "@storyteller/model-list";
 import { twMerge } from "tailwind-merge";
 import { ImagePromptRow, type UploadImageFn } from "./ImagePromptRow";
 import { RefImage, usePromptEditStore } from "./promptStore";
 import { GenerationProvider } from "@storyteller/api-enums";
 import { AspectRatioPicker } from "./common/AspectRatioPicker";
 import { GenerationCountPicker } from "./common/GenerationCountPicker";
+import { useSubscriptionState } from "@storyteller/subscription";
 
 export interface PromptBoxEditProps {
   onModeChange?: (mode: string) => void;
@@ -80,6 +80,10 @@ export const PromptBoxEdit = ({
   onUndo,
   onRedo,
 }: PromptBoxEditProps) => {
+  // Check subscription status to determine if user is on free plan
+  const hasPaidPlan = useSubscriptionState((s) => s.hasPaidPlan);
+  const isFreeUser = !hasPaidPlan();
+
   const [prompt, setPrompt] = useState("");
   const [useSystemPrompt, setUseSystemPrompt] = useState(true);
   const [isFocused, setIsFocused] = useState(false);
@@ -227,17 +231,17 @@ export const PromptBoxEdit = ({
     }
   };
 
-  const handleGenerationCountSelect = (selectedItem: PopoverItem) => {
-    const count = parseInt(selectedItem.label, 10);
-    setGenerationCount(count);
-    onGenerationCountChange?.(count);
-    setGenerationCountList((prev) =>
-      prev.map((item) => ({
-        ...item,
-        selected: item.label === selectedItem.label,
-      })),
-    );
-  };
+  // const handleGenerationCountSelect = (selectedItem: PopoverItem) => {
+  //   const count = parseInt(selectedItem.label, 10);
+  //   setGenerationCount(count);
+  //   onGenerationCountChange?.(count);
+  //   setGenerationCountList((prev) =>
+  //     prev.map((item) => ({
+  //       ...item,
+  //       selected: item.label === selectedItem.label,
+  //     })),
+  //   );
+  // };
 
   const handleGenerate = async () => {
     const busy = Boolean(isEnqueueing ?? internalEnqueueing);
@@ -421,28 +425,29 @@ export const PromptBoxEdit = ({
                     handleCommonAspectRatioSelect={setCommonAspectRatio}
                   />
                 )}
-                {selectedImageModel?.canChangeAspectRatio && !selectedImageModel?.supportsNewAspectRatio() && (
-                  <Tooltip
-                    content="Aspect Ratio"
-                    position="top"
-                    className="z-50"
-                    closeOnClick={true}
-                  >
-                    <PopoverMenu
-                      items={aspectRatioList}
-                      onSelect={handleAspectRatioSelect}
-                      mode="toggle"
-                      panelTitle="Aspect Ratio"
-                      showIconsInList
-                      triggerIcon={
-                        <FontAwesomeIcon
-                          icon={getCurrentAspectRatioIcon()}
-                          className="h-4 w-4"
-                        />
-                      }
-                    />
-                  </Tooltip>
-                )}
+                {selectedImageModel?.canChangeAspectRatio &&
+                  !selectedImageModel?.supportsNewAspectRatio() && (
+                    <Tooltip
+                      content="Aspect Ratio"
+                      position="top"
+                      className="z-50"
+                      closeOnClick={true}
+                    >
+                      <PopoverMenu
+                        items={aspectRatioList}
+                        onSelect={handleAspectRatioSelect}
+                        mode="toggle"
+                        panelTitle="Aspect Ratio"
+                        showIconsInList
+                        triggerIcon={
+                          <FontAwesomeIcon
+                            icon={getCurrentAspectRatioIcon()}
+                            className="h-4 w-4"
+                          />
+                        }
+                      />
+                    </Tooltip>
+                  )}
                 {selectedImageModel?.canChangeResolution && (
                   <Tooltip
                     content="Resolution"
@@ -504,6 +509,7 @@ export const PromptBoxEdit = ({
                   handleCountChange={(count) => {
                     onGenerationCountChange?.(count);
                   }}
+                  isFreeUser={isFreeUser}
                 />
                 <Button
                   className="flex items-center border-none bg-primary px-3 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"

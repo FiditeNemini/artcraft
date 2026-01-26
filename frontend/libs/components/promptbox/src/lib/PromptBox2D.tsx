@@ -1,11 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
-import { toast } from "@storyteller/ui-toaster";
-import {
-  JobContextType,
-  MaybeCanvasRenderBitmapType,
-  UploaderState,
-} from "@storyteller/common";
 import { PopoverMenu, PopoverItem } from "@storyteller/ui-popover";
 import { Tooltip } from "@storyteller/ui-tooltip";
 import { Button, ToggleButton } from "@storyteller/ui-button";
@@ -16,7 +10,6 @@ import {
   faSparkles,
   faSpinnerThird,
   faFrame,
-  faCopy,
   faExpand,
 } from "@fortawesome/pro-solid-svg-icons";
 import {
@@ -26,23 +19,15 @@ import {
 } from "@fortawesome/pro-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { IsDesktopApp } from "@storyteller/tauri-utils";
-import { PromptsApi } from "@storyteller/api";
-import {
-  EnqueueEditImage,
-  EnqueueEditImageSize,
-  EnqueueEditImageResolution,
-  EnqueueEditImageRequest,
-} from "@storyteller/tauri-api";
+
 import { Prompt2DStore, RefImage } from "./promptStore";
-import { gtagEvent } from "@storyteller/google-analytics";
-import { getCapabilitiesForModel } from "@storyteller/model-list";
 import { ImageModel } from "@storyteller/model-list";
 import { ImagePromptRow, UploadImageFn } from "./ImagePromptRow";
 import { twMerge } from "tailwind-merge";
 import { GenerationProvider } from "@storyteller/api-enums";
 import { GenerationCountPicker } from "./common/GenerationCountPicker";
 import { StoreApi, UseBoundStore } from "zustand";
+import { useSubscriptionState } from "@storyteller/subscription";
 
 export type AspectRatio = "wide" | "tall" | "square";
 
@@ -84,6 +69,10 @@ export const PromptBox2D = ({
   usePrompt2DStore,
 }: PromptBox2DProps) => {
   useSignals();
+
+  // Check subscription status to determine if user is on free plan
+  const hasPaidPlan = useSubscriptionState((s) => s.hasPaidPlan);
+  const isFreeUser = !hasPaidPlan();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [content, setContent] = useState<React.ReactNode>("");
@@ -206,64 +195,64 @@ export const PromptBox2D = ({
     setPrompt(e.target.value);
   };
 
-  const handleTauriEnqueue = async () => {
-    const api = new PromptsApi();
-    let image = getCanvasRenderBitmap();
-    if (image === undefined) {
-      console.log("image is undefined");
-      return;
-    }
-    const base64Bitmap = await EncodeImageBitmapToBase64(image);
+  // const handleTauriEnqueue = async () => {
+  //   const api = new PromptsApi();
+  //   let image = getCanvasRenderBitmap();
+  //   if (image === undefined) {
+  //     console.log("image is undefined");
+  //     return;
+  //   }
+  //   const base64Bitmap = await EncodeImageBitmapToBase64(image);
 
-    const byteString = atob(base64Bitmap);
-    const mimeString = "image/png";
+  //   const byteString = atob(base64Bitmap);
+  //   const mimeString = "image/png";
 
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
+  //   const ab = new ArrayBuffer(byteString.length);
+  //   const ia = new Uint8Array(ab);
 
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-    }
+  //   for (let i = 0; i < byteString.length; i++) {
+  //     ia[i] = byteString.charCodeAt(i);
+  //   }
 
-    const uuid = crypto.randomUUID(); // Generate a new UUID
-    const file = new File([ab], `${uuid}.png`, { type: mimeString });
+  //   const uuid = crypto.randomUUID(); // Generate a new UUID
+  //   const file = new File([ab], `${uuid}.png`, { type: mimeString });
 
-    const snapshotMediaToken = await api.uploadSceneSnapshot({
-      screenshot: file,
-    });
+  //   const snapshotMediaToken = await api.uploadSceneSnapshot({
+  //     screenshot: file,
+  //   });
 
-    if (snapshotMediaToken.data === undefined) {
-      toast.error("Error: Unable to upload scene snapshot Please try again.");
-      return;
-    }
+  //   if (snapshotMediaToken.data === undefined) {
+  //     toast.error("Error: Unable to upload scene snapshot Please try again.");
+  //     return;
+  //   }
 
-    console.log("useSystemPrompt", useSystemPrompt);
-    console.log("Snapshot media token:", snapshotMediaToken.data);
+  //   console.log("useSystemPrompt", useSystemPrompt);
+  //   console.log("Snapshot media token:", snapshotMediaToken.data);
 
-    const aspectRatio = getCurrentAspectRatio();
-    const resolution = getCurrentResolution();
+  //   const aspectRatio = getCurrentAspectRatio();
+  //   const resolution = getCurrentResolution();
 
-    let request: EnqueueEditImageRequest = {
-      model: selectedImageModel,
-      scene_image_media_token: snapshotMediaToken.data!,
-      image_media_tokens: referenceImages
-        .map((image) => image.mediaToken)
-        .filter((t) => t.length > 0),
-      disable_system_prompt: !useSystemPrompt,
-      prompt: prompt,
-      image_count: generationCount,
-      aspect_ratio: aspectRatio,
-      image_resolution: resolution,
-    };
+  //   let request: EnqueueEditImageRequest = {
+  //     model: selectedImageModel,
+  //     scene_image_media_token: snapshotMediaToken.data!,
+  //     image_media_tokens: referenceImages
+  //       .map((image) => image.mediaToken)
+  //       .filter((t) => t.length > 0),
+  //     disable_system_prompt: !useSystemPrompt,
+  //     prompt: prompt,
+  //     image_count: generationCount,
+  //     aspect_ratio: aspectRatio,
+  //     image_resolution: resolution,
+  //   };
 
-    if (!!selectedProvider) {
-      request.provider = selectedProvider;
-    }
+  //   if (!!selectedProvider) {
+  //     request.provider = selectedProvider;
+  //   }
 
-    const generateResponse = await EnqueueEditImage(request);
+  //   const generateResponse = await EnqueueEditImage(request);
 
-    console.log("generateResponse", generateResponse);
-  };
+  //   console.log("generateResponse", generateResponse);
+  // };
 
   const handleGenerate = async () => {
     const busy = Boolean(isEnqueueing ?? internalEnqueueing);
@@ -294,32 +283,32 @@ export const PromptBox2D = ({
     return iconElement.props.icon;
   };
 
-  const getCurrentAspectRatio = (): EnqueueEditImageSize => {
-    const selected = aspectRatioList.find((item) => item.selected);
-    switch (selected?.label.toLowerCase()) {
-      case "wide":
-        return EnqueueEditImageSize.Wide;
-      case "tall":
-        return EnqueueEditImageSize.Tall;
-      case "square":
-      default:
-        return EnqueueEditImageSize.Square;
-    }
-  };
+  // const getCurrentAspectRatio = (): EnqueueEditImageSize => {
+  //   const selected = aspectRatioList.find((item) => item.selected);
+  //   switch (selected?.label.toLowerCase()) {
+  //     case "wide":
+  //       return EnqueueEditImageSize.Wide;
+  //     case "tall":
+  //       return EnqueueEditImageSize.Tall;
+  //     case "square":
+  //     default:
+  //       return EnqueueEditImageSize.Square;
+  //   }
+  // };
 
-  const getCurrentResolution = (): EnqueueEditImageResolution | undefined => {
-    const selected = resolutionList.find((item) => item.selected);
-    switch (selected?.label) {
-      case "1k":
-        return EnqueueEditImageResolution.OneK;
-      case "2k":
-        return EnqueueEditImageResolution.TwoK;
-      case "4k":
-        return EnqueueEditImageResolution.FourK;
-      default:
-        return undefined;
-    }
-  };
+  // const getCurrentResolution = (): EnqueueEditImageResolution | undefined => {
+  //   const selected = resolutionList.find((item) => item.selected);
+  //   switch (selected?.label) {
+  //     case "1k":
+  //       return EnqueueEditImageResolution.OneK;
+  //     case "2k":
+  //       return EnqueueEditImageResolution.TwoK;
+  //     case "4k":
+  //       return EnqueueEditImageResolution.FourK;
+  //     default:
+  //       return undefined;
+  //   }
+  // };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // Stop propagation of keyboard events to prevent them from reaching the canvas
@@ -370,8 +359,8 @@ export const PromptBox2D = ({
           className={twMerge(
             "glass w-[730px] rounded-xl p-4",
             selectedImageModel?.canUseImagePrompt &&
-            isImageRowVisible &&
-            "rounded-t-none",
+              isImageRowVisible &&
+              "rounded-t-none",
           )}
         >
           <div className="flex justify-center gap-2">
@@ -417,8 +406,8 @@ export const PromptBox2D = ({
               onChange={handleChange}
               onPaste={handlePaste}
               onKeyDown={handleKeyDown}
-              onFocus={() => { }}
-              onBlur={() => { }}
+              onFocus={() => {}}
+              onBlur={() => {}}
             />
           </div>
           <div className="mt-2 flex items-center justify-between gap-2">
@@ -506,6 +495,7 @@ export const PromptBox2D = ({
                 handleCountChange={(count) => {
                   onGenerationCountChange?.(count);
                 }}
+                isFreeUser={isFreeUser}
               />
               <Button
                 className="flex items-center border-none bg-primary px-3 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"

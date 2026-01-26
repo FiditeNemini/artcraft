@@ -50,6 +50,9 @@
       "path": "../camera-settings-modal/tsconfig.lib.json"
     },
     {
+      "path": "../../state/subscription/tsconfig.lib.json"
+    },
+    {
       "path": "../../api-enums/tsconfig.lib.json"
     },
     {

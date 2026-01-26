@@ -17,7 +17,6 @@ import {
   faMessageCheck,
   faSparkles,
   faSpinnerThird,
-  faCopy,
   faExpand,
 } from "@fortawesome/pro-solid-svg-icons";
 import {
@@ -27,7 +26,7 @@ import {
 } from "@fortawesome/pro-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { CommonAspectRatio, ImageModel, getCapabilitiesForModel } from "@storyteller/model-list";
+import { CommonAspectRatio, ImageModel } from "@storyteller/model-list";
 import { usePromptImageStore, RefImage } from "./promptStore";
 import { gtagEvent } from "@storyteller/google-analytics";
 import { twMerge } from "tailwind-merge";
@@ -37,6 +36,7 @@ import { AspectRatioPicker } from "./common/AspectRatioPicker";
 import { GenerationCountPicker } from "./common/GenerationCountPicker";
 import { ResolutionPicker } from "./common/ResolutionPicker";
 import { CommonResolution } from "@storyteller/model-list";
+import { useSubscriptionState } from "@storyteller/subscription";
 
 interface PromptBoxImageProps {
   useJobContext: () => JobContextType;
@@ -72,6 +72,10 @@ export const PromptBoxImage = ({
   onImageRowVisibilityChange,
 }: PromptBoxImageProps) => {
   useSignals();
+
+  // Check subscription status to determine if user is on free plan
+  const hasPaidPlan = useSubscriptionState((s) => s.hasPaidPlan);
+  const isFreeUser = !hasPaidPlan();
 
   console.debug("Selected model:", selectedModel);
 
@@ -114,10 +118,14 @@ export const PromptBoxImage = ({
     uploadingImages.length > 0;
 
   // New aspect ratio state will begin to phase out old aspect ratio
-  const [commonAspectRatio, setCommonAspectRatio] = useState<CommonAspectRatio | undefined>(undefined);
+  const [commonAspectRatio, setCommonAspectRatio] = useState<
+    CommonAspectRatio | undefined
+  >(undefined);
 
   // New resolution state will begin to phase out old resolution
-  const [commonResolution, setCommonResolution] = useState<CommonResolution | undefined>(undefined);  
+  const [commonResolution, setCommonResolution] = useState<
+    CommonResolution | undefined
+  >(undefined);
 
   useEffect(() => {
     onImageRowVisibilityChange?.(isImageRowVisible);
@@ -459,28 +467,29 @@ export const PromptBoxImage = ({
                   handleCommonAspectRatioSelect={setCommonAspectRatio}
                 />
               )}
-              {selectedModel?.canChangeAspectRatio && !selectedModel?.supportsNewAspectRatio() && (
-                <Tooltip
-                  content="Aspect Ratio (Legacy)"
-                  position="top"
-                  className="z-50"
-                  closeOnClick={true}
-                >
-                  <PopoverMenu
-                    items={aspectRatioList}
-                    onSelect={handleAspectRatioSelect}
-                    mode="toggle"
-                    panelTitle="Aspect Ratio (Legacy)"
-                    showIconsInList
-                    triggerIcon={
-                      <FontAwesomeIcon
-                        icon={getCurrentResolutionIcon()}
-                        className="h-4 w-4"
-                      />
-                    }
-                  />
-                </Tooltip>
-              )}
+              {selectedModel?.canChangeAspectRatio &&
+                !selectedModel?.supportsNewAspectRatio() && (
+                  <Tooltip
+                    content="Aspect Ratio (Legacy)"
+                    position="top"
+                    className="z-50"
+                    closeOnClick={true}
+                  >
+                    <PopoverMenu
+                      items={aspectRatioList}
+                      onSelect={handleAspectRatioSelect}
+                      mode="toggle"
+                      panelTitle="Aspect Ratio (Legacy)"
+                      showIconsInList
+                      triggerIcon={
+                        <FontAwesomeIcon
+                          icon={getCurrentResolutionIcon()}
+                          className="h-4 w-4"
+                        />
+                      }
+                    />
+                  </Tooltip>
+                )}
               {selectedModel?.supportsNewResolution() && (
                 <ResolutionPicker
                   model={selectedModel}
@@ -488,25 +497,26 @@ export const PromptBoxImage = ({
                   handleCommonResolutionSelect={setCommonResolution}
                 />
               )}
-              {selectedModel?.canChangeResolution && !selectedModel?.supportsNewResolution() && (
-                <Tooltip
-                  content="Resolution"
-                  position="top"
-                  className="z-50"
-                  closeOnClick={true}
-                >
-                  <PopoverMenu
-                    items={resolutionList}
-                    onSelect={handleResolutionSelect}
-                    mode="toggle"
-                    panelTitle="Resolution"
-                    showIconsInList
-                    triggerIcon={
-                      <FontAwesomeIcon icon={faExpand} className="h-4 w-4" />
-                    }
-                  />
-                </Tooltip>
-              )}
+              {selectedModel?.canChangeResolution &&
+                !selectedModel?.supportsNewResolution() && (
+                  <Tooltip
+                    content="Resolution"
+                    position="top"
+                    className="z-50"
+                    closeOnClick={true}
+                  >
+                    <PopoverMenu
+                      items={resolutionList}
+                      onSelect={handleResolutionSelect}
+                      mode="toggle"
+                      panelTitle="Resolution"
+                      showIconsInList
+                      triggerIcon={
+                        <FontAwesomeIcon icon={faExpand} className="h-4 w-4" />
+                      }
+                    />
+                  </Tooltip>
+                )}
               <Tooltip
                 content={
                   useSystemPrompt
@@ -532,6 +542,7 @@ export const PromptBoxImage = ({
                 handleCountChange={(count) => {
                   setGenerationCount(count);
                 }}
+                isFreeUser={isFreeUser}
               />
               <Button
                 className="flex items-center border-none bg-primary px-3 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"
