@@ -246,8 +246,8 @@ const Landing = () => {
               className="text-base mt-4 sm:text-xl md:text-2xl lg:text-2xl text-white/70 mb-8 sm:mb-14 max-w-2xl mx-auto font-medium drop-shadow-[0_2px_12px_rgba(80,80,255,0.10)]"
               data-animate
             >
-              Text prompting sucks. Bring your true vision to life with
-              unparalleled control and precision.
+              Artists need and deserve unparalleled control and precision.
+              ArtCraft&rsquo;s got you covered.
             </p>
 
             {/* CTA Buttons */}
@@ -351,7 +351,20 @@ const Landing = () => {
                 We're Pulling You <br /> <span className="text-white">Out of Prompting</span>
               </h1>
               <p className="text-lg md:text-xl text-white/60 leading-relaxed max-w-2xl mx-auto">
-                Text-to-image is great, but artists <em>need control</em>. Achieve consistency and repeatability with our advanced toolset.
+                Text prompting is neat, but artists <em>crave control</em>.
+              </p>
+
+              <br />
+
+              <p className="text-lg md:text-xl text-white/60 leading-relaxed max-w-2xl mx-auto">
+                Before you type "rotate arm thirty degrees", try ArtCraft and let our advanced 
+                toolset help you achieve consistency and repeatability.
+              </p>
+
+              <br />
+
+              <p className="text-lg md:text-xl text-white/60 leading-relaxed max-w-2xl mx-auto">
+                ArtCraft is the control that mere words cannot buy. 
               </p>
             </div>
          </div>
@@ -478,62 +491,7 @@ const Landing = () => {
          </div>
       </div>
 
-      <div className="relative flex overflow-visible xl:items-center xl:pt-0 px-2 sm:px-4 md:px-0 md:-mt-36 min-[1980px]:-mt-64">
-        {/* Gradient Orb for Section */}
-        <div className="absolute left-[-200px] top-[-100px] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#00AABA] via-blue-500 to-blue-700 opacity-15 blur-[80px] md:blur-[120px] z-0 pointer-events-none transform-gpu" />
-        <div
-          className="w-full flex flex-col items-center justify-center text-center pt-16 sm:pt-24 md:pt-32 px-2 sm:px-6 md:px-10"
-          data-animate
-        >
-          <div className="relative">
-            <h1 className="relative mb-4 sm:mb-6 md:mb-10 font-bold text-3xl sm:text-4xl md:text-[3rem] lg:text-[4rem] xl:text-[5rem] !leading-none text-shadow-lg">
-              <span
-                className="text-primary"
-                style={{ textShadow: "0 0 15px var(--color-primary)" }}
-              >
-                "
-              </span>
-              Is this really AI?
-              <span
-                className="text-primary"
-                style={{ textShadow: "0 0 15px var(--color-primary)" }}
-              >
-                "
-              </span>
-            </h1>
-            <span className="absolute -right-6 sm:-right-5 -bottom-1 sm:bottom-4 md:-right-16 md:bottom-10 text-lg sm:text-xl md:text-3xl font-bold opacity-40 italic hover:opacity-80 transition-opacity duration-300">
-              — You
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div className="relative z-10 mx-auto w-full max-w-[1200px] sm:px-4 md:px-16 lg:px-12 xl:px-32 pb-8 sm:pb-16 md:pb-24 lg:pb-32 overflow-visible px-4">
-        {/* Gradient Orb for Section */}
-        <div className="absolute right-[-250px] top-[-150px] w-[700px] h-[700px] rounded-full bg-gradient-to-br from-blue-700 via-[#00AABA] to-pink-500 opacity-[0.1] blur-[100px] md:blur-[140px] z-0 pointer-events-none transform-gpu" />
-        <div
-          className="items-center gap-8 sm:gap-12 md:gap-16 mb-8 sm:mb-12 p-2 sm:p-4 bg-white/10 backdrop-blur-md rounded-[24px] sm:rounded-[40px] shadow-xl"
-          data-animate
-        >
-          <div className="rounded-[16px] sm:rounded-[24px] overflow-hidden bg-[#1C1C20] shadow-inner">
-            <video
-              muted
-              autoPlay
-              loop
-              playsInline
-              className="w-full aspect-[16/9] object-cover"
-            >
-              <source src="/videos/hero-video.mp4" type="video/mp4" />
-            </video>
-          </div>
-        </div>
-        <div
-          className="flex justify-center"
-          data-animate
-        >
-          <DiscordButton />
-        </div>
-      </div>
+      <OwnershipComparison />
 
       <div className="relative flex overflow-visible xl:items-center xl:pt-0 mb-4 md:mb-12 px-2 sm:px-4 md:px-0">
         {/* Gradient Orb for Section */}
@@ -748,7 +706,6 @@ const Landing = () => {
         </div>
       </div>
       
-      <OwnershipComparison />
 
       <div className="relative z-10 mx-auto w-full max-w-screen py-10 sm:py-20 md:py-32 sm:px-8 lg:px-32 overflow-visible px-4">
         {/* Gradient Orb for Section */}
