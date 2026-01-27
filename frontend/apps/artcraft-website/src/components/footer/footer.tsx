@@ -151,7 +151,7 @@ export default function Example() {
             </div>
           </div>
           <p className="text-center text-sm/6 text-gray-400">
-            &copy; 2025 ArtCraft. All rights reserved.
+            &copy; 2026 ArtCraft. All rights reserved.
           </p>
         </div>
       </div>
