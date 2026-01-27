@@ -16,13 +16,19 @@ const Pricing = () => {
 
       <main className="relative z-10 pt-32 pb-20 px-4 sm:px-6 lg:px-8">
         <PricingTable
-          title="Invest in ArtCraft"
-          subtitle="Support open-source development. Your subscription makes ArtCraft better and gets you tons of generations."
+          title="Invest in Yourself"
+          subtitle="You'll get a ton of generations and you'll be investing in a tool that you'll always own."
         />
       </main>
 
-      <p className="relative z-10 pt-32 pb-20 px-4 sm:px-6 lg:px-8">
-        Note: Pricing table is wrong, but we'll fix this shortly.
+      <p className="relative px-4 px-2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         sm:px-6 lg:px-8">
+        &dagger; ArtCraft can be used without paying for a subscription. 
+        You can bring your own compute and third party subscriptions. 
+        We hope you'll subscribe, though, as that helps accelerate our development.
+      </p>
+
+      <p className="relative pb-4 px-2 sm:px-6 lg:px-8">
+        &Dagger; Pricing table is wrong, but we'll fix this shortly.
       </p>
 
       <Footer />
