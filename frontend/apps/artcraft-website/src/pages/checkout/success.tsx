@@ -3,13 +3,14 @@ import {
   faDownload,
   faDesktop,
   faRocket,
-  faArrowLeft,
 } from "@fortawesome/pro-solid-svg-icons";
+import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "@storyteller/ui-button";
 import { Link } from "react-router-dom";
 import { isMobile, isMacOs } from "react-device-detect";
 import { DOWNLOAD_LINKS } from "../../config/downloads";
+import { SOCIAL_LINKS } from "../../config/links";
 import Seo from "../../components/seo";
 
 const CheckoutSuccess = () => {
@@ -91,14 +92,6 @@ const CheckoutSuccess = () => {
                   <FontAwesomeIcon icon={faDownload} className="mr-2" />
                   Download ArtCraft
                 </Button>
-                <Button
-                  as="link"
-                  href="/"
-                  className="bg-white/10 hover:bg-white/20 px-8 py-3 text-sm font-bold rounded-xl justify-center border-transparent"
-                >
-                  <FontAwesomeIcon icon={faArrowLeft} />
-                  Back to Home
-                </Button>
               </div>
             ) : (
               <div className="bg-[#431407] border border-orange-900/50 rounded-2xl p-6 text-orange-200 text-sm leading-relaxed">
@@ -129,15 +122,40 @@ const CheckoutSuccess = () => {
                 </a>
               </div>
             )}
+
+            {/* Discord CTA */}
+            <div className="mt-8 pt-6 border-t border-white/10 flex flex-col gap-2 items-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <span className="text-white/70 text-sm">
+                  Join our community
+                </span>
+              </div>
+              <Button
+                as="link"
+                href={SOCIAL_LINKS.DISCORD}
+                target="_blank"
+                className="bg-white text-black hover:bg-white/80 px-4 py-2 text-sm font-bold rounded-xl justify-center border-transparent"
+              >
+                <FontAwesomeIcon icon={faDiscord} />
+                Join Discord
+              </Button>
+            </div>
           </div>
 
-          {/* Footer Link */}
-          <div className="text-center mt-8">
+          {/* Footer Links */}
+          <div className="text-center mt-8 flex justify-center gap-4">
+            <Link
+              to="/"
+              className="text-white/40 hover:text-white text-sm font-medium transition-colors"
+            >
+              Back to Home
+            </Link>
+            <span className="text-white/20">•</span>
             <Link
               to="/pricing"
               className="text-white/40 hover:text-white text-sm font-medium transition-colors"
             >
-              View Plan Details
+              View Plans
             </Link>
           </div>
         </div>

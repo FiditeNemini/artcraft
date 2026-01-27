@@ -256,7 +256,7 @@ const PricingTable = ({
       {showHeader && (
         <div className={`text-center mx-auto ${compact ? "mb-6" : "mb-10"}`}>
           <h2
-            className={`font-bold mb-4 ${compact ? "text-2xl md:text-3xl" : "text-3xl sm:text-4xl md:text-5xl"}`}
+            className={`font-bold mb-4 ${compact ? "text-2xl md:text-3xl" : "text-4xl sm:text-4xl md:text-6xl"}`}
           >
             {title}
           </h2>

@@ -6,6 +6,9 @@
 /checkout_success/ /index.html 200
 /checkout_success/* /index.html 200
 
+/checkout* /index.html 200
+/checkout/* /index.html 200
+
 /download /index.html 200
 /download/ /index.html 200
 

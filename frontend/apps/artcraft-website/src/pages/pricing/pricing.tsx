@@ -21,15 +21,14 @@ const Pricing = () => {
         />
       </main>
 
-      <p className="relative px-4 px-2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         sm:px-6 lg:px-8">
-        &dagger; ArtCraft can be used without paying for a subscription. 
-        You can bring your own compute and third party subscriptions. 
-        We hope you'll subscribe, though, as that helps accelerate our development.
-      </p>
-
-      <p className="relative pb-4 px-2 sm:px-6 lg:px-8">
-        &Dagger; Pricing table is wrong, but we'll fix this shortly.
-      </p>
+      {/* Footnotes */}
+      <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 text-center">
+        <p className="text-md text-white/80 leading-relaxed">
+          &dagger; ArtCraft can be used without paying for a subscription. You
+          can bring your own compute and third party subscriptions. We hope
+          you'll subscribe, though, as that helps accelerate our development.
+        </p>
+      </div>
 
       <Footer />
     </div>
