@@ -230,7 +230,8 @@ export default function PressKitPage() {
             </h1>
             <p className="text-lg sm:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
               Everything you need for press coverage, reviews, and content
-              creation. Download high-quality assets and promotional materials.
+              creation. Download high-quality assets and promotional materials 
+              about the world's only open source precision AI tool for artists.
             </p>
           </div>
 
@@ -285,7 +286,7 @@ export default function PressKitPage() {
             </h2>
             <p className="text-white/70 mb-6 max-w-lg mx-auto">
               For specific press inquiries, interview requests, or custom
-              assets, reach out to us on Discord.
+              assets, reach out to us on Discord. Or text Brandon at <a href="tel:678-744-6080">(678) 744-6080</a>.
             </p>
             <a
               href="https://discord.gg/artcraft"
