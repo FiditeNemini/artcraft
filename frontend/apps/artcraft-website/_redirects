@@ -1,3 +1,7 @@
+/checkout_cancel /index.html 200
+/checkout_cancel/ /index.html 200
+/checkout_cancel/* /index.html 200
+
 /checkout_success /index.html 200
 /checkout_success/ /index.html 200
 /checkout_success/* /index.html 200
