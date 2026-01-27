@@ -44,3 +44,7 @@
 /signup /index.html 200
 /signup/ /index.html 200
 /signup/* /index.html 200
+
+/welcome /index.html 200
+/welcome/ /index.html 200
+/welcome/* /index.html 200
