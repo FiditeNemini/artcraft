@@ -73,20 +73,67 @@ export const markdownToHtml = (
     return "mp4"; // Default to mp4
   };
 
+  // Parse size string like "300" or "400x300"
+  const parseSize = (sizeStr: string): { width?: string; height?: string } => {
+    if (!sizeStr) return {};
+    const parts = sizeStr.toLowerCase().split("x");
+    if (parts.length === 2) {
+      return { width: parts[0], height: parts[1] };
+    }
+    return { width: parts[0] };
+  };
+
+  // Render an image with optional size
+  const renderImage = (
+    url: string,
+    alt: string = "",
+    sizeStr: string = "",
+  ): string => {
+    const safeUrl = normalizeLink(url);
+    const safeAlt = alt.replace(/"/g, "&quot;");
+    const { width, height } = parseSize(sizeStr);
+
+    let style =
+      "width: 100%; max-width: 100%; border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.1); margin: 2rem 0; display: block;";
+    let attrs = "";
+
+    if (width) {
+      const w =
+        width.endsWith("%") || width.endsWith("px") ? width : `${width}px`;
+      style += ` width: ${w};`;
+      attrs += ` width="${width.replace("px", "")}"`;
+    }
+    if (height) {
+      const h =
+        height.endsWith("%") || height.endsWith("px") ? height : `${height}px`;
+      style += ` height: ${h};`;
+      attrs += ` height="${height.replace("px", "")}"`;
+    }
+
+    // Centering if not full width
+    if (width && width !== "100%") {
+      style += " margin-left: auto; margin-right: auto;";
+    }
+
+    return `<img src="${safeUrl}" alt="${safeAlt}" style="${style}"${attrs} />`;
+  };
+
   const renderInline = (text: string): string => {
     // bold: **text**
     let out = text.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
     // italic: *text*
     out = out.replace(/\*([^*]+)\*/g, "<em>$1</em>");
 
-    // images/videos: ![alt](url) - detect video files and render as video
-    out = out.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_m, alt, url) => {
-      const safeUrl = String(url || "");
+    // images/videos: ![alt](url|size) - detect video files and render as video
+    out = out.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_m, alt, urlAndSize) => {
+      const [url, size] = urlAndSize.split("|");
+      const safeUrl = String(url || "").trim();
+
       if (isVideoUrl(safeUrl)) {
         return renderVideoEmbed(safeUrl);
       }
-      const safeAlt = String(alt || "").replace(/"/g, "&quot;");
-      return `<img src="${safeUrl}" alt="${safeAlt}" />`;
+
+      return renderImage(safeUrl, alt, size);
     });
     // links: [text](url)
     out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, label, url) => {
@@ -122,6 +169,18 @@ export const markdownToHtml = (
       continue;
     }
 
+    // Image/GIF embed: @image(url, size) or @gif(url, size)
+    const imageMatch = ltrim.match(
+      /^@(image|gif)\(([^,)]+)(?:,\s*([^)]+))?\)\s*$/,
+    );
+    if (imageMatch) {
+      closeListIfOpen();
+      const url = imageMatch[2].trim();
+      const size = imageMatch[3]?.trim() || "";
+      htmlParts.push(renderImage(url, "", size));
+      continue;
+    }
+
     // ATX headings: support #..###### with optional space after hashes
     const heading = ltrim.match(/^(#{1,6})\s*(.*)$/);
     if (heading) {
@@ -131,18 +190,19 @@ export const markdownToHtml = (
       htmlParts.push(`<h${level}>${text}</h${level}>`);
       continue;
     }
-    // Standalone image/video line
+    // Standalone image/video line: ![alt](url|size)
     const imgMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)\s*$/);
     if (imgMatch) {
       closeListIfOpen();
       const alt = String(imgMatch[1] || "").replace(/"/g, "&quot;");
-      const url = normalizeLink(String(imgMatch[2] || ""));
+      const [url, size] = imgMatch[2].split("|");
+      const safeUrl = normalizeLink(String(url || "").trim());
 
       // Check if it's a video file
-      if (isVideoUrl(url)) {
-        htmlParts.push(renderVideoEmbed(url));
+      if (isVideoUrl(safeUrl)) {
+        htmlParts.push(renderVideoEmbed(safeUrl));
       } else {
-        htmlParts.push(`<p><img src="${url}" alt="${alt}" /></p>`);
+        htmlParts.push(renderImage(safeUrl, alt, size));
       }
       continue;
     }

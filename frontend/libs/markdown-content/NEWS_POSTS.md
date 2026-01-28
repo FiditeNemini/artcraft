@@ -129,3 +129,28 @@ Alternatively, you can use standard image syntax with a video file extension. Th
 ```
 
 Supported video formats: `.mp4`, `.webm`, `.ogg`, `.mov`, `.m4v`, `.avi`
+
+### Images and GIFs
+
+Embed images or GIFs with controllable sizes. You can use standard markdown syntax with a pipe `|` or a dedicated tag:
+
+#### Standard Markdown with Size
+
+```markdown
+![My Image](https://example.com/image.png|300)
+![Animated GIF](https://example.com/animation.gif|400x300)
+```
+
+#### Dedicated Tags
+
+```markdown
+@image(https://example.com/image.png, 300)
+@gif(https://example.com/animation.gif, 400x300)
+```
+
+#### Size Formats:
+
+- **Width only**: `300` (defaults to pixels) or `50%`
+- **Width and Height**: `400x300`
+
+If the width is less than 100%, the image will be automatically centered. By default (if no size is specified), images and GIFs will take up **100% of the container width**. All images have a maximum width of 100% to ensure they stay within the blog container.

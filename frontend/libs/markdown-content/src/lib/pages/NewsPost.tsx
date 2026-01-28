@@ -86,7 +86,7 @@ export const NewsPost = ({ slug: propSlug, basePath }: NewsPostProps) => {
           .article-content p { margin: 1rem 0; line-height: 1.75; font-size: 1.05rem; }
           .article-content ul { list-style: disc; padding-left: 1.5rem; margin: 1rem 0; }
           .article-content li { margin-bottom: 0.5rem; }
-          .article-content img { display: block; max-width: 100%; height: auto; border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.1); margin: 2rem 0; }
+          .article-content img { display: block; width: 100%; max-width: 100%; height: auto; border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.1); margin: 2rem 0; }
           .article-content a { color: #3b82f6; text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
           .article-content a:hover { border-bottom-color: #3b82f6; }
           .article-content blockquote { border-left: 4px solid #3b82f6; padding-left: 1rem; font-style: italic; color: rgba(255,255,255,0.7); margin: 1.5rem 0; }
