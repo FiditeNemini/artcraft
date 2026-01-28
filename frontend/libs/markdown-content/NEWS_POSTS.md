@@ -19,8 +19,8 @@ thumbnail: https://optional-image-url.com/image.png
 ---
 ```
 
-| Field       | Required | Description                                           |
-|-------------|----------|-------------------------------------------------------|
+| Field       | Required | Description                                          |
+| ----------- | -------- | ---------------------------------------------------- |
 | `title`     | Yes      | The title displayed in the news list and post header |
 | `abstract`  | Yes      | Short description shown in the news list preview     |
 | `date`      | Yes      | Publication date in `YYYY-MM-DD` format              |
@@ -71,6 +71,7 @@ node scripts/generate-news-json.mjs
 ```
 
 This will output the compiled JSON to:
+
 ```
 frontend/apps/artcraft-website/public/news.json
 ```
@@ -89,3 +90,42 @@ frontend/apps/artcraft-website/public/news.json
 - **Sorting**: Posts are automatically sorted by date, newest first
 - **Markdown Support**: Full markdown is supported including headers, lists, bold, italic, images, and code blocks
 - **Hot Reload**: After adding/editing a post, restart the dev server to see changes (or run the build script manually)
+
+## Embedding Videos
+
+### YouTube Videos
+
+Embed YouTube videos using the `@youtube()` syntax. You can use either a video ID or a full URL:
+
+```markdown
+@youtube(dQw4w9WgXcQ)
+
+@youtube(https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+
+@youtube(https://youtu.be/dQw4w9WgXcQ)
+```
+
+All of the above will embed the same YouTube video. Supported URL formats:
+
+- `youtube.com/watch?v=VIDEO_ID`
+- `youtu.be/VIDEO_ID`
+- `youtube.com/embed/VIDEO_ID`
+- `youtube.com/shorts/VIDEO_ID`
+
+### Regular Videos
+
+Embed regular video files (mp4, webm, etc.) using the `@video()` syntax:
+
+```markdown
+@video(https://example.com/my-video.mp4)
+
+@video(/videos/demo.webm)
+```
+
+Alternatively, you can use standard image syntax with a video file extension. The parser will automatically detect video files and render them as videos:
+
+```markdown
+![Demo video](https://example.com/my-video.mp4)
+```
+
+Supported video formats: `.mp4`, `.webm`, `.ogg`, `.mov`, `.m4v`, `.avi`

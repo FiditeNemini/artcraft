@@ -6,8 +6,8 @@ import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
 import { useMemo } from "react";
 
 interface NewsPostProps {
-    slug?: string;
-    basePath: string; // e.g. "/news"
+  slug?: string;
+  basePath: string; // e.g. "/news"
 }
 
 export const NewsPost = ({ slug: propSlug, basePath }: NewsPostProps) => {
@@ -15,9 +15,7 @@ export const NewsPost = ({ slug: propSlug, basePath }: NewsPostProps) => {
   const slug = propSlug || paramSlug;
   const post = slug ? getNewsPostBySlug(slug) : null;
 
-  const html = useMemo(() => 
-    post ? markdownToHtml(post.body) : ""
-  , [post]);
+  const html = useMemo(() => (post ? markdownToHtml(post.body) : ""), [post]);
 
   if (!post) {
     return (
@@ -25,7 +23,12 @@ export const NewsPost = ({ slug: propSlug, basePath }: NewsPostProps) => {
         <div className="relative z-10 mx-auto w-full max-w-[1200px] px-4 sm:px-8 pt-28 sm:pt-36 pb-12">
           <h1 className="text-3xl font-bold">Not found</h1>
           <p className="text-white/70">We couldn't find this article.</p>
-          <Link to={basePath} className="text-blue-400 mt-4 inline-block hover:underline">Return to News</Link>
+          <Link
+            to={basePath}
+            className="text-blue-400 mt-4 inline-block hover:underline"
+          >
+            Return to News
+          </Link>
         </div>
       </div>
     );
@@ -54,8 +57,12 @@ export const NewsPost = ({ slug: propSlug, basePath }: NewsPostProps) => {
         <h1 className="text-4xl md:text-5xl font-bold mb-6 !leading-tight tracking-tight">
           {post.title}
         </h1>
-        
-        {post.description && <p className="text-xl text-white/70 mb-8 leading-relaxed font-light border-l-4 border-primary pl-4">{post.description}</p>}
+
+        {post.description && (
+          <p className="text-xl text-white/70 mb-8 leading-relaxed font-light border-l-4 border-primary pl-4">
+            {post.description}
+          </p>
+        )}
 
         {post.thumbnail && (
           <div className="w-full overflow-hidden rounded-xl border border-white/10 bg-black mb-12 shadow-2xl">
@@ -86,6 +93,12 @@ export const NewsPost = ({ slug: propSlug, basePath }: NewsPostProps) => {
           .article-content code { background: rgba(255,255,255,0.1); padding: 0.2em 0.4em; border-radius: 0.25em; font-family: monospace; font-size: 0.9em; }
           .article-content pre { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 1.5rem 0; border: 1px solid rgba(255,255,255,0.1); }
           .article-content pre code { background: transparent; padding: 0; color: inherit; }
+          
+          /* Video embed styles */
+          .article-content .video-embed { position: relative; width: 100%; margin: 2rem 0; border-radius: 0.75rem; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #000; }
+          .article-content .youtube-embed { padding-bottom: 56.25%; /* 16:9 aspect ratio */ height: 0; }
+          .article-content .youtube-embed iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+          .article-content .video-embed video { display: block; width: 100%; height: auto; max-height: 70vh; }
         `}</style>
       </div>
     </div>

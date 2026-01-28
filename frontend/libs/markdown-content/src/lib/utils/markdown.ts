@@ -1,6 +1,6 @@
 export const markdownToHtml = (
   markdown: string,
-  basePath: string = ""
+  basePath: string = "",
 ): string => {
   const lines = markdown.replace(/\r\n/g, "\n").split("\n");
   const htmlParts: string[] = [];
@@ -25,16 +25,67 @@ export const markdownToHtml = (
     return basePath + url;
   };
 
+  // Check if a URL points to a video file
+  const isVideoUrl = (url: string): boolean => {
+    const videoExtensions = [".mp4", ".webm", ".ogg", ".mov", ".m4v", ".avi"];
+    const lowerUrl = url.toLowerCase().split("?")[0]; // Remove query params for extension check
+    return videoExtensions.some((ext) => lowerUrl.endsWith(ext));
+  };
+
+  // Extract YouTube video ID from various URL formats
+  const extractYouTubeId = (input: string): string | null => {
+    // If it's already just a video ID (11 characters, alphanumeric with - and _)
+    if (/^[a-zA-Z0-9_-]{11}$/.test(input.trim())) {
+      return input.trim();
+    }
+
+    // YouTube URL patterns
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/,
+      /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
+    ];
+
+    for (const pattern of patterns) {
+      const match = input.match(pattern);
+      if (match) return match[1];
+    }
+
+    return null;
+  };
+
+  // Render a YouTube embed
+  const renderYouTubeEmbed = (videoId: string): string => {
+    return `<div class="video-embed youtube-embed"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
+  };
+
+  // Render a regular video embed
+  const renderVideoEmbed = (url: string): string => {
+    const safeUrl = normalizeLink(url);
+    return `<div class="video-embed"><video controls><source src="${safeUrl}" type="video/${getVideoMimeType(url)}">Your browser does not support the video tag.</video></div>`;
+  };
+
+  // Get video MIME type from URL
+  const getVideoMimeType = (url: string): string => {
+    const lowerUrl = url.toLowerCase().split("?")[0];
+    if (lowerUrl.endsWith(".webm")) return "webm";
+    if (lowerUrl.endsWith(".ogg")) return "ogg";
+    if (lowerUrl.endsWith(".mov") || lowerUrl.endsWith(".m4v")) return "mp4";
+    return "mp4"; // Default to mp4
+  };
+
   const renderInline = (text: string): string => {
     // bold: **text**
     let out = text.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
     // italic: *text*
     out = out.replace(/\*([^*]+)\*/g, "<em>$1</em>");
 
-    // images: ![alt](url)
+    // images/videos: ![alt](url) - detect video files and render as video
     out = out.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_m, alt, url) => {
-      const safeAlt = String(alt || "").replace(/"/g, "&quot;");
       const safeUrl = String(url || "");
+      if (isVideoUrl(safeUrl)) {
+        return renderVideoEmbed(safeUrl);
+      }
+      const safeAlt = String(alt || "").replace(/"/g, "&quot;");
       return `<img src="${safeUrl}" alt="${safeAlt}" />`;
     });
     // links: [text](url)
@@ -49,6 +100,28 @@ export const markdownToHtml = (
   for (const raw of lines) {
     const line = raw.trimEnd();
     const ltrim = line.replace(/^\s+/, "");
+
+    // YouTube embed: @youtube(VIDEO_ID or URL)
+    const youtubeMatch = ltrim.match(/^@youtube\(([^)]+)\)\s*$/);
+    if (youtubeMatch) {
+      closeListIfOpen();
+      const videoId = extractYouTubeId(youtubeMatch[1]);
+      if (videoId) {
+        htmlParts.push(renderYouTubeEmbed(videoId));
+      } else {
+        htmlParts.push(`<p>Invalid YouTube video: ${youtubeMatch[1]}</p>`);
+      }
+      continue;
+    }
+
+    // Video embed: @video(url)
+    const videoMatch = ltrim.match(/^@video\(([^)]+)\)\s*$/);
+    if (videoMatch) {
+      closeListIfOpen();
+      htmlParts.push(renderVideoEmbed(videoMatch[1]));
+      continue;
+    }
+
     // ATX headings: support #..###### with optional space after hashes
     const heading = ltrim.match(/^(#{1,6})\s*(.*)$/);
     if (heading) {
@@ -58,13 +131,19 @@ export const markdownToHtml = (
       htmlParts.push(`<h${level}>${text}</h${level}>`);
       continue;
     }
-    // Standalone image line
+    // Standalone image/video line
     const imgMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)\s*$/);
     if (imgMatch) {
       closeListIfOpen();
       const alt = String(imgMatch[1] || "").replace(/"/g, "&quot;");
       const url = normalizeLink(String(imgMatch[2] || ""));
-      htmlParts.push(`<p><img src="${url}" alt="${alt}" /></p>`);
+
+      // Check if it's a video file
+      if (isVideoUrl(url)) {
+        htmlParts.push(renderVideoEmbed(url));
+      } else {
+        htmlParts.push(`<p><img src="${url}" alt="${alt}" /></p>`);
+      }
       continue;
     }
     if (line.startsWith("- ")) {
