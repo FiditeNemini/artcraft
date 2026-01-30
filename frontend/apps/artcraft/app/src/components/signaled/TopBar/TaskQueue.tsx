@@ -18,7 +18,11 @@ import {
 } from "@storyteller/ui-gallery-modal";
 import type { GalleryItem } from "@storyteller/ui-gallery-modal";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { GetTaskQueue, MarkTaskAsDismissed, TasksNukeAll } from "@storyteller/tauri-api";
+import {
+  GetTaskQueue,
+  MarkTaskAsDismissed,
+  TasksNukeAll,
+} from "@storyteller/tauri-api";
 import type { TaskQueueItem } from "@storyteller/tauri-api";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import {
@@ -227,7 +231,8 @@ export const TaskQueue = () => {
       ),
       primaryActionText: "Clear completed",
       primaryActionIcon: faBroom,
-      primaryActionBtnClassName: "bg-green-500/10 hover:bg-green-500/20 text-green-500",
+      primaryActionBtnClassName:
+        "bg-green-500/10 hover:bg-green-500/20 text-green-500",
       onConfirm: async () => {
         await dismissCompleted();
         if (onSuccess) onSuccess();
@@ -246,7 +251,8 @@ export const TaskQueue = () => {
       ),
       primaryActionText: "Clear stale",
       primaryActionIcon: faTrashAlt,
-      primaryActionBtnClassName: "bg-orange-500/10 hover:bg-orange-500/20 text-orange-500",
+      primaryActionBtnClassName:
+        "bg-orange-500/10 hover:bg-orange-500/20 text-orange-500",
       onConfirm: async () => {
         await dismissStale();
       },
@@ -259,12 +265,14 @@ export const TaskQueue = () => {
       title: "Remove all tasks?",
       message: (
         <span className="text-sm text-white/80">
-          This will remove ALL tasks (completed and in-progress) from the queue. This cannot be undone.
+          This will remove ALL tasks (completed and in-progress) from the queue.
+          This cannot be undone.
         </span>
       ),
       primaryActionText: "Nuke all",
       primaryActionIcon: faBomb,
-      primaryActionBtnClassName: "bg-red-500/10 hover:bg-red-500/20 text-red-500",
+      primaryActionBtnClassName:
+        "bg-red-500/10 hover:bg-red-500/20 text-red-500",
       onConfirm: async () => {
         await dismissAll();
       },
@@ -284,23 +292,30 @@ export const TaskQueue = () => {
       const provider = t.provider
         ? getProviderDisplayName(String(t.provider).toLowerCase())
         : undefined;
-      const taskTypeStr = t.task_type ? String(t.task_type) : "";
+      const taskTypeStr = t.task_type ? String(t.task_type).toLowerCase() : "";
       const is3DModel =
         taskTypeStr.includes("3d") ||
         taskTypeStr.includes("object") ||
         taskTypeStr.includes("dimensional");
-      const kind = is3DModel
-        ? "3D Model"
-        : taskTypeStr.includes("video")
-          ? "Video"
-          : taskTypeStr.includes("image")
-            ? "Image"
-            : undefined;
+
+      let kind = undefined;
+      if (taskTypeStr.includes("image") && is3DModel) {
+        kind = "Image to 3D";
+      } else if (is3DModel) {
+        kind = "3D Model";
+      } else if (taskTypeStr.includes("video")) {
+        kind = "Video";
+      } else if (taskTypeStr.includes("image")) {
+        kind = "Image";
+      }
 
       const formatModelName = (modelType: string): string => {
-        const formatted = modelType
+        let formatted = modelType
+          // Handle version numbers with underscores (e.g. 2_0 -> 2.0)
+          .replace(/(\d)_(\d+)/g, "$1.$2")
           .replace(/_/g, " ")
-          .replace(/(\d)([a-zA-Z])/g, "$1 $2")
+          // Don't split number and 'd'/'D' (e.g. 3d)
+          .replace(/(\d)(?![dD])([a-zA-Z])/g, "$1 $2")
           .replace(/([a-zA-Z])(\d)/g, "$1 $2")
           .split(" ")
           .map((word) =>
@@ -311,6 +326,12 @@ export const TaskQueue = () => {
           .join(" ")
           .replace(/\s+/g, " ")
           .trim();
+
+        // Specific fix for Hunyuan 3D 3 -> 3.0 for consistency
+        if (formatted.endsWith("Hunyuan 3D 3")) {
+          formatted += ".0";
+        }
+
         return formatted;
       };
 
@@ -388,11 +409,14 @@ export const TaskQueue = () => {
             const mediaToken = t.completed_item?.primary_media_file?.token;
             // Try server thumbnail first, then fall back to local cache
             const serverThumbnail = getThumbnailUrl(
-              t.completed_item?.primary_media_file?.maybe_thumbnail_url_template,
+              t.completed_item?.primary_media_file
+                ?.maybe_thumbnail_url_template,
               { width: THUMBNAIL_SIZES.MEDIUM },
             );
-            const cachedThumbnail = mediaToken ? coverImageCache.get(mediaToken) : undefined;
-            
+            const cachedThumbnail = mediaToken
+              ? coverImageCache.get(mediaToken)
+              : undefined;
+
             return {
               id: t.id,
               ...formatTitleParts(t),
@@ -401,7 +425,8 @@ export const TaskQueue = () => {
                 ? [t.completed_item?.primary_media_file?.cdn_url]
                 : [],
               mediaTokens: (() => {
-                const primaryToken = t.completed_item?.primary_media_file?.token;
+                const primaryToken =
+                  t.completed_item?.primary_media_file?.token;
                 const tokens: string[] = primaryToken ? [primaryToken] : [];
                 return tokens;
               })(),
@@ -684,7 +709,7 @@ export const TaskQueue = () => {
             <div className="flex items-center justify-between p-3">
               <h2 className="text-lg font-semibold">Task Queue</h2>
               <div className="flex items-center gap-2">
-                 <Button
+                <Button
                   className="flex h-9 items-center justify-center bg-green-500/10 px-3 text-green-500 hover:bg-green-500/20"
                   onClick={() => handleClearCompleted()}
                 >

@@ -57,6 +57,11 @@ const generateId = () =>
     ? crypto.randomUUID()
     : Math.random().toString(36).slice(2, 10);
 
+const MODEL_OPTIONS = [
+  { id: EnqueueImageTo3dObjectModel.Hunyuan3d3, label: "Hunyuan 3.0" },
+  { id: EnqueueImageTo3dObjectModel.Hunyuan3d2_0, label: "Hunyuan 2.0" },
+];
+
 export const ImageTo3DExperience = ({
   title,
   subtitle,
@@ -64,6 +69,10 @@ export const ImageTo3DExperience = ({
   backgroundImage,
 }: ImageTo3DExperienceProps) => {
   const [activeMode, setActiveMode] = useState<Mode>("image");
+  const [selectedModel, setSelectedModel] =
+    useState<EnqueueImageTo3dObjectModel>(
+      EnqueueImageTo3dObjectModel.Hunyuan3d3,
+    );
   const [uploadedPreview, setUploadedPreview] = useState<string | null>(null);
   const [uploadedName, setUploadedName] = useState<string | null>(null);
   const [prompt, setPrompt] = useState("");
@@ -252,7 +261,7 @@ export const ImageTo3DExperience = ({
         variant === "object"
           ? await EnqueueImageTo3dObject({
               image_media_token: uploadedMediaToken || undefined,
-              model: EnqueueImageTo3dObjectModel.Hunyuan3d3,
+              model: selectedModel,
               frontend_caller: "mini_app",
               frontend_subscriber_id: subscriberId,
             })
@@ -624,7 +633,21 @@ export const ImageTo3DExperience = ({
             <div className="glass w-full rounded-xl p-5 shadow-2xl ring-1 ring-white/10">
               <div className="space-y-5">{renderActiveMode()}</div>
 
-              <div className="mt-6 flex justify-center">
+              <div className="mt-6 flex justify-between">
+                {variant === "object" && (
+                  <div className="flex justify-center">
+                    <TabSelector
+                      tabs={MODEL_OPTIONS}
+                      activeTab={selectedModel}
+                      onTabChange={(id) =>
+                        setSelectedModel(id as EnqueueImageTo3dObjectModel)
+                      }
+                      className="w-fit"
+                      indicatorClassName="bg-primary/25"
+                    />
+                  </div>
+                )}
+
                 <Button
                   variant="primary"
                   icon={faSparkles}
