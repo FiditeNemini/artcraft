@@ -207,24 +207,17 @@ We're painting with pictures. We're not prompters, but rather auteurs of craftin
 
 # ArtCraft: Free and Open 3D Filmmaking
 
-ArtCraft is a crafting engine and is available in its entirety on [Github (please star us!)](https://github.com/storytold/artcraft)
+ArtCraft is a crafting engine and is available in its entirety on [Github (please star us!)](https://github.com/storytold/artcraft), or try it today on [Mac or Windows](/download).
 
-We have [downloads for Windows and Mac](/download), with Linux support coming soon.
-
-You can pay us for image and video compute, or you can *bring your own keys and subscriptions*
-without needing to pay us a dime. We offer the ability to log in with MidJourney, Grok, 
-OpenAI/Sora, World Labs, and several other providers. 
+You generate images and videos in app using a wide selection of models and providers
+such as Midjourney, Google, Sora, Grok, WorldLabs, and more - or you can bring your own keys!
 
 Over the coming weeks, we'll be adding FAL, Replicate, and Google Gemini. Local GPU support and RunPod support 
 is also coming soon (subscribe to stay updated, or better yet, [join our Discord](https://discord.gg/artcraft)).
 
-If you're a blogger or podcaster, we've got a [ton of CC-BY-SA content here](/press-kit#top) if you'd like to help us let people
-know about ArtCraft, and we'd be happy to do interviews.
+If you're a blogger, podcaster, or creator we've got a [ton of CC-BY-SA content here](/press-kit#top) if you'd like to help us let people know about ArtCraft.
 
-If you're a creative, please enjoy ArtCraft. We built it for ourselves and for you. Please join the community 
-and let us know if there's anything we can help with, fix, or add. 
-
-If you're a filmmaker, please get in touch. We'd love to collaborate!
+If you're a creative, please enjoy ArtCraft. We built it for ourselves and for you. Please join the community and let us know if there's any way we can help. 
 
 &mdash; Brandon Thomas
 
