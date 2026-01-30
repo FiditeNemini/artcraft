@@ -459,7 +459,7 @@ export default function MediaPage() {
                                   return (
                                     <a
                                       key={contextImage.media_token}
-                                      href={contextImage.media_links.cdn_url}
+                                      href={`/media/${contextImage.media_token}`}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="glass relative aspect-square overflow-hidden rounded-lg border border-white/10 hover:border-white/40 transition-colors block"
