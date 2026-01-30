@@ -457,16 +457,19 @@ export default function MediaPage() {
                                       size: THUMBNAIL_SIZES.SMALL,
                                     });
                                   return (
-                                    <div
+                                    <a
                                       key={contextImage.media_token}
-                                      className="glass relative aspect-square overflow-hidden rounded-lg border border-white/10 hover:border-white/40 transition-colors"
+                                      href={contextImage.media_links.cdn_url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="glass relative aspect-square overflow-hidden rounded-lg border border-white/10 hover:border-white/40 transition-colors block"
                                     >
                                       <img
                                         src={thumbnail}
                                         alt={`Reference image ${index + 1}`}
                                         className="h-full w-full object-cover"
                                       />
-                                    </div>
+                                    </a>
                                   );
                                 },
                               )}
