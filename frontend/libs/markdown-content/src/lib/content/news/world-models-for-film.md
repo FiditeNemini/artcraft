@@ -11,7 +11,8 @@ You've seen a lot of these:
 @youtube(pGn-1BKo3nY)
 
 For the past year, it been relatively easy to make montages, "clip shows", and trailers
-like this. 
+like this. While they serve as fun proof-of-concepts and visual eyecandy, you'd be hard 
+pressed to get a "good story" out of this video style.
 
 Good stories have characters that occupy real spaces. They have room to live, breathe, and interact. 
 
@@ -216,6 +217,14 @@ OpenAI/Sora, World Labs, and several other providers.
 
 Over the coming weeks, we'll be adding FAL, Replicate, and Google Gemini. Local GPU support and RunPod support 
 is also coming soon (subscribe to stay updated, or better yet, [join our Discord](https://discord.gg/artcraft)).
+
+If you're a blogger or podcaster, we've got a [ton of CC-BY-SA content here](/press-kit#top) if you'd like to help us let people
+know about ArtCraft, and we'd be happy to do interviews.
+
+If you're a creative, please enjoy ArtCraft. We built it for ourselves and for you. Please join the community 
+and let us know if there's anything we can help with, fix, or add. 
+
+If you're a filmmaker, please get in touch. We'd love to collaborate!
 
 &mdash; Brandon Thomas
 
