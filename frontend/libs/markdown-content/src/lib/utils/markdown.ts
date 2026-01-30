@@ -5,6 +5,7 @@ export const markdownToHtml = (
   const lines = markdown.replace(/\r\n/g, "\n").split("\n");
   const htmlParts: string[] = [];
   let inList = false;
+  let blockquoteLines: string[] = [];
 
   const closeListIfOpen = () => {
     if (inList) {
@@ -144,13 +145,45 @@ export const markdownToHtml = (
     return out;
   };
 
+  // Accumulate paragraph lines - consecutive non-blank, non-block lines form a single paragraph
+  let paragraphLines: string[] = [];
+
+  const flushParagraph = () => {
+    if (paragraphLines.length > 0) {
+      const text = paragraphLines.map(renderInline).join(" ");
+      htmlParts.push(`<p>${text}</p>`);
+      paragraphLines = [];
+    }
+  };
+
+  const flushBlockquote = () => {
+    if (blockquoteLines.length > 0) {
+      const content = blockquoteLines.join(" ");
+      htmlParts.push(`<blockquote>${renderInline(content)}</blockquote>`);
+      blockquoteLines = [];
+    }
+  };
+
   for (const raw of lines) {
     const line = raw.trimEnd();
     const ltrim = line.replace(/^\s+/, "");
 
+    // Blockquote: > text
+    const blockquoteMatch = line.match(/^>\s?(.*)$/);
+    if (blockquoteMatch) {
+      flushParagraph();
+      closeListIfOpen();
+      blockquoteLines.push(blockquoteMatch[1]);
+      continue;
+    }
+
+    // If we were in a blockquote but this line isn't, flush it
+    flushBlockquote();
+
     // YouTube embed: @youtube(VIDEO_ID or URL)
     const youtubeMatch = ltrim.match(/^@youtube\(([^)]+)\)\s*$/);
     if (youtubeMatch) {
+      flushParagraph();
       closeListIfOpen();
       const videoId = extractYouTubeId(youtubeMatch[1]);
       if (videoId) {
@@ -164,6 +197,7 @@ export const markdownToHtml = (
     // Video embed: @video(url)
     const videoMatch = ltrim.match(/^@video\(([^)]+)\)\s*$/);
     if (videoMatch) {
+      flushParagraph();
       closeListIfOpen();
       htmlParts.push(renderVideoEmbed(videoMatch[1]));
       continue;
@@ -174,6 +208,7 @@ export const markdownToHtml = (
       /^@(image|gif)\(([^,)]+)(?:,\s*([^)]+))?\)\s*$/,
     );
     if (imageMatch) {
+      flushParagraph();
       closeListIfOpen();
       const url = imageMatch[2].trim();
       const size = imageMatch[3]?.trim() || "";
@@ -184,6 +219,7 @@ export const markdownToHtml = (
     // ATX headings: support #..###### with optional space after hashes
     const heading = ltrim.match(/^(#{1,6})\s*(.*)$/);
     if (heading) {
+      flushParagraph();
       closeListIfOpen();
       const level = Math.min(heading[1].length, 6);
       const text = renderInline(heading[2] || "");
@@ -193,6 +229,7 @@ export const markdownToHtml = (
     // Standalone image/video line: ![alt](url|size)
     const imgMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)\s*$/);
     if (imgMatch) {
+      flushParagraph();
       closeListIfOpen();
       const alt = String(imgMatch[1] || "").replace(/"/g, "&quot;");
       const [url, size] = imgMatch[2].split("|");
@@ -207,6 +244,7 @@ export const markdownToHtml = (
       continue;
     }
     if (line.startsWith("- ")) {
+      flushParagraph();
       if (!inList) {
         inList = true;
         htmlParts.push("<ul>");
@@ -215,14 +253,18 @@ export const markdownToHtml = (
       continue;
     }
     if (line.trim() === "") {
+      flushParagraph();
       closeListIfOpen();
       htmlParts.push("");
       continue;
     }
+    // Regular text line - accumulate for paragraph
     closeListIfOpen();
-    htmlParts.push(`<p>${renderInline(line)}</p>`);
+    paragraphLines.push(line);
   }
 
+  flushParagraph();
+  flushBlockquote();
   closeListIfOpen();
   return htmlParts.join("\n");
 };
