@@ -205,6 +205,19 @@ We're still being largely intentional. If there's something we want to see, we n
 
 We're painting with pictures. We're not prompters, but rather auteurs of crafting.
 
+# Machinima 2.0
+
+Do you remember "Machinima"? It's a niche, indie genre of filmmaking that was popular in the early 2000's. Creators would pilot video game characters, carefully controlling for the camera, character movements, and on-screen details in order to tell stories. They would then dub over the footage to breathe life into the narrative. 
+
+Popular Machinima series include "Red vs. Blue", from Rooster Teeth Productions, which was filmed using the Halo video game series. Other notable Machinima include "The Strangerhood" (which used The Sims) and "Skibidi Toilet" (which leverages Source Filmmaker). 
+
+I mention this obscure artform because as a former Machinima creator myself, it feels like Image-to-Video is the new Machinima. There's the character posting, keyframing, and dubbing, of course, but there's also this notion of using pixels created by someone else's engine. And it's very much in the spirit of machinima to carve new creativity out of these engines by operating at a higher level. 
+
+Image-to-image, 3D, and World Models make an entirely new form of Machinima possible:
+
+@youtube(tAAiiKteM-U)
+
+
 # ArtCraft: Free and Open 3D Filmmaking
 
 ArtCraft is a crafting engine and is available in its entirety on [Github (please star us!)](https://github.com/storytold/artcraft), or try it today on [Mac or Windows](/download).
