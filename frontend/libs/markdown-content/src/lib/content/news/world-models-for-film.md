@@ -1,5 +1,5 @@
 ---
-title: Less Slop: World Models for Consistent AI Filmmaking
+title: Machinima 2.0: World Models for Consistent AI Filmmaking
 abstract: How to use World Models and 3D Rendering to Get Consistent AI Film Locations and better AI Films.
 date: 2026-01-30
 ---
