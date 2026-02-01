@@ -6,6 +6,7 @@ use crate::utils::create_checkout::create_subscription_checkout_session::{create
 use actix_artcraft::requests::get_request_signup_source_enum::get_request_signup_source_enum;
 use actix_web::HttpRequest;
 use enums::by_table::users::user_feature_flag::UserFeatureFlag;
+use enums::by_table::users::user_signup_source::UserSignupSource;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{error, info, warn};
 use mysql_queries::queries::users::user::create::create_account_error::CreateAccountError;
@@ -37,7 +38,15 @@ pub (super) async fn user_creation_case(
       })?;
 
   let ip_address = get_request_ip(&http_request);
+
   let maybe_source = get_request_signup_source_enum(&http_request);
+
+  // NB: Adjust the signup source to the Stripe onboarding equivalent.
+  let maybe_source = match maybe_source {
+    Some(UserSignupSource::ArtCraftAiWeb) => Some(UserSignupSource::ArtCraftAiStripe),
+    Some(UserSignupSource::ArtCraftGetWeb) => Some(UserSignupSource::ArtCraftGetStripe),
+    _ => maybe_source,
+  };
 
   // NB: Not sure if these lock important functionality, so we're keeping this
   let user_feature_flags = vec![
