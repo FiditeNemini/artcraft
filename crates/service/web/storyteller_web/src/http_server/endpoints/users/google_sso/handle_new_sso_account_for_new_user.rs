@@ -1,9 +1,7 @@
 use crate::http_server::endpoints::users::google_sso::google_sso_handler::GoogleCreateAccountErrorResponse;
 use crate::http_server::endpoints::users::google_sso::handle_new_sso_account::NewSsoAccountInfo;
-use crate::http_server::requests::get_request_signup_source::{get_request_signup_source, get_request_signup_source_enum};
 use crate::http_server::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
-use crate::util::email_to_gravatar::email_to_gravatar;
-use crate::util::generate_random_username::generate_random_username;
+use actix_artcraft::requests::get_request_signup_source_enum::get_request_signup_source_enum;
 use actix_web::HttpRequest;
 use enums::by_table::users::user_feature_flag::UserFeatureFlag;
 use google_sign_in::claims::claims::Claims;
@@ -15,6 +13,8 @@ use mysql_queries::queries::users::user::create::create_account_from_google_sso:
 use mysql_queries::utils::transactor::Transactor;
 use sqlx::pool::PoolConnection;
 use sqlx::{Acquire, MySql};
+use users::email::email_to_gravatar_hash::email_to_gravatar_hash;
+use users::username::generate_random_username::generate_random_username;
 
 pub struct CreateArgs<'a> {
   pub http_request: &'a HttpRequest,
@@ -40,7 +40,7 @@ pub async fn handle_new_sso_account_for_new_user(
   let user_feature_flags = studio_feature_flags();
 
   let ip_address = get_request_ip(&args.http_request);
-  let user_email_gravatar_hash = email_to_gravatar(&args.user_email_address);
+  let user_email_gravatar_hash = email_to_gravatar_hash(&args.user_email_address);
 
   let mut maybe_source = get_request_signup_source_enum(&args.http_request);
 

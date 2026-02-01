@@ -21,10 +21,12 @@ normal = ["workspace-build-acceleration"]
 workspace-build-acceleration.workspace = true
 
 # Internal
+actix_artcraft.workspace = true
 artcraft_api_defs.workspace = true
 component_traits.workspace = true
 enums.workspace = true
 errors.workspace = true
+http_headers.workspace = true
 http_server_common = { path = "../../../lib/deprecated/http_server_common" }
 mysql_queries = { path = "../../../schema/database/mysql_queries" }
 reusable_types = { path = "../../../schema/public/reusable_types" }
@@ -42,6 +44,7 @@ serde.workspace = true
 serde_derive.workspace = true
 serde_json.workspace = true
 sqlx = { version = "0.7.4", features = [ "mysql", "runtime-tokio-rustls", "chrono" ] }
+users.workspace = true
 
 # Money
 async-stripe = { version = "1.0.0-alpha.2", default-features = false, features = ["rustls-tls-native"] }

@@ -331,6 +331,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix_artcraft"
+version = "0.0.1"
+dependencies = [
+ "actix-http",
+ "actix-service",
+ "actix-web",
+ "actix_helpers",
+ "anyhow",
+ "cookies",
+ "enums",
+ "errors",
+ "http_headers",
+ "log",
+ "tokens",
+ "workspace-build-acceleration",
+]
+
+[[package]]
 name = "actix_cors_configs"
 version = "0.0.1"
 dependencies = [
@@ -1351,6 +1369,7 @@ version = "0.0.1"
 dependencies = [
  "actix-http",
  "actix-web",
+ "actix_artcraft",
  "anyhow",
  "artcraft_api_defs",
  "async-stripe 1.0.0-alpha.2",
@@ -1364,6 +1383,7 @@ dependencies = [
  "component_traits",
  "enums",
  "errors",
+ "http_headers",
  "http_server_common",
  "log",
  "mockall",
@@ -1377,6 +1397,7 @@ dependencies = [
  "tokens",
  "tokio",
  "user_traits_component",
+ "users",
  "workspace-build-acceleration",
 ]
 
@@ -10718,6 +10739,7 @@ dependencies = [
  "actix-web",
  "actix-web-actors",
  "actix-web-lab",
+ "actix_artcraft",
  "actix_cors_configs",
  "actix_helpers",
  "anyhow",
@@ -10807,6 +10829,7 @@ dependencies = [
  "url_config",
  "user_input_common",
  "user_traits_component",
+ "users",
  "utoipa",
  "utoipa-swagger-ui",
  "videos",
@@ -12670,6 +12693,18 @@ version = "0.0.1"
 dependencies = [
  "actix-web",
  "mockall",
+ "workspace-build-acceleration",
+]
+
+[[package]]
+name = "users"
+version = "0.0.1"
+dependencies = [
+ "collections",
+ "md-5 0.10.6",
+ "once_cell",
+ "primitives",
+ "rand 0.9.1",
  "workspace-build-acceleration",
 ]
 
