@@ -2,11 +2,64 @@ import { faXmarkCircle } from "@fortawesome/pro-solid-svg-icons";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "@storyteller/ui-button";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { SOCIAL_LINKS } from "../../config/links";
 import Seo from "../../components/seo";
+import { useEffect, useState } from "react";
+import { UsersApi } from "@storyteller/api";
 
 const CheckoutCancel = () => {
+  const [searchParams] = useSearchParams();
+  const skipOnboarding = searchParams.get("skip_onboarding") === "true";
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      // Skip onboarding check if we already went through it
+      if (skipOnboarding) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const usersApi = new UsersApi();
+        const sessionResponse = await usersApi.GetSession();
+
+        if (sessionResponse.success && sessionResponse.data?.loggedIn) {
+          const onboarding = sessionResponse.data.onboarding;
+
+          // If onboarding is undefined or has any required fields not set, redirect to onboarding
+          if (
+            !onboarding ||
+            onboarding.password_not_set ||
+            onboarding.email_not_set ||
+            onboarding.email_not_confirmed
+          ) {
+            // Redirect to onboarding - it will add skip_onboarding=true after username step
+            window.location.href =
+              "/onboarding?redirect_to=" +
+              encodeURIComponent("/checkout/cancel");
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Error checking onboarding status:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkOnboarding();
+  }, [skipOnboarding]);
+
+  if (isLoading) {
+    return (
+      <div className="relative min-h-screen bg-[#101014] text-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#101014] text-white">
       <Seo
