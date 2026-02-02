@@ -44,8 +44,11 @@ const CheckoutSuccess = () => {
             onboarding.email_not_confirmed
           ) {
             // Use window.location for a hard redirect to ensure it works
+            // Include redirect_to so user comes back here after onboarding
             // Do NOT set isCheckingOnboarding to false - keep showing loading spinner
-            window.location.href = "/onboarding";
+            window.location.href =
+              "/onboarding?redirect_to=" +
+              encodeURIComponent("/checkout/success");
             return;
           }
         }

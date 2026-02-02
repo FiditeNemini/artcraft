@@ -50,7 +50,8 @@ const Onboarding = () => {
     // If redirecting to success, append parameter
     const decodedRedirect = decodeURIComponent(redirectTo);
     if (decodedRedirect.includes("/checkout/success")) {
-      return `${decodedRedirect}?onboarding_complete=true`;
+      const separator = decodedRedirect.includes("?") ? "&" : "?";
+      return `${decodedRedirect}${separator}onboarding_complete=true`;
     }
     // If redirecting to checkout/cancel and we've completed username step, add skip_onboarding
     if (decodedRedirect.includes("/checkout/cancel") && afterUsernameStep) {
@@ -147,7 +148,6 @@ const Onboarding = () => {
         setCurrentStep("username");
       } else {
         // All done!
-
         await handleCompletion();
       }
     } catch (err) {
@@ -176,25 +176,32 @@ const Onboarding = () => {
           throw new Error(errorMsg);
         }
 
-        // Re-fetch session to get updated onboarding state
+        // Immediately update local state to reflect that email is now set
+        const updatedOnboardingData = {
+          ...onboardingData!,
+          email_not_set: false,
+        };
+        setOnboardingData(updatedOnboardingData);
+
+        // Re-fetch session to get updated onboarding state from backend
         const sessionResponse = await usersApi.GetSession();
         if (sessionResponse.success && sessionResponse.data?.onboarding) {
-          const updatedOnboarding = sessionResponse.data.onboarding;
-          setOnboardingData(updatedOnboarding);
+          const backendOnboarding = sessionResponse.data.onboarding;
+          setOnboardingData(backendOnboarding);
 
           // Determine next step based on actual backend state
-          if (updatedOnboarding.password_not_set) {
+          if (backendOnboarding.password_not_set) {
             setCurrentStep("password");
-          } else if (updatedOnboarding.username_not_customized) {
+          } else if (backendOnboarding.username_not_customized) {
             setCurrentStep("username");
           } else {
             await handleCompletion();
           }
         } else {
-          // Fallback to old logic if session fetch fails
-          if (onboardingData?.password_not_set) {
+          // Fallback to our locally updated state if session fetch fails
+          if (updatedOnboardingData.password_not_set) {
             setCurrentStep("password");
-          } else if (onboardingData?.username_not_customized) {
+          } else if (updatedOnboardingData.username_not_customized) {
             setCurrentStep("username");
           } else {
             await handleCompletion();
@@ -218,21 +225,28 @@ const Onboarding = () => {
           throw new Error(errorMsg);
         }
 
-        // Re-fetch session to get updated onboarding state
+        // Immediately update local state to reflect that password is now set
+        const updatedOnboardingData = {
+          ...onboardingData!,
+          password_not_set: false,
+        };
+        setOnboardingData(updatedOnboardingData);
+
+        // Re-fetch session to get updated onboarding state from backend
         const sessionResponse = await usersApi.GetSession();
         if (sessionResponse.success && sessionResponse.data?.onboarding) {
-          const updatedOnboarding = sessionResponse.data.onboarding;
-          setOnboardingData(updatedOnboarding);
+          const backendOnboarding = sessionResponse.data.onboarding;
+          setOnboardingData(backendOnboarding);
 
           // Determine next step based on actual backend state
-          if (updatedOnboarding.username_not_customized) {
+          if (backendOnboarding.username_not_customized) {
             setCurrentStep("username");
           } else {
             await handleCompletion();
           }
         } else {
-          // Fallback to old logic if session fetch fails
-          if (onboardingData?.username_not_customized) {
+          // Fallback to our locally updated state if session fetch fails
+          if (updatedOnboardingData.username_not_customized) {
             setCurrentStep("username");
           } else {
             await handleCompletion();
@@ -249,6 +263,12 @@ const Onboarding = () => {
           const errorMsg = response.errorMessage || "Failed to set username";
           throw new Error(errorMsg);
         }
+
+        // Immediately update local state to reflect that username is now customized
+        setOnboardingData({
+          ...onboardingData!,
+          username_not_customized: false,
+        });
 
         await handleCompletion(true);
       }
