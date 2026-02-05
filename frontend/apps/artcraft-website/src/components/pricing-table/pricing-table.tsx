@@ -194,7 +194,8 @@ const PricingTable = ({
         return;
       }
 
-      // Logged in - determine if we need checkout (new subscription) or portal (switch plan)
+      // Logged in - user already has an account
+      // We use the normal subscription APIs here, not the signup one
       const hasActiveSub = activePlanSlug && activePlanSlug !== "free";
       const billingApi = new BillingApi();
 
@@ -214,7 +215,8 @@ const PricingTable = ({
         // Redirect to Stripe Portal
         window.location.href = response.data.stripePortalUrl;
       } else {
-        // User logged in but no active subscription - checkout
+        // User logged in but no active subscription - use normal subscription checkout
+        // This attaches the subscription to the existing account
         const response = await billingApi.SubscriptionCheckout({
           plan: apiPlanSlug,
           cadence: cadence,
