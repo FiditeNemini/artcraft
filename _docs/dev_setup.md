@@ -39,9 +39,7 @@ An easy way to get started with running the app in development is to run the two
 
 ArtCraft's server is a Rust / Actix app called `storyteller-web`.
 
-It can function entirely within the development environment, and ArtCraft can be pointed to a 
-local instance of the server.
+You don't need to run this to develop the ArtCraft application, but it can be useful to spin up 
+a development instance for adding new server functions or as your own private local copy.
 
-**TODO**: Concisely describe setting up server components. Note: we have 
-previous docs in `old/` that may still be relevant, though they're perhaps
-slightly out of date.
+See [dev_setup_server.md](./dev_setup_server.md) for instructions.
