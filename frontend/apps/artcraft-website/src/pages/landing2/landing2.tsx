@@ -305,7 +305,7 @@ const Landing = () => {
                 src="/images/try-download.png"
                 alt="Try Download"
                 draggable={false}
-                className="absolute right-[9%] -bottom-2 h-40 pointer-events-none select-none hidden md:block"
+                className="absolute right-[9.5%] -bottom-2 h-40 pointer-events-none select-none hidden md:block"
               />
             </div>
 
@@ -862,9 +862,6 @@ const Landing = () => {
               <LandingActionButtons onDownloadClick={onDownloadClick} />
               <div className="mt-4 text-sm text-white/80 font-medium">
                 Free to use.
-              </div>
-              <div className="text-xs text-white/80 mt-1 font-medium">
-                Unlimited Nano Banana Pro for a limited time!
               </div>
             </div>
           </div>
