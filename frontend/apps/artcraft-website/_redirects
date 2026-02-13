@@ -63,3 +63,7 @@
 /welcome /index.html 200
 /welcome/ /index.html 200
 /welcome/* /index.html 200
+
+/password-reset /index.html 200
+/password-reset/ /index.html 200
+/password-reset/* /index.html 200
