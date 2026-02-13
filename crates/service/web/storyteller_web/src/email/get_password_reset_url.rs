@@ -14,7 +14,7 @@ pub enum PasswordResetLocation {
 
 pub fn get_password_reset_url(reset_token: &str, location: PasswordResetLocation) -> String {
   let url = match location {
-    PasswordResetLocation::ArtCraftProduction => "https://getartcraft.com/password-reset/verify",
+    PasswordResetLocation::ArtCraftProduction => "https://getartcraft.com/forgot-password/verify",
     PasswordResetLocation::FakeYouProduction => "https://fakeyou.com/password-reset/verify",
     PasswordResetLocation::ArtCraftDevelopment |
     PasswordResetLocation::FakeYouDevelopment => {
