@@ -56,6 +56,10 @@
 /signup/ /index.html 200
 /signup/* /index.html 200
 
+/forgot-password /index.html 200
+/forgot-password/ /index.html 200
+/forgot-password/* /index.html 200
+
 /welcome /index.html 200
 /welcome/ /index.html 200
 /welcome/* /index.html 200
