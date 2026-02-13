@@ -204,26 +204,45 @@ export default function Navbar() {
                 >
                   Pricing
                 </Link>
-                <Button
-                  as="link"
-                  href="/signup"
-                  className="bg-white text-black hover:bg-white/90 text-sm font-semibold px-4 py-2 h-auto rounded-lg shadow-md"
-                >
-                  Sign up
-                </Button>
+                <div className="flex gap-2">
+                  <Link to="/login">
+                    <Button
+                      variant="primary"
+                      className="bg-white/80 text-black hover:bg-white/90 text-sm font-semibold px-4 py-2 rounded-lg shadow-md"
+                    >
+                      Login
+                    </Button>
+                  </Link>
+                  <Link to="/signup">
+                    <Button
+                      variant="primary"
+                      className="text-sm font-semibold px-4 py-2 rounded-lg shadow-md"
+                    >
+                      Sign up
+                    </Button>
+                  </Link>
+                </div>
               </div>
             )}
 
             {/* Mobile Menu Button - simplified for now */}
             <div className="-ml-2 flex items-center md:hidden gap-3">
               {!user && (
-                <Button
-                  as="link"
-                  href="/signup"
-                  className="bg-white text-black hover:bg-white/90 text-xs font-semibold px-3 py-1.5 h-auto rounded-lg"
-                >
-                  Sign up
-                </Button>
+                <div className="flex gap-2">
+                  <Link to="/login">
+                    <Button className="bg-white/60 text-black hover:bg-white/90 text-xs font-semibold px-3 py-1.5 h-auto rounded-lg">
+                      Login
+                    </Button>
+                  </Link>
+                  <Link to="/signup">
+                    <Button
+                      variant="primary"
+                      className="text-xs font-semibold px-3 py-1.5 h-auto"
+                    >
+                      Sign up
+                    </Button>
+                  </Link>
+                </div>
               )}
               {user && (
                 <img

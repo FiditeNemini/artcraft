@@ -11,6 +11,7 @@ export * from "./lib/LocalApi.js";
 export * from "./lib/PromptsApi.js";
 export * from "./lib/TtsApi.js";
 export * from "./lib/UserBookmarksApi.js";
+export * from "./lib/PasswordResetApi.js";
 export * from "./lib/UsersApi.js";
 export * from "./lib/VideoApi.js";
 export * from "./lib/WeightsApi.js";
