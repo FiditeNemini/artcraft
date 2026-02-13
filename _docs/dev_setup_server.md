@@ -86,6 +86,13 @@ diesel migration run
 You might get a scary message about `"Encountered unknown type for Mysql: enum"` -- you can safely ignore this
 error if you see it in isolation. It doesn't impact the migrations whatsoever.
 
+Finally, you'll need the sqlx CLI tool to run codegen. 
+You likely won't need this now, but if you change any queries, this will be necessary:
+
+```bash
+cargo install sqlx-cli --features rustls,mysql,sqlite
+```
+
 ### Install Redis (Mac)
 
 ```bash
