@@ -99,9 +99,9 @@ jobs:
           SQLX_OFFLINE: true
         with:
           projectPath: ./crates/desktop/artcraft
-          tagName: artcraft-windows-v__VERSION__ # the action automatically replaces __VERSION__ with the app version.
-          releaseName: "Artcraft Windows v__VERSION__"
-          releaseBody: "Windows build - See the assets to download this version and install."
+          tagName: artcraft-v__VERSION__ # the action automatically replaces __VERSION__ with the app version.
+          releaseName: "ArtCraft v__VERSION__"
+          releaseBody: "Production build of ArtCraft. See the assets below to download and install."
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}

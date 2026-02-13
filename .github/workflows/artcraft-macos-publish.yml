@@ -233,8 +233,8 @@ jobs:
         with:
           projectPath: ./crates/desktop/artcraft
           tagName: artcraft-v__VERSION__ # the action automatically replaces __VERSION__ with the app version.
-          releaseName: "Artcraft v__VERSION__"
-          releaseBody: "See the assets to download this version and install."
+          releaseName: "ArtCraft v__VERSION__"
+          releaseBody: "See the assets below to download this version and install."
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
