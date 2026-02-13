@@ -70,6 +70,7 @@ const VerifyReset = () => {
 
     if (response.success) {
       setSuccess(true);
+      window.dispatchEvent(new Event("auth-change"));
     } else {
       setError(
         response.errorMessage ||
@@ -256,15 +257,15 @@ const VerifyReset = () => {
                   Password Reset Successfully
                 </h3>
                 <p className="text-white/60 text-sm mb-8">
-                  Your password has been changed. You can now log in with your
-                  new password.
+                  Your password has been changed and you've been logged in
+                  successfully.
                 </p>
                 <Button
-                  id="go-to-login-btn"
+                  id="back-to-homepage-btn"
                   className="w-full bg-primary hover:bg-primary-600 text-white border-none justify-center font-bold h-12"
-                  onClick={() => navigate("/login")}
+                  onClick={() => navigate("/")}
                 >
-                  Go to Login
+                  Back to Homepage
                 </Button>
               </div>
             </>
