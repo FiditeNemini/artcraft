@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "@storyteller/ui-button";
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { PasswordResetApi } from "@storyteller/api";
+import { PasswordResetApi, BillingApi } from "@storyteller/api";
 
 import Seo from "../../components/seo";
 
@@ -31,6 +31,8 @@ const VerifyReset = () => {
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState(false);
+  const [redirectTo, setRedirectTo] = useState("/");
+  const [redirectLabel, setRedirectLabel] = useState("Back to Homepage");
 
   const handleRedeemReset = async () => {
     setError(null);
@@ -71,6 +73,27 @@ const VerifyReset = () => {
     if (response.success) {
       setSuccess(true);
       window.dispatchEvent(new Event("auth-change"));
+
+      // Check if user has an active subscription to decide redirect
+      try {
+        const billingApi = new BillingApi();
+        const billingResponse = await billingApi.ListActiveSubscriptions();
+        if (
+          billingResponse.success &&
+          billingResponse.data &&
+          billingResponse.data.active_subscriptions.length > 0
+        ) {
+          setRedirectTo("/");
+          setRedirectLabel("Back to Homepage");
+        } else {
+          setRedirectTo("/pricing");
+          setRedirectLabel("Continue");
+        }
+      } catch {
+        // Default to homepage if billing check fails
+        setRedirectTo("/");
+        setRedirectLabel("Back to Homepage");
+      }
     } else {
       setError(
         response.errorMessage ||
@@ -263,9 +286,9 @@ const VerifyReset = () => {
                 <Button
                   id="back-to-homepage-btn"
                   className="w-full bg-primary hover:bg-primary-600 text-white border-none justify-center font-bold h-12"
-                  onClick={() => navigate("/")}
+                  onClick={() => navigate(redirectTo)}
                 >
-                  Back to Homepage
+                  {redirectLabel}
                 </Button>
               </div>
             </>
