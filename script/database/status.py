@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
 """
-Database migration script for running queries in a loop with failure fallback.
-Reads MySQL credentials from a TOML secrets file.
+Database status polling script. Runs a count query in a loop and logs results.
+Reads MySQL credentials from the same secrets.toml as migrate.py.
 
 Requirements:
   pip install pymysql
-
-Secrets file (script/database/secrets.toml):
-  [database]
-  url = "mysql://user:password@host:3306/dbname"
 """
 
 import sys
@@ -27,16 +23,14 @@ except ImportError:
 
 SECRETS_PATH = "secrets.toml"
 
-# -- Migration query to run in batches --
-# Tweak this as needed. Use LIMIT to control batch size.
+# -- Count query to poll --
 QUERY = """
-  delete
+  select count(*)
   from media_files
   where maybe_creator_user_token is null
-  limit 10000
 """
 
-BATCH_PAUSE_SECONDS = 0.5
+POLL_INTERVAL_SECONDS = 60
 FAILURE_BACKOFF_SECONDS = 5
 MAX_BACKOFF_SECONDS = 300
 
@@ -69,36 +63,28 @@ def connect(config):
   )
 
 
-def run_migration():
+def run_status():
   config = load_config()
   conn = connect(config)
-  total_affected = 0
   failures = 0
-  start_time = time.monotonic()
 
   print(f"Connected to {config['host']}/{config['database']}")
-  print(f"Running query:\n{QUERY.strip()}\n")
+  print(f"Polling every {POLL_INTERVAL_SECONDS}s with:\n{QUERY.strip()}\n")
 
   try:
     while True:
       try:
-        batch_start = time.monotonic()
+        query_start = time.monotonic()
         with conn.cursor() as cursor:
           cursor.execute(QUERY)
-          affected = cursor.rowcount
+          count = cursor.fetchone()[0]
 
-        total_affected += affected
         failures = 0
-        batch_time = int(time.monotonic() - batch_start)
-        elapsed = int(time.monotonic() - start_time)
+        query_time = int(time.monotonic() - query_start)
         now = datetime.now().strftime("%H:%M:%S")
-        print(f"  Batch: {affected} rows {batch_time}s | Total: {total_affected} rows {elapsed}s | Clock: {now}")
+        print(f"  Remaining: {count:,} rows | Query: {query_time}s | Clock: {now}")
 
-        if affected == 0:
-          print("No more rows to process. Done.")
-          break
-
-        time.sleep(BATCH_PAUSE_SECONDS)
+        time.sleep(POLL_INTERVAL_SECONDS)
 
       except (pymysql.OperationalError, pymysql.InterfaceError) as e:
         failures += 1
@@ -113,12 +99,10 @@ def run_migration():
         conn = connect(config)
 
   except KeyboardInterrupt:
-    print(f"\nInterrupted. Total rows affected: {total_affected}")
+    print("\nInterrupted.")
   finally:
     conn.close()
 
-  print(f"Finished. Total rows affected: {total_affected}")
-
 
 if __name__ == "__main__":
-  run_migration()
+  run_status()
