@@ -29,11 +29,18 @@ SECRETS_PATH = "secrets.toml"
 
 # -- Migration query to run in batches --
 # Tweak this as needed. Use LIMIT to control batch size.
+#  QUERY = """
+#    delete
+#    from media_files
+#    where maybe_creator_user_token is null
+#    limit 10000
+#  """
+
 QUERY = """
-  delete
-  from media_files
-  where maybe_creator_user_token is null
-  limit 10000
+  delete from media_files 
+  where media_type in ("audio", "wav") 
+  and created_at < NOW() - INTERVAL 6 MONTH
+  limit 10000  
 """
 
 BATCH_PAUSE_SECONDS = 0.5

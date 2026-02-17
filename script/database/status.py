@@ -24,10 +24,17 @@ except ImportError:
 SECRETS_PATH = "secrets.toml"
 
 # -- Count query to poll --
+#   QUERY = """
+#     select count(*)
+#     from media_files
+#     where maybe_creator_user_token is null
+#   """
+
 QUERY = """
   select count(*)
   from media_files
-  where maybe_creator_user_token is null
+  where media_type in ("audio", "wav")
+    and created_at < NOW() - INTERVAL 6 MONTH
 """
 
 POLL_INTERVAL_SECONDS = 60

@@ -3,7 +3,7 @@
 -- noinspection SqlResolveForFile
 
 ALTER TABLE media_files
-    ADD COLUMN origin_product_category VARCHAR(16) NOT NULL DEFAULT "unknown"
+    ADD COLUMN origin_product_category VARCHAR(16) NOT NULL DEFAULT 'unknown'
     AFTER origin_category;
 
 ALTER TABLE media_files
