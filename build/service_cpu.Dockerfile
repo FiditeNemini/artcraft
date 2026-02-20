@@ -44,16 +44,18 @@ WORKDIR /tmp
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
         build-essential \
+        clang \
         cmake \
-        perl \
-        golang \
-        nasm \
-        git \
         curl \
         ffmpeg \
         fontconfig \
+        git \
+        golang \
+        libclang-dev \
         libfontconfig1-dev \
         libssl-dev \
+        nasm \
+        perl \
         pkg-config
 
 # NB: Fix for fontconfig (servo-fontconfig-sys): https://github.com/alacritty/alacritty/issues/4423#issuecomment-727277235
