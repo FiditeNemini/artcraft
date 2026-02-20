@@ -44,6 +44,7 @@ WORKDIR /tmp
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
         build-essential \
+        clang \
         cmake \
         curl \
         ffmpeg \
