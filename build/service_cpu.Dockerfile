@@ -33,7 +33,6 @@ RUN apt-get update \
 FROM ubuntu:jammy as rust-base
 
 # NB: This can be "stable" or another version.
-#ARG RUST_TOOLCHAIN="1.93.1"
 ARG RUST_TOOLCHAIN="1.86.0"
 
 WORKDIR /tmp
@@ -129,9 +128,8 @@ RUN du -hsc * | sort -hr
 
 # Build all the binaries.
 RUN SQLX_OFFLINE=true \
-  RUST_BACKTRACE=1 \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-  $HOME/.cargo/bin/cargo build -vv \
+  $HOME/.cargo/bin/cargo build \
   --release \
   --bin storyteller-web
 
@@ -140,12 +138,6 @@ RUN SQLX_OFFLINE=true \
   $HOME/.cargo/bin/cargo build \
   --release \
   --bin dummy-service
-
-RUN SQLX_OFFLINE=true \
-  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-  $HOME/.cargo/bin/cargo build \
-  --release \
-  --bin seedance2-pro-job
 
 RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
@@ -201,7 +193,6 @@ RUN echo -n ${GIT_SHA} > GIT_SHA
 # Copy all the binaries (except those that need a GPU):
 COPY --from=builder /tmp/target/release/storyteller-web /
 COPY --from=builder /tmp/target/release/dummy-service /
-COPY --from=builder /tmp/target/release/seedance2-pro-job /
 COPY --from=builder /tmp/target/release/analytics-job /
 COPY --from=builder /tmp/target/release/email-sender-job  /
 COPY --from=builder /tmp/target/release/es-update-job  /
