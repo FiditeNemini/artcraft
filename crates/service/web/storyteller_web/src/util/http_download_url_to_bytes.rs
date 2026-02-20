@@ -1,13 +1,13 @@
 use bytes::Bytes;
 use errors::AnyhowResult;
-use reqwest::{Client, IntoUrl};
+use wreq::Client;
 
 const USER_AGENT: &str = "storyteller-web/1.0";
 
 // TODO(bt, 2025-06-03): Don't load the entire file into memory!
 
 /// Downloads a (binary) file to memory. Good for images, etc. Not great for large files.
-pub async fn http_download_url_to_bytes<U: IntoUrl>(url: U) -> AnyhowResult<Bytes> {
+pub async fn http_download_url_to_bytes(url: &str) -> AnyhowResult<Bytes> {
   let client = Client::builder()
       .gzip(true)
       .build()?;

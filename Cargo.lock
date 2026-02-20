@@ -10335,37 +10335,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "seedance2-pro-job"
-version = "0.0.1"
-dependencies = [
- "actix-web",
- "actix_helpers",
- "anyhow",
- "bootstrap",
- "bucket_paths",
- "cloud_storage",
- "concurrency",
- "config",
- "easyenv",
- "enums",
- "errors",
- "hashing",
- "jobs_common",
- "log",
- "mysql_queries",
- "reqwest 0.12.23",
- "seedance2pro",
- "serde",
- "serde_derive",
- "serde_json",
- "server_environment",
- "sqlx",
- "tokens",
- "tokio",
- "workspace-build-acceleration",
-]
-
-[[package]]
 name = "seedance2pro"
 version = "0.0.1"
 dependencies = [
@@ -11479,7 +11448,6 @@ dependencies = [
  "redis_common",
  "redis_schema",
  "regex",
- "reqwest 0.12.23",
  "resend-rs",
  "reusable_types",
  "rust-s3",
@@ -11510,6 +11478,7 @@ dependencies = [
  "utoipa-swagger-ui",
  "videos",
  "workspace-build-acceleration",
+ "wreq",
  "zip 0.6.6",
 ]
 
