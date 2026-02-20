@@ -128,8 +128,9 @@ RUN du -hsc * | sort -hr
 
 # Build all the binaries.
 RUN SQLX_OFFLINE=true \
+  RUST_BACKTRACE=full \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-  $HOME/.cargo/bin/cargo build \
+  $HOME/.cargo/bin/cargo build -vv \
   --release \
   --bin storyteller-web
 
