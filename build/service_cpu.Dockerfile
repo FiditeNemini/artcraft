@@ -33,7 +33,8 @@ RUN apt-get update \
 FROM ubuntu:jammy as rust-base
 
 # NB: This can be "stable" or another version.
-ARG RUST_TOOLCHAIN="1.93.1"
+#ARG RUST_TOOLCHAIN="1.93.1"
+ARG RUST_TOOLCHAIN="1.86.0"
 
 WORKDIR /tmp
 
@@ -44,18 +45,12 @@ WORKDIR /tmp
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
         build-essential \
-        clang \
         cmake \
         curl \
         ffmpeg \
         fontconfig \
-        git \
-        golang \
-        libclang-dev \
         libfontconfig1-dev \
         libssl-dev \
-        nasm \
-        perl \
         pkg-config
 
 # NB: Fix for fontconfig (servo-fontconfig-sys): https://github.com/alacritty/alacritty/issues/4423#issuecomment-727277235
@@ -144,7 +139,7 @@ RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
   --release \
-  --bin dummy-service \
+  --bin dummy-service
 
 RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
@@ -168,7 +163,7 @@ RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
   --release \
-  --bin es-update-job \
+  --bin es-update-job
 
 # Print a report on disk space
 RUN echo "Disk usage at current directory (after all builds):"
