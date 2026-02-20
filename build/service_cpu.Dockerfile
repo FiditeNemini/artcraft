@@ -45,6 +45,10 @@ RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
         build-essential \
         cmake \
+        perl \
+        golang \
+        nasm \
+        git \
         curl \
         ffmpeg \
         fontconfig \
@@ -128,8 +132,9 @@ RUN du -hsc * | sort -hr
 
 # Build all the binaries.
 RUN SQLX_OFFLINE=true \
+  RUST_BACKTRACE=1 \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-  $HOME/.cargo/bin/cargo build \
+  $HOME/.cargo/bin/cargo build -vv \
   --release \
   --bin storyteller-web
 
