@@ -55,7 +55,7 @@ We haven't abandoned text-to-asset generation for quick prototyping and ideation
 
 | Provider   | Features                                                                                                                                                                |
 |------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Artcraft   | Nano Banana, Nano Banana Pro, GPT-Image-1 / 1.5, Seedream 4 / 4.5, Flux 1.1 / Kontext, Veo 2 / 3 / 3.1, Kling 1.6 / 2.1 / 2.5 / 2.6, Seedance, Sora 2 / Pro, Hunyuan 3d 2 / 3 |
+| Artcraft   | Nano Banana, Nano Banana Pro, GPT-Image-1 / 1.5, Seedance 2 / Seedream 4 / 4.5, Flux 1.1 / Kontext, Veo 2 / 3 / 3.1, Kling 1.6 / 2.1 / 2.5 / 2.6, Seedance, Sora 2 / Pro, Hunyuan 3d 2 / 3 |
 | Grok       | Grok Imagine, Grok Video                                                                                                                                                |
 | Midjourney | Image Gen (all versions)                                                                                                                                                |
 | Sora       | Sora 1, Sora 2, GPT-Image-1                                                                                                                                             |
