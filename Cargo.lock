@@ -681,6 +681,7 @@ version = "0.7.0"
 dependencies = [
  "anyhow",
  "artcraft_api_defs",
+ "artcraft_router",
  "base64 0.22.1",
  "build_metadata",
  "bytes",
@@ -746,6 +747,22 @@ dependencies = [
  "tokens",
  "url",
  "utoipa",
+ "workspace-build-acceleration",
+]
+
+[[package]]
+name = "artcraft_router"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "artcraft_api_defs",
+ "log",
+ "serde",
+ "serde_derive",
+ "storyteller_client",
+ "tokens",
+ "tokio",
+ "uuid 1.18.1",
  "workspace-build-acceleration",
 ]
 
