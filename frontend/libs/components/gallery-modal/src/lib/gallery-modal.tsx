@@ -106,6 +106,38 @@ interface GalleryModalProps {
   ) => Promise<void> | void;
 }
 
+/** Small thumbnail used in the bulk-selection footer bar. */
+const BulkThumb = ({
+  thumbnail,
+  placeholderIcon,
+}: {
+  thumbnail: string | null;
+  placeholderIcon: any;
+}) => {
+  const [failed, setFailed] = useState(false);
+  const showImage = !!thumbnail && !failed;
+
+  return (
+    <div className="h-8 w-8 rounded overflow-hidden border-2 border-ui-panel bg-black/30 flex-shrink-0">
+      {showImage ? (
+        <img
+          src={thumbnail}
+          alt=""
+          className="h-full w-full object-cover"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <div className="h-full w-full flex items-center justify-center bg-black/50">
+          <FontAwesomeIcon
+            icon={placeholderIcon}
+            className="text-xs text-white/50"
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const GalleryModal = React.memo(
   ({
     onClose,
@@ -792,27 +824,33 @@ export const GalleryModal = React.memo(
 
             {mode === "view" && bulkSelectionMode && (
               <div className="flex items-center justify-between border-t border-ui-panel-border bg-ui-background p-3 py-2 rounded-b-xl">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center">
                   {/* Thumbnail previews of selected items */}
-                  <div className="flex -space-x-1.5">
-                    {bulkSelectedItems.slice(0, 4).map((si) => (
-                      <div
-                        key={si.id}
-                        className="h-8 w-8 rounded overflow-hidden border-2 border-ui-panel bg-black/30 flex-shrink-0"
-                      >
-                        {si.thumbnail ? (
-                          <img
-                            src={si.thumbnail}
-                            alt=""
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="h-full w-full bg-black/50" />
-                        )}
-                      </div>
-                    ))}
+                  <div className="flex">
+                    {bulkSelectedItems.slice(0, 4).map((si) => {
+                      const placeholderIcon =
+                        si.mediaClass === "video"
+                          ? faVideo
+                          : si.mediaClass === "dimensional"
+                            ? faCube
+                            : faImage;
+                      return (
+                        <BulkThumb
+                          key={si.id}
+                          thumbnail={si.thumbnail}
+                          placeholderIcon={placeholderIcon}
+                        />
+                      );
+                    })}
                   </div>
-                  <span className="text-sm font-medium text-base-fg/80">
+                  {bulkSelectedItems.length > 4 && (
+                    <div className="h-8 w-8 rounded overflow-hidden border-2 border-ui-panel bg-black/20 flex-shrink-0 flex items-center justify-center">
+                      <span className="text-[11px] font-normal text-white/70">
+                        +{bulkSelectedItems.length - 4}
+                      </span>
+                    </div>
+                  )}
+                  <span className="ms-2.5 text-sm font-medium text-base-fg/80">
                     {bulkSelectedIds.size} selected
                   </span>
                 </div>
