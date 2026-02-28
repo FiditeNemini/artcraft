@@ -22,6 +22,10 @@ import {
 import { twMerge } from "tailwind-merge";
 import { uploadImage } from "../../components/reusable/UploadModalMedia/uploadImage";
 import { HelpMenuButton } from "@storyteller/ui-help-menu";
+import {
+  CostCalculatorButton,
+  useCostBreakdownModalStore,
+} from "@storyteller/ui-pricing-modal";
 import { GenerationProvider } from "@storyteller/api-enums";
 
 const PAGE_ID: ModelPage = ModelPage.ImageToVideo;
@@ -39,13 +43,17 @@ const ImageToVideo = ({ imageMediaId, imageUrl }: ImageToVideoProps) => {
   // const resetBatches = useImageToVideoStore((s) => s.reset);
   const [imageRowVisible, setImageRowVisible] = useState(true);
   const promptContentRef = useRef<HTMLDivElement>(null);
-  const [promptHeight, setPromptHeight] = useState<number>(138);
+  const [_promptHeight, setPromptHeight] = useState<number>(138);
 
   const selectedVideoModel: VideoModel | undefined =
     useSelectedVideoModel(PAGE_ID);
 
-  const selectedProvider: GenerationProvider | undefined = 
+  const selectedProvider: GenerationProvider | undefined =
     useSelectedProviderForModel(PAGE_ID, selectedVideoModel?.id);
+
+  const videoCredits = useCostBreakdownModalStore(
+    (s) => s.estimatedCreditsByPage[PAGE_ID],
+  );
 
   const jobContext: JobContextType = {
     jobTokens: [],
@@ -117,10 +125,10 @@ const ImageToVideo = ({ imageMediaId, imageUrl }: ImageToVideoProps) => {
               imageRowVisible && "mb-80",
             )}
           >
-            <span className="text-base-fg text-7xl font-bold">
+            <span className="text-7xl font-bold text-base-fg">
               Generate Video
             </span>
-            <span className="text-base-fg pt-2 text-xl opacity-80">
+            <span className="pt-2 text-xl text-base-fg opacity-80">
               Choose an image, add a prompt, then generate
             </span>
           </div>
@@ -196,6 +204,7 @@ const ImageToVideo = ({ imageMediaId, imageUrl }: ImageToVideoProps) => {
                 url={imageUrl ?? undefined}
                 onImageRowVisibilityChange={setImageRowVisible}
                 uploadImage={uploadImage}
+                credits={videoCredits}
                 onEnqueuePressed={async (prompt, subscriberId) => {
                   const modelLabel = selectedVideoModel?.fullName ?? "";
                   startBatch(prompt, modelLabel, subscriberId);
@@ -221,6 +230,7 @@ const ImageToVideo = ({ imageMediaId, imageUrl }: ImageToVideoProps) => {
             />
           </div>
           <div className="absolute bottom-6 right-6 z-20 flex items-center gap-2">
+            <CostCalculatorButton modelPage={PAGE_ID} />
             <HelpMenuButton />
           </div>
         </div>

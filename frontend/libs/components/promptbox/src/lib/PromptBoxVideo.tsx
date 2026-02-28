@@ -4,7 +4,7 @@ import { JobContextType } from "@storyteller/common";
 import { downloadFileFromUrl } from "@storyteller/api";
 import { PopoverMenu, PopoverItem } from "@storyteller/ui-popover";
 import { Tooltip } from "@storyteller/ui-tooltip";
-import { Button, ToggleButton } from "@storyteller/ui-button";
+import { ToggleButton, GenerateButton } from "@storyteller/ui-button";
 import { Modal } from "@storyteller/ui-modal";
 import {
   EnqueueImageToVideo,
@@ -13,8 +13,6 @@ import {
 import {
   faMessageXmark,
   faMessageCheck,
-  faSparkles,
-  faSpinnerThird,
   faWaveformLines,
   faClock,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -62,6 +60,7 @@ interface PromptBoxVideoProps {
   url?: string;
   onImageRowVisibilityChange?: (visible: boolean) => void;
   uploadImage?: UploadImageFn;
+  credits?: number | null;
 }
 
 export const PromptBoxVideo = ({
@@ -73,6 +72,7 @@ export const PromptBoxVideo = ({
   url,
   onImageRowVisibilityChange,
   uploadImage,
+  credits,
 }: PromptBoxVideoProps) => {
   useSignals();
 
@@ -835,21 +835,16 @@ export const PromptBoxVideo = ({
                 disabled={!modelNeedsAnImageButNoneAreSelected}
               >
                 <div>
-                  <Button
+                  <GenerateButton
                     className="flex items-center border-none bg-primary px-3 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"
-                    icon={!isEnqueueing ? faSparkles : undefined}
+                    icon={undefined}
                     onClick={handleEnqueue}
-                    disabled={isEnqueueing || !prompt.trim()}
+                    disabled={!prompt.trim()}
+                    loading={isEnqueueing}
+                    credits={credits}
                   >
-                    {isEnqueueing ? (
-                      <FontAwesomeIcon
-                        icon={faSpinnerThird}
-                        className="animate-spin text-lg"
-                      />
-                    ) : (
-                      "Generate"
-                    )}
-                  </Button>
+                    Generate
+                  </GenerateButton>
                 </div>
               </Tooltip>
             </div>
