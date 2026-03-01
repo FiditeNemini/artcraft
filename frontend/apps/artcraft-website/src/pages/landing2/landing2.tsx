@@ -860,7 +860,7 @@ const Landing = () => {
 
             <div className="relative z-10 w-full flex flex-col items-center">
               <LandingActionButtons onDownloadClick={onDownloadClick} />
-              <div className="mt-4 text-sm text-white/80 font-medium">
+              <div className="mt-8 text-sm text-white/80 font-medium">
                 Free to use.
               </div>
             </div>

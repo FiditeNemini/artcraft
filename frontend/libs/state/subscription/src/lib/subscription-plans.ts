@@ -26,9 +26,14 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
     originalMonthlyPrice: 10,
     originalYearlyPrice: 120,
     features: [
+      { text: "1,000 credits / month", included: true },
       { text: "~50 Nano Banana Pro 4K images", included: true },
       { text: "~50 GPT-Image-1.5 images", included: true },
       { text: "~8 minutes Kling video", included: true },
+      {
+        text: "~12 Seedance 2.0 videos",
+        included: true,
+      },
       { text: "You Own ArtCraft Forever", included: true },
     ],
     colorScheme: "green" as const,
@@ -42,9 +47,11 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
     originalMonthlyPrice: 35,
     originalYearlyPrice: 420,
     features: [
+      { text: "3,750 credits / month", included: true },
       { text: "~300 Nano Banana Pro 4K images", included: true },
       { text: "~300 GPT-Image-1.5 images", included: true },
       { text: "~15 minutes Kling video", included: true },
+      { text: "~46 Seedance 2.0 videos", included: true },
       { text: "You Own ArtCraft Forever", included: true },
     ],
     colorScheme: "purple" as const,
@@ -58,9 +65,11 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
     originalMonthlyPrice: 60,
     originalYearlyPrice: 720,
     features: [
+      { text: "6,600 credits / month", included: true },
       { text: "~10,000 Nano Banana Pro 4K images", included: true },
       { text: "~10,000 GPT-Image-1.5 images", included: true },
       { text: "~30 minutes Kling video", included: true },
+      { text: "~82 Seedance 2.0 videos", included: true },
       { text: "You Own ArtCraft Forever", included: true },
     ],
     colorScheme: "orange" as const,

@@ -30,6 +30,7 @@ interface PricingTableProps {
   subtitle?: string;
   className?: string;
   compact?: boolean;
+  showSeedanceFeatures?: boolean;
 }
 
 const PricingTable = ({
@@ -39,6 +40,7 @@ const PricingTable = ({
   subtitle = "Support open-source development. Your subscription keeps ArtCraft free and open for everyone.",
   className = "",
   compact = false,
+  showSeedanceFeatures = false,
 }: PricingTableProps) => {
   const navigate = useNavigate();
   const [billingType, setBillingType] = useState("yearly");
@@ -406,7 +408,9 @@ const PricingTable = ({
               </Button>
 
               <ul className="space-y-3 md:space-y-4 flex-1">
-                {plan.features.map((feature, idx) => (
+                {plan.features
+                  .filter((f) => !f.seedanceOnly || showSeedanceFeatures)
+                  .map((feature, idx) => (
                   <Feature
                     key={idx}
                     text={feature.text}
@@ -448,7 +452,9 @@ const Feature = ({
     >
       <FontAwesomeIcon icon={faCheck} className="text-xs" />
     </div>
-    <span className={`text-sm ${highlighted ? "text-white" : "text-white/80"}`}>
+    <span
+      className={`text-sm mt-[3px] ${highlighted ? "text-white" : "text-white/80"}`}
+    >
       {text}
     </span>
   </li>

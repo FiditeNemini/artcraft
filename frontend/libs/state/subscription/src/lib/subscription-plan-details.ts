@@ -2,6 +2,7 @@ export interface PricingFeature {
   text: string;
   included: boolean;
   tooltip?: string;
+  seedanceOnly?: boolean;
 }
 
 export interface SubscriptionPlanDetails {
