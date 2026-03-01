@@ -1,6 +1,6 @@
 [package]
 name = "artcraft"
-version = "0.9.2"
+version = "0.0.1"
 description = "Artcraft"
 authors = ["you"]
 license = ""
