@@ -5,6 +5,9 @@ use crate::api::image_list_ref::ImageListRef;
 use crate::api::image_ref::ImageRef;
 use crate::api::provider::Provider;
 use crate::client::request_mismatch_mitigation_strategy::RequestMismatchMitigationStrategy;
+use crate::errors::artcraft_router_error::ArtcraftRouterError;
+use crate::generate::generate_video::plan::artcraft::plan_generate_video_artcraft_seedance2p0::plan_generate_video_artcraft_seedance2p0;
+use crate::generate::generate_video::video_generation_plan::VideoGenerationPlan;
 
 pub struct GenerateVideoRequest<'a> {
   /// Which model to use.
@@ -52,7 +55,19 @@ pub struct GenerateVideoRequest<'a> {
   pub idempotency_token: Option<&'a str>,
 }
 
-impl <'a> GenerateVideoRequest<'a> {
+impl<'a> GenerateVideoRequest<'a> {
+  /// Read the video generation request, construct a plan, then yield a means to execute it.
+  pub fn build(&self) -> Result<VideoGenerationPlan<'_>, ArtcraftRouterError> {
+    match self.provider {
+      Provider::Artcraft => match self.model {
+        CommonVideoModel::Seedance2p0 => {
+          plan_generate_video_artcraft_seedance2p0(self).map(VideoGenerationPlan::ArtcraftSeedance2p0)
+        }
+        _ => Err(ArtcraftRouterError::UnsupportedModel(format!("{:?}", self.model))),
+      },
+    }
+  }
+
   pub fn get_or_generate_idempotency_token(&self) -> String {
     self.idempotency_token.map(|t| t.to_string())
         .unwrap_or_else(|| uuid::Uuid::new_v4().to_string())

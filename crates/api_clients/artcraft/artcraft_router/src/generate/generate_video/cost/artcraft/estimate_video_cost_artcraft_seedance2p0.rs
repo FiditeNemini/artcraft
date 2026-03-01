@@ -50,7 +50,6 @@ mod tests {
   use crate::api::common_video_model::CommonVideoModel;
   use crate::api::provider::Provider;
   use crate::client::request_mismatch_mitigation_strategy::RequestMismatchMitigationStrategy;
-  use crate::generate::generate_video::begin_video_generation::begin_video_generation;
   use crate::generate::generate_video::generate_video_request::GenerateVideoRequest;
 
   fn estimate_usd_cents(duration_seconds: u16, video_batch_count: u16) -> u64 {
@@ -68,8 +67,8 @@ mod tests {
       request_mismatch_mitigation_strategy: RequestMismatchMitigationStrategy::ErrorOut,
       idempotency_token: None,
     };
-    begin_video_generation(&request)
-      .expect("begin_video_generation should succeed")
+    request.build()
+      .expect("build should succeed")
       .estimate_costs()
       .cost_in_usd_cents
       .expect("cost_in_usd_cents should be present")

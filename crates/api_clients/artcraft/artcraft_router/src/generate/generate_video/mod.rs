@@ -1,4 +1,3 @@
-pub mod begin_video_generation;
 pub mod cost;
 pub mod execute;
 pub mod generate_video_request;

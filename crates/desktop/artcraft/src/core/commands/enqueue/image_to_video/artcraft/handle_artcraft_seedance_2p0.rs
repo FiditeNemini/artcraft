@@ -10,7 +10,6 @@ use artcraft_router::api::provider::Provider;
 use artcraft_router::client::request_mismatch_mitigation_strategy::RequestMismatchMitigationStrategy;
 use artcraft_router::client::router_artcraft_client::RouterArtcraftClient;
 use artcraft_router::client::router_client::RouterClient;
-use artcraft_router::generate::generate_video::begin_video_generation::begin_video_generation;
 use artcraft_router::generate::generate_video::generate_video_request::GenerateVideoRequest;
 use enums::common::generation_provider::GenerationProvider;
 use enums::tauri::tasks::task_type::TaskType;
@@ -46,7 +45,7 @@ pub(super) async fn handle_artcraft_seedance_2p0(
     idempotency_token: None,
   };
 
-  let plan = begin_video_generation(&router_request)?;
+  let plan = router_request.build()?;
   
   info!("Video Generation Plan: {:?}", plan);
 
