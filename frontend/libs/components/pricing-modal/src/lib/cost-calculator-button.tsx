@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalculator } from "@fortawesome/pro-solid-svg-icons";
+import { faCalculator, faCoins } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "@storyteller/ui-button";
 import { ModelPage } from "@storyteller/ui-model-selector";
 import { useCostBreakdownModalStore } from "./cost-breakdown-modal-store";
@@ -28,7 +28,10 @@ export function CostCalculatorButton({
       <FontAwesomeIcon icon={faCalculator} className="text-base-fg" />
       <span>Costs</span>
       {credits != null && (
-        <span className="text-xs font-semibold">{credits} cr</span>
+        <span className="text-xs font-semibold flex items-center gap-1">
+          <FontAwesomeIcon icon={faCoins} className="text-base-fg" />
+          {credits}
+        </span>
       )}
     </Button>
   );

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Button } from "@storyteller/ui-button";
 import { Label } from "@storyteller/ui-label";
 import {
-  faCoinFront,
+  faCoins,
   faInfoCircle,
   faStar,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -37,8 +37,10 @@ export const BillingSettingsPane = (args: BillingSettingsPaneProps) => {
 
   const canCancelPlan = subscriptionStore.canCancelPlan();
 
-  const nextBillAt = subscriptionStore.subscriptionInfo?.nextBillAt?.toLocaleDateString();
-  const subscriptionEndAt = subscriptionStore.subscriptionInfo?.subscriptionEndAt?.toLocaleDateString();
+  const nextBillAt =
+    subscriptionStore.subscriptionInfo?.nextBillAt?.toLocaleDateString();
+  const subscriptionEndAt =
+    subscriptionStore.subscriptionInfo?.subscriptionEndAt?.toLocaleDateString();
 
   const changeOrUpgradePlanButtonLabel = canCancelPlan
     ? "Change plan"
@@ -54,8 +56,8 @@ export const BillingSettingsPane = (args: BillingSettingsPaneProps) => {
       <div className="space-y-4 text-base-fg">
         <Label>Support ArtCraft</Label>
         <p className="text-sm opacity-70">
-          You do not have to purchase anything from us to use ArtCraft, but
-          you can support ArtCraft development by subscribing or buying credits. 
+          You do not have to purchase anything from us to use ArtCraft, but you
+          can support ArtCraft development by subscribing or buying credits.
         </p>
       </div>
 
@@ -117,7 +119,7 @@ export const BillingSettingsPane = (args: BillingSettingsPaneProps) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <FontAwesomeIcon
-                icon={faCoinFront}
+                icon={faCoins}
                 className="text-primary text-lg"
               />
               <span className="text-2xl font-bold">{sumTotalCredits}</span>

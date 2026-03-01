@@ -5,7 +5,7 @@ import {
   faXmark,
 } from "@fortawesome/pro-regular-svg-icons";
 import {
-  faCoinFront,
+  faCoins,
   faGear,
   faGem,
   faGrid2,
@@ -428,10 +428,7 @@ export const TopBar = ({ pageName }: Props) => {
                 position="bottom"
                 align="center"
                 triggerIcon={
-                  <FontAwesomeIcon
-                    icon={faCoinFront}
-                    className="text-primary"
-                  />
+                  <FontAwesomeIcon icon={faCoins} className="text-primary" />
                 }
                 triggerLabel={
                   <span className="whitespace-nowrap text-sm font-medium">
@@ -459,7 +456,7 @@ export const TopBar = ({ pageName }: Props) => {
                     </div>
                     <div className="flex items-center gap-2 text-4xl font-bold text-base-fg">
                       <FontAwesomeIcon
-                        icon={faCoinFront}
+                        icon={faCoins}
                         className="text-2xl text-primary"
                       />
                       {sumTotalCredits}

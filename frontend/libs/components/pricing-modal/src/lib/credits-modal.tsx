@@ -1,7 +1,6 @@
 import { Modal } from "@storyteller/ui-modal";
 import { Button } from "@storyteller/ui-button";
-import { faCoinFront as faCoinFrontLine } from "@fortawesome/pro-regular-svg-icons";
-import { faCoinFront } from "@fortawesome/pro-solid-svg-icons";
+import { faCoins } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { invoke } from "@tauri-apps/api/core";
 
@@ -30,15 +29,6 @@ interface CreditsModalProps {
   onPurchase?: (pack: CreditPack) => void;
 }
 
-function CoinIcon() {
-  return (
-    <FontAwesomeIcon
-      icon={faCoinFrontLine}
-      className=" absolute text-[100px] right-[20px] top-[70px] text-primary/5"
-    />
-  );
-}
-
 export function CreditsModal({
   isOpen = false,
   onClose,
@@ -53,7 +43,7 @@ export function CreditsModal({
     await invoke("storyteller_open_credits_purchase_command", {
       request: {
         credits_pack: pack.id,
-      }
+      },
     });
 
     // Hook up Stripe/checkout here
@@ -65,50 +55,50 @@ export function CreditsModal({
   };
 
   const cardBase =
-    "relative rounded-xl border p-6 h-full flex flex-col justify-between bg-[#1F1F1F] border-white/10 hover:border-white/20 transition-all";
+    "relative rounded-xl border p-6 h-full flex flex-col justify-between bg-ui-controls/50 border-ui-controls-border hover:border-base-fg/20 hover:bg-ui-controls/80 transition-all overflow-hidden";
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose ?? (() => {})}
-      className="rounded-xl bg-[#1A1A1A] max-h-[90vh] max-w-screen-2xl overflow-y-auto flex flex-col"
+      className="rounded-xl bg-ui-panel border border-ui-panel-border max-h-[90vh] max-w-5xl overflow-y-auto flex flex-col shadow-2xl"
       allowBackgroundInteraction={false}
       showClose={true}
       closeOnOutsideClick={true}
       resizable={false}
       backdropClassName="bg-black/80"
     >
-      <div className="p-16 py-24 flex-1 overflow-y-auto min-h-0">
+      <div className="p-8 md:p-12 lg:p-16 flex-1 overflow-y-auto min-h-0">
         <div className="text-center mb-10">
-          <h1 className="text-5xl font-bold text-white mb-4">Buy credits</h1>
-          <p className="text-gray-400 text-lg">
+          <h1 className="text-4xl md:text-5xl font-bold text-base-fg mb-4">
+            Buy credits
+          </h1>
+          <p className="text-base-fg/60 text-lg">
             Choose a one-time credits package. No subscription required.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {creditPacks.map((pack) => (
             <div key={pack.id} className={cardBase}>
               {pack.badge && (
-                <div className="absolute -top-3 right-4 bg-white text-black px-3 py-1 rounded-full text-xs font-semibold shadow-xl">
+                <div className="absolute -top-3 right-4 bg-primary text-primary-fg px-3 py-1 rounded-full text-xs font-bold shadow-xl">
                   {pack.badge}
                 </div>
               )}
 
-              <CoinIcon />
-
               <div>
-                <div className="text-white text-5xl font-bold tracking-tight flex items-center gap-2.5">
+                <div className="text-base-fg text-5xl font-bold tracking-tight flex items-center gap-2.5">
                   <FontAwesomeIcon
-                    icon={faCoinFront}
+                    icon={faCoins}
                     className="text-primary text-3xl"
                   />
                   {pack.total.toLocaleString()}
                 </div>
                 {pack.bonus > 0 && (
-                  <div className="text-gray-400 text-sm mt-2">
+                  <div className="text-base-fg/60 text-sm mt-2">
                     Total: {pack.base.toLocaleString()} {" + "}
-                    <span className="text-[#faca5a]">
+                    <span className="text-primary font-bold">
                       {pack.bonus.toLocaleString()} Bonus
                     </span>
                   </div>
@@ -116,12 +106,13 @@ export function CreditsModal({
               </div>
 
               <div className="flex items-center justify-between pt-6">
-                <div className="text-white text-xl font-semibold">
+                <div className="text-base-fg text-2xl font-bold opacity-60">
                   ${pack.priceUsd}
                 </div>
                 <Button
+                  variant="primary"
                   onClick={() => handlePurchase(pack)}
-                  className="bg-white text-black hover:bg-white/90 px-5 h-10 rounded-xl"
+                  className="px-6 h-10 rounded-xl font-bold shadow-md hover:shadow-lg transition-all"
                 >
                   Purchase
                 </Button>
