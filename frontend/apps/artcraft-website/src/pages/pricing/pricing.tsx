@@ -7,7 +7,7 @@ const SeedanceBanner = () => (
   <div className="flex flex-col gap-5">
     <div className="flex flex-wrap items-center gap-2">
       <span className="bg-primary/20 border border-primary/40 text-primary px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase">
-        Exclusive Early Access
+        Early Access
       </span>
       <span className="bg-white/10 border border-white/15 text-white/70 px-3 py-1 rounded-full text-xs font-medium">
         Available Today in ArtCraft
@@ -17,7 +17,7 @@ const SeedanceBanner = () => (
     <div>
       <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-2">
         Seedance 2.0 is here -{" "}
-        <span className="text-primary">only in ArtCraft</span>
+        <span className="text-primary">now in ArtCraft</span>
       </h1>
       <p className="text-white/65 text-sm md:text-base leading-relaxed">
         Generate jaw-dropping AI videos with Seedance 2.0 before it's available
