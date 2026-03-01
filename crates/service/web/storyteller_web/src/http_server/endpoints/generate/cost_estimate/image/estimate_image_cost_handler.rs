@@ -3,52 +3,48 @@ use std::fmt::{Display, Formatter};
 use actix_http::StatusCode;
 use actix_web::web::Json;
 use actix_web::{HttpResponse, ResponseError};
-use artcraft_api_defs::generate::cost_estimate::estimate_video_cost::{
-  EstimateVideoCostError, EstimateVideoCostErrorType, EstimateVideoCostRequest,
-  EstimateVideoCostResponse,
+use artcraft_api_defs::generate::cost_estimate::estimate_image_cost::{
+  EstimateImageCostError, EstimateImageCostErrorType, EstimateImageCostRequest,
+  EstimateImageCostResponse,
 };
 use artcraft_router::api::common_aspect_ratio::CommonAspectRatio as RouterAspectRatio;
+use artcraft_router::api::common_image_model::CommonImageModel as RouterImageModel;
 use artcraft_router::api::common_resolution::CommonResolution as RouterResolution;
-use artcraft_router::api::common_video_model::CommonVideoModel as RouterVideoModel;
 use artcraft_router::api::provider::Provider as RouterProvider;
 use artcraft_router::client::request_mismatch_mitigation_strategy::RequestMismatchMitigationStrategy;
-use artcraft_router::generate::generate_video::generate_video_request::GenerateVideoRequest;
+use artcraft_router::generate::generate_image::generate_image_request::GenerateImageRequest;
 use enums::common::generation::common_aspect_ratio::CommonAspectRatio;
-use enums::common::generation::common_video_model::CommonVideoModel;
+use enums::common::generation::common_image_model::CommonImageModel;
 use enums::common::generation::common_video_resolution::CommonVideoResolution;
 use enums::common::generation_provider::GenerationProvider;
 
-
-/// Estimate the credit and USD cost of a video generation request.
+/// Estimate the credit and USD cost of an image generation request.
 /// Does not require authentication and does not charge any credits.
 #[utoipa::path(
   post,
   tag = "Cost Estimate",
-  path = "/v1/generate/cost_estimate/video",
+  path = "/v1/generate/cost_estimate/image",
   responses(
-    (status = 200, description = "Cost estimate", body = EstimateVideoCostResponse),
-    (status = 400, description = "Invalid request", body = EstimateVideoCostError),
+    (status = 200, description = "Cost estimate", body = EstimateImageCostResponse),
+    (status = 400, description = "Invalid request", body = EstimateImageCostError),
   ),
 )]
-pub async fn estimate_video_cost_handler(
-  request: Json<EstimateVideoCostRequest>,
-) -> Result<Json<EstimateVideoCostResponse>, HandlerError> {
+pub async fn estimate_image_cost_handler(
+  request: Json<EstimateImageCostRequest>,
+) -> Result<Json<EstimateImageCostResponse>, HandlerError> {
   let router_provider = map_provider(request.provider, request.model)?;
-  let router_model = map_video_model(request.model)?;
+  let router_model = map_image_model(request.model)?;
   let router_aspect_ratio = request.aspect_ratio.map(map_aspect_ratio);
   let router_resolution = request.resolution.map(map_resolution);
 
-  let router_request = GenerateVideoRequest {
+  let router_request = GenerateImageRequest {
     model: router_model,
     provider: router_provider,
     prompt: None,
-    start_frame: None,
-    end_frame: None,
-    reference_images: None,
+    image_inputs: None,
     resolution: router_resolution,
     aspect_ratio: router_aspect_ratio,
-    duration_seconds: request.duration_seconds,
-    video_batch_count: request.video_batch_count,
+    image_batch_count: request.image_batch_count,
     request_mismatch_mitigation_strategy: RequestMismatchMitigationStrategy::PayLessDowngrade,
     idempotency_token: None,
   };
@@ -58,7 +54,7 @@ pub async fn estimate_video_cost_handler(
 
   let estimate = plan.estimate_costs();
 
-  Ok(Json(EstimateVideoCostResponse {
+  Ok(Json(EstimateImageCostResponse {
     success: true,
     cost_in_credits: estimate.cost_in_credits,
     cost_in_usd_cents: estimate.cost_in_usd_cents,
@@ -93,15 +89,15 @@ impl ResponseError for HandlerError {
   fn error_response(&self) -> HttpResponse {
     let (error_type, error_message) = match self {
       HandlerError::InvalidProviderForModel { provider, model } => (
-        EstimateVideoCostErrorType::InvalidProviderForModel,
+        EstimateImageCostErrorType::InvalidProviderForModel,
         format!("Provider '{}' is not supported for model '{}'", provider, model),
       ),
       HandlerError::InvalidInput(msg) => (
-        EstimateVideoCostErrorType::InvalidInput,
+        EstimateImageCostErrorType::InvalidInput,
         msg.clone(),
       ),
     };
-    HttpResponse::BadRequest().json(EstimateVideoCostError {
+    HttpResponse::BadRequest().json(EstimateImageCostError {
       success: false,
       error_type,
       error_message,
@@ -111,7 +107,7 @@ impl ResponseError for HandlerError {
 
 fn map_provider(
   provider: GenerationProvider,
-  model: CommonVideoModel,
+  model: CommonImageModel,
 ) -> Result<RouterProvider, HandlerError> {
   match provider {
     GenerationProvider::Artcraft => Ok(RouterProvider::Artcraft),
@@ -122,23 +118,9 @@ fn map_provider(
   }
 }
 
-fn map_video_model(model: CommonVideoModel) -> Result<RouterVideoModel, HandlerError> {
+fn map_image_model(model: CommonImageModel) -> Result<RouterImageModel, HandlerError> {
   let router_model = match model {
-    CommonVideoModel::GrokVideo => RouterVideoModel::GrokVideo,
-    CommonVideoModel::Kling16Pro => RouterVideoModel::Kling16Pro,
-    CommonVideoModel::Kling21Pro => RouterVideoModel::Kling21Pro,
-    CommonVideoModel::Kling21Master => RouterVideoModel::Kling21Master,
-    CommonVideoModel::Kling2p5TurboPro => RouterVideoModel::Kling2p5TurboPro,
-    CommonVideoModel::Kling2p6Pro => RouterVideoModel::Kling2p6Pro,
-    CommonVideoModel::Seedance10Lite => RouterVideoModel::Seedance10Lite,
-    CommonVideoModel::Seedance2p0 => RouterVideoModel::Seedance2p0,
-    CommonVideoModel::Sora2 => RouterVideoModel::Sora2,
-    CommonVideoModel::Sora2Pro => RouterVideoModel::Sora2Pro,
-    CommonVideoModel::Veo2 => RouterVideoModel::Veo2,
-    CommonVideoModel::Veo3 => RouterVideoModel::Veo3,
-    CommonVideoModel::Veo3Fast => RouterVideoModel::Veo3Fast,
-    CommonVideoModel::Veo3p1 => RouterVideoModel::Veo3p1,
-    CommonVideoModel::Veo3p1Fast => RouterVideoModel::Veo3p1Fast,
+    CommonImageModel::NanaBananaPro => RouterImageModel::NanaBananaPro,
   };
   Ok(router_model)
 }
