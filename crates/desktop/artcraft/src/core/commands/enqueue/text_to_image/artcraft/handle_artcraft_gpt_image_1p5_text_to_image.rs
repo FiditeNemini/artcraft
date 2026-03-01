@@ -18,7 +18,7 @@ use enums::tauri::tasks::task_type::TaskType;
 use idempotency::uuid::generate_random_uuid;
 use log::{error, info};
 use std::time::Duration;
-use storyteller_client::endpoints::generate::image::multi_function::gpt_image_1p5_multi_function_image_gen_image::gpt_image_1p5_multi_function_image_gen;
+use artcraft_client::endpoints::generate::image::multi_function::gpt_image_1p5_multi_function_image_gen_image::gpt_image_1p5_multi_function_image_gen;
 use tauri::AppHandle;
 
 pub async fn handle_artcraft_gpt_image_1p5_text_to_image(

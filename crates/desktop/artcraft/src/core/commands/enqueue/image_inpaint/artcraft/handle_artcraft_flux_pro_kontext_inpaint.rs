@@ -25,13 +25,13 @@ use images::encoding::image_bytes_to_png_bytes_with_dimensions::image_bytes_to_p
 use images::mask_images::normalize_image_bytes_to_flux_mask::normalize_image_bytes_to_flux_mask;
 use log::{error, info};
 use mimetypes::mimetype_info::mimetype_info::MimetypeInfo;
-use storyteller_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
-use storyteller_client::endpoints::generate::image::edit::flux_pro_kontext_max_edit_image::flux_pro_kontext_max_edit_image;
-use storyteller_client::endpoints::generate::image::edit::gpt_image_1_edit_image::gpt_image_1_edit_image;
-use storyteller_client::endpoints::generate::image::inpaint::flux_pro_1_inpaint_image::flux_pro_1_inpaint_image;
-use storyteller_client::endpoints::media_files::get_media_file::get_media_file;
-use storyteller_client::endpoints::media_files::upload_image_media_file_from_bytes::{upload_image_media_file_from_bytes, ImageType, UploadImageBytesArgs};
-use storyteller_client::endpoints::media_files::upload_image_media_file_from_file::upload_image_media_file_from_file;
+use artcraft_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
+use artcraft_client::endpoints::generate::image::edit::flux_pro_kontext_max_edit_image::flux_pro_kontext_max_edit_image;
+use artcraft_client::endpoints::generate::image::edit::gpt_image_1_edit_image::gpt_image_1_edit_image;
+use artcraft_client::endpoints::generate::image::inpaint::flux_pro_1_inpaint_image::flux_pro_1_inpaint_image;
+use artcraft_client::endpoints::media_files::get_media_file::get_media_file;
+use artcraft_client::endpoints::media_files::upload_image_media_file_from_bytes::{upload_image_media_file_from_bytes, ImageType, UploadImageBytesArgs};
+use artcraft_client::endpoints::media_files::upload_image_media_file_from_file::upload_image_media_file_from_file;
 use tauri::AppHandle;
 use tokens::tokens::media_files::MediaFileToken;
 

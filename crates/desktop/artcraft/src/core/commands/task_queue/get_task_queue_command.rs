@@ -16,7 +16,7 @@ use errors::AnyhowResult;
 use log::{error, info, warn};
 use serde_derive::{Deserialize, Serialize};
 use sqlite_tasks::queries::list_tasks_for_frontend::list_tasks_for_frontend;
-use storyteller_client::endpoints::media_files::delete_media_file::delete_media_file;
+use artcraft_client::endpoints::media_files::delete_media_file::delete_media_file;
 use tauri::{AppHandle, State};
 use enums::tauri::tasks::task_media_file_class::TaskMediaFileClass;
 use tokens::tokens::batch_generations::BatchGenerationToken;

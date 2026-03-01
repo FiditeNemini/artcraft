@@ -26,8 +26,8 @@ use openai_sora_client::recipes::maybe_upgrade_or_renew_session::maybe_upgrade_o
 use openai_sora_client::recipes::simple_image_gen_with_session_auto_renew::{simple_image_gen_with_session_auto_renew, SimpleImageGenAutoRenewRequest};
 use openai_sora_client::requests::image_gen::common::{ImageSize, NumImages};
 use std::time::Duration;
-use storyteller_client::endpoints::generate::image::edit::gemini_25_flash_edit_image::gemini_25_flash_edit_image;
-use storyteller_client::endpoints::generate::image::multi_function::nano_banana_pro_multi_function_image_gen_image::nano_banana_pro_multi_function_image_gen;
+use artcraft_client::endpoints::generate::image::edit::gemini_25_flash_edit_image::gemini_25_flash_edit_image;
+use artcraft_client::endpoints::generate::image::multi_function::nano_banana_pro_multi_function_image_gen_image::nano_banana_pro_multi_function_image_gen;
 use tauri::AppHandle;
 
 pub async fn handle_artcraft_nano_banana_pro_text_to_image(

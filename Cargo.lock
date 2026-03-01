@@ -681,6 +681,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "artcraft_api_defs",
+ "artcraft_client",
  "artcraft_router",
  "base64 0.22.1",
  "build_metadata",
@@ -714,7 +715,6 @@ dependencies = [
  "serde_json",
  "serial_test",
  "sqlite_tasks",
- "storyteller_client",
  "tauri",
  "tauri-build",
  "tauri-plugin-dialog",
@@ -752,16 +752,44 @@ dependencies = [
 ]
 
 [[package]]
+name = "artcraft_client"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "artcraft_api_defs",
+ "backoff",
+ "chrono",
+ "cloudflare_errors",
+ "cookie 0.18.1",
+ "enums",
+ "enums_public",
+ "errors",
+ "idempotency",
+ "log",
+ "mimetypes",
+ "reqwest 0.12.23",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "tokens",
+ "tokio",
+ "url",
+ "url-builder",
+ "uuid 1.18.1",
+ "workspace-build-acceleration",
+]
+
+[[package]]
 name = "artcraft_router"
 version = "0.0.1"
 dependencies = [
  "anyhow",
  "artcraft_api_defs",
+ "artcraft_client",
  "log",
  "seedance2pro",
  "serde",
  "serde_derive",
- "storyteller_client",
  "tokens",
  "tokio",
  "uuid 1.18.1",
@@ -11573,34 +11601,6 @@ dependencies = [
  "workspace-build-acceleration",
  "wreq",
  "zip 0.6.6",
-]
-
-[[package]]
-name = "storyteller_client"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "artcraft_api_defs",
- "backoff",
- "chrono",
- "cloudflare_errors",
- "cookie 0.18.1",
- "enums",
- "enums_public",
- "errors",
- "idempotency",
- "log",
- "mimetypes",
- "reqwest 0.12.23",
- "serde",
- "serde_derive",
- "serde_json",
- "tokens",
- "tokio",
- "url",
- "url-builder",
- "uuid 1.18.1",
- "workspace-build-acceleration",
 ]
 
 [[package]]

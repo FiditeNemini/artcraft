@@ -14,7 +14,7 @@ use openai_sora_client::requests::list_classic_tasks::list_classic_tasks::Partia
 use sqlite_tasks::queries::task::Task;
 use sqlite_tasks::queries::update_task_status::{update_task_status, UpdateTaskArgs};
 use std::collections::HashMap;
-use storyteller_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
+use artcraft_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
 use tauri::AppHandle;
 
 pub struct FailedGeneration {

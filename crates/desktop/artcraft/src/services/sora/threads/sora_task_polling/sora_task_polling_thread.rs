@@ -35,8 +35,8 @@ use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
-use storyteller_client::endpoints::media_files::upload_image_media_file_from_file::{upload_image_media_file_from_file, UploadImageFromFileArgs};
-use storyteller_client::endpoints::prompts::create_prompt::create_prompt;
+use artcraft_client::endpoints::media_files::upload_image_media_file_from_file::{upload_image_media_file_from_file, UploadImageFromFileArgs};
+use artcraft_client::endpoints::prompts::create_prompt::create_prompt;
 use tauri::AppHandle;
 use tempdir::TempDir;
 

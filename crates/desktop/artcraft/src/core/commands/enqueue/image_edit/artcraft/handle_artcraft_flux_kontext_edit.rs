@@ -17,8 +17,8 @@ use enums::common::generation_provider::GenerationProvider;
 use enums::tauri::tasks::task_type::TaskType;
 use idempotency::uuid::generate_random_uuid;
 use log::{error, info};
-use storyteller_client::endpoints::generate::image::edit::flux_pro_kontext_max_edit_image::flux_pro_kontext_max_edit_image;
-use storyteller_client::endpoints::generate::image::edit::gpt_image_1_edit_image::gpt_image_1_edit_image;
+use artcraft_client::endpoints::generate::image::edit::flux_pro_kontext_max_edit_image::flux_pro_kontext_max_edit_image;
+use artcraft_client::endpoints::generate::image::edit::gpt_image_1_edit_image::gpt_image_1_edit_image;
 use tauri::AppHandle;
 
 pub async fn handle_artcraft_flux_kontext_edit(

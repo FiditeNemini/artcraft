@@ -1,9 +1,9 @@
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
 use errors::AnyhowResult;
 use std::fs::read_to_string;
-use storyteller_client::credentials::storyteller_avt_cookie::StorytellerAvtCookie;
-use storyteller_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
-use storyteller_client::credentials::storyteller_session_cookie::StorytellerSessionCookie;
+use artcraft_client::credentials::storyteller_avt_cookie::StorytellerAvtCookie;
+use artcraft_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
+use artcraft_client::credentials::storyteller_session_cookie::StorytellerSessionCookie;
 
 pub fn read_storyteller_credentials_from_disk(app_data_root: &AppDataRoot) -> AnyhowResult<StorytellerCredentialSet> {
   let creds_dir= app_data_root.credentials_dir();

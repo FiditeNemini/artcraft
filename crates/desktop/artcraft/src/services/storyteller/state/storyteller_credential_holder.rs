@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use errors::AnyhowResult;
 use std::sync::{Arc, RwLock};
-use storyteller_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
+use artcraft_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
 
 /// Hold credentials for the application.
 #[derive(Clone)]

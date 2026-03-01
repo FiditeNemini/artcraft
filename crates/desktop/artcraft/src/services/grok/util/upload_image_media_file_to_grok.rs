@@ -16,9 +16,9 @@ use openai_sora_client::creds::sora_credential_set::SoraCredentialSet;
 use openai_sora_client::recipes::image_upload_from_file_with_session_auto_renew::{image_upload_from_file_with_session_auto_renew, ImageUploadFromFileAutoRenewRequest};
 use openai_sora_client::recipes::maybe_upgrade_or_renew_session::maybe_upgrade_or_renew_session;
 use std::time::Duration;
-use storyteller_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
-use storyteller_client::endpoints::media_files::get_media_file::get_media_file;
-use storyteller_client::utils::api_host::ApiHost;
+use artcraft_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
+use artcraft_client::endpoints::media_files::get_media_file::get_media_file;
+use artcraft_client::utils::api_host::ApiHost;
 use tokens::tokens::media_files::MediaFileToken;
 
 const GROK_IMAGE_UPLOAD_TIMEOUT: Duration = Duration::from_millis(1000 * 30); // 30 seconds

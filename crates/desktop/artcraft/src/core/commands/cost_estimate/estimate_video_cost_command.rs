@@ -8,7 +8,7 @@ use artcraft_api_defs::generate::cost_estimate::estimate_video_cost::{
   EstimateVideoCostResponse,
 };
 use log::info;
-use storyteller_client::endpoints::generate::cost_estimate::video::estimate_video_cost::estimate_video_cost;
+use artcraft_client::endpoints::generate::cost_estimate::video::estimate_video_cost::estimate_video_cost;
 use tauri::State;
 
 impl SerializeMarker for EstimateVideoCostResponse {}

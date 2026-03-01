@@ -2,8 +2,8 @@ use crate::core::commands::enqueue::generate_error::{BillingIssueReason, Billing
 use crate::core::events::functional_events::show_provider_billing_modal_event::ShowProviderBillingModalEvent;
 use enums::common::generation_provider::GenerationProvider;
 use log::warn;
-use storyteller_client::error::api_error::ApiError;
-use storyteller_client::error::storyteller_error::StorytellerError;
+use artcraft_client::error::api_error::ApiError;
+use artcraft_client::error::storyteller_error::StorytellerError;
 use tauri::AppHandle;
 
 pub async fn maybe_notify_frontend_of_billing_errors(

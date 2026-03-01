@@ -13,9 +13,9 @@ use artcraft_router::generate::generate_video::video_generation_plan::VideoGener
 use artcraft_api_defs::generate::video::multi_function::seedance_2p0_multi_function_video_gen::{
   Seedance2p0AspectRatio, Seedance2p0BatchCount,
 };
-use storyteller_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
-use storyteller_client::credentials::storyteller_session_cookie::StorytellerSessionCookie;
-use storyteller_client::utils::api_host::ApiHost;
+use artcraft_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
+use artcraft_client::credentials::storyteller_session_cookie::StorytellerSessionCookie;
+use artcraft_client::utils::api_host::ApiHost;
 
 fn get_artcraft_client() -> RouterClient {
   let cookies = std::fs::read_to_string("/Users/bt/Artcraft/credentials/artcraft_cookies.txt")

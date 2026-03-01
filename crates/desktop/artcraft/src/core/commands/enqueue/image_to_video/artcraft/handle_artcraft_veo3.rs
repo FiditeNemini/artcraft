@@ -18,9 +18,9 @@ use enums::common::generation_provider::GenerationProvider;
 use enums::tauri::tasks::task_type::TaskType;
 use idempotency::uuid::generate_random_uuid;
 use log::{error, info};
-use storyteller_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
-use storyteller_client::endpoints::generate::video::generate_veo_3_image_to_video::generate_veo_3_image_to_video;
-use storyteller_client::endpoints::generate::video::multi_function::veo_3p1_multi_function_video_gen::veo_3p1_multi_function_video_gen;
+use artcraft_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
+use artcraft_client::endpoints::generate::video::generate_veo_3_image_to_video::generate_veo_3_image_to_video;
+use artcraft_client::endpoints::generate::video::multi_function::veo_3p1_multi_function_video_gen::veo_3p1_multi_function_video_gen;
 use tauri::AppHandle;
 use tokens::tokens::media_files::MediaFileToken;
 

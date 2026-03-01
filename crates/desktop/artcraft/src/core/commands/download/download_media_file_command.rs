@@ -13,7 +13,7 @@ use log::{error, info};
 use serde_derive::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::str::FromStr;
-use storyteller_client::endpoints::media_files::get_media_file::get_media_file;
+use artcraft_client::endpoints::media_files::get_media_file::get_media_file;
 use tauri::{AppHandle, State};
 use tokens::tokens::media_files::MediaFileToken;
 use crate::core::state::app_preferences::app_preferences_manager::AppPreferencesManager;

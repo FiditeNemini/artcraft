@@ -27,6 +27,7 @@ workspace-build-acceleration.workspace =  true
 
 # Internal
 artcraft_api_defs.workspace = true
+artcraft_client.workspace = true
 artcraft_router.workspace = true
 build_metadata.workspace = true
 cookie_store.workspace = true
@@ -42,7 +43,6 @@ mimetypes.workspace = true
 openai_sora_client.workspace = true
 primitives.workspace = true
 sqlite_tasks.workspace = true
-storyteller_client.workspace = true
 tokens.workspace = true
 url_utils.workspace = true
 web_base64.workspace = true

@@ -9,9 +9,9 @@ use log::{info, warn};
 use std::fs::read_to_string;
 use std::sync::{Arc, RwLock};
 use midjourney_client::credentials::cookie_store_has_auth_cookies::cookie_store_has_auth_cookies;
-use storyteller_client::credentials::storyteller_avt_cookie::StorytellerAvtCookie;
-use storyteller_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
-use storyteller_client::credentials::storyteller_session_cookie::StorytellerSessionCookie;
+use artcraft_client::credentials::storyteller_avt_cookie::StorytellerAvtCookie;
+use artcraft_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
+use artcraft_client::credentials::storyteller_session_cookie::StorytellerSessionCookie;
 
 #[derive(Clone)]
 pub struct MidjourneyCredentialManager {

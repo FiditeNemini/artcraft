@@ -4,7 +4,7 @@ use crate::core::events::generation_events::common::GenerationAction;
 use crate::core::events::generation_events::generation_enqueue_failure_event::GenerationEnqueueFailureEvent;
 use crate::services::storyteller::state::storyteller_credential_manager::StorytellerCredentialManager;
 use log::error;
-use storyteller_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
+use artcraft_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
 use tauri::AppHandle;
 
 pub (super) fn get_storyteller_creds_or_error(

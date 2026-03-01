@@ -7,7 +7,7 @@ members = [
   # API clients for external services
   # These might be custom implementations or wrappers over other client libraries.
   "crates/api_clients/artcraft/artcraft_api_defs", # TODO: api_clients/{artcraft}/{api_defs,client}
-  "crates/api_clients/artcraft/storyteller_client",
+  "crates/api_clients/artcraft/artcraft_client",
   "crates/api_clients/cloud_storage",
   "crates/api_clients/fal_client",
   "crates/api_clients/google_drive_common",
@@ -240,7 +240,7 @@ seedance2pro = { path = "crates/api_clients/seedance2pro" }
 primitives = { path = "crates/lib/data/primitives" }
 shared_service_components = { path = "crates/lib/shared_service_components" }
 sqlite_tasks = { path = "crates/schema/database/sqlite_tasks" }
-storyteller_client = { path = "crates/api_clients/artcraft/storyteller_client" }
+artcraft_client = { path = "crates/api_clients/artcraft/artcraft_client" }
 subprocess_common = { path = "crates/lib/subprocess_common" }
 test_data = { path = "crates/lib/test_data" }
 testing = { path = "crates/lib/testing" }

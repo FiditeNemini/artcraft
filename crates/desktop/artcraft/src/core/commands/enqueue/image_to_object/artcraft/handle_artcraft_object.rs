@@ -14,11 +14,11 @@ use enums::common::generation_provider::GenerationProvider;
 use enums::tauri::tasks::task_type::TaskType;
 use idempotency::uuid::generate_random_uuid;
 use log::{error, info};
-use storyteller_client::endpoints::generate::object::generate_hunyuan_3d_2_0_image_to_3d::generate_hunyuan3d_2_0_image_to_3d;
-use storyteller_client::endpoints::generate::object::generate_hunyuan_3d_2_1_image_to_3d::generate_hunyuan3d_2_1_image_to_3d;
+use artcraft_client::endpoints::generate::object::generate_hunyuan_3d_2_0_image_to_3d::generate_hunyuan3d_2_0_image_to_3d;
+use artcraft_client::endpoints::generate::object::generate_hunyuan_3d_2_1_image_to_3d::generate_hunyuan3d_2_1_image_to_3d;
 use tauri::AppHandle;
 use artcraft_api_defs::generate::object::multi_function::hunyuan3d_v3_multi_function_object_gen::Hunyuan3dV3MultiFunctionObjectGenRequest;
-use storyteller_client::endpoints::generate::object::multi_function::hunyuan3d_v3_multi_function_object_gen::hunyuan3d_v3_multi_function_object_gen;
+use artcraft_client::endpoints::generate::object::multi_function::hunyuan3d_v3_multi_function_object_gen::hunyuan3d_v3_multi_function_object_gen;
 
 pub async fn handle_artcraft_object(
   request: &EnqueueImageTo3dObjectRequest,

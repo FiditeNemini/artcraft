@@ -21,9 +21,9 @@ use log::{error, info};
 use openai_sora_client::recipes::generate_sora2_video::generate_sora2_video_with_session_auto_renew::generate_sora2_video_with_session_auto_renew;
 use openai_sora_client::recipes::list_sora2_drafts::list_sora2_drafts_with_session_auto_renew::list_sora2_drafts_with_session_auto_renew;
 use openai_sora_client::requests::generate_sora2_video::generate_sora2_video::{GenerateSora2VideoArgs, Orientation};
-use storyteller_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
-use storyteller_client::endpoints::generate::video::generate_kling_16_pro_image_to_video::generate_kling_16_pro_image_to_video;
-use storyteller_client::endpoints::generate::video::multi_function::sora_2_multi_function_video_gen::sora_2_multi_function_video_gen;
+use artcraft_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
+use artcraft_client::endpoints::generate::video::generate_kling_16_pro_image_to_video::generate_kling_16_pro_image_to_video;
+use artcraft_client::endpoints::generate::video::multi_function::sora_2_multi_function_video_gen::sora_2_multi_function_video_gen;
 use tauri::AppHandle;
 use tokens::tokens::media_files::MediaFileToken;
 

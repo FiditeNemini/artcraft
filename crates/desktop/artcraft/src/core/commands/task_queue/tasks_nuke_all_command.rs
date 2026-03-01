@@ -19,7 +19,7 @@ use sqlite_tasks::queries::dismiss_all_tasks::dismiss_all_tasks;
 use sqlite_tasks::queries::list_tasks_for_frontend::list_tasks_for_frontend;
 use sqlite_tasks::queries::mark_task_as_dismissed::mark_task_as_dismissed;
 use sqlite_tasks::queries::nuke_all_tasks::nuke_all_tasks;
-use storyteller_client::endpoints::media_files::delete_media_file::delete_media_file;
+use artcraft_client::endpoints::media_files::delete_media_file::delete_media_file;
 use tauri::{AppHandle, State};
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::sqlite::tasks::TaskId;

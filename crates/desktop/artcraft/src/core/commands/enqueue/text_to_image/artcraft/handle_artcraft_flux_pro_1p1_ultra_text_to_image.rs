@@ -11,7 +11,7 @@ use enums::common::generation_provider::GenerationProvider;
 use enums::tauri::tasks::task_type::TaskType;
 use idempotency::uuid::generate_random_uuid;
 use log::{error, info};
-use storyteller_client::endpoints::generate::image::text::generate_flux_pro_11_ultra_text_to_image::generate_flux_pro_11_ultra_text_to_image;
+use artcraft_client::endpoints::generate::image::text::generate_flux_pro_11_ultra_text_to_image::generate_flux_pro_11_ultra_text_to_image;
 
 pub async fn handle_artcraft_flux_pro_1p1_ultra_text_to_image(
   request: &EnqueueTextToImageRequest,

@@ -12,7 +12,7 @@ use crate::services::storyteller::state::storyteller_credential_manager::Storyte
 use errors::AnyhowResult;
 use log::{error, info, warn};
 use serde_derive::{Deserialize, Serialize};
-use storyteller_client::endpoints::media_files::delete_media_file::delete_media_file;
+use artcraft_client::endpoints::media_files::delete_media_file::delete_media_file;
 use tauri::{AppHandle, State};
 use tokens::tokens::media_files::MediaFileToken;
 

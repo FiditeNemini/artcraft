@@ -1,6 +1,6 @@
 use std::error::Error;
 use std::fmt::{Display, Formatter};
-use storyteller_client::error::storyteller_error::StorytellerError;
+use artcraft_client::error::storyteller_error::StorytellerError;
 
 #[derive(Debug)]
 pub enum ProviderError {

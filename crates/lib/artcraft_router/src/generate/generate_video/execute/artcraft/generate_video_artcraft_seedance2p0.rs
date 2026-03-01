@@ -4,7 +4,7 @@ use crate::errors::provider_error::ProviderError;
 use crate::generate::generate_video::plan::artcraft::plan_generate_video_artcraft_seedance2p0::PlanArtcraftSeedance2p0;
 use crate::generate::generate_video::video_generation_plan::GenerateVideoResponse;
 use artcraft_api_defs::generate::video::multi_function::seedance_2p0_multi_function_video_gen::Seedance2p0MultiFunctionVideoGenRequest;
-use storyteller_client::endpoints::generate::video::multi_function::seedance_2p0_multi_function_video_gen::seedance_2p0_multi_function_video_gen;
+use artcraft_client::endpoints::generate::video::multi_function::seedance_2p0_multi_function_video_gen::seedance_2p0_multi_function_video_gen;
 
 pub async fn execute_artcraft_seedance2p0(
   plan: &PlanArtcraftSeedance2p0<'_>,

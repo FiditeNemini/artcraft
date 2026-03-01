@@ -1,7 +1,7 @@
 use crate::core::state::app_env_configs::app_env_configs_serializeable::{AppEnvConfigsSerializable, StorytellerApiHost};
 use crate::core::state::data_dir::app_data_root::AppDataRoot;
 use errors::AnyhowResult;
-use storyteller_client::utils::api_host::ApiHost;
+use artcraft_client::utils::api_host::ApiHost;
 
 #[derive(Clone)]
 pub struct AppEnvConfigs {

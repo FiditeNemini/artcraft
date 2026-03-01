@@ -19,7 +19,7 @@ use enums::common::generation_provider::GenerationProvider;
 use enums::tauri::tasks::task_type::TaskType;
 use idempotency::uuid::generate_random_uuid;
 use log::{error, info};
-use storyteller_client::endpoints::generate::image::multi_function::bytedance_seedream_v4_multi_function_image_gen_image::bytedance_seedream_v4_multi_function_image_gen;
+use artcraft_client::endpoints::generate::image::multi_function::bytedance_seedream_v4_multi_function_image_gen_image::bytedance_seedream_v4_multi_function_image_gen;
 use tauri::AppHandle;
 
 const MAX_IMAGES: usize = 4;

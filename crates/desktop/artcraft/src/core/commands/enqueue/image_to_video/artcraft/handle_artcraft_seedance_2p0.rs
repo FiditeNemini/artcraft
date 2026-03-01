@@ -15,7 +15,7 @@ use artcraft_router::generate::generate_video::generate_video_request::GenerateV
 use enums::common::generation_provider::GenerationProvider;
 use enums::tauri::tasks::task_type::TaskType;
 use log::{error, info};
-use storyteller_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
+use artcraft_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
 
 pub(super) async fn handle_artcraft_seedance_2p0(
   request: &EnqueueImageToVideoRequest,

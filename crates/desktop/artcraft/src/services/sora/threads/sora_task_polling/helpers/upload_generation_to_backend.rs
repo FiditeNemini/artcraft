@@ -2,10 +2,10 @@ use crate::services::sora::threads::sora_task_polling::helpers::generation_type:
 use errors::AnyhowResult;
 use log::info;
 use std::path::Path;
-use storyteller_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
-use storyteller_client::endpoints::media_files::upload_image_media_file_from_file::{upload_image_media_file_from_file, UploadImageFromFileArgs};
-use storyteller_client::endpoints::media_files::upload_video_media_file_from_file::{upload_video_media_file_from_file, UploadVideoFromFileArgs};
-use storyteller_client::utils::api_host::ApiHost;
+use artcraft_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
+use artcraft_client::endpoints::media_files::upload_image_media_file_from_file::{upload_image_media_file_from_file, UploadImageFromFileArgs};
+use artcraft_client::endpoints::media_files::upload_video_media_file_from_file::{upload_video_media_file_from_file, UploadVideoFromFileArgs};
+use artcraft_client::utils::api_host::ApiHost;
 use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::prompts::PromptToken;

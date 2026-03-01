@@ -14,7 +14,7 @@ use log::{error, info};
 use serde_derive::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::str::FromStr;
-use storyteller_client::endpoints::media_files::get_media_file::get_media_file;
+use artcraft_client::endpoints::media_files::get_media_file::get_media_file;
 use tauri::{AppHandle, State};
 use tauri_plugin_opener::OpenerExt;
 use tokens::tokens::media_files::MediaFileToken;

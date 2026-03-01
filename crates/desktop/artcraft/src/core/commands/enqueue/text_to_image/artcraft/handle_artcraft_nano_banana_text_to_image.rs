@@ -21,8 +21,8 @@ use enums::tauri::tasks::task_type::TaskType;
 use idempotency::uuid::generate_random_uuid;
 use log::{error, info};
 use std::time::Duration;
-use storyteller_client::endpoints::generate::image::multi_function::nano_banana_multi_function_image_gen_image::nano_banana_multi_function_image_gen;
-use storyteller_client::endpoints::generate::image::multi_function::nano_banana_pro_multi_function_image_gen_image::nano_banana_pro_multi_function_image_gen;
+use artcraft_client::endpoints::generate::image::multi_function::nano_banana_multi_function_image_gen_image::nano_banana_multi_function_image_gen;
+use artcraft_client::endpoints::generate::image::multi_function::nano_banana_pro_multi_function_image_gen_image::nano_banana_pro_multi_function_image_gen;
 use tauri::AppHandle;
 
 pub async fn handle_artcraft_nano_banana_text_to_image(

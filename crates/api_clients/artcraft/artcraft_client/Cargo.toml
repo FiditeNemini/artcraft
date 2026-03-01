@@ -1,5 +1,5 @@
 [package]
-name = "storyteller_client"
+name = "artcraft_client"
 edition = "2021"
 version = "0.0.1"
 authors = [
@@ -15,7 +15,7 @@ normal = ["workspace-build-acceleration"]
 # unused_imports = "forbid"
 
 [lib]
-name = "storyteller_client"
+name = "artcraft_client"
 path = "src/lib.rs"
 
 [dependencies]

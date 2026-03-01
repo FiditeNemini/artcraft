@@ -16,7 +16,7 @@ use enums::tauri::tasks::task_type::TaskType;
 use idempotency::uuid::generate_random_uuid;
 use log::{error, info};
 use std::path::PathBuf;
-use storyteller_client::endpoints::media_files::get_media_file::get_media_file;
+use artcraft_client::endpoints::media_files::get_media_file::get_media_file;
 use tauri::AppHandle;
 use tokens::tokens::media_files::MediaFileToken;
 use world_labs_client::credentials::world_labs_cookies::WorldLabsCookies;
