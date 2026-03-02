@@ -506,6 +506,7 @@ export function LightboxModal({
               </div>
             ) : mediaClass === "video" ? (
               <video
+                key={selectedImageUrl}
                 controls
                 loop={true}
                 autoPlay={true}
