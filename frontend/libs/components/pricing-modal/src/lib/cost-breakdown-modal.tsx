@@ -28,6 +28,7 @@ import {
 import { Model } from "@storyteller/model-list";
 import { useCurrency } from "./use-currency";
 import { useVideoCostEstimate } from "./useVideoCostEstimate";
+import { useImageCostEstimate } from "./useImageCostEstimate";
 
 // Drag handle subcomponent that Modal looks for
 const DragHandle = ({ children }: { children: React.ReactNode }) => (
@@ -113,6 +114,12 @@ export function CostBreakdownModal({ activeTabId }: CostBreakdownModalProps) {
     selectedModel,
     selectedProvider,
   );
+  const { isLoading: isImageEstimateLoading } = useImageCostEstimate(
+    activePage,
+    selectedModel,
+    selectedProvider,
+  );
+  const isEstimateLoading = isVideoEstimateLoading || isImageEstimateLoading;
 
   // Get generation settings from the appropriate stores based on active page
   const prompt2D = usePrompt2DStore();
@@ -165,17 +172,24 @@ export function CostBreakdownModal({ activeTabId }: CostBreakdownModalProps) {
 
   const storeData = getStoreData();
 
-  // For video, use the live estimate from the backend; for others use a default
-  const videoCredits =
-    activePage === ModelPage.ImageToVideo
-      ? (estimatedCreditsByPage[ModelPage.ImageToVideo] ?? null)
-      : null;
+  // Pages that use a live backend estimate instead of a local calculation
+  const LIVE_ESTIMATE_PAGES = new Set<ModelPage>([
+    ModelPage.TextToImage,
+    ModelPage.Canvas2D,
+    ModelPage.Stage3D,
+    ModelPage.ImageEditor,
+    ModelPage.ImageToVideo,
+  ]);
+
+  const isLiveEstimatePage = LIVE_ESTIMATE_PAGES.has(activePage);
+  const liveCredits = isLiveEstimatePage
+    ? (estimatedCreditsByPage[activePage] ?? null)
+    : null;
 
   const creditsPerGeneration = 1;
-  const totalCredits =
-    activePage === ModelPage.ImageToVideo
-      ? (videoCredits ?? null)
-      : creditsPerGeneration * storeData.generationCount;
+  const totalCredits = isLiveEstimatePage
+    ? liveCredits
+    : creditsPerGeneration * storeData.generationCount;
 
   // Convert credits to USD first (1 credit = $0.01), then to selected currency
   const usdAmount = (totalCredits ?? 0) * 0.01;
@@ -308,8 +322,7 @@ export function CostBreakdownModal({ activeTabId }: CostBreakdownModalProps) {
                   Credits
                 </div>
                 <div className="text-lg font-bold text-base-fg flex items-center gap-1.5">
-                  {isVideoEstimateLoading &&
-                  activePage === ModelPage.ImageToVideo ? (
+                  {isEstimateLoading && isLiveEstimatePage ? (
                     <>
                       <FontAwesomeIcon
                         icon={faSpinner}
