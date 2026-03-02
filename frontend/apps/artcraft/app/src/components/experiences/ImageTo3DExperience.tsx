@@ -632,7 +632,7 @@ export const ImageTo3DExperience = ({
             <div className="glass w-full rounded-xl p-5 shadow-2xl ring-1 ring-white/10">
               <div className="space-y-5">{renderActiveMode()}</div>
 
-              <div className="mt-6 flex justify-between">
+              <div className="mt-6 flex justify-center gap-2.5">
                 {variant === "object" && (
                   <div className="flex justify-center">
                     <TabSelector
