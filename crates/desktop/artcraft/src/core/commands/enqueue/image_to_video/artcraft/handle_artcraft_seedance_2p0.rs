@@ -59,11 +59,15 @@ pub(super) async fn handle_artcraft_seedance_2p0(
       return Err(GenerateError::from(err));
     }
   };
+  
+  let job_id = response.get_artcraft_payload()
+      .map(|p| p.inference_job_token.to_string())
+      .ok_or(GenerateError::ResponseHadNoJobTokens)?;
 
   Ok(TaskEnqueueSuccess {
     task_type: TaskType::VideoGeneration,
     model: Some(GenerationModel::Seedance2p0),
     provider: GenerationProvider::Artcraft,
-    provider_job_id: Some(response.inference_job_token.to_string()),
+    provider_job_id: Some(job_id),
   })
 }

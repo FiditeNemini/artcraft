@@ -31,6 +31,9 @@ pub enum GenerateError {
     model: ModelType,
   },
 
+  /// If the response didn't contain job tokens to track.
+  ResponseHadNoJobTokens,
+
   /// There was a billing, credits, or payments issue.
   BillingIssue(BillingIssueReason),
 
@@ -223,6 +226,7 @@ impl From<ArtcraftRouterError> for GenerateError {
       ArtcraftRouterError::Provider(ProviderError::Storyteller(e)) => {
         Self::ProviderFailure(ProviderFailureReason::StorytellerError(e))
       }
+      ArtcraftRouterError::Provider(ProviderError::Fal(_)) => Self::FalNoLongerSupported,
     }
   }
 }
