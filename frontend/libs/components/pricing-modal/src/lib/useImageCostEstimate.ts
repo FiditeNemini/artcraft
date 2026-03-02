@@ -42,11 +42,13 @@ export function useImageCostEstimate(
   const imageResolution = usePromptImageStore((s) => s.commonResolution);
   const imageLegacyResolution = usePromptImageStore((s) => s.resolution);
   const imageReferenceImages = usePromptImageStore((s) => s.referenceImages);
+  const imageGenerationCount = usePromptImageStore((s) => s.generationCount);
 
   // Canvas2D store
   const prompt2DAspectRatio = usePrompt2DStore((s) => s.aspectRatio);
   const prompt2DResolution = usePrompt2DStore((s) => s.resolution);
   const prompt2DReferenceImages = usePrompt2DStore((s) => s.referenceImages);
+  const prompt2DGenerationCount = usePrompt2DStore((s) => s.generationCount);
 
   // Stage3D store
   const prompt3DResolution = usePrompt3DStore((s) => s.resolution);
@@ -72,6 +74,7 @@ export function useImageCostEstimate(
     let legacyAspectRatioStr: string | undefined;
     let resolutionStr: string | undefined;
     let referenceImageCount = 0;
+    let generationCount = 1;
 
     switch (activePage) {
       case ModelPage.TextToImage:
@@ -79,20 +82,24 @@ export function useImageCostEstimate(
         legacyAspectRatioStr = imageLegacyAspectRatio;
         resolutionStr = imageResolution ?? imageLegacyResolution;
         referenceImageCount = imageReferenceImages.length;
+        generationCount = imageGenerationCount;
         break;
       case ModelPage.Canvas2D:
         legacyAspectRatioStr = prompt2DAspectRatio;
         resolutionStr = prompt2DResolution;
         referenceImageCount = prompt2DReferenceImages.length;
+        generationCount = prompt2DGenerationCount;
         break;
       case ModelPage.Stage3D:
         resolutionStr = prompt3DResolution;
         referenceImageCount = prompt3DReferenceImages.length;
+        generationCount = 1;
         break;
       case ModelPage.ImageEditor:
         legacyAspectRatioStr = editAspectRatio;
         resolutionStr = editResolution;
         referenceImageCount = editReferenceImages.length;
+        generationCount = 1;
         break;
     }
 
@@ -100,7 +107,8 @@ export function useImageCostEstimate(
       aspectRatioStr,
       legacyAspectRatioStr,
     );
-    const commonResolution = imageResolutionToCommonVideoResolution(resolutionStr);
+    const commonResolution =
+      imageResolutionToCommonVideoResolution(resolutionStr);
     const generationMode =
       referenceImageCount > 0
         ? { type: "image_edit" as const, count: referenceImageCount }
@@ -121,8 +129,12 @@ export function useImageCostEstimate(
     })
       .then((result) => {
         if (isEstimateImageCostSuccess(result)) {
-          const credits = result.payload.cost_in_credits ?? null;
-          setEstimatedCreditsForPage(activePage, credits);
+          const creditsPerGeneration = result.payload.cost_in_credits ?? null;
+          const totalCredits =
+            creditsPerGeneration != null
+              ? creditsPerGeneration * generationCount
+              : null;
+          setEstimatedCreditsForPage(activePage, totalCredits);
         } else {
           setEstimatedCreditsForPage(activePage, null);
         }
@@ -142,9 +154,11 @@ export function useImageCostEstimate(
     imageResolution,
     imageLegacyResolution,
     imageReferenceImages.length,
+    imageGenerationCount,
     prompt2DAspectRatio,
     prompt2DResolution,
     prompt2DReferenceImages.length,
+    prompt2DGenerationCount,
     prompt3DResolution,
     prompt3DReferenceImages.length,
     editAspectRatio,

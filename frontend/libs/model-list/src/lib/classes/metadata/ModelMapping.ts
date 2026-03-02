@@ -8,22 +8,52 @@ export const MODEL_TYPE_TO_CREATOR: Record<string, ModelCreator> = {
   flux_1_schnell: ModelCreator.BlackForestLabs,
   flux_pro_1p1: ModelCreator.BlackForestLabs,
   flux_pro_1p1_ultra: ModelCreator.BlackForestLabs,
+  flux_pro_kontext_max: ModelCreator.BlackForestLabs,
+  flux_dev_juggernaut: ModelCreator.BlackForestLabs,
+  flux_pro_1: ModelCreator.BlackForestLabs,
   // Aliases commonly returned by other services
   flux_pro_1_1: ModelCreator.BlackForestLabs,
   flux_pro_1_1_ultra: ModelCreator.BlackForestLabs,
   gpt_image_1: ModelCreator.OpenAi,
+  gpt_image_1p5: ModelCreator.OpenAi,
+  // Kling — p-style IDs
   kling_1p6_pro: ModelCreator.Kling,
   kling_2p1_pro: ModelCreator.Kling,
   kling_2p1_master: ModelCreator.Kling,
+  kling_2p5_turbo_pro: ModelCreator.Kling,
+  kling_2p6_pro: ModelCreator.Kling,
+  // Kling — dot-normalized aliases (backend sends e.g. "kling_1.6_pro", normalizeModelKey converts . → _)
+  kling_1_6_pro: ModelCreator.Kling,
+  kling_2_1_pro: ModelCreator.Kling,
+  kling_2_1_master: ModelCreator.Kling,
+  // Seedance — p-style IDs
   seedance_1p0_lite: ModelCreator.Bytedance,
   seedance_2p0: ModelCreator.Bytedance,
+  // Seedance — dot-normalized aliases
+  seedance_1_0_lite: ModelCreator.Bytedance,
+  // Seedream
+  seedream_4: ModelCreator.Bytedance,
+  seedream_4p5: ModelCreator.Bytedance,
+  // Sora
   sora_2: ModelCreator.OpenAi,
+  sora_2_pro: ModelCreator.OpenAi,
+  // Veo
   veo_2: ModelCreator.Google,
+  veo_3: ModelCreator.Google,
+  veo_3_fast: ModelCreator.Google,
+  veo_3p1: ModelCreator.Google,
+  veo_3p1_fast: ModelCreator.Google,
   gemini_25_flash: ModelCreator.Google,
   nano_banana: ModelCreator.Google,
   nano_banana_pro: ModelCreator.Google,
   recraft_3: ModelCreator.Recraft,
+  // Hunyuan — p-style IDs
   hunyuan_3d: ModelCreator.Tencent,
+  hunyuan_3d_2p0: ModelCreator.Tencent,
+  hunyuan_3d_2p1: ModelCreator.Tencent,
+  // Hunyuan — dot-normalized aliases
+  hunyuan_3d_2_0: ModelCreator.Tencent,
+  hunyuan_3d_2_1: ModelCreator.Tencent,
   worldlabs_gaussian: ModelCreator.WorldLabs,
   grok_image: ModelCreator.Grok,
   grok_video: ModelCreator.Grok,
@@ -104,33 +134,72 @@ export const getModelCreatorName = (modelType: string): string | null => {
 // Convert model type string to human-readable display name
 export const getModelDisplayName = (modelType: string): string => {
   const displayNames: Record<string, string> = {
+    // Grok
     grok_image: "Grok Image",
     grok_video: "Grok Video",
+
+    // Flux — Black Forest Labs
     flux_1_dev: "Flux 1 Dev",
     flux_1_schnell: "Flux 1 Schnell",
     flux_pro_1p1: "Flux Pro 1.1",
     flux_pro_1p1_ultra: "Flux Pro 1.1 Ultra",
-    // Aliases
+    flux_pro_kontext_max: "Flux Pro Kontext Max",
+    flux_dev_juggernaut: "Flux Dev Juggernaut",
+    flux_pro_1: "Flux Pro (Inpainting)",
+    // Aliases (dot-normalized underscores)
     flux_pro_1_1: "Flux Pro 1.1",
     flux_pro_1_1_ultra: "Flux Pro 1.1 Ultra",
+
+    // OpenAI
     gpt_image_1: "GPT Image 1",
+    gpt_image_1p5: "GPT Image 1.5",
+    sora_2: "Sora 2",
+    sora_2_pro: "Sora 2 Pro",
+
+    // Kling — p-style IDs
     kling_1p6_pro: "Kling 1.6 Pro",
     kling_2p1_pro: "Kling 2.1 Pro",
     kling_2p1_master: "Kling 2.1 Master",
+    kling_2p5_turbo_pro: "Kling 2.5 Turbo Pro",
+    kling_2p6_pro: "Kling 2.6 Pro",
+    // Kling — dot-normalized aliases (backend sends e.g. "kling_1.6_pro", normalizeModelKey converts . → _)
+    kling_1_6_pro: "Kling 1.6 Pro",
+    kling_2_1_pro: "Kling 2.1 Pro",
+    kling_2_1_master: "Kling 2.1 Master",
+
+    // Seedance (ByteDance) — p-style IDs
     seedance_1p0_lite: "Seedance 1.0 Lite",
     seedance_2p0: "Seedance 2.0",
+    // Seedance — dot-normalized aliases
+    seedance_1_0_lite: "Seedance 1.0 Lite",
+
+    // Seedream (ByteDance)
+    seedream_4: "Seedream 4",
+    seedream_4p5: "Seedream 4.5",
+
+    // Google
     veo_2: "Veo 2",
-    sora_2: "Sora 2",
-    recraft_3: "Recraft 3",
-    hunyuan_3d_2p0: "Hunyuan 3D 2.0",
-    hunyuan_3d_2p1: "Hunyuan 3D 2.1",
-    hunyuan_3d: "Hunyuan 3D",
-    worldlabs_gaussian: "World Labs Marble",
-    flux_pro_kontext_max: "Flux Pro Kontext Max",
+    veo_3: "Google Veo 3",
+    veo_3_fast: "Google Veo 3 Fast",
+    veo_3p1: "Google Veo 3.1",
+    veo_3p1_fast: "Google Veo 3.1 Fast",
     gemini_25_flash: "Nano Banana",
     nano_banana: "Nano Banana",
     nano_banana_pro: "Nano Banana Pro",
-    flux_dev_juggernaut: "Flux Dev Juggernaut",
+
+    // Recraft
+    recraft_3: "Recraft 3",
+
+    // Hunyuan (Tencent) — p-style IDs
+    hunyuan_3d: "Hunyuan 3D",
+    hunyuan_3d_2p0: "Hunyuan 3D 2.0",
+    hunyuan_3d_2p1: "Hunyuan 3D 2.1",
+    // Hunyuan — dot-normalized aliases
+    hunyuan_3d_2_0: "Hunyuan 3D 2.0",
+    hunyuan_3d_2_1: "Hunyuan 3D 2.1",
+
+    // World Labs
+    worldlabs_gaussian: "World Labs Marble",
 
     // Catch-all bucket for Midjourney.
     midjourney: "Midjourney",
@@ -142,8 +211,6 @@ export const getModelDisplayName = (modelType: string): string => {
     midjourney_v7: "Midjourney V7",
     midjourney_v7_raw: "Midjourney V7 (Raw)",
     midjourney_v7_draft_raw: "Midjourney V7 (Draft Raw)",
-
-    // TODO: add more models here - BFlat
   };
 
   const key = normalizeModelKey(modelType);
