@@ -89,8 +89,7 @@ async function getCachedUsername(): Promise<string | null> {
 const SKELETON_COUNT = 15;
 
 const SkeletonGrid = ({ columns }: { columns: number }) => {
-  const gapClass =
-    columns <= 4 ? "gap-1.5" : columns <= 7 ? "gap-1" : "gap-0.5";
+  const gapClass = columns <= 4 ? "gap-2" : columns <= 7 ? "gap-2" : "gap-0.5";
   return (
     <div className="space-y-6 p-4 animate-in fade-in duration-200">
       {/* Fake date heading */}
