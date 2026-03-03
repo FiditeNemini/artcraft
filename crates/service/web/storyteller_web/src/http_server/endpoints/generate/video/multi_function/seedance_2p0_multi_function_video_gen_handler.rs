@@ -283,6 +283,14 @@ pub async fn seedance_2p0_multi_function_video_gen_handler(
         context_semantic_type: PromptContextSemanticType::VidEndFrame,
       });
     }
+    if let Some(ref_tokens) = &request.reference_image_media_tokens {
+      for media_token in ref_tokens {
+        context_items.push(PromptContextItem {
+          media_token: media_token.clone(),
+          context_semantic_type: PromptContextSemanticType::VidRef,
+        });
+      }
+    }
 
     if !context_items.is_empty() {
       if let Err(err) = insert_batch_prompt_context_items(InsertBatchArgs {
