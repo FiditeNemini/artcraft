@@ -68,7 +68,7 @@ export function CreditsModal({
       resizable={false}
       backdropClassName="bg-black/80"
     >
-      <div className="p-8 md:p-12 lg:p-16 flex-1 overflow-y-auto min-h-0">
+      <div className="p-8 flex-1 overflow-y-auto min-h-0">
         <div className="text-center mb-10">
           <h1 className="text-4xl md:text-5xl font-bold text-base-fg mb-4">
             Buy credits
