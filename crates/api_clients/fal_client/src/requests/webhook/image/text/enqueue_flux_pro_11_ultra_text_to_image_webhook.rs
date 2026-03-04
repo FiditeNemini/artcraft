@@ -55,7 +55,7 @@ impl <U: IntoUrl> FalRequestCostCalculator for FluxPro11UltraArgs<'_, U> {
 pub async fn enqueue_flux_pro_11_ultra_text_to_image_webhook<U: IntoUrl>(
   args: FluxPro11UltraArgs<'_, U>
 ) -> Result<WebhookResponse, FalErrorPlus> {
-  
+
   let num_images = match args.num_images {
     FluxPro11UltraNumImages::One => 1,
     FluxPro11UltraNumImages::Two => 2,
@@ -74,7 +74,7 @@ pub async fn enqueue_flux_pro_11_ultra_text_to_image_webhook<U: IntoUrl>(
     FluxPro11UltraAspectRatio::PortraitNineBySixteen => AspectRatioProperty::Property_9_16,
     FluxPro11UltraAspectRatio::PortraitNineByTwentyOne => AspectRatioProperty::Property_9_21,
   };
-  
+
   let request = FluxProUltraTextToImageInput {
     prompt: args.prompt.to_string(),
     num_images: Some(num_images),
@@ -89,7 +89,7 @@ pub async fn enqueue_flux_pro_11_ultra_text_to_image_webhook<U: IntoUrl>(
     output_format: Some("png".to_string()),
     sync_mode: None, // Synchronous / slow
   };
-  
+
   let result = v1_1_ultra(request)
       .with_api_key(&args.api_key.0)
       .queue_webhook(args.webhook_url)

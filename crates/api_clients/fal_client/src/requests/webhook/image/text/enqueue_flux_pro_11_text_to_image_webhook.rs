@@ -53,7 +53,7 @@ impl <U: IntoUrl> FalRequestCostCalculator for FluxPro11Args<'_, U> {
 pub async fn enqueue_flux_pro_11_text_to_image_webhook<U: IntoUrl>(
   args: FluxPro11Args<'_, U>
 ) -> Result<WebhookResponse, FalErrorPlus> {
-  
+
   let num_images = match args.num_images {
     FluxPro11NumImages::One => 1,
     FluxPro11NumImages::Two => 2,
@@ -69,7 +69,7 @@ pub async fn enqueue_flux_pro_11_text_to_image_webhook<U: IntoUrl>(
     FluxPro11AspectRatio::PortraitThreeByFour => ImageSizeProperty::Portrait43,
     FluxPro11AspectRatio::PortraitNineBySixteen => ImageSizeProperty::Portrait169,
   };
-  
+
   let request = FluxProPlusTextToImageInput {
     prompt: args.prompt.to_string(),
     num_images: Some(num_images),
@@ -83,7 +83,7 @@ pub async fn enqueue_flux_pro_11_text_to_image_webhook<U: IntoUrl>(
     output_format: Some("png".to_string()),
     sync_mode: None, // Synchronous / slow
   };
-  
+
   let result = v1_1(request)
       .with_api_key(&args.api_key.0)
       .queue_webhook(args.webhook_url)
@@ -95,7 +95,7 @@ pub async fn enqueue_flux_pro_11_text_to_image_webhook<U: IntoUrl>(
 #[cfg(test)]
 mod tests {
   use crate::creds::fal_api_key::FalApiKey;
-  use crate::requests::webhook::image::enqueue_flux_pro_11_text_to_image_webhook::{enqueue_flux_pro_11_text_to_image_webhook, FluxPro11Args, FluxPro11AspectRatio, FluxPro11NumImages};
+  use crate::requests::webhook::image::text::enqueue_flux_pro_11_text_to_image_webhook::{enqueue_flux_pro_11_text_to_image_webhook, FluxPro11Args, FluxPro11AspectRatio, FluxPro11NumImages};
   use errors::AnyhowResult;
   use std::fs::read_to_string;
 

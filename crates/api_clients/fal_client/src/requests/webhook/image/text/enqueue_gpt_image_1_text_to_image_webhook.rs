@@ -13,7 +13,7 @@ pub struct GptTextToImageByokArgs<'a, V: IntoUrl> {
   pub image_size: GptTextToImageSize,
   pub num_images: GptTextToImageNumImages,
   pub quality: GptTextToImageQuality,
-  
+
   // Fulfillment
   pub api_key: &'a FalApiKey,
   pub openai_api_key: &'a OpenAiApiKey,
@@ -80,7 +80,7 @@ pub async fn enqueue_gpt_image_1_text_to_image_webhook<V: IntoUrl>(
     GptTextToImageSize::Horizontal => "1536x1024",
     GptTextToImageSize::Vertical => "1024x1536",
   };
-  
+
   let quality = match args.quality {
     GptTextToImageQuality::Auto => "auto",
     GptTextToImageQuality::Low => "low",
@@ -116,7 +116,7 @@ pub async fn enqueue_gpt_image_1_text_to_image_webhook<V: IntoUrl>(
 mod tests {
   use crate::creds::fal_api_key::FalApiKey;
   use crate::creds::open_ai_api_key::OpenAiApiKey;
-  use crate::requests::webhook::image::enqueue_gpt_image_1_text_to_image_webhook::{enqueue_gpt_image_1_text_to_image_webhook, GptTextToImageByokArgs, GptTextToImageNumImages, GptTextToImageQuality, GptTextToImageSize};
+  use crate::requests::webhook::image::text::enqueue_gpt_image_1_text_to_image_webhook::{enqueue_gpt_image_1_text_to_image_webhook, GptTextToImageByokArgs, GptTextToImageNumImages, GptTextToImageQuality, GptTextToImageSize};
   use errors::AnyhowResult;
   use std::fs::read_to_string;
 

@@ -37,14 +37,14 @@ pub enum Flux1SchnellNumImages {
 pub async fn enqueue_flux_1_schnell_text_to_image_webhook<U: IntoUrl>(
   args: Flux1SchnellArgs<'_, U>
 ) -> Result<WebhookResponse, FalErrorPlus> {
-  
+
   let num_images = match args.num_images {
     Flux1SchnellNumImages::One => 1,
     Flux1SchnellNumImages::Two => 2,
     Flux1SchnellNumImages::Three => 3,
     Flux1SchnellNumImages::Four => 4,
   };
-  
+
   let image_size = match args.aspect_ratio {
     Flux1SchnellAspectRatio::Square => ImageSizeProperty::Square,
     Flux1SchnellAspectRatio::SquareHd => ImageSizeProperty::SquareHd,
@@ -53,7 +53,7 @@ pub async fn enqueue_flux_1_schnell_text_to_image_webhook<U: IntoUrl>(
     Flux1SchnellAspectRatio::PortraitThreeByFour => ImageSizeProperty::Portrait43,
     Flux1SchnellAspectRatio::PortraitNineBySixteen => ImageSizeProperty::Portrait169,
   };
-  
+
   let request = SchnellTextToImageInput {
     prompt: args.prompt.to_string(),
     num_images: Some(num_images),
@@ -66,7 +66,7 @@ pub async fn enqueue_flux_1_schnell_text_to_image_webhook<U: IntoUrl>(
     // Constants
     sync_mode: None, // Synchronous / slow
   };
-  
+
   let result = schnell(request)
       .with_api_key(&args.api_key.0)
       .queue_webhook(args.webhook_url)
@@ -78,7 +78,7 @@ pub async fn enqueue_flux_1_schnell_text_to_image_webhook<U: IntoUrl>(
 #[cfg(test)]
 mod tests {
   use crate::creds::fal_api_key::FalApiKey;
-  use crate::requests::webhook::image::enqueue_flux_1_schnell_text_to_image_webhook::{enqueue_flux_1_schnell_text_to_image_webhook, Flux1SchnellArgs, Flux1SchnellAspectRatio, Flux1SchnellNumImages};
+  use crate::requests::webhook::image::text::enqueue_flux_1_schnell_text_to_image_webhook::{enqueue_flux_1_schnell_text_to_image_webhook, Flux1SchnellArgs, Flux1SchnellAspectRatio, Flux1SchnellNumImages};
   use errors::AnyhowResult;
   use std::fs::read_to_string;
 

@@ -37,14 +37,14 @@ pub enum Flux1DevNumImages {
 pub async fn enqueue_flux_1_dev_text_to_image_webhook<U: IntoUrl>(
   args: Flux1DevArgs<'_, U>
 ) -> Result<WebhookResponse, FalErrorPlus> {
-  
+
   let num_images = match args.num_images {
     Flux1DevNumImages::One => 1,
     Flux1DevNumImages::Two => 2,
     Flux1DevNumImages::Three => 3,
     Flux1DevNumImages::Four => 4,
   };
-  
+
   let image_size = match args.aspect_ratio {
     Flux1DevAspectRatio::Square => ImageSizeProperty::Square,
     Flux1DevAspectRatio::SquareHd => ImageSizeProperty::SquareHd,
@@ -53,7 +53,7 @@ pub async fn enqueue_flux_1_dev_text_to_image_webhook<U: IntoUrl>(
     Flux1DevAspectRatio::PortraitThreeByFour => ImageSizeProperty::Portrait43,
     Flux1DevAspectRatio::PortraitNineBySixteen => ImageSizeProperty::Portrait169,
   };
-  
+
   let request = DevTextToImageInput {
     prompt: args.prompt.to_string(),
     num_images: Some(num_images),
@@ -67,7 +67,7 @@ pub async fn enqueue_flux_1_dev_text_to_image_webhook<U: IntoUrl>(
     // Constants
     sync_mode: None, // Synchronous / slow
   };
-  
+
   let result = dev(request)
       .with_api_key(&args.api_key.0)
       .queue_webhook(args.webhook_url)
@@ -79,7 +79,7 @@ pub async fn enqueue_flux_1_dev_text_to_image_webhook<U: IntoUrl>(
 #[cfg(test)]
 mod tests {
   use crate::creds::fal_api_key::FalApiKey;
-  use crate::requests::webhook::image::enqueue_flux_1_dev_text_to_image_webhook::{enqueue_flux_1_dev_text_to_image_webhook, Flux1DevArgs, Flux1DevAspectRatio, Flux1DevNumImages};
+  use crate::requests::webhook::image::text::enqueue_flux_1_dev_text_to_image_webhook::{enqueue_flux_1_dev_text_to_image_webhook, Flux1DevArgs, Flux1DevAspectRatio, Flux1DevNumImages};
   use errors::AnyhowResult;
   use std::fs::read_to_string;
 
