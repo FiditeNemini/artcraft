@@ -121,7 +121,15 @@ fn map_provider(
 
 fn map_image_model(model: CommonImageModel) -> Result<RouterImageModel, HandlerError> {
   let router_model = match model {
+    CommonImageModel::Flux1Dev => RouterImageModel::Flux1Dev,
+    CommonImageModel::Flux1Schnell => RouterImageModel::Flux1Schnell,
+    CommonImageModel::FluxPro11 => RouterImageModel::FluxPro11,
+    CommonImageModel::FluxPro11Ultra => RouterImageModel::FluxPro11Ultra,
+    CommonImageModel::GptImage1p5 => RouterImageModel::GptImage1p5,
+    CommonImageModel::NanaBanana => RouterImageModel::NanaBanana,
     CommonImageModel::NanaBananaPro => RouterImageModel::NanaBananaPro,
+    CommonImageModel::Seedream4 => RouterImageModel::Seedream4,
+    CommonImageModel::Seedream4p5 => RouterImageModel::Seedream4p5,
   };
   Ok(router_model)
 }
