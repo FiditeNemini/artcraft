@@ -150,6 +150,10 @@ const popOverLabelToAspectRatio = (
       return CommonAspectRatio.Auto;
     case "Square":
       return CommonAspectRatio.Square;
+    case "Wide":
+      return CommonAspectRatio.Wide;
+    case "Tall":
+      return CommonAspectRatio.Tall;
     case "5:4 (Wide)":
       return CommonAspectRatio.WideFiveByFour;
     case "4:3 (Wide)":
@@ -176,6 +180,7 @@ const popOverLabelToAspectRatio = (
       return CommonAspectRatio.Auto4k;
     case "Square (HD)":
       return CommonAspectRatio.SquareHd;
+
   }
   console.error("Unknown aspect ratio label:", label, "for model:", model.id);
   // If we can't find it, return the model's default aspect ratio or Square as fallback
