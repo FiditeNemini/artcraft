@@ -35,6 +35,8 @@ export type SubscriptionActions = {
 
   // Call to fetch credits from the server
   fetchFromServer: () => Promise<void>
+  // Reset subscription state (e.g. on logout)
+  reset: () => void
 };
 
 export const useSubscriptionState = create<SubscriptionState & SubscriptionActions>((set, get) => ({
@@ -51,6 +53,8 @@ export const useSubscriptionState = create<SubscriptionState & SubscriptionActio
     return info?.subscriptionToken !== undefined 
         && info?.subscriptionEndAt === undefined;
   },
+
+  reset: () => set({ subscriptionInfo: undefined }),
 
   // Call to fetch credits from the server
   fetchFromServer: async () => {

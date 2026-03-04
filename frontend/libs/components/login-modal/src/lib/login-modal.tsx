@@ -103,9 +103,8 @@ export function LoginModal({
       {[...Array(uiTotalSteps)].map((_, idx) => (
         <div
           key={idx}
-          className={`h-1.5 rounded transition-all duration-300 w-16 ${
-            idx < uiCurrentStep ? "bg-primary" : "bg-white/30"
-          }`}
+          className={`h-1.5 rounded transition-all duration-300 w-16 ${idx < uiCurrentStep ? "bg-primary" : "bg-white/30"
+            }`}
         />
       ))}
     </div>
@@ -210,7 +209,7 @@ export function LoginModal({
                   if (!signupResponse.success) {
                     setErrorMessage(
                       signupResponse.errorMessage ||
-                        "Signup failed, please try again."
+                      "Signup failed, please try again."
                     );
                     setIsLoading(false);
                     return;
@@ -233,7 +232,7 @@ export function LoginModal({
                 if (!loginResponse.success) {
                   setErrorMessage(
                     loginResponse.errorMessage ||
-                      "Login failed, please try again."
+                    "Login failed, please try again."
                   );
                   setIsLoading(false);
                   return;
@@ -276,20 +275,44 @@ export function LoginModal({
 
     return (
       <div className="flex items-center justify-center gap-2.5 mt-6">
-        {step === 2 && (
-          <Button variant="secondary" onClick={handleBack} disabled={isLoading}>
-            Back
-          </Button>
+        {step === 1 ? (
+          <>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setIsSignUp(false);
+                setStep(2);
+              }}
+            >
+              Login
+            </Button>
+            <Button
+              icon={faArrowRight}
+              iconFlip={true}
+              onClick={() => {
+                setIsSignUp(true);
+                setStep(2);
+              }}
+            >
+              Sign up
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button variant="secondary" onClick={handleBack} disabled={isLoading}>
+              Back
+            </Button>
+            <Button
+              icon={faArrowRight}
+              iconFlip={true}
+              onClick={handleNext}
+              loading={isLoading}
+              disabled={isLoading}
+            >
+              {isSignUp ? "Sign up" : "Login"}
+            </Button>
+          </>
         )}
-        <Button
-          icon={faArrowRight}
-          iconFlip={true}
-          onClick={handleNext}
-          loading={isLoading}
-          disabled={isLoading}
-        >
-          {step === 1 ? "Continue" : isSignUp ? "Sign up" : "Login"}
-        </Button>
       </div>
     );
   };
@@ -317,41 +340,41 @@ export function LoginModal({
             leaveTo="opacity-0 scale-95"
           >
             <div
-              className="relative h-[660px] max-w-4xl w-full rounded-xl bg-[#2C2C2C] text-white shadow-lg border border-white/5"
+              className="relative h-[660px] max-w-4xl w-full rounded-xl overflow-hidden bg-[#2C2C2C] text-white shadow-lg border border-[#222222]/10"
               onClick={(e) => e.stopPropagation()}
             >
-                <div className="flex flex-col gap-4 p-8 h-full relative overflow-hidden">
-                  {step === 1 && !showSuccess && !showDiscord && (
-                    <div className="absolute inset-0 z-0">
-                      <video
-                        className="w-full h-full object-cover"
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                      >
-                        <source
-                          src="/resources/videos/artcraft-intro.mp4"
-                          type="video/mp4"
-                        />
-                      </video>
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#2C2C2C] via-transparent to-[#2C2C2C]/80" />
-                    </div>
-                  )}
-
-                  <div className="relative z-10 flex flex-col h-full">
-                    {!showSuccess && (
-                      <>
-                        <span className="text-sm text-center opacity-60 font-medium">
-                          Step {uiCurrentStep} of {uiTotalSteps}
-                        </span>
-                        {renderProgress()}
-                      </>
-                    )}
-                    {renderStepContent()}
-                    {renderFooterButtons()}
+              <div className="flex flex-col gap-4 p-8 h-full relative overflow-hidden">
+                {step === 1 && !showSuccess && !showDiscord && (
+                  <div className="absolute inset-0 z-0">
+                    <video
+                      className="w-full h-full object-cover opacity-90"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                    >
+                      <source
+                        src="/resources/videos/artcraft-intro.mp4"
+                        type="video/mp4"
+                      />
+                    </video>
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#090909] via-transparent to-[#111111]/80" />
                   </div>
+                )}
+
+                <div className="relative z-10 flex flex-col h-full">
+                  {!showSuccess && (
+                    <>
+                      <span className="text-sm text-center opacity-60 font-medium">
+                        Step {uiCurrentStep} of {uiTotalSteps}
+                      </span>
+                      {renderProgress()}
+                    </>
+                  )}
+                  {renderStepContent()}
+                  {renderFooterButtons()}
                 </div>
+              </div>
             </div>
           </TransitionChild>
         </div>

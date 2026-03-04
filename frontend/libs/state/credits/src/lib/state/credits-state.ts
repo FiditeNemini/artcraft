@@ -18,6 +18,8 @@ export interface CreditsState {
 export type CreditsActions = {
   // Call to fetch credits from the server
   fetchFromServer: () => Promise<void>
+  // Reset all credits to zero (e.g. on logout)
+  reset: () => void
 }
 
 export const useCreditsState = create<CreditsState & CreditsActions>((set) => ({
@@ -25,6 +27,8 @@ export const useCreditsState = create<CreditsState & CreditsActions>((set) => ({
   monthlyCredits: 0,
   bankedCredits: 0,
   totalCredits: 0,
+
+  reset: () => set({ freeCredits: 0, monthlyCredits: 0, bankedCredits: 0, totalCredits: 0 }),
 
   // Call to fetch credits from the server
   fetchFromServer: async () => {

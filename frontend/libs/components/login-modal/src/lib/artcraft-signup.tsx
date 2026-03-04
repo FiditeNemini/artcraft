@@ -157,11 +157,11 @@ export const ArtCraftSignUp = ({
             </p>
             <Button
               variant="secondary"
-              className="p-0 bg-transparent hover:bg-transparent"
+              className="p-0 bg-transparent hover:bg-transparent border-none shadow-none"
               type="button"
               onClick={onToggleMode}
             >
-              <span className="text-sm text-primary-400 underline">
+              <span className="text-sm text-primary-400 underline hover:text-primary-300 transition-colors duration-200">
                 {isSignUp ? "Log in" : "Sign up"}
               </span>
             </Button>

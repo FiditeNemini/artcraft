@@ -1,6 +1,8 @@
 import { AUTH_STATUS } from "~/enums";
 import { UserInfo, ActiveSubscriptions } from "~/models";
 import { authentication, flushAllBackgroundLoadedMedia } from "~/signals";
+import { useCreditsState } from "@storyteller/credits";
+import { useSubscriptionState } from "@storyteller/subscription";
 
 export const updateAuthStatus = (newStatus: AUTH_STATUS) => {
   console.log('updateAuthStatus()', newStatus)
@@ -36,4 +38,6 @@ export const setLogoutStates = () => {
   updateUserInfo(undefined);
   updateActiveSubscriptions(undefined);
   flushAllBackgroundLoadedMedia();
+  useCreditsState.getState().reset();
+  useSubscriptionState.getState().reset();
 };
