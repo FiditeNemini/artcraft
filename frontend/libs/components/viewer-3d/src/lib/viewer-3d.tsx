@@ -353,7 +353,7 @@ export function Viewer3D({
 
   return (
     <div
-      className={`relative h-full w-full overflow-hidden rounded-xl bg-[#282828] ${className}`}
+      className={`relative h-full w-full overflow-hidden rounded-l-xl bg-[#282828] ${className}`}
       onMouseDown={stopPropagation}
       onMouseMove={stopPropagation}
       onMouseUp={stopPropagation}

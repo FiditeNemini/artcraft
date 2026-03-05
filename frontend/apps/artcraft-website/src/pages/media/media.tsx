@@ -30,15 +30,22 @@ import {
   getProviderDisplayName,
   getProviderIconByName,
 } from "@storyteller/model-list";
+import { Viewer3D } from "@storyteller/ui-viewer-3d";
 import Seo from "../../components/seo";
 
 const VIDEO_EXTENSIONS = [".mp4", ".webm", ".mov", ".avi", ".mkv", ".m4v"];
+const MODEL_3D_EXTENSIONS = [".glb", ".gltf", ".fbx", ".spz"];
 const COPY_FEEDBACK_DURATION = 1500;
 const SHARE_URL_BASE = "https://getartcraft.com/media/";
 
 const isVideoUrl = (url: string): boolean => {
   const urlLower = url.toLowerCase();
   return VIDEO_EXTENSIONS.some((ext) => urlLower.includes(ext));
+};
+
+const is3DModelUrl = (url: string): boolean => {
+  const urlLower = url.toLowerCase();
+  return MODEL_3D_EXTENSIONS.some((ext) => urlLower.includes(ext));
 };
 
 interface ContextImage {
@@ -52,6 +59,7 @@ interface MediaData {
   token: string | null;
   createdAt: string | null;
   isVideo: boolean;
+  is3D: boolean;
   isLoaded: boolean;
   width?: number;
   height?: number;
@@ -140,6 +148,7 @@ export default function MediaPage() {
     token: null,
     createdAt: null,
     isVideo: false,
+    is3D: false,
     isLoaded: false,
     creator: null,
   });
@@ -170,6 +179,7 @@ export default function MediaPage() {
             token: file.token || id,
             createdAt: file.created_at || null,
             isVideo: url ? isVideoUrl(url) : false,
+            is3D: url ? is3DModelUrl(url) : false,
             isLoaded: isSameUrl ? prev.isLoaded : false,
             width: isSameUrl ? prev.width : undefined,
             height: isSameUrl ? prev.height : undefined,
@@ -200,6 +210,7 @@ export default function MediaPage() {
           token: null,
           createdAt: null,
           isVideo: false,
+          is3D: false,
           isLoaded: false,
           creator: null,
         });
@@ -211,6 +222,7 @@ export default function MediaPage() {
         token: null,
         createdAt: null,
         isVideo: false,
+        is3D: false,
         isLoaded: false,
         creator: null,
       });
@@ -266,7 +278,13 @@ export default function MediaPage() {
               </div>
             ) : media.url ? (
               <div className="relative h-full w-full flex items-center justify-center">
-                {media.isVideo ? (
+                {media.is3D ? (
+                  <Viewer3D
+                    modelUrl={addCorsParam(media.url) || media.url}
+                    isActive
+                    className="h-full w-full"
+                  />
+                ) : media.isVideo ? (
                   <video
                     src={addCorsParam(media.url) || media.url}
                     className="h-full w-full object-contain"
