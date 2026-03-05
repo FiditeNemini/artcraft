@@ -68,7 +68,7 @@ pub async fn moderator_user_lookup_handler(
     })?;
 
   let maybe_user_details = maybe_user.map(|user| ModeratorUserLookupUserDetails {
-    token: user.user_token.to_string(),
+    token: user.user_token,
     username: user.username,
     display_name: user.display_name,
     username_is_generated: user.username_is_generated,
@@ -82,6 +82,9 @@ pub async fn moderator_user_lookup_handler(
     ip_address_last_login: user.ip_address_last_login,
     maybe_avatar_media_file_token: user.maybe_avatar_media_file_token,
     email_gravatar_hash: user.email_gravatar_hash,
+    is_banned: user.is_banned,
+    created_at: user.created_at,
+    updated_at: user.updated_at,
   });
 
   Ok(Json(ModeratorUserLookupSuccessResponse {
