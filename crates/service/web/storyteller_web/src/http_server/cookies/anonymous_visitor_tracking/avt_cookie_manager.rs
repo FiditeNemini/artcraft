@@ -31,7 +31,12 @@ impl AvtCookieManager {
   }
 
   pub fn make_new_cookie(&self) -> AnyhowResult<Cookie> {
-    let payload = AvtCookiePayload::new();
+    let token = AnonymousVisitorTrackingToken::generate();
+    self.make_new_cookie_with_apriori_token(&token)
+  }
+
+  pub fn make_new_cookie_with_apriori_token(&self, token: &AnonymousVisitorTrackingToken) -> AnyhowResult<Cookie> {
+    let payload = AvtCookiePayload::from_token(token.clone());
     let claims = payload.to_map();
     let jwt_string = self.jwt_signer.claims_to_jwt(&claims)?;
 
