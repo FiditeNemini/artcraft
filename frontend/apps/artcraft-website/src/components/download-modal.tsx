@@ -110,13 +110,13 @@ export const DownloadModal = ({ isOpen, onClose }: DownloadModalProps) => {
 
         {view === "menu" ? (
           <div className="space-y-3">
-            <Button
+            {/* <Button
               className="w-full bg-white text-black hover:bg-gray-100 border-none justify-center gap-3 font-medium h-12"
               onClick={() => {}} // Dummy op
             >
               <FontAwesomeIcon icon={faGoogle} className="text-lg" />
               Continue with Google
-            </Button>
+            </Button> */}
 
             <Button
               className="w-full bg-white/5 hover:bg-white/10 text-white border-white/10 justify-center gap-3 font-medium h-12"
