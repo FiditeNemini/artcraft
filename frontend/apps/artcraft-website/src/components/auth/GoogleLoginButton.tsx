@@ -32,6 +32,7 @@ export function GoogleLoginButton({
       const api = new UsersApi();
       const result = await api.GoogleSSO({
         credential: credentialResponse.credential,
+        maybeReferralUrl: (window as any).cached_referrer,
       });
       if (result.success) {
         window.dispatchEvent(new Event("auth-change"));

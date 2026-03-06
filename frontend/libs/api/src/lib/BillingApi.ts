@@ -34,14 +34,16 @@ export class BillingApi extends ApiManager {
   public async UserSignupSubscriptionCheckout({
     plan,
     cadence,
+    maybeReferralUrl,
   }: {
     plan: string;
     cadence: "yearly" | "monthly";
+    maybeReferralUrl?: string;
   }): Promise<ApiResponse<{ stripeCheckoutRedirectUrl: string }>> {
     const endpoint = `${this.getApiSchemeAndHost()}/v1/stripe_artcraft/user_signup_subscription_checkout`;
 
     return await this.post<
-      { plan: string; cadence: string },
+      { plan: string; cadence: string; maybe_referral_url?: string },
       {
         success: boolean;
         stripe_checkout_redirect_url?: string;
@@ -52,6 +54,7 @@ export class BillingApi extends ApiManager {
       body: {
         plan,
         cadence,
+        ...(maybeReferralUrl && { maybe_referral_url: maybeReferralUrl }),
       },
     })
       .then((response) => ({

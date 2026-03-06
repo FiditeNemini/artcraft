@@ -8,6 +8,7 @@ interface SignupRequest {
   password: string;
   password_confirmation: string;
   signup_source?: string;
+  maybe_referral_url?: string;
 }
 
 export class UsersApi extends ApiManager {
@@ -170,18 +171,44 @@ export class UsersApi extends ApiManager {
       });
   }
 
+  public async LogWebReferral({
+    maybeReferralUrl,
+  }: {
+    maybeReferralUrl?: string;
+  }): Promise<ApiResponse<{ success: boolean }>> {
+    const endpoint = `${this.getApiSchemeAndHost()}/v1/web_referrals/record`;
+    const body = {
+      maybe_referral_url: maybeReferralUrl ?? null,
+    };
+
+    try {
+      const response = await this.authFetch<
+        { maybe_referral_url: string | null },
+        { success: boolean }
+      >(endpoint, {
+        method: "POST",
+        body,
+      });
+      return { success: response.success };
+    } catch {
+      return { success: false };
+    }
+  }
+
   public async Signup({
     username,
     email,
     password,
     passwordConfirmation,
     signupSource,
+    maybeReferralUrl,
   }: {
     username: string;
     email: string;
     password: string;
     passwordConfirmation: string;
     signupSource?: string;
+    maybeReferralUrl?: string;
   }): Promise<ApiResponse<{ signedSession?: string }>> {
     const endpoint = `${this.getApiSchemeAndHost()}/v1/create_account`;
     const body: SignupRequest = {
@@ -190,8 +217,11 @@ export class UsersApi extends ApiManager {
       password_confirmation: passwordConfirmation,
       username,
     };
-    if (!!signupSource) {
+    if (signupSource) {
       body.signup_source = signupSource;
+    }
+    if (maybeReferralUrl) {
+      body.maybe_referral_url = maybeReferralUrl;
     }
 
     try {
@@ -228,13 +258,18 @@ export class UsersApi extends ApiManager {
 
   public async GoogleSSO({
     credential,
+    maybeReferralUrl,
   }: {
     credential: string;
+    maybeReferralUrl?: string;
   }): Promise<ApiResponse<{ usernameNotYetCustomized?: boolean }>> {
     const endpoint = `${this.getApiSchemeAndHost()}/v1/accounts/google_sso`;
-    const body = {
+    const body: { google_credential: string; maybe_referral_url?: string } = {
       google_credential: credential,
     };
+    if (maybeReferralUrl) {
+      body.maybe_referral_url = maybeReferralUrl;
+    }
 
     try {
       const response = await this.authFetch<

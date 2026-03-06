@@ -183,6 +183,7 @@ const PricingTable = ({
         const response = await billingApi.UserSignupSubscriptionCheckout({
           plan: apiPlanSlug,
           cadence: cadence,
+          maybeReferralUrl: (window as any).cached_referrer,
         });
 
         if (!response.success || !response.data) {
