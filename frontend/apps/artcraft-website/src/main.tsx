@@ -27,13 +27,16 @@ if (!(window as any).cached_referrer) {
   (window as any).cached_referrer = document.referrer || undefined;
 }
 
-// Fire-and-forget: log the referral for analytics
-new UsersApi()
-  .LogWebReferral({ maybeReferralUrl: (window as any).cached_referrer })
-  .then(() => {
-    console.log("maybeReferralUrl", (window as any).cached_referrer);
-  })
-  .catch(() => {});
+// Fire-and-forget: log the referral once per browser session
+if (!sessionStorage.getItem("referral_logged")) {
+  sessionStorage.setItem("referral_logged", "1");
+  new UsersApi()
+    .LogWebReferral({ maybeReferralUrl: (window as any).cached_referrer })
+    .then(() => {
+      console.log("maybeReferralUrl", (window as any).cached_referrer);
+    })
+    .catch(() => {});
+}
 
 root.render(
   <StrictMode>
