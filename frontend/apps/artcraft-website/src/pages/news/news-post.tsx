@@ -16,11 +16,11 @@ const NewsPost = ({ basePath }: { basePath: string }) => {
   const desc = post ? post.description : "";
 
   return (
-    <>
+    <div className="bg-[#101014] bg-dots">
       <Seo title={title} description={desc} />
       <LibNewsPost basePath={basePath} />
       <Footer />
-    </>
+    </div>
   );
 };
 

@@ -215,12 +215,13 @@ export default function PressKitPage() {
         description="Download ArtCraft press assets including logos, promotional videos, screenshots, and branding materials for media coverage."
       />
 
+      {/* Background glow */}
+      <div className="absolute top-0 inset-x-0 flex justify-center pointer-events-none z-0">
+        <div className="w-[900px] h-[900px] -mt-[200px] rounded-full bg-gradient-to-br from-blue-700 via-blue-500 to-[#00AABA] opacity-20 blur-[120px]" />
+      </div>
+
       {/* Hero Section */}
       <main className="relative pt-24 sm:pt-32 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8">
-        {/* Glowing Gradient Orb Background */}
-        <div className="absolute inset-0 flex items-start justify-center pointer-events-none z-0 overflow-hidden">
-          <div className="w-[800px] h-[600px] rounded-full bg-gradient-to-br from-blue-700 via-blue-500 to-[#00AABA] opacity-20 blur-[100px] md:blur-[150px] transform-gpu -translate-y-1/2" />
-        </div>
 
         <div className="relative z-10 max-w-7xl mx-auto">
           {/* Header */}

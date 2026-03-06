@@ -41,11 +41,11 @@ export const TutorialsPage = () => {
   return (
     <div className="relative min-h-screen bg-[#101014] text-white overflow-x-hidden bg-dots">
       <Seo title={pageTitle} description={pageDescription} />
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-        <div className="w-[900px] h-[900px] rounded-full bg-gradient-to-br from-blue-700 via-blue-500 to-[#00AABA] opacity-25 blur-[120px]"></div>
+      <div className="absolute top-0 inset-x-0 flex justify-center pointer-events-none z-0">
+        <div className="w-[900px] h-[900px] -mt-[200px] rounded-full bg-gradient-to-br from-blue-700 via-blue-500 to-[#00AABA] opacity-20 blur-[120px]"></div>
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-[1200px] px-4 sm:px-8 pt-28 sm:pt-36 pb-12">
+      <div className="relative z-10 mx-auto w-full max-w-[1200px] px-4 sm:px-8 pt-28 sm:pt-36 pb-12 min-h-screen">
         {/* Hero */}
         <div className="text-center mb-8 sm:mb-12">
           <h1 className="text-4xl sm:text-6xl font-bold mb-3">Tutorials</h1>

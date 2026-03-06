@@ -18,9 +18,9 @@ export const NewsIndex = ({ basePath }: NewsIndexProps) => {
   // For now, we return the UI structure.
 
   return (
-    <div className="relative min-h-screen bg-[#101014] text-white overflow-hidden bg-dots">
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-        <div className="w-[900px] h-[900px] rounded-full bg-gradient-to-br from-blue-700 via-blue-500 to-[#00AABA] opacity-20 blur-[120px]"></div>
+    <div className="relative min-h-screen text-white">
+      <div className="absolute top-0 inset-x-0 flex justify-center pointer-events-none z-0">
+        <div className="w-[900px] h-[900px] -mt-[200px] rounded-full bg-gradient-to-br from-blue-700 via-blue-500 to-[#00AABA] opacity-20 blur-[120px]"></div>
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-4xl px-4 sm:px-8 pt-28 sm:pt-36 pb-12">

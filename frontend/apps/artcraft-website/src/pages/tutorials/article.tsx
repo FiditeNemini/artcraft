@@ -53,8 +53,8 @@ const TutorialsArticle = () => {
     <div className="relative min-h-screen bg-[#101014] text-white overflow-x-hidden bg-dots">
       <Seo title={title} description={description} jsonLd={jsonLd} />
 
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-        <div className="w-[900px] h-[900px] rounded-full bg-gradient-to-br from-blue-700 via-blue-500 to-[#00AABA] opacity-25 blur-[120px]"></div>
+      <div className="absolute top-0 inset-x-0 flex justify-center pointer-events-none z-0">
+        <div className="w-[900px] h-[900px] -mt-[200px] rounded-full bg-gradient-to-br from-blue-700 via-blue-500 to-[#00AABA] opacity-20 blur-[120px]"></div>
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-4xl px-4 sm:px-6 pt-24 sm:pt-32 pb-32">
