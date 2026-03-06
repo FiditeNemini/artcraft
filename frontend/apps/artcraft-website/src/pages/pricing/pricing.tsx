@@ -72,8 +72,8 @@ const Pricing = () => {
         description="Simple, transparent pricing for ArtCraft. Start for free and scale as you grow."
       />
       <div className="dotted-pattern absolute inset-0 z-[0] opacity-50 pointer-events-none" />
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-        <div className="w-[900px] h-[900px] rounded-full bg-gradient-to-br from-blue-700 via-blue-500 to-[#00AABA] opacity-20 blur-[120px]" />
+      <div className="absolute top-0 inset-x-0 flex justify-center pointer-events-none z-0">
+        <div className="w-[900px] h-[900px] -mt-[200px] rounded-full bg-gradient-to-br from-blue-700 via-blue-500 to-[#00AABA] opacity-20 blur-[120px]" />
       </div>
 
       {isSeedanceRef ? (
@@ -101,7 +101,7 @@ const Pricing = () => {
 
       {/* Footnotes */}
       <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 text-center">
-        <p className="text-md text-white/80 leading-relaxed">
+        <p className="text-md text-white/50 leading-relaxed">
           &dagger; ArtCraft can be used without paying for a subscription. You
           can bring your own compute and third party subscriptions. We hope
           you'll subscribe, though, as that helps accelerate our development.

@@ -68,7 +68,7 @@ const Download = () => {
       />
 
       {/* Background effects */}
-      <div className="dotted-pattern absolute inset-0 z-[0] opacity-50" />
+      <div className="dotted-pattern absolute inset-0 z-[0] opacity-50 pointer-events-none" />
       <div className="absolute top-0 inset-x-0 flex justify-center pointer-events-none z-0">
         <div className="w-[900px] h-[900px] -mt-[200px] rounded-full bg-gradient-to-br from-blue-700 via-blue-500 to-[#00AABA] opacity-20 blur-[120px]" />
       </div>
