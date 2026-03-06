@@ -1,32 +1,63 @@
 import { faApple, faWindows } from "@fortawesome/free-brands-svg-icons";
-import { faArrowDownToLine } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faArrowDownToLine,
+  faDesktop,
+  faFiles,
+  faMemory,
+} from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "@storyteller/ui-button";
 import { DOWNLOAD_LINKS } from "../../config/github_download_links";
-import { isMobile } from "react-device-detect";
+import { isMobile, isMacOs } from "react-device-detect";
+import { useState, useEffect } from "react";
+import { UsersApi } from "@storyteller/api";
+import { DownloadModal } from "../../components/download-modal";
 import Seo from "../../components/seo";
 
+const SYSTEMS = [
+  {
+    os: "Windows",
+    icon: faWindows,
+    link: DOWNLOAD_LINKS.WINDOWS,
+    requirements: [
+      { icon: faDesktop, text: "Windows 10 (64-bit) or newer" },
+      { icon: faMemory, text: "8 GB RAM recommended" },
+      { icon: faFiles, text: "2 GB available storage" },
+    ],
+  },
+  {
+    os: "macOS",
+    icon: faApple,
+    link: DOWNLOAD_LINKS.MACOS,
+    requirements: [
+      { icon: faDesktop, text: "macOS 12.0 or newer" },
+      { icon: faMemory, text: "8 GB RAM recommended" },
+      { icon: faFiles, text: "2 GB available storage" },
+    ],
+  },
+] as const;
+
 const Download = () => {
-  const systemRequirements = [
-    {
-      os: "Windows",
-      icon: faWindows,
-      requirements: [
-        "Windows 10 (64-bit) or newer",
-        "16GB RAM recommended",
-        "Dedicated GPU recommended",
-      ],
-    },
-    {
-      os: "macOS",
-      icon: faApple,
-      requirements: [
-        "macOS 12.0 or newer",
-        "16GB RAM recommended",
-        "Apple Silicon recommended",
-      ],
-    },
-  ];
+  const detectedLink = isMacOs ? DOWNLOAD_LINKS.MACOS : DOWNLOAD_LINKS.WINDOWS;
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const api = new UsersApi();
+      const response = await api.GetSession();
+      if (response.success && response.data?.loggedIn) {
+        setIsLoggedIn(true);
+      }
+    };
+    checkSession();
+  }, []);
+
+  const onDownloadClick = (e: React.MouseEvent) => {
+    if (isLoggedIn) return;
+    setShowDownloadModal(true);
+    localStorage.setItem("artcraft_download_initiated", "true");
+  };
 
   return (
     <div className="relative min-h-screen bg-[#101014] text-white bg-dots">
@@ -34,24 +65,26 @@ const Download = () => {
         title="Download ArtCraft - Windows and macOS"
         description="Download ArtCraft for Windows and macOS. Start creating AI artwork today."
       />
+
+      {/* Background effects */}
       <div className="dotted-pattern absolute inset-0 z-[0] opacity-50" />
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-        <div className="w-[900px] h-[900px] rounded-full bg-gradient-to-br from-blue-700 via-blue-500 to-[#00AABA] opacity-30 blur-[120px]"></div>
+        <div className="w-[800px] h-[800px] rounded-full bg-gradient-to-br from-blue-700 via-blue-500 to-[#00AABA] opacity-20 blur-[150px]" />
       </div>
 
-      {/* Hero Section */}
-      <div className="relative flex overflow-hidden">
-        <div className="w-full flex flex-col items-center justify-center text-center pt-40 pb-20 px-10">
-          <h1 className="relative mb-10 font-bold text-5xl lg:text-7xl">
+      <div className="relative w-full max-w-6xl mx-auto px-6 sm:px-10 pt-36 sm:pt-40 pb-24">
+        {/* Hero */}
+        <div className="text-center mb-16 sm:mb-20">
+          <h1 className="font-bold text-4xl sm:text-5xl lg:text-7xl mb-6 drop-shadow-[0_4px_32px_rgba(80,80,255,0.25)]">
             Download ArtCraft
           </h1>
-
-          <p className="mb-12 max-w-xl text-lg lg:text-xl leading-relaxed text-gray-300">
-            Use ArtCraft to easily create AI-powered artwork on your computer,
-            with canvas editing and 3D scene composition.
+          <p className="max-w-xl mx-auto text-lg lg:text-xl leading-relaxed text-white/70">
+            AI-powered artwork creation with canvas editing and 3D scene
+            composition - right on your desktop.
           </p>
 
-          <div className="flex flex-col gap-4 sm:flex-row items-center justify-center mb-20">
+          {/* Primary CTA — auto-detects OS */}
+          <div className="mt-10 flex items-center justify-center">
             {isMobile ? (
               <Button
                 className="text-lg font-semibold rounded-xl shadow-lg"
@@ -60,85 +93,148 @@ const Download = () => {
                 Download on a desktop
               </Button>
             ) : (
-              <>
-                <Button
-                  className="text-md px-4 py-3 font-semibold rounded-xl shadow-lg gap-3"
-                  as="link"
-                  href={DOWNLOAD_LINKS.WINDOWS}
-                >
-                  <FontAwesomeIcon icon={faWindows} />
-                  Download Windows
-                </Button>
-                <Button
-                  className="text-md px-4 py-3 font-semibold rounded-xl shadow-lg gap-3"
-                  as="link"
-                  href={DOWNLOAD_LINKS.MACOS}
-                >
-                  <FontAwesomeIcon icon={faApple} />
-                  Download Mac
-                </Button>
-              </>
+              <Button
+                className="glow-border-animated text-md px-8 py-4 text-lg font-semibold rounded-xl shadow-lg gap-3 transition-all duration-300 hover:scale-105 hover:shadow-primary/25 bg-white text-black hover:bg-white/90"
+                as="link"
+                href={detectedLink}
+                onClick={onDownloadClick}
+              >
+                <FontAwesomeIcon icon={isMacOs ? faApple : faWindows} />
+                Download for {isMacOs ? "Mac" : "Windows"}
+              </Button>
             )}
           </div>
+        </div>
 
-          <div className="w-full max-w-7xl mb-20">
+        {/* App preview */}
+        <div className="mb-20 sm:mb-24">
+          <div className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-primary/5">
             <img
               src="/images/3d-interface-preview.jpg"
               alt="ArtCraft Interface Preview"
-              className="w-full rounded-xl border-2 border-white/10"
+              className="w-full block"
+              loading="eager"
             />
           </div>
+        </div>
 
-          {/* Recommended System Requirements */}
-          <div className="w-full max-w-6xl mb-20">
-            <h2 className="text-3xl font-bold mb-10">
-              Recommended System Requirements
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {systemRequirements.map((system, index) => (
+        {/* Platform cards */}
+        <div className="mb-20 sm:mb-24">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-10">
+            Available Platforms
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {SYSTEMS.map((system) => {
+              const isDetected =
+                (system.os === "macOS" && isMacOs) ||
+                (system.os === "Windows" && !isMacOs);
+
+              return (
                 <div
-                  key={index}
-                  className="bg-white/10 backdrop-blur-md rounded-xl p-8 flex flex-col gap-4 items-center"
+                  key={system.os}
+                  className={`relative rounded-2xl p-8 flex flex-col border transition-all duration-300 ${
+                    isDetected && !isMobile
+                      ? "bg-white/[0.08] border-primary/40 shadow-[0_0_30px_rgba(45,129,255,0.1)]"
+                      : "bg-white/5 border-white/10 hover:border-white/20"
+                  }`}
                 >
-                  <div className="flex items-center justify-center gap-4 mb-6">
+                  {isDetected && !isMobile && (
+                    <span className="absolute -top-3 left-6 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">
+                      Your system
+                    </span>
+                  )}
+
+                  <div className="flex items-center gap-3 mb-6">
                     <FontAwesomeIcon
                       icon={system.icon}
                       className="text-2xl text-white/80"
                     />
-                    <h3 className="text-2xl font-semibold">{system.os}</h3>
+                    <h3 className="text-xl font-bold">{system.os}</h3>
                   </div>
-                  <ul className="space-y-3 mb-5">
+
+                  <ul className="space-y-3 mb-8 flex-1">
                     {system.requirements.map((req, idx) => (
-                      <li key={idx} className="text-gray-300">
-                        {req}
+                      <li
+                        key={idx}
+                        className="flex items-center gap-3 text-white/60 text-sm"
+                      >
+                        <FontAwesomeIcon
+                          icon={req.icon}
+                          className="text-white/30 w-4 text-center"
+                        />
+                        {req.text}
                       </li>
                     ))}
                   </ul>
+
                   {isMobile ? (
-                    <Button className="w-fit" icon={faArrowDownToLine} disabled>
-                      Download on a desktop
+                    <Button
+                      className="w-full justify-center font-semibold"
+                      disabled
+                    >
+                      Desktop only
                     </Button>
                   ) : (
                     <Button
-                      className="w-fit"
-                      onClick={() => {
-                        const downloadLink =
-                          system.os === "Windows"
-                            ? DOWNLOAD_LINKS.WINDOWS
-                            : DOWNLOAD_LINKS.MACOS;
-                        window.open(downloadLink, "_blank");
-                      }}
+                      className="w-full justify-center font-semibold gap-2"
+                      as="link"
+                      href={system.link}
                       icon={faArrowDownToLine}
+                      onClick={onDownloadClick}
                     >
                       Download
                     </Button>
                   )}
                 </div>
-              ))}
-            </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Quick-start steps */}
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-10">
+            Get Started in Minutes
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {[
+              {
+                step: "1",
+                title: "Download",
+                desc: "Grab the installer for your platform",
+              },
+              {
+                step: "2",
+                title: "Install & Sign In",
+                desc: "Create a free account or log in",
+              },
+              {
+                step: "3",
+                title: "Create",
+                desc: "Start generating artwork immediately",
+              },
+            ].map((item) => (
+              <div
+                key={item.step}
+                className="text-center bg-white/5 border border-white/10 rounded-2xl p-8"
+              >
+                <div className="w-10 h-10 rounded-full bg-primary/20 text-primary font-bold text-sm flex items-center justify-center mx-auto mb-4">
+                  {item.step}
+                </div>
+                <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
+                <p className="text-white/50 text-sm">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
+
+      <DownloadModal
+        isOpen={showDownloadModal}
+        onClose={() => setShowDownloadModal(false)}
+      />
     </div>
   );
 };

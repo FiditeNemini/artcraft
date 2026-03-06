@@ -208,7 +208,7 @@ export default function Navbar() {
                   <Link to="/login">
                     <Button
                       variant="primary"
-                      className="bg-white/80 text-black hover:bg-white/90 text-sm font-semibold px-4 py-2 rounded-lg shadow-md"
+                      className="bg-white text-black hover:bg-white/90 text-sm font-semibold px-4 py-2 rounded-lg shadow-md"
                     >
                       Login
                     </Button>
