@@ -13,6 +13,7 @@ import { useState, useEffect } from "react";
 import { UsersApi } from "@storyteller/api";
 import { DownloadModal } from "../../components/download-modal";
 import Seo from "../../components/seo";
+import Footer from "../../components/footer";
 
 const SYSTEMS = [
   {
@@ -230,6 +231,8 @@ const Download = () => {
           </div>
         </div>
       </div>
+
+      <Footer />
 
       <DownloadModal
         isOpen={showDownloadModal}

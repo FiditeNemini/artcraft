@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import Seo from "../../components/seo";
+import Footer from "../../components/footer";
 import { getFaqItems } from "@storyteller/markdown-content";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
@@ -25,7 +26,7 @@ const FaqIndex = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#101014] text-white overflow-hidden bg-dots">
+    <div className="relative min-h-screen bg-[#101014] text-white overflow-x-hidden bg-dots">
       <Seo title={title} description={description} jsonLd={jsonLd} />
 
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
@@ -58,6 +59,8 @@ const FaqIndex = () => {
           ))}
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 };

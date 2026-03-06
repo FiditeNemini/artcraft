@@ -1,4 +1,3 @@
-import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import {
   faTimes,
   faEnvelope,
@@ -30,6 +29,7 @@ export const DownloadModal = ({ isOpen, onClose }: DownloadModalProps) => {
     if (isOpen) {
       setIsVisible(true);
       document.body.style.overflow = "hidden";
+      return;
     } else {
       const timer = setTimeout(() => {
         setIsVisible(false);

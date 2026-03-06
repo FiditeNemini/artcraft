@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import Seo from "../../components/seo";
+import Footer from "../../components/footer";
 import { getFaqItemBySlug, markdownToHtml } from "@storyteller/markdown-content";
 import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,7 +16,7 @@ const FaqArticle = () => {
 
   if (!item) {
     return (
-      <div className="relative min-h-screen bg-[#101014] text-white overflow-hidden bg-dots">
+      <div className="relative min-h-screen bg-[#101014] text-white overflow-x-hidden bg-dots">
         <div className="relative z-10 mx-auto w-full max-w-[1200px] px-4 sm:px-8 pt-28 sm:pt-36 pb-12">
           <h1 className="text-3xl font-bold">Not found</h1>
           <p className="text-white/70">We couldn't find this FAQ article.</p>
@@ -37,7 +38,7 @@ const FaqArticle = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#101014] text-white overflow-hidden bg-dots">
+    <div className="relative min-h-screen bg-[#101014] text-white overflow-x-hidden bg-dots">
       <Seo title={title} description={description} jsonLd={jsonLd} />
 
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
@@ -84,6 +85,8 @@ const FaqArticle = () => {
           .article-content img { display: block; max-width: 100%; height: auto; border-radius: 0.5rem; }
         `}</style>
       </div>
+
+      <Footer />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { NewsIndex as LibNewsIndex } from "@storyteller/markdown-content";
 import Seo from "../../components/seo";
+import Footer from "../../components/footer";
 
 const NewsIndex = ({ basePath }: { basePath: string }) => {
   return (
@@ -9,6 +10,7 @@ const NewsIndex = ({ basePath }: { basePath: string }) => {
         description="Latest updates, features, and announcements from the ArtCraft team."
       />
       <LibNewsIndex basePath={basePath} />
+      <Footer />
     </>
   );
 };

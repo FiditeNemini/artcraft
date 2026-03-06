@@ -3,6 +3,7 @@ import {
   getNewsPostBySlug,
 } from "@storyteller/markdown-content";
 import Seo from "../../components/seo";
+import Footer from "../../components/footer";
 import { useParams } from "react-router-dom";
 
 const NewsPost = ({ basePath }: { basePath: string }) => {
@@ -18,6 +19,7 @@ const NewsPost = ({ basePath }: { basePath: string }) => {
     <>
       <Seo title={title} description={desc} />
       <LibNewsPost basePath={basePath} />
+      <Footer />
     </>
   );
 };

@@ -34,6 +34,7 @@ slug: models-supported
 - Kling 2.5 Turbo Pro
 - Kling 2.6 Pro
 - Seedance 1.0 Lite
+- Seedance 2.0
 - Sora 2
 - Sora 2 Pro
 - Google Veo 2
