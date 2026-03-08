@@ -1,4 +1,4 @@
-import { faArrowRight, faCheck } from "@fortawesome/pro-solid-svg-icons";
+import { faCheck } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "@storyteller/ui-button";
 import {
@@ -450,7 +450,7 @@ const PricingTable = ({
               href="mailto:hello@storyteller.ai"
               className="w-full flex items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/10 hover:bg-white/15 text-white px-4 py-2 text-sm font-medium transition-colors mb-6 md:mb-8"
             >
-              Contact Us <FontAwesomeIcon icon={faArrowRight} />
+              Contact Us
             </a>
 
             <div className="text-sm text-white/50 mb-3">
@@ -489,7 +489,7 @@ const PricingTable = ({
             href="mailto:hello@storyteller.ai"
             className="md:self-center flex-shrink-0 flex items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/10 hover:bg-white/15 text-white px-4 py-2 text-sm font-medium transition-colors"
           >
-            Contact Us <FontAwesomeIcon icon={faArrowRight} />
+            Contact Us
           </a>
         </div>
       )}
