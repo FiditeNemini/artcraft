@@ -1,44 +1,43 @@
-use crate::prelude::{Deserialize, FalRequest, Serialize};
+use fal::request::FalRequest;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Sora2ImageToVideoInput {
   pub prompt: String,
 
-  /// Starting frame
+  /// Starting frame image URL.
   pub image_url: String,
 
   /// Possible enum values: auto, 720p
-  /// Default value auto
+  /// Default value: "auto"
   #[serde(skip_serializing_if = "Option::is_none")]
   pub resolution: Option<String>,
 
   /// Possible enum values: auto, 9:16, 16:9
-  /// Default value "auto"
+  /// Default value: "auto"
   #[serde(skip_serializing_if = "Option::is_none")]
   pub aspect_ratio: Option<String>,
 
-  /// Duration in seconds
+  /// Duration in seconds.
   /// Possible enum values: 4, 8, 12
-  /// Default value 4
+  /// Default value: 4
   #[serde(skip_serializing_if = "Option::is_none")]
   pub duration: Option<u8>,
 
   /// Whether to delete the video after generation for privacy reasons.
-  /// If True, the video cannot be used for remixing and will be permanently deleted.
   /// Default value: true
   #[serde(skip_serializing_if = "Option::is_none")]
   pub delete_video: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Sora2ImageToVideoOutput {
-  pub video: VideoFile,
+pub struct Sora2ImageToVideoVideoFile {
+  pub url: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct VideoFile {
-  /// The URL where the file can be downloaded from.
-  pub url: String,
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Sora2ImageToVideoOutput {
+  pub video: Sora2ImageToVideoVideoFile,
 }
 
 pub fn sora_2_image_to_video(
