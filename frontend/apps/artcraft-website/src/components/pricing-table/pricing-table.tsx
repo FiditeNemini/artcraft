@@ -1,4 +1,4 @@
-import { faCheck } from "@fortawesome/pro-solid-svg-icons";
+import { faArrowRight, faCheck } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "@storyteller/ui-button";
 import {
@@ -16,6 +16,13 @@ const billingTabs = [
   { id: "monthly", label: "Monthly" },
 ];
 
+const ENTERPRISE_FEATURES = [
+  "Bespoke credit allocation",
+  "Secure models",
+  "Support SLAs",
+  "Custom integrations",
+];
+
 // Mapping from our plan slugs to API plan slugs
 const PLAN_SLUG_MAP: Record<string, string> = {
   artcraft_basic: "artcraft_basic",
@@ -31,6 +38,7 @@ interface PricingTableProps {
   className?: string;
   compact?: boolean;
   showSeedanceFeatures?: boolean;
+  showEnterprise?: boolean;
 }
 
 const PricingTable = ({
@@ -41,6 +49,7 @@ const PricingTable = ({
   className = "",
   compact = false,
   showSeedanceFeatures = false,
+  showEnterprise = false,
 }: PricingTableProps) => {
   const navigate = useNavigate();
   const [billingType, setBillingType] = useState("yearly");
@@ -280,9 +289,10 @@ const PricingTable = ({
     }
   };
 
-  // Determine grid columns based on number of plans
+  // Determine grid columns based on number of plans + enterprise
+  const visibleCols = plans.length + (showEnterprise && !compact ? 1 : 0);
   const gridCols =
-    plans.length === 3
+    visibleCols <= 3
       ? "grid-cols-1 md:grid-cols-3"
       : "grid-cols-1 md:grid-cols-2 lg:grid-cols-4";
 
@@ -333,7 +343,7 @@ const PricingTable = ({
               key={plan.slug}
               className={
                 getColorSchemeClasses(plan.colorScheme) +
-                (isPopular ? " transform md:-translate-y-4 shadow-2xl" : "") +
+                (isPopular ? " shadow-2xl" : "") +
                 (isCurrent ? " ring-2 ring-white/50" : "")
               }
             >
@@ -412,17 +422,77 @@ const PricingTable = ({
                 {plan.features
                   .filter((f) => !f.seedanceOnly || showSeedanceFeatures)
                   .map((feature, idx) => (
-                  <Feature
-                    key={idx}
-                    text={feature.text}
-                    highlighted={isPopular}
-                  />
-                ))}
+                    <Feature
+                      key={idx}
+                      text={feature.text}
+                      highlighted={isPopular}
+                    />
+                  ))}
               </ul>
             </div>
           );
         })}
+
+        {/* Enterprise card - inline in grid for normal view */}
+        {showEnterprise && !compact && (
+          <div className="relative rounded-3xl p-6 md:p-8 border flex flex-col transition-all duration-300 backdrop-blur-md bg-gradient-to-b from-[#0d1f4a]/90 via-[#183878]/60 to-[#2456b8]/15 border-[#3568c9]/40 hover:border-[#3568c9] hover:shadow-[0_0_30px_rgba(53,104,201,0.25)]">
+            <h3 className="text-xl md:text-2xl font-bold mb-2 text-white">
+              Enterprise
+            </h3>
+            <div className="mb-1 flex items-baseline gap-2">
+              <span className="text-3xl md:text-4xl font-bold">Custom</span>
+            </div>
+            <div className="text-xs text-white/40 mb-4 md:mb-6 uppercase tracking-wider font-semibold min-h-[1rem]">
+              For bespoke solutions
+            </div>
+
+            <a
+              href="mailto:hello@storyteller.ai"
+              className="w-full flex items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/10 hover:bg-white/15 text-white px-4 py-2 text-sm font-medium transition-colors mb-6 md:mb-8"
+            >
+              Contact Us <FontAwesomeIcon icon={faArrowRight} />
+            </a>
+
+            <div className="text-sm text-white/50 mb-3">
+              Everything in Max, plus:
+            </div>
+            <ul className="space-y-3 md:space-y-4 flex-1">
+              {ENTERPRISE_FEATURES.map((text, idx) => (
+                <Feature key={idx} text={text} />
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
+
+      {/* Enterprise card - horizontal bar below grid for compact/sd2 view */}
+      {showEnterprise && compact && (
+        <div className="mt-4 relative rounded-3xl p-6 border flex flex-col md:flex-row md:items-center gap-4 md:gap-8 transition-all duration-300 backdrop-blur-md bg-gradient-to-b from-[#0d1f4a]/90 via-[#183878]/60 to-[#2456b8]/15 border-[#3568c9]/40 hover:border-[#3568c9] hover:shadow-[0_0_30px_rgba(53,104,201,0.25)]">
+          <div className="flex-shrink-0">
+            <h3 className="text-lg font-bold text-white">Enterprise</h3>
+            <div className="text-2xl font-bold mt-1">Custom</div>
+            <div className="text-xs text-white/50 mt-1">
+              For bespoke solutions
+            </div>
+          </div>
+          <div className="flex-1">
+            <div className="text-xs text-white/40 mb-2">
+              Everything in Max, plus:
+            </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+              {ENTERPRISE_FEATURES.map((text, idx) => (
+                <Feature key={idx} text={text} />
+              ))}
+            </div>
+          </div>
+          <a
+            href="mailto:hello@storyteller.ai"
+            className="md:self-center flex-shrink-0 flex items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/10 hover:bg-white/15 text-white px-4 py-2 text-sm font-medium transition-colors"
+          >
+            Contact Us <FontAwesomeIcon icon={faArrowRight} />
+          </a>
+        </div>
+      )}
 
       {/* Manage Plan Button - Only shown if user has active subscription */}
       {activePlanSlug && activePlanSlug !== "free" && (

@@ -86,6 +86,7 @@ const Pricing = () => {
                 subtitle="Every plan includes Seedance video credits. Invest in a tool you'll always own."
                 compact
                 showSeedanceFeatures
+                showEnterprise
               />
             </div>
           </div>
@@ -95,6 +96,7 @@ const Pricing = () => {
           <PricingTable
             title="Invest in Yourself"
             subtitle="You'll get a ton of generations and you'll be investing in a tool that you'll always own."
+            showEnterprise
           />
         </main>
       )}
