@@ -37,6 +37,11 @@ import {
   useSelectedModel,
   useSelectedProviderForModel,
 } from "@storyteller/ui-model-selector";
+import {
+  CostCalculatorButton,
+  useCostBreakdownModalStore,
+} from "@storyteller/ui-pricing-modal";
+import { HelpMenuButton } from "@storyteller/ui-help-menu";
 
 type Mode = "image" | "text";
 type Variant = "object" | "world";
@@ -92,7 +97,13 @@ export const ImageTo3DExperience = ({
       EnqueueImageTo3dObjectModel.Hunyuan3d3,
     );
   const selectedWorldModel = useSelectedModel(WORLD_MODEL_PAGE);
-  const selectedWorldProvider = useSelectedProviderForModel(WORLD_MODEL_PAGE, selectedWorldModel?.id);
+  const selectedWorldProvider = useSelectedProviderForModel(
+    WORLD_MODEL_PAGE,
+    selectedWorldModel?.id,
+  );
+  const worldCredits = useCostBreakdownModalStore(
+    (s) => s.estimatedCreditsByPage[WORLD_MODEL_PAGE],
+  );
   const [uploadedPreview, setUploadedPreview] = useState<string | null>(null);
   const [uploadedName, setUploadedName] = useState<string | null>(null);
   const [prompt, setPrompt] = useState("");
@@ -709,7 +720,7 @@ export const ImageTo3DExperience = ({
           <textarea
             ref={worldTextareaRef}
             rows={2}
-            className="w-full resize-none overflow-y-auto rounded-lg bg-white/5 px-3 py-2.5 text-base text-base-fg placeholder-base-fg/60 focus:outline-none focus:ring-2 focus:ring-primary/60"
+            className="w-full resize-none overflow-y-auto rounded-lg bg-white/5 px-3 py-2.5 text-base text-base-fg placeholder-base-fg/60 outline-none ring-2 ring-transparent transition-all focus:ring-primary/80"
             style={{ maxHeight: "5em" }}
             value={worldPrompt}
             placeholder="Describe your 3D world (optional)..."
@@ -1058,7 +1069,7 @@ export const ImageTo3DExperience = ({
               <div
                 className={twMerge(
                   "flex justify-center gap-2.5",
-                  hasResults ? "mt-3" : "mt-6",
+                  hasResults ? "mt-3" : "mt-3",
                 )}
               >
                 {variant === "object" && (
@@ -1081,6 +1092,7 @@ export const ImageTo3DExperience = ({
                   disabled={!canGenerate}
                   onClick={handleGenerate}
                   loading={isGenerating}
+                  credits={variant === "world" ? worldCredits : undefined}
                 >
                   {`Generate ${variant === "object" ? "Object" : "World"}`}
                 </GenerateButton>
@@ -1102,17 +1114,23 @@ export const ImageTo3DExperience = ({
         </animated.div>
 
         {variant === "world" && (
-          <div className="absolute bottom-6 left-6 z-20 flex items-center gap-5">
-            <ClassyModelSelector
-              items={IMAGE_TO_3D_WORLD_PAGE_MODEL_LIST}
-              page={WORLD_MODEL_PAGE}
-              mode="hoverSelect"
-              panelTitle="Select Model"
-              panelClassName="min-w-[300px]"
-              buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-white/80 hover:text-white"
-              showIconsInList
-            />
-          </div>
+          <>
+            <div className="absolute bottom-6 left-6 z-20 flex items-center gap-5">
+              <ClassyModelSelector
+                items={IMAGE_TO_3D_WORLD_PAGE_MODEL_LIST}
+                page={WORLD_MODEL_PAGE}
+                mode="hoverSelect"
+                panelTitle="Select Model"
+                panelClassName="min-w-[300px]"
+                buttonClassName="bg-transparent p-0 text-lg hover:bg-transparent text-white/80 hover:text-white"
+                showIconsInList
+              />
+            </div>
+            <div className="absolute bottom-6 right-6 z-20 flex items-center gap-2">
+              <CostCalculatorButton modelPage={WORLD_MODEL_PAGE} />
+              <HelpMenuButton />
+            </div>
+          </>
         )}
       </div>
 

@@ -17,6 +17,7 @@ import {
   CANVAS_2D_PAGE_MODEL_LIST,
   STAGE_3D_PAGE_MODEL_LIST,
   IMAGE_EDITOR_PAGE_MODEL_LIST,
+  IMAGE_TO_3D_WORLD_PAGE_MODEL_LIST,
 } from "@storyteller/ui-model-selector";
 import {
   usePrompt2DStore,
@@ -29,6 +30,7 @@ import { Model } from "@storyteller/model-list";
 import { useCurrency } from "./use-currency";
 import { useVideoCostEstimate } from "./useVideoCostEstimate";
 import { useImageCostEstimate } from "./useImageCostEstimate";
+import { useSplatCostEstimate } from "./useSplatCostEstimate";
 
 // Drag handle subcomponent that Modal looks for
 const DragHandle = ({ children }: { children: React.ReactNode }) => (
@@ -67,6 +69,10 @@ const getModelsForPage = (page: ModelPage | null): Model[] => {
       );
     case ModelPage.ImageEditor:
       return IMAGE_EDITOR_PAGE_MODEL_LIST.map((item) => item.model).filter(
+        (m): m is Model => m !== undefined,
+      );
+    case ModelPage.ImageTo3DWorld:
+      return IMAGE_TO_3D_WORLD_PAGE_MODEL_LIST.map((item) => item.model).filter(
         (m): m is Model => m !== undefined,
       );
     default:
@@ -119,7 +125,13 @@ export function CostBreakdownModal({ activeTabId }: CostBreakdownModalProps) {
     selectedModel,
     selectedProvider,
   );
-  const isEstimateLoading = isVideoEstimateLoading || isImageEstimateLoading;
+  const { isLoading: isSplatEstimateLoading } = useSplatCostEstimate(
+    activePage,
+    selectedModel,
+    selectedProvider,
+  );
+  const isEstimateLoading =
+    isVideoEstimateLoading || isImageEstimateLoading || isSplatEstimateLoading;
 
   // Get generation settings from the appropriate stores based on active page
   const prompt2D = usePrompt2DStore();
@@ -161,6 +173,12 @@ export function CostBreakdownModal({ activeTabId }: CostBreakdownModalProps) {
           generationCount: 1, // Edit doesn't have generation count in store
           label: "Images",
         };
+      case ModelPage.ImageTo3DWorld:
+        return {
+          resolution: undefined,
+          generationCount: 1,
+          label: "Worlds",
+        };
       default:
         return {
           resolution: "1k",
@@ -179,6 +197,7 @@ export function CostBreakdownModal({ activeTabId }: CostBreakdownModalProps) {
     ModelPage.Stage3D,
     ModelPage.ImageEditor,
     ModelPage.ImageToVideo,
+    ModelPage.ImageTo3DWorld,
   ]);
 
   const isLiveEstimatePage = LIVE_ESTIMATE_PAGES.has(activePage);
@@ -228,6 +247,8 @@ export function CostBreakdownModal({ activeTabId }: CostBreakdownModalProps) {
         return "Stage 3D";
       case ModelPage.ImageEditor:
         return "Image Editor";
+      case ModelPage.ImageTo3DWorld:
+        return "Image to 3D World";
       default:
         return null;
     }
@@ -252,6 +273,8 @@ export function CostBreakdownModal({ activeTabId }: CostBreakdownModalProps) {
     "kling_3p0_pro",
     "seedance_1p5_pro",
     "seedance_2p0",
+    "marble_0p1_mini",
+    "marble_0p1_plus",
   ]);
   const hasCostData =
     selectedModel != null && MODELS_WITH_COST_DATA.has(selectedModel.id);
