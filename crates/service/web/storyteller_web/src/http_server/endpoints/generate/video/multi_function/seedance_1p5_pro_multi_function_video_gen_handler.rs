@@ -120,6 +120,8 @@ pub async fn seedance_1p5_pro_multi_function_video_gen_handler(
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<Json<Seedance1p5ProMultiFunctionVideoGenResponse>, CommonWebError> {
 
+  info!("Request: {:?}", request);
+  
   payments_error_test(&request.prompt.as_deref().unwrap_or(""))?;
 
   let mut mysql_connection = server_state.mysql_pool
@@ -204,6 +206,9 @@ pub async fn seedance_1p5_pro_multi_function_video_gen_handler(
 
   let apriori_job_token = InferenceJobToken::generate();
 
+  // Most people will want audio
+  let generate_audio = request.generate_audio.unwrap_or(true);
+
   let fal_result;
 
   if let Some(image_url) = maybe_image_url {
@@ -220,6 +225,7 @@ pub async fn seedance_1p5_pro_multi_function_video_gen_handler(
       duration: Some(duration),
       aspect_ratio: Some(aspect_ratio),
       resolution: Some(resolution),
+      generate_audio: Some(generate_audio),
       webhook_url: &server_state.fal.webhook_url,
       api_key: &server_state.fal.api_key,
     };
@@ -254,6 +260,7 @@ pub async fn seedance_1p5_pro_multi_function_video_gen_handler(
       duration: Some(duration),
       aspect_ratio: Some(aspect_ratio),
       resolution: Some(resolution),
+      generate_audio: Some(generate_audio),
       webhook_url: &server_state.fal.webhook_url,
       api_key: &server_state.fal.api_key,
     };
