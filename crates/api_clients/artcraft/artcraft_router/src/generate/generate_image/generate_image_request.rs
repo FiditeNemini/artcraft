@@ -19,6 +19,8 @@ use crate::generate::generate_image::plan::artcraft::plan_generate_image_artcraf
 use crate::generate::generate_image::plan::artcraft::plan_generate_image_artcraft_seedream_4::plan_generate_image_artcraft_seedream_4;
 use crate::generate::generate_image::plan::artcraft::plan_generate_image_artcraft_seedream_4p5::plan_generate_image_artcraft_seedream_4p5;
 use crate::generate::generate_image::plan::artcraft::plan_generate_image_artcraft_seedream_5_lite::plan_generate_image_artcraft_seedream_5_lite;
+use crate::generate::generate_image::plan::artcraft::plan_generate_image_artcraft_qwen_edit_2511_angles::plan_generate_image_artcraft_qwen_edit_2511_angles;
+use crate::generate::generate_image::plan::artcraft::plan_generate_image_artcraft_flux_2_lora_angles::plan_generate_image_artcraft_flux_2_lora_angles;
 use crate::generate::generate_image::plan::fal::plan_generate_image_fal_nano_banana_pro::plan_generate_image_fal_nano_banana_pro;
 
 pub struct GenerateImageRequest<'a> {
@@ -44,6 +46,15 @@ pub struct GenerateImageRequest<'a> {
 
   /// How many images to generate.
   pub image_batch_count: Option<u16>,
+
+  /// Only for angle manipulation models.
+  pub horizontal_angle: Option<f64>,
+
+  /// Only for angle manipulation models.
+  pub vertical_angle: Option<f64>,
+
+  /// Only for angle manipulation models.
+  pub zoom: Option<f64>,
 
   /// If the request is a mismatch with the (model/provider), how to mitigate it.
   pub request_mismatch_mitigation_strategy: RequestMismatchMitigationStrategy,
@@ -96,6 +107,12 @@ impl<'a> GenerateImageRequest<'a> {
         CommonImageModel::Seedream5Lite => {
           plan_generate_image_artcraft_seedream_5_lite(self).map(ImageGenerationPlan::ArtcraftSeedream5Lite)
         }
+        CommonImageModel::QwenEdit2511Angles => {
+          plan_generate_image_artcraft_qwen_edit_2511_angles(self).map(ImageGenerationPlan::ArtcraftQwenEdit2511Angles)
+        }
+        CommonImageModel::Flux2LoraAngles => {
+          plan_generate_image_artcraft_flux_2_lora_angles(self).map(ImageGenerationPlan::ArtcraftFlux2LoraAngles)
+        }
       },
       Provider::Fal => match self.model {
         CommonImageModel::NanaBananaPro => {
@@ -110,7 +127,9 @@ impl<'a> GenerateImageRequest<'a> {
         | CommonImageModel::NanaBanana2
         | CommonImageModel::Seedream4
         | CommonImageModel::Seedream4p5
-        | CommonImageModel::Seedream5Lite => {
+        | CommonImageModel::Seedream5Lite
+        | CommonImageModel::QwenEdit2511Angles
+        | CommonImageModel::Flux2LoraAngles => {
           Err(ArtcraftRouterError::Client(ClientError::ModelDoesNotSupportOption {
             field: "provider",
             value: format!("{:?} is only available on the Artcraft provider", self.model),

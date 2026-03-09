@@ -1,19 +1,19 @@
-use artcraft_api_defs::generate::image::multi_function::bytedance_seedream_5_lite_multi_function_image_gen::BytedanceSeedream5LiteMultiFunctionImageGenNumImages;
+use artcraft_api_defs::generate::image::angle::flux_2_lora_edit_image_angle::Flux2LoraEditImageAngleNumImages;
 
 use crate::generate::generate_image::image_generation_cost_estimate::ImageGenerationCostEstimate;
-use crate::generate::generate_image::plan::artcraft::plan_generate_image_artcraft_seedream_5_lite::PlanArtcraftSeedream5Lite;
+use crate::generate::generate_image::plan::artcraft::plan_generate_image_artcraft_flux_2_lora_angles::PlanArtcraftFlux2LoraAngles;
 
-pub(crate) fn estimate_image_cost_artcraft_seedream_5_lite(
-  plan: &PlanArtcraftSeedream5Lite<'_>,
+pub(crate) fn estimate_image_cost_artcraft_flux_2_lora_angles(
+  plan: &PlanArtcraftFlux2LoraAngles<'_>,
 ) -> ImageGenerationCostEstimate {
   // Pricing: $0.04/image (4 cents). 1 credit = 1 USD cent.
   let cost_per_image: u64 = 4;
 
   let num_images: u64 = match plan.num_images {
-    BytedanceSeedream5LiteMultiFunctionImageGenNumImages::One => 1,
-    BytedanceSeedream5LiteMultiFunctionImageGenNumImages::Two => 2,
-    BytedanceSeedream5LiteMultiFunctionImageGenNumImages::Three => 3,
-    BytedanceSeedream5LiteMultiFunctionImageGenNumImages::Four => 4,
+    Flux2LoraEditImageAngleNumImages::One => 1,
+    Flux2LoraEditImageAngleNumImages::Two => 2,
+    Flux2LoraEditImageAngleNumImages::Three => 3,
+    Flux2LoraEditImageAngleNumImages::Four => 4,
   };
 
   let cost_in_usd_cents = cost_per_image * num_images;
@@ -31,25 +31,28 @@ pub(crate) fn estimate_image_cost_artcraft_seedream_5_lite(
 #[cfg(test)]
 mod tests {
   use crate::api::common_image_model::CommonImageModel;
+  use crate::api::image_list_ref::ImageListRef;
   use crate::api::provider::Provider;
   use crate::client::request_mismatch_mitigation_strategy::RequestMismatchMitigationStrategy;
   use crate::generate::generate_image::generate_image_request::GenerateImageRequest;
+  use tokens::tokens::media_files::MediaFileToken;
 
   fn estimate_usd_cents(image_batch_count: u16) -> u64 {
+    let tokens = vec![MediaFileToken::new_from_str("test_token")];
     let request = GenerateImageRequest {
-      model: CommonImageModel::Seedream5Lite,
+      model: CommonImageModel::Flux2LoraAngles,
       provider: Provider::Artcraft,
       prompt: None,
-      image_inputs: None,
+      image_inputs: Some(ImageListRef::MediaFileTokens(&tokens)),
       resolution: None,
       aspect_ratio: None,
       image_batch_count: Some(image_batch_count),
-      request_mismatch_mitigation_strategy: RequestMismatchMitigationStrategy::ErrorOut,
-      generation_mode_mismatch_strategy: None,
-      idempotency_token: None,
       horizontal_angle: None,
       vertical_angle: None,
       zoom: None,
+      request_mismatch_mitigation_strategy: RequestMismatchMitigationStrategy::ErrorOut,
+      generation_mode_mismatch_strategy: None,
+      idempotency_token: None,
     };
     request.build()
       .expect("build should succeed")

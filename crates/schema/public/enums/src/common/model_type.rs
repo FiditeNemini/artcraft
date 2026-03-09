@@ -27,6 +27,8 @@ pub enum ModelType {
   FluxPro11Ultra,
   #[serde(rename = "flux_pro_kontext_max")]
   FluxProKontextMax,
+  #[serde(rename = "flux_2_lora_angles")]
+  Flux2LoraAngles,
   #[serde(rename = "gpt_image_1")]
   GptImage1,
   #[serde(rename = "gpt_image_1p5")]
@@ -40,6 +42,8 @@ pub enum ModelType {
   SeedEdit3,
   #[serde(rename = "qwen")]
   Qwen,
+  #[serde(rename = "qwen_edit_2511_angles")]
+  QwenEdit2511Angles,
   /// Gemini 2.5 Flash, AKA "Nano Banana"
   #[serde(rename = "gemini_25_flash")]
   Gemini25Flash,
@@ -152,12 +156,14 @@ impl ModelType {
       Self::FluxPro11 => "flux_pro_1p1",
       Self::FluxPro11Ultra => "flux_pro_1p1_ultra",
       Self::FluxProKontextMax => "flux_pro_kontext_max",
+      Self::Flux2LoraAngles => "flux_2_lora_angles",
       Self::GptImage1 => "gpt_image_1",
       Self::GptImage1p5 => "gpt_image_1p5",
       Self::GrokImage => "grok_image",
       Self::Recraft3 => "recraft_3",
       Self::SeedEdit3 => "seededit_3",
       Self::Qwen => "qwen",
+      Self::QwenEdit2511Angles => "qwen_edit_2511_angles",
       Self::Gemini25Flash => "gemini_25_flash",
       Self::NanoBanana => "nano_banana",
       Self::NanoBanana2 => "nano_banana_2",
@@ -216,12 +222,14 @@ impl ModelType {
       "flux_pro_1p1" => Ok(Self::FluxPro11),
       "flux_pro_1p1_ultra" => Ok(Self::FluxPro11Ultra),
       "flux_pro_kontext_max" => Ok(Self::FluxProKontextMax),
+      "flux_2_lora_angles" => Ok(Self::Flux2LoraAngles),
       "gpt_image_1" => Ok(Self::GptImage1),
       "gpt_image_1p5" => Ok(Self::GptImage1p5),
       "grok_image" => Ok(Self::GrokImage),
       "recraft_3" => Ok(Self::Recraft3),
       "seededit_3" => Ok(Self::SeedEdit3),
       "qwen" => Ok(Self::Qwen),
+      "qwen_edit_2511_angles" => Ok(Self::QwenEdit2511Angles),
       "gemini_25_flash" => Ok(Self::Gemini25Flash),
       "nano_banana" => Ok(Self::NanoBanana),
       "nano_banana_2" => Ok(Self::NanoBanana2),
@@ -284,12 +292,14 @@ impl ModelType {
       Self::FluxPro11,
       Self::FluxPro11Ultra,
       Self::FluxProKontextMax,
+      Self::Flux2LoraAngles,
       Self::GptImage1,
       Self::GptImage1p5,
       Self::GrokImage,
       Self::Recraft3,
       Self::SeedEdit3,
       Self::Qwen,
+      Self::QwenEdit2511Angles,
       Self::Gemini25Flash,
       Self::NanoBanana,
       Self::NanoBanana2,
@@ -357,12 +367,14 @@ mod tests {
       assert_serialization(ModelType::FluxPro11, "flux_pro_1p1");
       assert_serialization(ModelType::FluxPro11Ultra, "flux_pro_1p1_ultra");
       assert_serialization(ModelType::FluxProKontextMax, "flux_pro_kontext_max");
+      assert_serialization(ModelType::Flux2LoraAngles, "flux_2_lora_angles");
       assert_serialization(ModelType::GptImage1, "gpt_image_1");
       assert_serialization(ModelType::GptImage1p5, "gpt_image_1p5");
       assert_serialization(ModelType::GrokImage, "grok_image");
       assert_serialization(ModelType::Recraft3, "recraft_3");
       assert_serialization(ModelType::SeedEdit3, "seededit_3");
       assert_serialization(ModelType::Qwen, "qwen");
+      assert_serialization(ModelType::QwenEdit2511Angles, "qwen_edit_2511_angles");
       assert_serialization(ModelType::Gemini25Flash, "gemini_25_flash");
       assert_serialization(ModelType::NanoBanana, "nano_banana");
       assert_serialization(ModelType::NanoBanana2, "nano_banana_2");
@@ -417,12 +429,14 @@ mod tests {
       assert_eq!(ModelType::FluxPro11.to_str(), "flux_pro_1p1");
       assert_eq!(ModelType::FluxPro11Ultra.to_str(), "flux_pro_1p1_ultra");
       assert_eq!(ModelType::FluxProKontextMax.to_str(), "flux_pro_kontext_max");
+      assert_eq!(ModelType::Flux2LoraAngles.to_str(), "flux_2_lora_angles");
       assert_eq!(ModelType::GptImage1.to_str(), "gpt_image_1");
       assert_eq!(ModelType::GptImage1p5.to_str(), "gpt_image_1p5");
       assert_eq!(ModelType::GrokImage.to_str(), "grok_image");
       assert_eq!(ModelType::Recraft3.to_str(), "recraft_3");
       assert_eq!(ModelType::SeedEdit3.to_str(), "seededit_3");
       assert_eq!(ModelType::Qwen.to_str(), "qwen");
+      assert_eq!(ModelType::QwenEdit2511Angles.to_str(), "qwen_edit_2511_angles");
       assert_eq!(ModelType::Gemini25Flash.to_str(), "gemini_25_flash");
       assert_eq!(ModelType::NanoBanana.to_str(), "nano_banana");
       assert_eq!(ModelType::NanoBanana2.to_str(), "nano_banana_2");
@@ -479,12 +493,14 @@ mod tests {
       assert_eq!(ModelType::from_str("flux_pro_1p1").unwrap(), ModelType::FluxPro11);
       assert_eq!(ModelType::from_str("flux_pro_1p1_ultra").unwrap(), ModelType::FluxPro11Ultra);
       assert_eq!(ModelType::from_str("flux_pro_kontext_max").unwrap(), ModelType::FluxProKontextMax);
+      assert_eq!(ModelType::from_str("flux_2_lora_angles").unwrap(), ModelType::Flux2LoraAngles);
       assert_eq!(ModelType::from_str("gpt_image_1").unwrap(), ModelType::GptImage1);
       assert_eq!(ModelType::from_str("gpt_image_1p5").unwrap(), ModelType::GptImage1p5);
       assert_eq!(ModelType::from_str("grok_image").unwrap(), ModelType::GrokImage);
       assert_eq!(ModelType::from_str("recraft_3").unwrap(), ModelType::Recraft3);
       assert_eq!(ModelType::from_str("seededit_3").unwrap(), ModelType::SeedEdit3);
       assert_eq!(ModelType::from_str("qwen").unwrap(), ModelType::Qwen);
+      assert_eq!(ModelType::from_str("qwen_edit_2511_angles").unwrap(), ModelType::QwenEdit2511Angles);
       assert_eq!(ModelType::from_str("gemini_25_flash").unwrap(), ModelType::Gemini25Flash);
       assert_eq!(ModelType::from_str("nano_banana").unwrap(), ModelType::NanoBanana);
       assert_eq!(ModelType::from_str("nano_banana_2").unwrap(), ModelType::NanoBanana2);
@@ -533,7 +549,7 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = ModelType::all_variants();
-      assert_eq!(variants.len(), 52);
+      assert_eq!(variants.len(), 54);
       // Image models
       assert_eq!(variants.pop_first(), Some(ModelType::Flux1Dev));
       assert_eq!(variants.pop_first(), Some(ModelType::Flux1Schnell));
@@ -542,12 +558,14 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(ModelType::FluxPro11));
       assert_eq!(variants.pop_first(), Some(ModelType::FluxPro11Ultra));
       assert_eq!(variants.pop_first(), Some(ModelType::FluxProKontextMax));
+      assert_eq!(variants.pop_first(), Some(ModelType::Flux2LoraAngles));
       assert_eq!(variants.pop_first(), Some(ModelType::GptImage1));
       assert_eq!(variants.pop_first(), Some(ModelType::GptImage1p5));
       assert_eq!(variants.pop_first(), Some(ModelType::GrokImage));
       assert_eq!(variants.pop_first(), Some(ModelType::Recraft3));
       assert_eq!(variants.pop_first(), Some(ModelType::SeedEdit3));
       assert_eq!(variants.pop_first(), Some(ModelType::Qwen));
+      assert_eq!(variants.pop_first(), Some(ModelType::QwenEdit2511Angles));
       assert_eq!(variants.pop_first(), Some(ModelType::Gemini25Flash));
       assert_eq!(variants.pop_first(), Some(ModelType::NanoBanana));
       assert_eq!(variants.pop_first(), Some(ModelType::NanoBanana2));
