@@ -1,5 +1,6 @@
 use crate::core::commands::enqueue::common::notify_frontend_of_errors::notify_frontend_of_errors;
 use crate::core::commands::enqueue::generate_error::{BadInputReason, GenerateError, MissingCredentialsReason};
+use crate::core::commands::enqueue::image_to_gaussian::artcraft::handle_artcraft_gaussian::handle_gaussian_artcraft;
 use crate::core::commands::enqueue::image_to_gaussian::worldlabs::handle_worldlabs_marble::handle_worldlabs_marble;
 use crate::core::commands::enqueue::task_enqueue_success::TaskEnqueueSuccess;
 use crate::core::commands::response::failure_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus};
@@ -40,6 +41,12 @@ use crate::core::state::artcraft_usage_tracker::artcraft_usage_type::{ArtcraftUs
 pub enum GaussianModel {
   #[serde(rename = "world_labs_marble")]
   WorldLabsMarble,
+
+  #[serde(rename = "marble_0p1_mini")]
+  Marble0p1Mini,
+
+  #[serde(rename = "marble_0p1_plus")]
+  Marble0p1Plus,
 }
 
 #[derive(Deserialize)]
@@ -47,7 +54,12 @@ pub struct EnqueueImageToGaussianRequest {
   /// REQUIRED.
   /// The model to use.
   pub model: Option<GaussianModel>,
-  
+
+  /// OPTIONAL.
+  /// The provider to use (defaults to Artcraft/Storyteller).
+  /// Not all (provider, model) combinations are valid.
+  pub provider: Option<GenerationProvider>,
+
   /// OPTIONAL.
   /// Text prompt for the gaussian generation. Required.
   pub prompt: Option<String>,
@@ -224,20 +236,32 @@ pub async fn dispatch_request(
   app_env_configs: &AppEnvConfigs,
 ) -> Result<TaskEnqueueSuccess, GenerateError> {
 
-  match request.model {
-    None => {
-      return Err(GenerateError::BadInput(BadInputReason::NoModelSpecified));
-    }
-    Some(GaussianModel::WorldLabsMarble) => {
-      return handle_worldlabs_marble(
+  if request.model.is_none() {
+    return Err(GenerateError::BadInput(BadInputReason::NoModelSpecified));
+  }
+
+  let provider = request.provider.unwrap_or(GenerationProvider::Artcraft);
+
+  match provider {
+    GenerationProvider::WorldLabs => {
+      handle_worldlabs_marble(
         app,
         app_data_root,
         app_env_configs,
         request,
         worldlabs_creds_manager,
-      ).await;
+      ).await
     }
-  };
-
-  Err(GenerateError::NoProviderAvailable)
+    GenerationProvider::Artcraft => {
+      handle_gaussian_artcraft(
+        request,
+        app,
+        app_env_configs,
+        storyteller_creds_manager,
+      ).await
+    }
+    _ => {
+      Err(GenerateError::NoProviderAvailable)
+    }
+  }
 }
