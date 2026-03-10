@@ -1,7 +1,15 @@
-import { IMAGE_MODELS_BY_ID, Model, SPLAT_MODELS_BY_ID, VIDEO_MODELS_BY_ID } from "@storyteller/model-list";
+import {
+  IMAGE_MODELS_BY_ID,
+  Model,
+  SPLAT_MODELS_BY_ID,
+  VIDEO_MODELS_BY_ID,
+} from "@storyteller/model-list";
 import { ModelPage } from "./model-pages";
 
-export const defaultModelForPage = (models: Model[], page: ModelPage): Model => {
+export const defaultModelForPage = (
+  models: Model[],
+  page: ModelPage,
+): Model => {
   let imageModel: Model | undefined;
 
   switch (page) {
@@ -23,7 +31,10 @@ export const defaultModelForPage = (models: Model[], page: ModelPage): Model => 
     case ModelPage.ImageTo3DWorld:
       imageModel = SPLAT_MODELS_BY_ID.get("marble_0p1_mini");
       break;
+    case ModelPage.Angles:
+      imageModel = IMAGE_MODELS_BY_ID.get("flux_2_lora_angles");
+      break;
   }
 
   return imageModel || models[0];
-}
+};

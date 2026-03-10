@@ -28,6 +28,10 @@ export function imageModelToCommonImageModel(
       return CommonImageModel.Seedream4p5;
     case "seedream_5_lite":
       return CommonImageModel.Seedream5Lite;
+    case "qwen_edit_2511_angles":
+      return CommonImageModel.QwenEdit2511Angles;
+    case "flux_2_lora_angles":
+      return CommonImageModel.Flux2LoraAngles;
     default:
       return null;
   }

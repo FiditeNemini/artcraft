@@ -112,6 +112,20 @@ export const IMAGE_TO_VIDEO_PAGE_MODEL_LIST: ModelList =
     <FontAwesomeIcon icon={faFilm} className="h-4 w-4" />
   );
 
+export const ANGLES_PAGE_MODEL_LIST: ModelList =
+  buildItems(
+    (function (): Model[] {
+      const set: Set<Model> = new Set();
+      IMAGE_MODELS
+        .filter((m) => m.canEditAngles)
+        .forEach((m) => set.add(m));
+      const list = Array.from(set);
+      list.sort((a, b) => a.selectorName?.localeCompare(b.selectorName));
+      return list;
+    })(),
+    <FontAwesomeIcon icon={faImage} className="h-4 w-4" />
+  );
+
 export const IMAGE_TO_3D_WORLD_PAGE_MODEL_LIST: ModelList =
   buildItems(
     SPLAT_MODELS as Model[],

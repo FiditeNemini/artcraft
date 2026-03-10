@@ -24,6 +24,7 @@ const IMAGE_PAGES = new Set<ModelPage>([
   ModelPage.Canvas2D,
   ModelPage.Stage3D,
   ModelPage.ImageEditor,
+  ModelPage.Angles,
 ]);
 
 export function useImageCostEstimate(
@@ -99,6 +100,10 @@ export function useImageCostEstimate(
         legacyAspectRatioStr = editAspectRatio;
         resolutionStr = editResolution;
         referenceImageCount = editReferenceImages.length;
+        generationCount = 1;
+        break;
+      case ModelPage.Angles:
+        referenceImageCount = 1;
         generationCount = 1;
         break;
     }

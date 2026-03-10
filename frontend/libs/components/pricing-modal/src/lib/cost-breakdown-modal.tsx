@@ -18,6 +18,7 @@ import {
   STAGE_3D_PAGE_MODEL_LIST,
   IMAGE_EDITOR_PAGE_MODEL_LIST,
   IMAGE_TO_3D_WORLD_PAGE_MODEL_LIST,
+  ANGLES_PAGE_MODEL_LIST,
 } from "@storyteller/ui-model-selector";
 import {
   usePrompt2DStore,
@@ -73,6 +74,10 @@ const getModelsForPage = (page: ModelPage | null): Model[] => {
       );
     case ModelPage.ImageTo3DWorld:
       return IMAGE_TO_3D_WORLD_PAGE_MODEL_LIST.map((item) => item.model).filter(
+        (m): m is Model => m !== undefined,
+      );
+    case ModelPage.Angles:
+      return ANGLES_PAGE_MODEL_LIST.map((item) => item.model).filter(
         (m): m is Model => m !== undefined,
       );
     default:
@@ -179,6 +184,12 @@ export function CostBreakdownModal({ activeTabId }: CostBreakdownModalProps) {
           generationCount: 1,
           label: "Worlds",
         };
+      case ModelPage.Angles:
+        return {
+          resolution: undefined,
+          generationCount: 1,
+          label: "Images",
+        };
       default:
         return {
           resolution: "1k",
@@ -198,6 +209,7 @@ export function CostBreakdownModal({ activeTabId }: CostBreakdownModalProps) {
     ModelPage.ImageEditor,
     ModelPage.ImageToVideo,
     ModelPage.ImageTo3DWorld,
+    ModelPage.Angles,
   ]);
 
   const isLiveEstimatePage = LIVE_ESTIMATE_PAGES.has(activePage);
@@ -249,6 +261,8 @@ export function CostBreakdownModal({ activeTabId }: CostBreakdownModalProps) {
         return "Image Editor";
       case ModelPage.ImageTo3DWorld:
         return "Image to 3D World";
+      case ModelPage.Angles:
+        return "Angles";
       default:
         return null;
     }
@@ -275,6 +289,8 @@ export function CostBreakdownModal({ activeTabId }: CostBreakdownModalProps) {
     "seedance_2p0",
     "marble_0p1_mini",
     "marble_0p1_plus",
+    "flux_2_lora_angles",
+    "qwen_edit_2511_angles",
   ]);
   const hasCostData =
     selectedModel != null && MODELS_WITH_COST_DATA.has(selectedModel.id);

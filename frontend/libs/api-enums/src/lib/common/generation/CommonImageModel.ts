@@ -14,4 +14,6 @@ export enum CommonImageModel {
   Seedream4 = "seedream_4",
   Seedream4p5 = "seedream_4p5",
   Seedream5Lite = "seedream_5_lite",
+  QwenEdit2511Angles = "qwen_edit_2511_angles",
+  Flux2LoraAngles = "flux_2_lora_angles",
 }

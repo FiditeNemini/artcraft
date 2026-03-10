@@ -28,7 +28,7 @@ export const ZOOM_VALUES = [0, 5, 10];
 interface AnglesState {
   // Source image
   sourceImageUrl: string | null;
-  sourceBase64: string | null;
+  sourceMediaToken: string | null;
   imageDimensions: ImageDimensions | null;
 
   // Angle config
@@ -41,11 +41,11 @@ interface AnglesState {
 
   // Processing
   isProcessing: boolean;
-  pendingJobId: string | null;
+  pendingSubscriberId: string | null;
   isLoadingImage: boolean;
 
   // Actions
-  setSourceImage: (url: string, base64: string) => void;
+  setSourceImage: (url: string, mediaToken: string | null) => void;
   setImageDimensions: (dims: ImageDimensions | null) => void;
   setRotation: (value: number) => void;
   setTilt: (value: number) => void;
@@ -55,8 +55,12 @@ interface AnglesState {
   setActiveAngle: (id: string | null) => void;
   getActiveAngle: () => GeneratedAngle | null;
   setIsProcessing: (value: boolean) => void;
-  setPendingJobId: (id: string | null) => void;
   setIsLoadingImage: (value: boolean) => void;
+  startGeneration: (subscriberId: string) => void;
+  completeGeneration: (
+    subscriberId: string,
+    images: Array<{ cdn_url: string; media_token: string }>,
+  ) => void;
   resetSource: () => void;
   clearAll: () => void;
 }
@@ -69,18 +73,18 @@ const DEFAULT_CONFIG: AngleConfig = {
 
 export const useAnglesStore = create<AnglesState>((set, get) => ({
   sourceImageUrl: null,
-  sourceBase64: null,
+  sourceMediaToken: null,
   imageDimensions: null,
   angleConfig: { ...DEFAULT_CONFIG },
   generateFromBestAngles: false,
   generatedAngles: [],
   activeAngleId: null,
   isProcessing: false,
-  pendingJobId: null,
+  pendingSubscriberId: null,
   isLoadingImage: false,
 
-  setSourceImage: (url, base64) => {
-    set({ sourceImageUrl: url, sourceBase64: base64 });
+  setSourceImage: (url, mediaToken) => {
+    set({ sourceImageUrl: url, sourceMediaToken: mediaToken });
   },
 
   setImageDimensions: (dims) => {
@@ -131,23 +135,44 @@ export const useAnglesStore = create<AnglesState>((set, get) => ({
     set({ isProcessing: value });
   },
 
-  setPendingJobId: (id) => {
-    set({ pendingJobId: id });
-  },
-
   setIsLoadingImage: (value) => {
     set({ isLoadingImage: value });
+  },
+
+  startGeneration: (subscriberId) => {
+    set({ isProcessing: true, pendingSubscriberId: subscriberId });
+  },
+
+  completeGeneration: (subscriberId, images) => {
+    const state = get();
+    if (state.pendingSubscriberId !== subscriberId) return;
+
+    const newAngles: GeneratedAngle[] = images.map((img) => ({
+      id: img.media_token,
+      imageUrl: img.cdn_url,
+      rotation: state.angleConfig.rotation,
+      tilt: state.angleConfig.tilt,
+      zoom: state.angleConfig.zoom,
+      timestamp: Date.now(),
+    }));
+
+    set((s) => ({
+      generatedAngles: [...s.generatedAngles, ...newAngles],
+      activeAngleId: newAngles[0]?.id ?? s.activeAngleId,
+      isProcessing: false,
+      pendingSubscriberId: null,
+    }));
   },
 
   resetSource: () => {
     set({
       sourceImageUrl: null,
-      sourceBase64: null,
+      sourceMediaToken: null,
       imageDimensions: null,
       angleConfig: { ...DEFAULT_CONFIG },
       generateFromBestAngles: false,
       isProcessing: false,
-      pendingJobId: null,
+      pendingSubscriberId: null,
       isLoadingImage: false,
     });
   },
@@ -155,14 +180,14 @@ export const useAnglesStore = create<AnglesState>((set, get) => ({
   clearAll: () => {
     set({
       sourceImageUrl: null,
-      sourceBase64: null,
+      sourceMediaToken: null,
       imageDimensions: null,
       angleConfig: { ...DEFAULT_CONFIG },
       generateFromBestAngles: false,
       generatedAngles: [],
       activeAngleId: null,
       isProcessing: false,
-      pendingJobId: null,
+      pendingSubscriberId: null,
       isLoadingImage: false,
     });
   },

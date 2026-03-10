@@ -2,52 +2,52 @@ import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faImages,
-  faPlus,
   faDownload,
-  faUpload,
   faCrosshairs,
   faChevronUp,
   faChevronDown,
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/pro-solid-svg-icons";
-import { Button } from "@storyteller/ui-button";
+import { Button, GenerateButton } from "@storyteller/ui-button";
 import { GalleryItem, GalleryModal } from "@storyteller/ui-gallery-modal";
-import { downloadFileFromUrl } from "@storyteller/api";
+import { MediaUploadApi, downloadFileFromUrl } from "@storyteller/api";
 import toast from "react-hot-toast";
+import { v4 as uuidv4 } from "uuid";
 
 import { UploadEntryCard } from "../../components/media/UploadEntryCard";
 import {
   useAnglesStore,
-  GeneratedAngle,
   ROTATION_VALUES,
   TILT_VALUES,
   ZOOM_VALUES,
 } from "./AnglesStore";
 import { OrbitSphere, snapToNearest } from "./OrbitSphere";
-import { PopoverMenu, PopoverItem } from "@storyteller/ui-popover";
 import { twMerge } from "tailwind-merge";
 import { LoadingSpinner } from "@storyteller/ui-loading-spinner";
 import { SliderV2 } from "@storyteller/ui-sliderv2";
 import { Switch } from "@headlessui/react";
-import { EnqueueEditImage, EnqueueEditImageRequest } from "@storyteller/tauri-api";
+import { EnqueueEditImage } from "@storyteller/tauri-api";
+import { listen } from "@tauri-apps/api/event";
+import {
+  ClassyModelSelector,
+  ANGLES_PAGE_MODEL_LIST,
+  ModelPage,
+  useSelectedModel,
+  useSelectedProviderForModel,
+} from "@storyteller/ui-model-selector";
+import {
+  CostCalculatorButton,
+  useCostBreakdownModalStore,
+} from "@storyteller/ui-pricing-modal";
+import { HelpMenuButton } from "@storyteller/ui-help-menu";
+import {
+  HistoryStack,
+  ImageBundle,
+} from "../PageEdit/HistoryStack";
+import type { BaseSelectorImage } from "../PageEdit/BaseImageSelector";
 
-// ─── Utility ──────────────────────────────────────────────────────────────────
-
-const convertFileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (reader.result) {
-        resolve(reader.result as string);
-      } else {
-        reject(new Error("Failed to convert file to base64."));
-      }
-    };
-    reader.onerror = () => reject(new Error("Error reading file."));
-    reader.readAsDataURL(file);
-  });
-};
+const ANGLES_MODEL_PAGE = ModelPage.Angles;
 
 // ─── Main Angles Component ─────────────────────────────────────────────────────
 
@@ -56,16 +56,32 @@ export const Angles = () => {
   const [selectedGalleryImages, setSelectedGalleryImages] = useState<string[]>(
     [],
   );
-  const [sourceMediaToken, setSourceMediaToken] = useState<string | null>(null);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
+  const [pendingGenerations, setPendingGenerations] = useState<
+    { id: string; count: number }[]
+  >([]);
+  const [historyBundles, setHistoryBundles] = useState<ImageBundle[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Model selector
+  const selectedModel = useSelectedModel(ANGLES_MODEL_PAGE);
+  const selectedProvider = useSelectedProviderForModel(
+    ANGLES_MODEL_PAGE,
+    selectedModel?.id,
+  );
+
+  // Cost estimation
+  const anglesCredits = useCostBreakdownModalStore(
+    (s) => s.estimatedCreditsByPage[ANGLES_MODEL_PAGE],
+  );
+
   // State selectors (only re-render when specific values change)
   const sourceImageUrl = useAnglesStore((s) => s.sourceImageUrl);
+  const sourceMediaToken = useAnglesStore((s) => s.sourceMediaToken);
   const imageDimensions = useAnglesStore((s) => s.imageDimensions);
   const angleConfig = useAnglesStore((s) => s.angleConfig);
   const generateFromBestAngles = useAnglesStore(
@@ -85,16 +101,74 @@ export const Angles = () => {
   const setGenerateFromBestAngles = useAnglesStore(
     (s) => s.setGenerateFromBestAngles,
   );
-  const addGeneratedAngle = useAnglesStore((s) => s.addGeneratedAngle);
   const setActiveAngle = useAnglesStore((s) => s.setActiveAngle);
-  const setIsProcessing = useAnglesStore((s) => s.setIsProcessing);
   const setIsLoadingImage = useAnglesStore((s) => s.setIsLoadingImage);
   const resetSource = useAnglesStore((s) => s.resetSource);
 
+  // Currently displayed image (active generated angle, or source)
   const activeAngle = useMemo(
     () => generatedAngles.find((a) => a.id === activeAngleId) ?? null,
     [generatedAngles, activeAngleId],
   );
+
+  // The token of whatever is currently selected (for HistoryStack highlight)
+  const selectedImageToken = activeAngleId ?? sourceMediaToken ?? undefined;
+
+  // ─── Event listener for generation results ───────────────────────────────────
+  // Angle models route through ImageGeneration task type, which fires
+  // text_to_image_generation_complete_event (not image_edit_complete_event).
+  useEffect(() => {
+    const unlisten = listen<{
+      status: string;
+      data: {
+        generated_images: Array<{
+          media_token: string;
+          cdn_url: string;
+          maybe_thumbnail_template?: string;
+        }>;
+        maybe_frontend_subscriber_id?: string;
+      };
+    }>("text_to_image_generation_complete_event", (wrappedEvent) => {
+      const event = wrappedEvent.payload.data;
+      const state = useAnglesStore.getState();
+      if (!state.pendingSubscriberId || !state.isProcessing) return;
+
+      // Accept if subscriber ID matches OR if the backend didn't echo it back
+      const idMatches =
+        !event.maybe_frontend_subscriber_id ||
+        event.maybe_frontend_subscriber_id === state.pendingSubscriberId;
+      if (!idMatches) return;
+
+      const images = event.generated_images.map((img) => ({
+        cdn_url: img.cdn_url,
+        media_token: img.media_token,
+      }));
+
+      state.completeGeneration(state.pendingSubscriberId, images);
+
+      // Add to history bundles
+      const newBundle: ImageBundle = {
+        images: event.generated_images.map((img) => ({
+          url: img.cdn_url,
+          mediaToken: img.media_token,
+          thumbnailUrlTemplate: img.maybe_thumbnail_template,
+          fullImageUrl: img.cdn_url,
+        })),
+      };
+      setHistoryBundles((prev) => [...prev, newBundle]);
+
+      // Resolve pending placeholder
+      const resolveId =
+        event.maybe_frontend_subscriber_id ?? state.pendingSubscriberId;
+      setPendingGenerations((prev) =>
+        prev.filter((p) => p.id !== resolveId),
+      );
+    });
+
+    return () => {
+      unlisten.then((fn) => fn());
+    };
+  }, []);
 
   // Window resize handler (debounced to avoid excessive re-renders)
   useEffect(() => {
@@ -112,33 +186,7 @@ export const Angles = () => {
     };
   }, []);
 
-  // Popover "add" items
-  const addMenuItems: PopoverItem[] = useMemo(
-    () => [
-      {
-        label: "Upload Image",
-        selected: false,
-        icon: <FontAwesomeIcon icon={faUpload} className="h-4 w-4" />,
-        action: "upload",
-      },
-      {
-        label: "Choose from Library",
-        selected: false,
-        icon: <FontAwesomeIcon icon={faImages} className="h-4 w-4" />,
-        action: "library",
-      },
-    ],
-    [],
-  );
-
-  const handleAddMenuSelect = useCallback((item: PopoverItem) => {
-    if (item.action === "upload") {
-      fileInputRef.current?.click();
-    } else if (item.action === "library") {
-      setIsGalleryModalOpen(true);
-    }
-  }, []);
-
+  // ─── Local file upload → MediaUploadApi → media token ───────────────────────
   const handleLocalImageSelect = useCallback(
     async (files: FileList) => {
       const file = files[0];
@@ -147,9 +195,9 @@ export const Angles = () => {
       setIsLoadingImage(true);
 
       try {
-        const base64Image = await convertFileToBase64(file);
         const objectUrl = URL.createObjectURL(file);
 
+        // Load dimensions
         await new Promise<void>((resolve, reject) => {
           const img = new Image();
           img.onload = () => {
@@ -163,7 +211,19 @@ export const Angles = () => {
           img.src = objectUrl;
         });
 
-        setSourceImage(objectUrl, base64Image);
+        // Upload to backend for media token
+        const mediaUploadApi = new MediaUploadApi();
+        const uploadResult = await mediaUploadApi.UploadImage({
+          blob: file,
+          fileName: file.name,
+          uuid: uuidv4(),
+        });
+
+        if (!uploadResult?.success || !uploadResult.data) {
+          throw new Error("Upload failed — no media token returned");
+        }
+
+        setSourceImage(objectUrl, uploadResult.data);
         setIsLoadingImage(false);
       } catch (error) {
         console.error("Error processing image:", error);
@@ -181,6 +241,7 @@ export const Angles = () => {
     });
   }, []);
 
+  // ─── Gallery select → media token from item.id ──────────────────────────────
   const handleGallerySelect = useCallback(
     async (selectedItems: GalleryItem[]) => {
       const item = selectedItems[0];
@@ -189,12 +250,11 @@ export const Angles = () => {
         return;
       }
 
-      let mediaToken = item.id; // NB: `id` is a media token.
-
+      const mediaToken = item.id; // item.id is a media token
       const imageUrl = item.fullImage;
+
       setIsGalleryModalOpen(false);
       setSelectedGalleryImages([]);
-      setSourceMediaToken(mediaToken);
       setIsLoadingImage(true);
 
       try {
@@ -211,7 +271,7 @@ export const Angles = () => {
           img.src = imageUrl;
         });
 
-        setSourceImage(imageUrl, "");
+        setSourceImage(imageUrl, mediaToken);
         setIsLoadingImage(false);
       } catch (error) {
         console.error("Error processing gallery image:", error);
@@ -222,34 +282,40 @@ export const Angles = () => {
     [setSourceImage, setImageDimensions, setIsLoadingImage],
   );
 
+  // ─── Generate with subscriber pattern ───────────────────────────────────────
   const handleGenerate = useCallback(async () => {
-    if (!sourceMediaToken || isProcessing) return;
+    const state = useAnglesStore.getState();
+    if (!state.sourceMediaToken || state.isProcessing) return;
 
-    setIsProcessing(true);
+    const subscriberId = uuidv4();
+    state.startGeneration(subscriberId);
+    setPendingGenerations((prev) => [...prev, { id: subscriberId, count: 1 }]);
 
     try {
       await EnqueueEditImage({
-        model: "flux_2_lora_angles" as EnqueueEditImageRequest["model"],
-        image_media_tokens: [sourceMediaToken],
+        model: selectedModel ?? ("flux_2_lora_angles" as any),
+        provider: selectedProvider ?? undefined,
+        image_media_tokens: [state.sourceMediaToken],
         prompt: "",
-        horizontal_angle: angleConfig.rotation,
-        vertical_angle: angleConfig.tilt,
-        zoom: angleConfig.zoom,
+        horizontal_angle: state.angleConfig.rotation,
+        vertical_angle: state.angleConfig.tilt,
+        zoom: state.angleConfig.zoom,
+        frontend_subscriber_id: subscriberId,
       });
 
       toast.success("Angle generation enqueued");
     } catch (error) {
       console.error("Error generating angle:", error);
       toast.error("Failed to generate angle");
-    } finally {
-      setIsProcessing(false);
+      useAnglesStore.setState({
+        isProcessing: false,
+        pendingSubscriberId: null,
+      });
+      setPendingGenerations((prev) =>
+        prev.filter((p) => p.id !== subscriberId),
+      );
     }
-  }, [
-    sourceMediaToken,
-    isProcessing,
-    angleConfig,
-    setIsProcessing,
-  ]);
+  }, [selectedModel, selectedProvider]);
 
   const handleDownload = useCallback(async () => {
     if (!activeAngle) {
@@ -264,13 +330,6 @@ export const Angles = () => {
       toast.error("Failed to download image");
     }
   }, [activeAngle]);
-
-  const handleThumbnailClick = useCallback(
-    (angle: GeneratedAngle) => {
-      setActiveAngle(angle.id);
-    },
-    [setActiveAngle],
-  );
 
   // Called when user releases the sphere drag — values are already snapped
   const handleSphereDragEnd = useCallback(
@@ -288,8 +347,6 @@ export const Angles = () => {
       return { width: "600px", height: "450px" };
     }
 
-    // Floating panels: ~80px left thumbnails, ~16px margins, p-16 (128px total horizontal)
-    // Top toolbar ~56px + top bar ~56px, bottom controls ~160px floating + margins
     const horizontalPadding = 128 + 80;
     const verticalPadding = 56 + 64 + 160;
 
@@ -335,7 +392,8 @@ export const Angles = () => {
 
   const handleChangeImage = useCallback(() => {
     resetSource();
-    setSourceMediaToken(null);
+    setHistoryBundles([]);
+    setPendingGenerations([]);
   }, [resetSource]);
 
   // Slider handlers that snap to allowed values
@@ -383,6 +441,56 @@ export const Angles = () => {
     [angleConfig.tilt, setTilt],
   );
 
+  // ─── HistoryStack data ──────────────────────────────────────────────────────
+  // Source image as the first entry so user can return to original
+  const allBundles = useMemo(() => {
+    if (!sourceImageUrl || !sourceMediaToken) return historyBundles;
+    const sourceBundle: ImageBundle = {
+      images: [
+        {
+          url: sourceImageUrl,
+          mediaToken: sourceMediaToken,
+          fullImageUrl: sourceImageUrl,
+        },
+      ],
+    };
+    return [sourceBundle, ...historyBundles];
+  }, [sourceImageUrl, sourceMediaToken, historyBundles]);
+
+  const handleHistoryImageSelect = useCallback(
+    (image: BaseSelectorImage) => {
+      // If selecting the source image, clear active angle to show source
+      if (image.mediaToken === useAnglesStore.getState().sourceMediaToken) {
+        setActiveAngle(null);
+      } else {
+        setActiveAngle(image.mediaToken);
+      }
+    },
+    [setActiveAngle],
+  );
+
+  const handleHistoryImageRemove = useCallback(
+    (image: BaseSelectorImage) => {
+      setHistoryBundles((prev) =>
+        prev
+          .map((bundle) => ({
+            ...bundle,
+            images: bundle.images.filter(
+              (img) => img.mediaToken !== image.mediaToken,
+            ),
+          }))
+          .filter((bundle) => bundle.images.length > 0),
+      );
+    },
+    [],
+  );
+
+  const handleHistoryClear = useCallback(() => {
+    setHistoryBundles([]);
+    setPendingGenerations([]);
+    setActiveAngle(null);
+  }, [setActiveAngle]);
+
   return (
     <>
       <div className="flex h-[calc(100vh-56px)] w-full flex-col overflow-hidden bg-ui-background text-base-fg">
@@ -424,7 +532,7 @@ export const Angles = () => {
               onChange={handleFileInputChange}
             />
 
-            {/* Full-bleed image display — pb-44 reserves space for floating bottom controls */}
+            {/* Full-bleed image display */}
             <div className="flex h-full w-full items-center justify-center px-16 pb-56 pt-16">
               <div
                 className="relative overflow-hidden rounded-xl shadow-lg"
@@ -495,56 +603,29 @@ export const Angles = () => {
               </div>
             </div>
 
-            {/* ── Floating left thumbnail strip ── */}
-            <div className="absolute left-4 top-1/2 z-10 -translate-y-1/2">
-              <div className="glass flex max-h-[calc(100%-120px)] flex-col items-center gap-2 rounded-xl p-2">
-                <PopoverMenu
-                  items={addMenuItems}
-                  onSelect={handleAddMenuSelect}
-                  mode="button"
-                  position="bottom"
-                  showIconsInList
-                  buttonClassName={twMerge(
-                    "h-12 w-12 rounded-lg border-2 border-dashed border-base-fg/20 bg-ui-controls/30 transition-colors hover:border-base-fg/40",
-                    isProcessing && "cursor-not-allowed opacity-50",
-                  )}
-                  triggerIcon={
-                    <FontAwesomeIcon icon={faPlus} className="text-base" />
-                  }
-                />
-
-                {generatedAngles.length > 0 && (
-                  <div className="flex flex-col items-center gap-2 overflow-y-auto">
-                    {generatedAngles.map((angle) => (
-                      <button
-                        key={angle.id}
-                        onClick={() => handleThumbnailClick(angle)}
-                        className={twMerge(
-                          "relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border-2 transition-all",
-                          angle.id === activeAngleId
-                            ? "border-primary ring-2 ring-primary/30"
-                            : "border-transparent hover:border-primary/50",
-                        )}
-                      >
-                        <img
-                          src={angle.imageUrl}
-                          alt={`Angle ${angle.rotation}°`}
-                          className="h-full w-full object-cover"
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 bg-black/70 px-0.5 py-px text-center text-[8px] text-base-fg/80">
-                          {angle.rotation}°
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+            {/* ── History stack (right side, like PageEdit) ── */}
+            <div className="absolute right-4 top-1/2 z-10 -translate-y-1/2">
+              <HistoryStack
+                onClear={handleHistoryClear}
+                imageBundles={allBundles}
+                pendingPlaceholders={pendingGenerations}
+                blurredBackgroundUrl={sourceImageUrl ?? undefined}
+                selectedImageToken={selectedImageToken}
+                onImageSelect={handleHistoryImageSelect}
+                onImageRemove={handleHistoryImageRemove}
+                onNewImageBundle={() => {
+                  /* handled by our own event listener */
+                }}
+                onResolvePending={() => {
+                  /* handled by our own event listener */
+                }}
+              />
             </div>
 
             {/* ── Floating bottom angle controls ── */}
             <div className="absolute bottom-4 left-1/2 z-10 w-[calc(100%-32px)] max-w-[860px] -translate-x-1/2">
               <div className="glass flex items-center gap-4 rounded-xl px-4 lg:gap-5 lg:px-5">
-                {/* Orbit sphere — compact, with equal arrow spacing on all sides */}
+                {/* Orbit sphere */}
                 <div className="relative shrink-0 px-5 py-5">
                   <button
                     onClick={() => handleTiltStep(1)}
@@ -682,18 +763,37 @@ export const Angles = () => {
                     </div>
                   </Switch.Group>
 
-                  <Button
+                  <GenerateButton
                     variant="primary"
                     icon={faCrosshairs}
                     onClick={handleGenerate}
                     disabled={isProcessing || !sourceMediaToken}
                     loading={isProcessing}
+                    credits={anglesCredits}
                     className="whitespace-nowrap px-5 py-1.5 text-sm"
                   >
                     {isProcessing ? "Generating..." : "Generate"}
-                  </Button>
+                  </GenerateButton>
                 </div>
               </div>
+            </div>
+
+            {/* ── Model selector (bottom-left) ── */}
+            <div className="absolute bottom-6 left-6 z-20 flex items-center gap-5">
+              <ClassyModelSelector
+                items={ANGLES_PAGE_MODEL_LIST}
+                page={ANGLES_MODEL_PAGE}
+                mode="hoverSelect"
+                panelTitle="Select Model"
+                panelClassName="min-w-[300px]"
+                showIconsInList
+              />
+            </div>
+
+            {/* ── Cost calculator + Help (bottom-right) ── */}
+            <div className="absolute bottom-6 right-6 z-20 flex items-center gap-2">
+              <CostCalculatorButton modelPage={ANGLES_MODEL_PAGE} />
+              <HelpMenuButton />
             </div>
           </div>
         )}

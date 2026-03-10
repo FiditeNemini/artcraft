@@ -38,4 +38,5 @@ export const TAB_TO_MODEL_PAGE: Record<string, ModelPage> = {
   "3D": ModelPage.Stage3D,
   EDIT: ModelPage.ImageEditor,
   IMAGE_TO_3D_WORLD: ModelPage.ImageTo3DWorld,
+  ANGLES: ModelPage.Angles,
 };
