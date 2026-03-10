@@ -28,7 +28,6 @@ import { LoadingSpinner } from "@storyteller/ui-loading-spinner";
 import { SliderV2 } from "@storyteller/ui-sliderv2";
 // import { Switch } from "@headlessui/react";
 import { EnqueueEditImage } from "@storyteller/tauri-api";
-import { listen } from "@tauri-apps/api/event";
 import {
   ClassyModelSelector,
   ANGLES_PAGE_MODEL_LIST,
@@ -57,10 +56,6 @@ export const Angles = () => {
     width: window.innerWidth,
     height: window.innerHeight,
   });
-  const [pendingGenerations, setPendingGenerations] = useState<
-    { id: string; count: number }[]
-  >([]);
-  const [historyBundles, setHistoryBundles] = useState<ImageBundle[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -111,59 +106,30 @@ export const Angles = () => {
   // The token of whatever is currently selected (for HistoryStack highlight)
   const selectedImageToken = activeAngleId ?? sourceMediaToken ?? undefined;
 
-  // ─── Event listener for generation results ───────────────────────────────────
-  // Angle models route through ImageGeneration task type, which fires
-  // text_to_image_generation_complete_event (not image_edit_complete_event).
-  useEffect(() => {
-    const unlisten = listen<{
-      status: string;
-      data: {
-        generated_images: Array<{
-          media_token: string;
-          cdn_url: string;
-          maybe_thumbnail_template?: string;
-        }>;
-        maybe_frontend_subscriber_id?: string;
-      };
-    }>("text_to_image_generation_complete_event", (wrappedEvent) => {
-      const event = wrappedEvent.payload.data;
-      const state = useAnglesStore.getState();
-      if (!state.pendingSubscriberId || !state.isProcessing) return;
+  // Event listener is at module level in AnglesStore.ts — persists across navigations.
 
-      // Accept if subscriber ID matches OR if the backend didn't echo it back
-      const idMatches =
-        !event.maybe_frontend_subscriber_id ||
-        event.maybe_frontend_subscriber_id === state.pendingSubscriberId;
-      if (!idMatches) return;
+  // Derive history bundles from store (no local state needed)
+  const historyBundles = useMemo<ImageBundle[]>(
+    () =>
+      generatedAngles.map((angle) => ({
+        images: [
+          {
+            url: angle.imageUrl,
+            mediaToken: angle.id,
+            thumbnailUrlTemplate: angle.thumbnailUrlTemplate,
+            fullImageUrl: angle.imageUrl,
+          },
+        ],
+      })),
+    [generatedAngles],
+  );
 
-      const images = event.generated_images.map((img) => ({
-        cdn_url: img.cdn_url,
-        media_token: img.media_token,
-      }));
-
-      state.completeGeneration(state.pendingSubscriberId, images);
-
-      // Add to history bundles
-      const newBundle: ImageBundle = {
-        images: event.generated_images.map((img) => ({
-          url: img.cdn_url,
-          mediaToken: img.media_token,
-          thumbnailUrlTemplate: img.maybe_thumbnail_template,
-          fullImageUrl: img.cdn_url,
-        })),
-      };
-      setHistoryBundles((prev) => [...prev, newBundle]);
-
-      // Resolve pending placeholder
-      const resolveId =
-        event.maybe_frontend_subscriber_id ?? state.pendingSubscriberId;
-      setPendingGenerations((prev) => prev.filter((p) => p.id !== resolveId));
-    });
-
-    return () => {
-      unlisten.then((fn) => fn());
-    };
-  }, []);
+  // Derive pending placeholders from store
+  const pendingSubscriberIds = useAnglesStore((s) => s.pendingSubscriberIds);
+  const pendingGenerations = useMemo(
+    () => pendingSubscriberIds.map((id) => ({ id, count: 1 })),
+    [pendingSubscriberIds],
+  );
 
   // Window resize handler (debounced to avoid excessive re-renders)
   useEffect(() => {
@@ -280,11 +246,10 @@ export const Angles = () => {
   // ─── Generate with subscriber pattern ───────────────────────────────────────
   const handleGenerate = useCallback(async () => {
     const state = useAnglesStore.getState();
-    if (!state.sourceMediaToken || state.isProcessing) return;
+    if (!state.sourceMediaToken) return;
 
     const subscriberId = uuidv4();
     state.startGeneration(subscriberId);
-    setPendingGenerations((prev) => [...prev, { id: subscriberId, count: 1 }]);
 
     try {
       await EnqueueEditImage({
@@ -302,13 +267,7 @@ export const Angles = () => {
     } catch (error) {
       console.error("Error generating angle:", error);
       toast.error("Failed to generate angle");
-      useAnglesStore.setState({
-        isProcessing: false,
-        pendingSubscriberId: null,
-      });
-      setPendingGenerations((prev) =>
-        prev.filter((p) => p.id !== subscriberId),
-      );
+      useAnglesStore.getState().removePendingSubscriber(subscriberId);
     }
   }, [selectedModel, selectedProvider]);
 
@@ -387,8 +346,7 @@ export const Angles = () => {
 
   const handleChangeImage = useCallback(() => {
     resetSource();
-    setHistoryBundles([]);
-    setPendingGenerations([]);
+    useAnglesStore.getState().clearGeneratedAngles();
   }, [resetSource]);
 
   // Slider handlers that snap to allowed values
@@ -465,23 +423,12 @@ export const Angles = () => {
   );
 
   const handleHistoryImageRemove = useCallback((image: BaseSelectorImage) => {
-    setHistoryBundles((prev) =>
-      prev
-        .map((bundle) => ({
-          ...bundle,
-          images: bundle.images.filter(
-            (img) => img.mediaToken !== image.mediaToken,
-          ),
-        }))
-        .filter((bundle) => bundle.images.length > 0),
-    );
+    useAnglesStore.getState().removeGeneratedAngle(image.mediaToken);
   }, []);
 
   const handleHistoryClear = useCallback(() => {
-    setHistoryBundles([]);
-    setPendingGenerations([]);
-    setActiveAngle(null);
-  }, [setActiveAngle]);
+    useAnglesStore.getState().clearGeneratedAngles();
+  }, []);
 
   return (
     <>
@@ -537,29 +484,11 @@ export const Angles = () => {
                     className="absolute inset-0 h-full w-full object-contain"
                   />
                 ) : sourceImageUrl ? (
-                  <>
-                    <img
-                      src={sourceImageUrl}
-                      alt="Source"
-                      className="absolute inset-0 h-full w-full object-contain"
-                    />
-                    {isProcessing && (
-                      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
-                        <div className="relative z-10 flex flex-col items-center gap-4">
-                          <div className="relative">
-                            <div className="h-16 w-16 animate-spin rounded-full border-4 border-primary-500/30 border-t-primary-500" />
-                            <FontAwesomeIcon
-                              icon={faCrosshairs}
-                              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl text-primary-400"
-                            />
-                          </div>
-                          <span className="text-lg font-semibold text-white">
-                            Generating Angle...
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </>
+                  <img
+                    src={sourceImageUrl}
+                    alt="Source"
+                    className="absolute inset-0 h-full w-full object-contain"
+                  />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center bg-ui-background">
                     <LoadingSpinner className="h-12 w-12" />
@@ -758,12 +687,11 @@ export const Angles = () => {
                   <GenerateButton
                     variant="primary"
                     onClick={handleGenerate}
-                    disabled={isProcessing || !sourceMediaToken}
-                    loading={isProcessing}
+                    disabled={!sourceMediaToken}
                     credits={anglesCredits}
                     className="whitespace-nowrap px-5 py-1.5 text-sm"
                   >
-                    {isProcessing ? "Generating..." : "Generate"}
+                    Generate
                   </GenerateButton>
                 </div>
               </div>

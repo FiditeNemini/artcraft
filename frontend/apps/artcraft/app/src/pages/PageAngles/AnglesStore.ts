@@ -1,8 +1,10 @@
 import { create } from "zustand";
+import { listen } from "@tauri-apps/api/event";
 
 export interface GeneratedAngle {
   id: string;
   imageUrl: string;
+  thumbnailUrlTemplate?: string;
   rotation: number;
   tilt: number;
   zoom: number;
@@ -41,7 +43,7 @@ interface AnglesState {
 
   // Processing
   isProcessing: boolean;
-  pendingSubscriberId: string | null;
+  pendingSubscriberIds: string[];
   isLoadingImage: boolean;
 
   // Actions
@@ -54,12 +56,18 @@ interface AnglesState {
   addGeneratedAngle: (angle: GeneratedAngle) => void;
   setActiveAngle: (id: string | null) => void;
   getActiveAngle: () => GeneratedAngle | null;
-  setIsProcessing: (value: boolean) => void;
+  removeGeneratedAngle: (id: string) => void;
+  clearGeneratedAngles: () => void;
+  removePendingSubscriber: (subscriberId: string) => void;
   setIsLoadingImage: (value: boolean) => void;
   startGeneration: (subscriberId: string) => void;
   completeGeneration: (
     subscriberId: string,
-    images: Array<{ cdn_url: string; media_token: string }>,
+    images: Array<{
+      cdn_url: string;
+      media_token: string;
+      maybe_thumbnail_template?: string;
+    }>,
   ) => void;
   resetSource: () => void;
   clearAll: () => void;
@@ -80,7 +88,7 @@ export const useAnglesStore = create<AnglesState>((set, get) => ({
   generatedAngles: [],
   activeAngleId: null,
   isProcessing: false,
-  pendingSubscriberId: null,
+  pendingSubscriberIds: [],
   isLoadingImage: false,
 
   setSourceImage: (url, mediaToken) => {
@@ -131,8 +139,35 @@ export const useAnglesStore = create<AnglesState>((set, get) => ({
     );
   },
 
-  setIsProcessing: (value) => {
-    set({ isProcessing: value });
+  removeGeneratedAngle: (id) => {
+    set((s) => {
+      const filtered = s.generatedAngles.filter((a) => a.id !== id);
+      return {
+        generatedAngles: filtered,
+        activeAngleId: s.activeAngleId === id ? null : s.activeAngleId,
+      };
+    });
+  },
+
+  clearGeneratedAngles: () => {
+    set({
+      generatedAngles: [],
+      activeAngleId: null,
+      isProcessing: false,
+      pendingSubscriberIds: [],
+    });
+  },
+
+  removePendingSubscriber: (subscriberId) => {
+    set((s) => {
+      const remaining = s.pendingSubscriberIds.filter(
+        (id) => id !== subscriberId,
+      );
+      return {
+        pendingSubscriberIds: remaining,
+        isProcessing: remaining.length > 0,
+      };
+    });
   },
 
   setIsLoadingImage: (value) => {
@@ -140,27 +175,34 @@ export const useAnglesStore = create<AnglesState>((set, get) => ({
   },
 
   startGeneration: (subscriberId) => {
-    set({ isProcessing: true, pendingSubscriberId: subscriberId });
+    set((s) => ({
+      isProcessing: true,
+      pendingSubscriberIds: [...s.pendingSubscriberIds, subscriberId],
+    }));
   },
 
   completeGeneration: (subscriberId, images) => {
     const state = get();
-    if (state.pendingSubscriberId !== subscriberId) return;
+    if (!state.pendingSubscriberIds.includes(subscriberId)) return;
 
     const newAngles: GeneratedAngle[] = images.map((img) => ({
       id: img.media_token,
       imageUrl: img.cdn_url,
+      thumbnailUrlTemplate: img.maybe_thumbnail_template,
       rotation: state.angleConfig.rotation,
       tilt: state.angleConfig.tilt,
       zoom: state.angleConfig.zoom,
       timestamp: Date.now(),
     }));
 
+    const remaining = state.pendingSubscriberIds.filter(
+      (id) => id !== subscriberId,
+    );
     set((s) => ({
       generatedAngles: [...s.generatedAngles, ...newAngles],
       activeAngleId: newAngles[0]?.id ?? s.activeAngleId,
-      isProcessing: false,
-      pendingSubscriberId: null,
+      isProcessing: remaining.length > 0,
+      pendingSubscriberIds: remaining,
     }));
   },
 
@@ -172,7 +214,7 @@ export const useAnglesStore = create<AnglesState>((set, get) => ({
       angleConfig: { ...DEFAULT_CONFIG },
       generateFromBestAngles: false,
       isProcessing: false,
-      pendingSubscriberId: null,
+      pendingSubscriberIds: [],
       isLoadingImage: false,
     });
   },
@@ -187,8 +229,42 @@ export const useAnglesStore = create<AnglesState>((set, get) => ({
       generatedAngles: [],
       activeAngleId: null,
       isProcessing: false,
-      pendingSubscriberId: null,
+      pendingSubscriberIds: [],
       isLoadingImage: false,
     });
   },
 }));
+
+// ─── Module-level event listener ────────────────────────────────────────────────
+// Persists across page navigations so generation results are never lost.
+// Angle models route through ImageGeneration task type, which fires
+// text_to_image_generation_complete_event (not image_edit_complete_event).
+listen<{
+  status: string;
+  data: {
+    generated_images: Array<{
+      media_token: string;
+      cdn_url: string;
+      maybe_thumbnail_template?: string;
+    }>;
+    maybe_frontend_subscriber_id?: string;
+  };
+}>("text_to_image_generation_complete_event", (wrappedEvent) => {
+  const event = wrappedEvent.payload.data;
+  const state = useAnglesStore.getState();
+  if (state.pendingSubscriberIds.length === 0) return;
+
+  const subscriberId = event.maybe_frontend_subscriber_id;
+  if (subscriberId && !state.pendingSubscriberIds.includes(subscriberId))
+    return;
+
+  const resolvedId = subscriberId ?? state.pendingSubscriberIds[0];
+
+  const images = event.generated_images.map((img) => ({
+    cdn_url: img.cdn_url,
+    media_token: img.media_token,
+    maybe_thumbnail_template: img.maybe_thumbnail_template,
+  }));
+
+  state.completeGeneration(resolvedId, images);
+});
