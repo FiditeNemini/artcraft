@@ -64,6 +64,9 @@ export const MODEL_TYPE_TO_CREATOR: Record<string, ModelCreator> = {
   midjourney_v7: ModelCreator.Midjourney,
   midjourney_v7_raw: ModelCreator.Midjourney,
   midjourney_v7_draft_raw: ModelCreator.Midjourney,
+  // Angles
+  flux_2_lora_angles: ModelCreator.BlackForestLabs,
+  qwen_edit_2511_angles: ModelCreator.Alibaba,
 };
 
 // Get creator icon for a model type
@@ -211,6 +214,10 @@ export const getModelDisplayName = (modelType: string): string => {
     midjourney_v7: "Midjourney V7",
     midjourney_v7_raw: "Midjourney V7 (Raw)",
     midjourney_v7_draft_raw: "Midjourney V7 (Draft Raw)",
+
+    // Angles
+    flux_2_lora_angles: "Flux 2 LoRA Angles",
+    qwen_edit_2511_angles: "Qwen Edit 2511 Angles",
   };
 
   const key = normalizeModelKey(modelType);
