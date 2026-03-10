@@ -186,7 +186,7 @@ export const ControlPanelSceneObject = () => {
       as="div"
       show={isShowing.value}
       className={twMerge(
-        "glass absolute bottom-0 right-0 mb-4 mr-4 flex h-fit w-56 origin-bottom-right flex-col gap-2 rounded-lg border border-ui-panel-border p-3.5 text-white shadow-lg",
+        "glass absolute bottom-16 right-0 mb-4 mr-4 flex h-fit w-56 origin-bottom-right flex-col gap-2 rounded-lg border border-ui-panel-border p-3.5 text-white shadow-lg",
       )}
       enter="transition-opacity duration-150"
       enterFrom="opacity-0"

@@ -51,10 +51,14 @@ export const MODEL_TYPE_TO_CREATOR: Record<string, ModelCreator> = {
   hunyuan_3d: ModelCreator.Tencent,
   hunyuan_3d_2p0: ModelCreator.Tencent,
   hunyuan_3d_2p1: ModelCreator.Tencent,
+  hunyuan_3d_2: ModelCreator.Tencent,
+  hunyuan_3d_3: ModelCreator.Tencent,
   // Hunyuan — dot-normalized aliases
   hunyuan_3d_2_0: ModelCreator.Tencent,
   hunyuan_3d_2_1: ModelCreator.Tencent,
   worldlabs_gaussian: ModelCreator.WorldLabs,
+  marble_0p1_mini: ModelCreator.WorldLabs,
+  marble_0p1_plus: ModelCreator.WorldLabs,
   grok_image: ModelCreator.Grok,
   grok_video: ModelCreator.Grok,
   midjourney: ModelCreator.Midjourney,
@@ -195,14 +199,18 @@ export const getModelDisplayName = (modelType: string): string => {
 
     // Hunyuan (Tencent) — p-style IDs
     hunyuan_3d: "Hunyuan 3D",
+    hunyuan_3d_2: "Hunyuan 3D 2.0",
     hunyuan_3d_2p0: "Hunyuan 3D 2.0",
     hunyuan_3d_2p1: "Hunyuan 3D 2.1",
+    hunyuan_3d_3: "Hunyuan 3D 3.0",
     // Hunyuan — dot-normalized aliases
     hunyuan_3d_2_0: "Hunyuan 3D 2.0",
     hunyuan_3d_2_1: "Hunyuan 3D 2.1",
 
     // World Labs
     worldlabs_gaussian: "World Labs Marble",
+    marble_0p1_mini: "Marble Mini",
+    marble_0p1_plus: "Marble Plus",
 
     // Catch-all bucket for Midjourney.
     midjourney: "Midjourney",

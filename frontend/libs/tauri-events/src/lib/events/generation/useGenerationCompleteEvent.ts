@@ -57,7 +57,9 @@ const makeMessage = (event: GenerationCompleteEvent) => {
     case GenerationAction.RemoveBackground:
       return "Background removal complete!";
     case GenerationAction.ImageTo3d:
-      return "Image to 3D complete!";
+      return "3D model generation complete!";
+    case GenerationAction.GenerateGaussian:
+      return "3D world generation complete!";
     default:
       return "Generation complete!";
   }

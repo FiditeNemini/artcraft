@@ -412,13 +412,21 @@ export const TaskQueue = () => {
         ? getProviderDisplayName(String(t.provider).toLowerCase())
         : undefined;
       const taskTypeStr = t.task_type ? String(t.task_type).toLowerCase() : "";
+      const modelTypeStr = t.model_type ? String(t.model_type).toLowerCase() : "";
+      const isSplatModel =
+        taskTypeStr.includes("gaussian") ||
+        modelTypeStr.includes("marble") ||
+        modelTypeStr.includes("worldlabs");
       const is3DModel =
         taskTypeStr.includes("3d") ||
         taskTypeStr.includes("object") ||
-        taskTypeStr.includes("dimensional");
+        taskTypeStr.includes("dimensional") ||
+        isSplatModel;
 
       let kind = undefined;
-      if (taskTypeStr.includes("image") && is3DModel) {
+      if (isSplatModel) {
+        kind = "3D World";
+      } else if (taskTypeStr.includes("image") && is3DModel) {
         kind = "Image to 3D";
       } else if (is3DModel) {
         kind = "3D Model";

@@ -58,7 +58,9 @@ const makeMessage = (event: GenerationFailedEvent) => {
     case GenerationAction.RemoveBackground:
       return "Background removal failed!";
     case GenerationAction.ImageTo3d:
-      return "Image to 3D failed!";
+      return "3D model generation failed!";
+    case GenerationAction.GenerateGaussian:
+      return "3D world generation failed!";
     default:
       return "Generation failed!";
   }

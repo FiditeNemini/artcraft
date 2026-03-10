@@ -152,15 +152,17 @@ export const ImageTo3DExperience = ({
   );
 
   useEffect(() => {
-    if (variant === "world" && pendingExternalImage) {
+    // Read from store directly to avoid Strict Mode double-execution adding the image twice
+    const pending = useImageTo3DWorldStore.getState().pendingExternalImage;
+    if (variant === "world" && pending) {
       setWorldImages((prev) => {
         if (prev.length >= MAX_WORLD_IMAGES) return prev;
         return [
           ...prev,
           {
             id: generateId(),
-            preview: pendingExternalImage.url,
-            mediaToken: pendingExternalImage.mediaToken,
+            preview: pending.url,
+            mediaToken: pending.mediaToken,
             name: "Library Image",
             isUploading: false,
           },
@@ -400,9 +402,6 @@ export const ImageTo3DExperience = ({
         if ("error_type" in result) {
           throw new Error(result.error_message || result.error_type);
         }
-
-        setWorldImages([]);
-        setWorldPrompt("");
       } else {
         const snapshotPrompt = prompt.trim();
         const snapshotPreview = uploadedPreview || undefined;
@@ -735,7 +734,7 @@ export const ImageTo3DExperience = ({
         key={img.id}
         className={twMerge(
           "glass group relative aspect-square overflow-hidden rounded-lg border-2 border-white/30 transition-all",
-          hasResults ? "w-10" : "w-14",
+          hasResults ? "w-10" : "w-auto",
           img.isUploading
             ? "cursor-default"
             : "cursor-pointer hover:cursor-zoom-in hover:border-white/80",

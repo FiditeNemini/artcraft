@@ -6,5 +6,6 @@ export enum TaskType {
   ImageInpaintEdit = "image_inpaint_edit",
   VideoGeneration = "video_generation",
   ObjectGeneration = "object_generation",
+  SplatGeneration = "gaussian_generation",
   BackgroundRemoval = "background_removal",
 }

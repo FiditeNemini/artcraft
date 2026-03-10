@@ -58,7 +58,9 @@ const makeMessage = (event: GenerationEnqueueFailureEvent) => {
     case GenerationAction.RemoveBackground:
       return "Couldn't enqueue background removal!";
     case GenerationAction.ImageTo3d:
-      return "Couldn't enqueue image to 3D!";
+      return "Couldn't enqueue 3D model generation!";
+    case GenerationAction.GenerateGaussian:
+      return "Couldn't enqueue 3D world generation!";
     default:
       return "Couldn't enqueue generation!";
   }

@@ -15,4 +15,6 @@ export enum GenerationAction {
   GenerateVideo = "generate_video",
   RemoveBackground = "remove_background",
   ImageTo3d = "image_to_3d",
+  GenerateGaussian = "generate_gaussian",
+  ImageInpaintEdit = "image_inpaint_edit",
 }

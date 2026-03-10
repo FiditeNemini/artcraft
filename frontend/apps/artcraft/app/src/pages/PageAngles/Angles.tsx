@@ -26,7 +26,7 @@ import { OrbitSphere, snapToNearest } from "./OrbitSphere";
 import { twMerge } from "tailwind-merge";
 import { LoadingSpinner } from "@storyteller/ui-loading-spinner";
 import { SliderV2 } from "@storyteller/ui-sliderv2";
-import { Switch } from "@headlessui/react";
+// import { Switch } from "@headlessui/react";
 import { EnqueueEditImage } from "@storyteller/tauri-api";
 import { listen } from "@tauri-apps/api/event";
 import {
@@ -41,10 +41,7 @@ import {
   useCostBreakdownModalStore,
 } from "@storyteller/ui-pricing-modal";
 import { HelpMenuButton } from "@storyteller/ui-help-menu";
-import {
-  HistoryStack,
-  ImageBundle,
-} from "../PageEdit/HistoryStack";
+import { HistoryStack, ImageBundle } from "../PageEdit/HistoryStack";
 import type { BaseSelectorImage } from "../PageEdit/BaseImageSelector";
 
 const ANGLES_MODEL_PAGE = ModelPage.Angles;
@@ -84,9 +81,9 @@ export const Angles = () => {
   const sourceMediaToken = useAnglesStore((s) => s.sourceMediaToken);
   const imageDimensions = useAnglesStore((s) => s.imageDimensions);
   const angleConfig = useAnglesStore((s) => s.angleConfig);
-  const generateFromBestAngles = useAnglesStore(
-    (s) => s.generateFromBestAngles,
-  );
+  // const generateFromBestAngles = useAnglesStore(
+  //   (s) => s.generateFromBestAngles,
+  // );
   const generatedAngles = useAnglesStore((s) => s.generatedAngles);
   const activeAngleId = useAnglesStore((s) => s.activeAngleId);
   const isProcessing = useAnglesStore((s) => s.isProcessing);
@@ -98,9 +95,9 @@ export const Angles = () => {
   const setRotation = useAnglesStore((s) => s.setRotation);
   const setTilt = useAnglesStore((s) => s.setTilt);
   const setZoom = useAnglesStore((s) => s.setZoom);
-  const setGenerateFromBestAngles = useAnglesStore(
-    (s) => s.setGenerateFromBestAngles,
-  );
+  // const setGenerateFromBestAngles = useAnglesStore(
+  //   (s) => s.setGenerateFromBestAngles,
+  // );
   const setActiveAngle = useAnglesStore((s) => s.setActiveAngle);
   const setIsLoadingImage = useAnglesStore((s) => s.setIsLoadingImage);
   const resetSource = useAnglesStore((s) => s.resetSource);
@@ -160,9 +157,7 @@ export const Angles = () => {
       // Resolve pending placeholder
       const resolveId =
         event.maybe_frontend_subscriber_id ?? state.pendingSubscriberId;
-      setPendingGenerations((prev) =>
-        prev.filter((p) => p.id !== resolveId),
-      );
+      setPendingGenerations((prev) => prev.filter((p) => p.id !== resolveId));
     });
 
     return () => {
@@ -469,21 +464,18 @@ export const Angles = () => {
     [setActiveAngle],
   );
 
-  const handleHistoryImageRemove = useCallback(
-    (image: BaseSelectorImage) => {
-      setHistoryBundles((prev) =>
-        prev
-          .map((bundle) => ({
-            ...bundle,
-            images: bundle.images.filter(
-              (img) => img.mediaToken !== image.mediaToken,
-            ),
-          }))
-          .filter((bundle) => bundle.images.length > 0),
-      );
-    },
-    [],
-  );
+  const handleHistoryImageRemove = useCallback((image: BaseSelectorImage) => {
+    setHistoryBundles((prev) =>
+      prev
+        .map((bundle) => ({
+          ...bundle,
+          images: bundle.images.filter(
+            (img) => img.mediaToken !== image.mediaToken,
+          ),
+        }))
+        .filter((bundle) => bundle.images.length > 0),
+    );
+  }, []);
 
   const handleHistoryClear = useCallback(() => {
     setHistoryBundles([]);
@@ -738,7 +730,7 @@ export const Angles = () => {
 
                 {/* Toggle + Generate */}
                 <div className="flex shrink-0 flex-col items-end gap-2.5">
-                  <Switch.Group>
+                  {/* <Switch.Group>
                     <div className="flex items-center gap-2">
                       <Switch.Label className="cursor-pointer whitespace-nowrap text-xs text-base-fg/50">
                         Best 12 angles
@@ -761,11 +753,10 @@ export const Angles = () => {
                         />
                       </Switch>
                     </div>
-                  </Switch.Group>
+                  </Switch.Group> */}
 
                   <GenerateButton
                     variant="primary"
-                    icon={faCrosshairs}
                     onClick={handleGenerate}
                     disabled={isProcessing || !sourceMediaToken}
                     loading={isProcessing}
