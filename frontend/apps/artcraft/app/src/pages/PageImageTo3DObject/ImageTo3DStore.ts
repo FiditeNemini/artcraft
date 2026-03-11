@@ -129,6 +129,11 @@ async function captureModelThumbnail(modelUrl: string): Promise<string | null> {
   });
 }
 
+export interface PendingExternalImage {
+  url: string;
+  mediaToken: string;
+}
+
 export type ImageTo3DResult = {
   id: string;
   mode: "image" | "text";
@@ -149,6 +154,9 @@ export const coverImageCache = new Map<string, string>();
 
 type ImageTo3DState = {
   results: ImageTo3DResult[];
+  pendingExternalImage: PendingExternalImage | null;
+  setPendingExternalImage: (url: string, mediaToken: string) => void;
+  clearPendingExternalImage: () => void;
   startGeneration: (
     mode: "image" | "text",
     note: string,
@@ -175,6 +183,13 @@ type ImageTo3DState = {
 
 export const useImageTo3DStore = create<ImageTo3DState>((set, get) => ({
   results: [],
+  pendingExternalImage: null,
+  setPendingExternalImage: (url: string, mediaToken: string) => {
+    set({ pendingExternalImage: { url, mediaToken } });
+  },
+  clearPendingExternalImage: () => {
+    set({ pendingExternalImage: null });
+  },
   startGeneration: (
     mode: "image" | "text",
     note: string,

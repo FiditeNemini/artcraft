@@ -241,6 +241,10 @@ interface GalleryModalProps {
     url: string,
     media_id?: string,
   ) => Promise<void> | void;
+  onMake3DObjectClicked?: (
+    url: string,
+    media_id?: string,
+  ) => Promise<void> | void;
   onMake3DWorldClicked?: (
     url: string,
     media_id?: string,
@@ -356,6 +360,7 @@ export const GalleryModal = React.memo(
     onEditClicked,
     onTurnIntoVideoClicked,
     onRemoveBackgroundClicked,
+    onMake3DObjectClicked,
     onMake3DWorldClicked,
   }: GalleryModalProps) => {
     const [loading, setLoading] = useState(false);
@@ -1286,6 +1291,7 @@ export const GalleryModal = React.memo(
             onEditClicked={onEditClicked}
             onTurnIntoVideoClicked={onTurnIntoVideoClicked}
             onRemoveBackgroundClicked={onRemoveBackgroundClicked}
+            onMake3DObjectClicked={onMake3DObjectClicked}
             onMake3DWorldClicked={onMake3DWorldClicked}
             onNavigatePrev={handleNavigatePrev}
             onNavigateNext={handleNavigateNext}

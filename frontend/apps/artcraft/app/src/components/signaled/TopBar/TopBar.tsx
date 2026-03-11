@@ -63,6 +63,7 @@ import {
   is3DSceneLoaded,
   set3DPageMounted,
 } from "~/pages/PageEnigma/Editor/editor";
+import { useImageTo3DStore } from "~/pages/PageImageTo3DObject/ImageTo3DStore";
 import { useImageTo3DWorldStore } from "~/pages/PageImageTo3DWorld/ImageTo3DWorldStore";
 import { useRemoveBackgroundStore } from "~/pages/PageRemoveBackground/RemoveBackgroundStore";
 import { TabId, useTabStore } from "~/pages/Stores/TabState";
@@ -266,6 +267,23 @@ export const TopBar = ({ pageName }: Props) => {
     try {
       useRemoveBackgroundStore.getState().setPendingExternalUrl(url);
       useTabStore.getState().setActiveTab("REMOVE_BACKGROUND");
+      galleryModalVisibleViewMode.value = false;
+      galleryModalVisibleDuringDrag.value = false;
+      galleryModalLightboxVisible.value = false;
+    } catch (e) {
+      // no-op
+    }
+  };
+
+  const handleMake3DObjectFromGallery = async (
+    url: string,
+    mediaId?: string,
+  ) => {
+    try {
+      if (mediaId) {
+        useImageTo3DStore.getState().setPendingExternalImage(url, mediaId);
+      }
+      useTabStore.getState().setActiveTab("IMAGE_TO_3D_OBJECT");
       galleryModalVisibleViewMode.value = false;
       galleryModalVisibleDuringDrag.value = false;
       galleryModalLightboxVisible.value = false;
@@ -620,6 +638,7 @@ export const TopBar = ({ pageName }: Props) => {
         onEditClicked={handleEditFromGallery}
         onTurnIntoVideoClicked={handleTurnIntoVideoFromGallery}
         onRemoveBackgroundClicked={handleRemoveBackgroundFromGallery}
+        onMake3DObjectClicked={handleMake3DObjectFromGallery}
         onMake3DWorldClicked={handleMake3DWorldFromGallery}
       />
 

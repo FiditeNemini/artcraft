@@ -15,11 +15,7 @@ import {
   faVideo,
   faWandMagicSparkles,
 } from "@fortawesome/pro-solid-svg-icons";
-import {
-  EnqueueImageTo3dObject,
-  EnqueueImageTo3dObjectModel,
-  MediaFileDelete,
-} from "@storyteller/tauri-api";
+import { MediaFileDelete } from "@storyteller/tauri-api";
 import { LoadingSpinner } from "@storyteller/ui-loading-spinner";
 import { Viewer3D } from "@storyteller/ui-viewer-3d";
 import {
@@ -85,6 +81,10 @@ interface LightboxModalProps {
     url: string,
     media_id?: string,
   ) => Promise<void> | void;
+  onMake3DObjectClicked?: (
+    url: string,
+    media_id?: string,
+  ) => Promise<void> | void;
   onMake3DWorldClicked?: (
     url: string,
     media_id?: string,
@@ -115,6 +115,7 @@ export function LightboxModal({
   onEditClicked,
   onTurnIntoVideoClicked,
   onRemoveBackgroundClicked,
+  onMake3DObjectClicked,
   onMake3DWorldClicked,
   batchImageToken,
   onNavigatePrev,
@@ -985,23 +986,27 @@ export function LightboxModal({
                     </Button>
                   )}
 
-                {derivedMediaClass === "image" && (
-                  <Button
-                    className="w-full"
-                    variant="secondary"
-                    icon={faCube}
-                    onClick={async (e) => {
-                      gtagEvent("image_to_3d_clicked");
-                      await EnqueueImageTo3dObject({
-                        image_media_token: selectedMediaToken,
-                        model: EnqueueImageTo3dObjectModel.Hunyuan3d3,
-                        frontend_caller: "mini_app",
-                      });
-                    }}
-                  >
-                    Make 3D
-                  </Button>
-                )}
+                {onMake3DObjectClicked &&
+                  actionUrl &&
+                  derivedMediaClass === "image" && (
+                    <Button
+                      className="w-full"
+                      variant="secondary"
+                      icon={faCube}
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        gtagEvent("image_to_3d_clicked");
+                        await onMake3DObjectClicked(
+                          actionUrl,
+                          selectedMediaToken,
+                        );
+                        onClose();
+                        onCloseGallery();
+                      }}
+                    >
+                      Make 3D
+                    </Button>
+                  )}
 
                 {onMake3DWorldClicked &&
                   actionUrl &&

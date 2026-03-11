@@ -140,6 +140,12 @@ export const ImageTo3DExperience = ({
   const clearPendingExternalImage = useImageTo3DWorldStore(
     (s) => s.clearPendingExternalImage,
   );
+  const pendingObjectImage = useImageTo3DStore(
+    (s) => s.pendingExternalImage,
+  );
+  const clearPendingObjectImage = useImageTo3DStore(
+    (s) => s.clearPendingExternalImage,
+  );
 
   const results = variant === "object" ? objectResults : worldResults;
   const resetResults = variant === "object" ? objectReset : worldReset;
@@ -153,24 +159,34 @@ export const ImageTo3DExperience = ({
 
   useEffect(() => {
     // Read from store directly to avoid Strict Mode double-execution adding the image twice
-    const pending = useImageTo3DWorldStore.getState().pendingExternalImage;
-    if (variant === "world" && pending) {
-      setWorldImages((prev) => {
-        if (prev.length >= MAX_WORLD_IMAGES) return prev;
-        return [
-          ...prev,
-          {
-            id: generateId(),
-            preview: pending.url,
-            mediaToken: pending.mediaToken,
-            name: "Library Image",
-            isUploading: false,
-          },
-        ];
-      });
-      clearPendingExternalImage();
+    if (variant === "world") {
+      const pending = useImageTo3DWorldStore.getState().pendingExternalImage;
+      if (pending) {
+        setWorldImages((prev) => {
+          if (prev.length >= MAX_WORLD_IMAGES) return prev;
+          return [
+            ...prev,
+            {
+              id: generateId(),
+              preview: pending.url,
+              mediaToken: pending.mediaToken,
+              name: "Library Image",
+              isUploading: false,
+            },
+          ];
+        });
+        clearPendingExternalImage();
+      }
+    } else if (variant === "object") {
+      const pending = useImageTo3DStore.getState().pendingExternalImage;
+      if (pending) {
+        setUploadedPreview(pending.url);
+        setUploadedMediaToken(pending.mediaToken);
+        setUploadedName("Library Image");
+        clearPendingObjectImage();
+      }
     }
-  }, [variant, pendingExternalImage, clearPendingExternalImage]);
+  }, [variant, pendingExternalImage, clearPendingExternalImage, pendingObjectImage, clearPendingObjectImage]);
 
   useEffect(() => {
     const onResize = () => setVh(window.innerHeight);
