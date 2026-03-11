@@ -76,6 +76,7 @@ type FailedTask = {
   subtitle?: string;
   failedAt?: Date;
   status: string;
+  failureReason?: string;
 };
 
 const formatTimeLeft = (ms: number): string => {
@@ -237,6 +238,18 @@ const FAILED_STATUS_LABEL: Record<string, string> = {
   cancelled_by_us: "Cancelled",
 };
 
+const FAILURE_REASON_LABEL: Record<string, string> = {
+  rule_bans_user_image: "Image violates content policy",
+  rule_bans_user_image_with_faces: "Images with faces are not allowed",
+  rule_bans_user_text_prompt: "Text prompt violates content policy",
+  rule_bans_user_content: "Content violates content policy",
+  rule_bans_generated_video: "Generated video flagged by content policy",
+  rule_bans_generated_audio: "Generated audio flagged by content policy",
+  rule_bans_generated_content: "Generated content flagged by content policy",
+  generation_failed: "Generation failed",
+  unknown: "An unknown error occurred",
+};
+
 const FailedCard = ({
   task,
   onDismiss,
@@ -269,6 +282,11 @@ const FailedCard = ({
           <div className="mt-1 text-xs font-medium text-red-400">
             {statusLabel}
           </div>
+          {task.failureReason && (
+            <div className="mt-0.5 text-xs text-red-400/60">
+              {task.failureReason}
+            </div>
+          )}
         </div>
         {onDismiss && (
           <button
@@ -412,7 +430,9 @@ export const TaskQueue = () => {
         ? getProviderDisplayName(String(t.provider).toLowerCase())
         : undefined;
       const taskTypeStr = t.task_type ? String(t.task_type).toLowerCase() : "";
-      const modelTypeStr = t.model_type ? String(t.model_type).toLowerCase() : "";
+      const modelTypeStr = t.model_type
+        ? String(t.model_type).toLowerCase()
+        : "";
       const isSplatModel =
         taskTypeStr.includes("gaussian") ||
         modelTypeStr.includes("marble") ||
@@ -562,12 +582,19 @@ export const TaskQueue = () => {
           .sort((a, b) => b.updated_at.getTime() - a.updated_at.getTime())
           .map((t: TaskQueueItem) => {
             const parts = formatTitleParts(t);
+            const fr = t.failure_reason;
+            const failureReason = fr
+              ? fr.failure_message ||
+                FAILURE_REASON_LABEL[fr.failure_type] ||
+                undefined
+              : undefined;
             return {
               id: t.id,
               title: parts.title || "Task",
               subtitle: parts.subtitle,
               failedAt: t.completed_at || t.updated_at,
               status: t.task_status,
+              failureReason,
             };
           });
 

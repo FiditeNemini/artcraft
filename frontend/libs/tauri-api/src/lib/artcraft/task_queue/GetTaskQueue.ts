@@ -12,6 +12,11 @@ interface GetTaskQueueResponse {
   tasks: TaskQueueItem[];
 }
 
+export interface TaskQueueFailureReason {
+  failure_type: string;
+  failure_message?: string;
+}
+
 export interface TaskQueueItem {
   id: string;
   task_status: TaskStatus;
@@ -20,6 +25,7 @@ export interface TaskQueueItem {
   provider?: GenerationProvider;
   provider_job_id?: string;
   completed_item?: TaskQueueCompletedItem;
+  failure_reason?: TaskQueueFailureReason;
   created_at: Date;
   updated_at: Date;
   completed_at?: Date;
@@ -67,6 +73,7 @@ export const GetTaskQueue = async (): Promise<GetTaskQueueResponse> => {
       provider: task.provider,
       provider_job_id: task.provider_job_id,
       completed_item: completed_item,
+      failure_reason: task.failure_reason,
       created_at: new Date(task.created_at),
       updated_at: new Date(task.updated_at),
       completed_at: task.completed_at ? new Date(task.completed_at) : undefined,
