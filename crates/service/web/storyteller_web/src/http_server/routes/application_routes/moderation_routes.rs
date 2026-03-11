@@ -24,6 +24,7 @@ use crate::http_server::endpoints::moderation::wallet_ledger_entries::list_walle
 use crate::http_server::endpoints::moderation::wallet_ledger_entries::moderator_get_wallet_ledger_entry_handler::moderator_get_wallet_ledger_entry_handler;
 use crate::http_server::endpoints::moderation::wallets::list_user_wallets_handler::list_user_wallets_handler;
 use crate::http_server::endpoints::moderation::wallets::moderator_add_banked_balance_to_wallet_handler::moderator_add_banked_balance_to_wallet_handler;
+use crate::http_server::endpoints::moderation::wallets::moderator_create_wallet_for_user_handler::moderator_create_wallet_for_user_handler;
 use crate::http_server::endpoints::moderation::wallets::moderator_get_wallet_handler::moderator_get_wallet_handler;
 use crate::http_server::endpoints::moderation::jobs::get_tts_inference_queue_count::get_tts_inference_queue_count_handler;
 use crate::http_server::endpoints::moderation::jobs::get_w2l_inference_queue_count::get_w2l_inference_queue_count_handler;
@@ -66,13 +67,19 @@ pub fn add_moderator_routes<T, B> (app: App<T>) -> App<T>
                 .route(web::head().to(|| HttpResponse::Ok()))
             )
         )
-        .service(web::resource("/wallet/{wallet_token}")
-            .route(web::get().to(moderator_get_wallet_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
-        )
-        .service(web::resource("/wallet/{wallet_token}/add_banked_balance")
-            .route(web::post().to(moderator_add_banked_balance_to_wallet_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
+        .service(web::scope("/wallet")
+            .service(web::resource("/create_for_user")
+                .route(web::post().to(moderator_create_wallet_for_user_handler))
+                .route(web::head().to(|| HttpResponse::Ok()))
+            )
+            .service(web::resource("/{wallet_token}")
+                .route(web::get().to(moderator_get_wallet_handler))
+                .route(web::head().to(|| HttpResponse::Ok()))
+            )
+            .service(web::resource("/{wallet_token}/add_banked_balance")
+                .route(web::post().to(moderator_add_banked_balance_to_wallet_handler))
+                .route(web::head().to(|| HttpResponse::Ok()))
+            )
         )
         .service(web::scope("/wallets")
             .service(web::resource("/user/{user_token}/list")
