@@ -48,7 +48,7 @@ export const VIDEO_MODELS: VideoModel[] = [
     startFrame: true,
     endFrame: true,
     requiresImage: true,
-    progressBarTime: 100000,
+    progressBarTime: 300000,
     generateWithSound: false,
   }),
   new VideoModel({
@@ -63,7 +63,7 @@ export const VIDEO_MODELS: VideoModel[] = [
     startFrame: true,
     endFrame: true,
     requiresImage: true,
-    progressBarTime: 100000,
+    progressBarTime: 300000,
     generateWithSound: false,
   }),
   new VideoModel({
@@ -78,7 +78,7 @@ export const VIDEO_MODELS: VideoModel[] = [
     startFrame: true,
     endFrame: false,
     requiresImage: true,
-    progressBarTime: 100000,
+    progressBarTime: 300000,
     generateWithSound: false,
   }),
   new VideoModel({
@@ -93,7 +93,7 @@ export const VIDEO_MODELS: VideoModel[] = [
     startFrame: true,
     endFrame: true,
     requiresImage: false,
-    progressBarTime: 100000,
+    progressBarTime: 300000,
     generateWithSound: false,
   }),
   new VideoModel({
@@ -108,7 +108,7 @@ export const VIDEO_MODELS: VideoModel[] = [
     startFrame: true,
     endFrame: false,
     requiresImage: true,
-    progressBarTime: 100000,
+    progressBarTime: 300000,
     generateWithSound: false,
   }),
   new VideoModel({
@@ -143,7 +143,7 @@ export const VIDEO_MODELS: VideoModel[] = [
     supportsCommonAspectRatio: true,
     durationOptions: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
     defaultDuration: 5,
-    progressBarTime: 100000,
+    progressBarTime: 300000,
     generateWithSound: true,
   }),
   new VideoModel({
@@ -178,7 +178,7 @@ export const VIDEO_MODELS: VideoModel[] = [
     supportsCommonAspectRatio: true,
     durationOptions: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
     defaultDuration: 5,
-    progressBarTime: 100000,
+    progressBarTime: 300000,
     generateWithSound: true,
   }),
   new VideoModel({
@@ -245,7 +245,7 @@ export const VIDEO_MODELS: VideoModel[] = [
     defaultResolution: "720p",
     supportsSystemPrompt: false,
     generateWithSound: true,
-    progressBarTime: 100000,
+    progressBarTime: 180000,
   }),
   new VideoModel({
     id: "seedance_2p0",

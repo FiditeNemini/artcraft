@@ -22,18 +22,22 @@ export const MODEL_TYPE_TO_CREATOR: Record<string, ModelCreator> = {
   kling_2p1_master: ModelCreator.Kling,
   kling_2p5_turbo_pro: ModelCreator.Kling,
   kling_2p6_pro: ModelCreator.Kling,
+  kling_3p0_standard: ModelCreator.Kling,
+  kling_3p0_pro: ModelCreator.Kling,
   // Kling — dot-normalized aliases (backend sends e.g. "kling_1.6_pro", normalizeModelKey converts . → _)
   kling_1_6_pro: ModelCreator.Kling,
   kling_2_1_pro: ModelCreator.Kling,
   kling_2_1_master: ModelCreator.Kling,
   // Seedance — p-style IDs
   seedance_1p0_lite: ModelCreator.Bytedance,
+  seedance_1p5_pro: ModelCreator.Bytedance,
   seedance_2p0: ModelCreator.Bytedance,
   // Seedance — dot-normalized aliases
   seedance_1_0_lite: ModelCreator.Bytedance,
   // Seedream
   seedream_4: ModelCreator.Bytedance,
   seedream_4p5: ModelCreator.Bytedance,
+  seedream_5_lite: ModelCreator.Bytedance,
   // Sora
   sora_2: ModelCreator.OpenAi,
   sora_2_pro: ModelCreator.OpenAi,
@@ -45,6 +49,7 @@ export const MODEL_TYPE_TO_CREATOR: Record<string, ModelCreator> = {
   veo_3p1_fast: ModelCreator.Google,
   gemini_25_flash: ModelCreator.Google,
   nano_banana: ModelCreator.Google,
+  nano_banana_2: ModelCreator.Google,
   nano_banana_pro: ModelCreator.Google,
   recraft_3: ModelCreator.Recraft,
   // Hunyuan — p-style IDs
@@ -169,6 +174,8 @@ export const getModelDisplayName = (modelType: string): string => {
     kling_2p1_master: "Kling 2.1 Master",
     kling_2p5_turbo_pro: "Kling 2.5 Turbo Pro",
     kling_2p6_pro: "Kling 2.6 Pro",
+    kling_3p0_standard: "Kling 3.0 Standard",
+    kling_3p0_pro: "Kling 3.0 Pro",
     // Kling — dot-normalized aliases (backend sends e.g. "kling_1.6_pro", normalizeModelKey converts . → _)
     kling_1_6_pro: "Kling 1.6 Pro",
     kling_2_1_pro: "Kling 2.1 Pro",
@@ -176,6 +183,7 @@ export const getModelDisplayName = (modelType: string): string => {
 
     // Seedance (ByteDance) — p-style IDs
     seedance_1p0_lite: "Seedance 1.0 Lite",
+    seedance_1p5_pro: "Seedance 1.5 Pro",
     seedance_2p0: "Seedance 2.0",
     // Seedance — dot-normalized aliases
     seedance_1_0_lite: "Seedance 1.0 Lite",
@@ -183,6 +191,7 @@ export const getModelDisplayName = (modelType: string): string => {
     // Seedream (ByteDance)
     seedream_4: "Seedream 4",
     seedream_4p5: "Seedream 4.5",
+    seedream_5_lite: "Seedream 5 Lite",
 
     // Google
     veo_2: "Veo 2",
@@ -192,6 +201,7 @@ export const getModelDisplayName = (modelType: string): string => {
     veo_3p1_fast: "Google Veo 3.1 Fast",
     gemini_25_flash: "Nano Banana",
     nano_banana: "Nano Banana",
+    nano_banana_2: "Nano Banana 2",
     nano_banana_pro: "Nano Banana Pro",
 
     // Recraft
