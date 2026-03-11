@@ -238,6 +238,7 @@ def main():
                 UPDATE users
                 SET email_address = %s,
                     username = %s,
+                    is_temporary = false,
                     version = version + 1
                 WHERE token = %s
                 LIMIT 1
@@ -257,6 +258,7 @@ def main():
                     password_hash = %s,
                     email_gravatar_hash = %s,
                     is_without_password = false,
+                    is_temporary = false,
                     password_version = password_version + 1,
                     version = version + 1
                 WHERE token = %s
