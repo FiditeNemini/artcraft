@@ -281,6 +281,7 @@ use artcraft_api_defs::moderation::wallet_ledger_entries::list_wallet_ledger_ent
 use artcraft_api_defs::moderation::wallet_ledger_entries::moderator_get_wallet_ledger_entry::*;
 use artcraft_api_defs::moderation::wallets::list_user_wallets::*;
 use artcraft_api_defs::moderation::wallets::moderator_add_banked_balance_to_wallet::*;
+use artcraft_api_defs::moderation::wallets::moderator_create_wallet_for_user::*;
 use artcraft_api_defs::moderation::wallets::moderator_get_wallet::*;
 use artcraft_api_defs::web_referrals::log_web_referral::*;
 use crate::http_server::endpoints::web_referrals::log_web_referral_handler::*;
@@ -468,6 +469,7 @@ use crate::http_server::endpoints::media_files::list::list_batch_generated_redux
     crate::http_server::endpoints::moderation::wallet_ledger_entries::moderator_get_wallet_ledger_entry_handler::moderator_get_wallet_ledger_entry_handler,
     crate::http_server::endpoints::moderation::wallets::list_user_wallets_handler::list_user_wallets_handler,
     crate::http_server::endpoints::moderation::wallets::moderator_add_banked_balance_to_wallet_handler::moderator_add_banked_balance_to_wallet_handler,
+    crate::http_server::endpoints::moderation::wallets::moderator_create_wallet_for_user_handler::moderator_create_wallet_for_user_handler,
     crate::http_server::endpoints::moderation::wallets::moderator_get_wallet_handler::moderator_get_wallet_handler,
     // Credits
     crate::http_server::endpoints::credits::get_session_credits_handler::get_session_credits_handler,
@@ -666,6 +668,8 @@ use crate::http_server::endpoints::media_files::list::list_batch_generated_redux
     ModeratorAddBankedBalanceToWalletPathInfo,
     ModeratorAddBankedBalanceToWalletRequest,
     ModeratorAddBankedBalanceToWalletResponse,
+    ModeratorCreateWalletForUserRequest,
+    ModeratorCreateWalletForUserResponse,
     ModeratorGetWalletPathInfo,
     ModeratorGetWalletResponse,
     ModeratorGetWalletDetails,
