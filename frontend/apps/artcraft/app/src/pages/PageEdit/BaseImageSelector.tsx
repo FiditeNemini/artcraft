@@ -1,5 +1,5 @@
 import { faImages, faPencil } from "@fortawesome/pro-solid-svg-icons";
-import { downloadFileFromUrl } from "libs/api/src/lib/LocalApi";
+import { downloadFileFromUrl } from "@storyteller/api";
 import { GalleryModal, GalleryItem } from "@storyteller/ui-gallery-modal";
 import { useState } from "react";
 import toast from "react-hot-toast";
