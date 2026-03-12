@@ -10,6 +10,7 @@ import {
   faBroom,
   faBomb,
   faCircleExclamation,
+  faTriangleExclamation,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Modal } from "@storyteller/ui-modal";
 import {
@@ -55,6 +56,7 @@ type InProgressTask = {
   updatedAt?: Date;
   canDismiss?: boolean;
   estimatedTimeLeftMs?: number;
+  modelType?: string;
 };
 
 type CompletedTask = {
@@ -105,6 +107,7 @@ const InProgressCard = ({
     : task.estimatedTimeLeftMs != null && task.estimatedTimeLeftMs > 0
       ? formatTimeLeft(task.estimatedTimeLeftMs)
       : null;
+  const isSeedance2 = task.modelType === "seedance_2p0";
   return (
     <div className="rounded-md p-2 transition-colors hover:bg-ui-controls/40">
       <div className="flex items-center gap-2.5">
@@ -117,8 +120,23 @@ const InProgressCard = ({
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between text-sm">
-            <div className="truncate font-medium text-base-fg/90">
+            <div className="flex items-center gap-1.5 truncate font-medium text-base-fg/90">
               {task.title}
+              {isSeedance2 && (
+                <Tooltip
+                  content="Seedance 2.0 is in Early Alpha. Generations may be slow and may experience outages."
+                  position="top"
+                  strategy="fixed"
+                  className="w-[200px] text-wrap bg-yellow-400/60 backdrop-blur-3xl"
+                  zIndex={50}
+                  delay={100}
+                >
+                  <FontAwesomeIcon
+                    icon={faTriangleExclamation}
+                    className="h-3 w-3 shrink-0 text-yellow-400/60 transition-all hover:text-yellow-400"
+                  />
+                </Tooltip>
+              )}
             </div>
             <div className="ml-2 shrink-0 text-xs tabular-nums text-base-fg/60">
               {progressPercent}%
@@ -518,6 +536,7 @@ export const TaskQueue = () => {
               updatedAt: t.updated_at,
               canDismiss,
               estimatedTimeLeftMs,
+              modelType: t.model_type ? String(t.model_type) : undefined,
             };
           });
 
