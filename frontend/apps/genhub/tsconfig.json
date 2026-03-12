@@ -12,6 +12,9 @@
       "path": "../artcraft"
     },
     {
+      "path": "../../libs/api"
+    },
+    {
       "path": "./tsconfig.app.json"
     },
     {
