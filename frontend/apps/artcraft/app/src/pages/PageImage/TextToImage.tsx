@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { JobContextType } from "@storyteller/common";
+import {
+  JobContextType,
+  getThumbnailUrl,
+  THUMBNAIL_SIZES,
+} from "@storyteller/common";
 import { PromptBoxImage } from "@storyteller/ui-promptbox";
 import { uploadImage } from "../../components/reusable/UploadModalMedia/uploadImage";
 import BackgroundGallery from "./BackgroundGallery";
@@ -194,7 +198,7 @@ const TextToImage = ({ imageMediaId, imageUrl }: TextToImageProps) => {
                               key={`sk-${batch.id}-${i}`}
                               className="aspect-square w-full overflow-hidden rounded-lg bg-white/[0.03]"
                             >
-                              <div className="animate-shimmer h-full w-full bg-gradient-to-r from-transparent via-white/10 to-transparent bg-[length:200%_100%]" />
+                              <div className="h-full w-full animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent bg-[length:200%_100%]" />
                             </div>
                           ))}
                           {Array.from({
@@ -222,8 +226,16 @@ const TextToImage = ({ imageMediaId, imageUrl }: TextToImageProps) => {
                                 const lightboxItem = {
                                   id: img.media_token,
                                   label: batch.prompt || "Generated Image",
-                                  thumbnail: img.cdn_url,
-                                  fullImage: img.cdn_url,
+                                  thumbnail:
+                                    getThumbnailUrl(
+                                      img.maybe_thumbnail_template,
+                                      { width: THUMBNAIL_SIZES.MEDIUM },
+                                    ) ?? img.cdn_url,
+                                  fullImage:
+                                    getThumbnailUrl(
+                                      img.maybe_thumbnail_template,
+                                      { width: 2048 },
+                                    ) ?? img.cdn_url,
                                   createdAt: new Date(
                                     batch.createdAt,
                                   ).toISOString(),
@@ -232,6 +244,13 @@ const TextToImage = ({ imageMediaId, imageUrl }: TextToImageProps) => {
                                     (image) => image.media_token,
                                   ),
                                   imageUrls: batch.images.map(
+                                    (image) =>
+                                      getThumbnailUrl(
+                                        image.maybe_thumbnail_template,
+                                        { width: 3200 },
+                                      ) ?? image.cdn_url,
+                                  ),
+                                  actionUrls: batch.images.map(
                                     (image) => image.cdn_url,
                                   ),
                                   thumbnailUrlTemplate:
@@ -245,8 +264,14 @@ const TextToImage = ({ imageMediaId, imageUrl }: TextToImageProps) => {
                               className="aspect-square w-full overflow-hidden rounded-lg transition-opacity duration-200 hover:cursor-pointer hover:opacity-75"
                             >
                               <img
-                                src={img.cdn_url}
+                                src={
+                                  getThumbnailUrl(
+                                    img.maybe_thumbnail_template,
+                                    { width: THUMBNAIL_SIZES.LARGE },
+                                  ) ?? img.cdn_url
+                                }
                                 alt="Generated"
+                                loading="lazy"
                                 className="h-full w-full bg-black/10 object-cover"
                               />
                             </button>

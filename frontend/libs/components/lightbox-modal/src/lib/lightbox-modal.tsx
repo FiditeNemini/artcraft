@@ -57,6 +57,7 @@ interface LightboxModalProps {
   onCloseGallery: () => void;
   imageUrl?: string | null;
   imageUrls?: string[];
+  actionUrls?: string[];
   mediaTokens?: string[];
   imageAlt?: string;
   onImageError?: () => void;
@@ -101,6 +102,7 @@ export function LightboxModal({
   onCloseGallery,
   imageUrl,
   imageUrls,
+  actionUrls,
   mediaTokens,
   imageAlt = "",
   onImageError,
@@ -412,7 +414,8 @@ export function LightboxModal({
   }, [batchImageToken, imageUrl, emblaMainApi, emblaThumbsApi]);
 
   const selectedImageUrl = effectiveImageUrls[selectedIndex] ?? null;
-  const actionUrl = selectedImageUrl ?? downloadUrl ?? undefined;
+  const actionUrl =
+    actionUrls?.[selectedIndex] ?? selectedImageUrl ?? downloadUrl ?? undefined;
 
   const selectedMediaToken = useMemo(() => {
     const tokenFromBatch = batchTokens?.[selectedIndex];

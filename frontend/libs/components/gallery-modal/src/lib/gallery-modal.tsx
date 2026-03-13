@@ -421,6 +421,8 @@ export const GalleryModal = React.memo(
     const imageUrl = lightboxImageSignal.value?.fullImage || "";
     const imageUrls: string[] | undefined = (lightboxImageSignal.value as any)
       ?.imageUrls;
+    const actionUrls: string[] | undefined = (lightboxImageSignal.value as any)
+      ?.actionUrls;
 
     const api = useMemo(() => new GalleryModalApi(), []);
     const mediaFilesApi = useMemo(() => new MediaFilesApi(), []);
@@ -1275,6 +1277,7 @@ export const GalleryModal = React.memo(
             imageUrl={imageUrl}
             // pass multiple images if present
             imageUrls={imageUrls}
+            actionUrls={actionUrls}
             mediaTokens={(lightboxImageSignal.value as any)?.mediaTokens}
             batchImageToken={
               (lightboxImageSignal.value as any)?.batchImageToken
