@@ -29,7 +29,6 @@ import { RefImage, usePromptEditStore } from "./promptStore";
 import { GenerationProvider } from "@storyteller/api-enums";
 import { AspectRatioPicker } from "./common/AspectRatioPicker";
 import { GenerationCountPicker } from "./common/GenerationCountPicker";
-import { useSubscriptionState } from "@storyteller/subscription";
 
 export interface PromptBoxEditProps {
   onModeChange?: (mode: string) => void;
@@ -80,10 +79,6 @@ export const PromptBoxEdit = ({
   onRedo,
   credits,
 }: PromptBoxEditProps) => {
-  // Check subscription status to determine if user is on free plan
-  const hasPaidPlan = useSubscriptionState((s) => s.hasPaidPlan);
-  const isFreeUser = !hasPaidPlan();
-
   const [prompt, setPrompt] = useState("");
   const [useSystemPrompt, setUseSystemPrompt] = useState(true);
   const [isFocused, setIsFocused] = useState(false);
@@ -509,7 +504,6 @@ export const PromptBoxEdit = ({
                   handleCountChange={(count) => {
                     onGenerationCountChange?.(count);
                   }}
-                  isFreeUser={isFreeUser}
                 />
                 <GenerateButton
                   className="flex items-center border-none bg-primary px-3 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"

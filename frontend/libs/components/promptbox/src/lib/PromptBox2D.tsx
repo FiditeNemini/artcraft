@@ -25,7 +25,6 @@ import { twMerge } from "tailwind-merge";
 import { GenerationProvider } from "@storyteller/api-enums";
 import { GenerationCountPicker } from "./common/GenerationCountPicker";
 import { StoreApi, UseBoundStore } from "zustand";
-import { useSubscriptionState } from "@storyteller/subscription";
 
 export type AspectRatio = "wide" | "tall" | "square";
 
@@ -67,10 +66,6 @@ export const PromptBox2D = ({
   usePrompt2DStore,
 }: PromptBox2DProps) => {
   useSignals();
-
-  // Check subscription status to determine if user is on free plan
-  const hasPaidPlan = useSubscriptionState((s) => s.hasPaidPlan);
-  const isFreeUser = !hasPaidPlan();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [content, setContent] = useState<React.ReactNode>("");
@@ -493,7 +488,6 @@ export const PromptBox2D = ({
                 handleCountChange={(count) => {
                   onGenerationCountChange?.(count);
                 }}
-                isFreeUser={isFreeUser}
               />
               <GenerateButton
                 className="flex items-center border-none bg-primary px-3 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"

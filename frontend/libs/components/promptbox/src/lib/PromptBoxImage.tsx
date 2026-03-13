@@ -29,7 +29,6 @@ import { AspectRatioIcon } from "./common/AspectRatioIcon";
 import { GenerationCountPicker } from "./common/GenerationCountPicker";
 import { ResolutionPicker } from "./common/ResolutionPicker";
 import { CommonResolution } from "@storyteller/model-list";
-import { useSubscriptionState } from "@storyteller/subscription";
 
 interface PromptBoxImageProps {
   useJobContext: () => JobContextType;
@@ -67,10 +66,6 @@ export const PromptBoxImage = ({
   credits,
 }: PromptBoxImageProps) => {
   useSignals();
-
-  // Check subscription status to determine if user is on free plan
-  const hasPaidPlan = useSubscriptionState((s) => s.hasPaidPlan);
-  const isFreeUser = !hasPaidPlan();
 
   console.debug("Selected model:", selectedModel);
 
@@ -535,7 +530,6 @@ export const PromptBoxImage = ({
                 handleCountChange={(count) => {
                   setGenerationCount(count);
                 }}
-                isFreeUser={isFreeUser}
               />
               <GenerateButton
                 className="flex items-center border-none bg-primary px-3 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"
