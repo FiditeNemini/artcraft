@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useRef, useEffect, useCallback, useMemo, memo } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { DRAW_LAYER_ID, INPAINT_LAYER_ID, PaintSurface } from "./PaintSurface";
 import "./App.css";
@@ -45,8 +45,208 @@ import { EncodeImageBitmapToBase64 } from "./utilities/EncodeImageBitmapToBase64
 import { RefImage, usePrompt2DStore } from "@storyteller/ui-promptbox";
 import { PromptsApi } from "@storyteller/api";
 import toast from "react-hot-toast";
+import {
+  render3DModelToDataUrl,
+  DEFAULT_MODEL3D_PARAMS,
+  type Model3DParams,
+} from "./utilities/render3DModel";
+import {
+  Model3DOverlay,
+  type Model3DOverlayHandle,
+} from "./components/Model3DOverlay";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faUpRightAndDownLeftFromCenter,
+  faArrowsRotate,
+  faCamera,
+} from "@fortawesome/pro-solid-svg-icons";
 
 const PAGE_ID: ModelPage = ModelPage.Canvas2D;
+
+// ─── Edit3DButton ─────────────────────────────────────────────────────────────
+// Isolated memoized component so Konva-driven position updates (stage pan/zoom,
+// transformer drag) only re-render this small button — not the entire PageDraw
+// tree. It owns the forceUpdate state and Konva event listeners internally.
+interface Edit3DButtonProps {
+  nodeId: string;
+  stageRef: { current: Konva.Stage };
+  onEdit: (nodeId: string) => void;
+}
+
+const Edit3DButton = memo(function Edit3DButton({
+  nodeId,
+  stageRef,
+  onEdit,
+}: Edit3DButtonProps) {
+  const [, forceUpdate] = useState(0);
+  const bump = useCallback(() => forceUpdate((t) => t + 1), []);
+  const [interacting, setInteracting] = useState(false);
+
+  // Attach Konva event listeners:
+  // - Stage pan/zoom → bump() to reposition
+  // - Transformer start/end → hide/show button to avoid jitter
+  // - Node drag start/end → hide/show button
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage?.on) return;
+
+    const ns = ".edit3dbtn";
+    stage.on(
+      `dragmove${ns} xChange${ns} yChange${ns} scaleXChange${ns} scaleYChange${ns}`,
+      bump,
+    );
+
+    const transformers = stage.find("Transformer");
+    transformers.forEach((tr) => {
+      tr.on(`transformstart${ns}`, () => setInteracting(true));
+      // Defer one rAF so Konva finishes writing the node's new attributes
+      // (scaleX/Y, width/height) before we read getClientRect() in the render.
+      tr.on(`transformend${ns}`, () => requestAnimationFrame(() => { setInteracting(false); bump(); }));
+    });
+
+    const konvaNode = stage.findOne("#" + nodeId);
+    if (konvaNode) {
+      konvaNode.on(`dragstart${ns}`, () => setInteracting(true));
+      konvaNode.on(`dragend${ns}`, () => requestAnimationFrame(() => { setInteracting(false); bump(); }));
+    }
+
+    return () => {
+      stage.off(ns);
+      transformers.forEach((tr) => tr.off(ns));
+      konvaNode?.off(ns);
+    };
+  }, [stageRef, bump, nodeId]);
+
+  if (interacting) return null;
+
+  const stage = stageRef.current;
+  if (!stage?.container) return null;
+
+  const konvaNode = stage.findOne("#" + nodeId) as Konva.Shape | undefined;
+  if (!konvaNode) return null;
+
+  // getClientRect() returns the AABB in stage-container coords after all
+  // transforms (rotation, scale, stage pan/zoom) — no manual math needed.
+  const clientRect = konvaNode.getClientRect();
+  const stageContainerRect = stage.container().getBoundingClientRect();
+  const btnLeft = stageContainerRect.left + clientRect.x + clientRect.width / 2;
+  const btnTop = stageContainerRect.top + clientRect.y + clientRect.height / 2;
+
+  return (
+    <button
+      className="pointer-events-auto fixed z-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white shadow-lg hover:bg-blue-500"
+      style={{ left: btnLeft, top: btnTop }}
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={() => onEdit(nodeId)}
+    >
+      Edit 3D
+    </button>
+  );
+});
+
+// ─── DragScrubButton ──────────────────────────────────────────────────────────
+// Round button that scrubs a 3D parameter on horizontal+vertical drag.
+// Uses pointer capture so the drag continues outside the button bounds.
+function DragScrubButton({
+  icon,
+  title,
+  onDrag,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  onDrag: (dx: number, dy: number) => void;
+}) {
+  const onPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+  const onPointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (e.buttons === 0) return;
+    onDrag(e.movementX, e.movementY);
+  };
+  return (
+    <button
+      title={title}
+      className="flex h-10 w-10 cursor-move items-center justify-center rounded-full bg-black/70 text-white shadow-lg hover:bg-black/90 active:bg-blue-600"
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+    >
+      {icon}
+    </button>
+  );
+}
+
+// ─── Edit3DScrubControls ──────────────────────────────────────────────────────
+// Shown in place of Edit3DButton while the 3D overlay is open. Renders the
+// scrub buttons (scale, rotate, FOV, apply) at the same node-center position,
+// communicating with Model3DOverlay via an imperative handle ref.
+interface Edit3DScrubControlsProps {
+  nodeId: string;
+  stageRef: { current: Konva.Stage };
+  overlayHandle: React.RefObject<Model3DOverlayHandle>;
+}
+
+const Edit3DScrubControls = memo(function Edit3DScrubControls({
+  nodeId,
+  stageRef,
+  overlayHandle,
+}: Edit3DScrubControlsProps) {
+  const [, forceUpdate] = useState(0);
+  const bump = useCallback(() => forceUpdate((t) => t + 1), []);
+
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage?.on) return;
+    const ns = ".edit3dcontrols";
+    stage.on(
+      `dragmove${ns} xChange${ns} yChange${ns} scaleXChange${ns} scaleYChange${ns}`,
+      bump,
+    );
+    return () => {
+      stage.off(ns);
+    };
+  }, [stageRef, bump, nodeId]);
+
+  const stage = stageRef.current;
+  if (!stage?.container) return null;
+  const konvaNode = stage.findOne("#" + nodeId) as Konva.Shape | undefined;
+  if (!konvaNode) return null;
+
+  const clientRect = konvaNode.getClientRect();
+  const stageContainerRect = stage.container().getBoundingClientRect();
+  const cx = stageContainerRect.left + clientRect.x + clientRect.width / 2;
+  const cy = stageContainerRect.top + clientRect.y + clientRect.height / 2;
+
+  return (
+    <div
+      className="pointer-events-auto fixed z-[60] flex -translate-x-1/2 -translate-y-1/2 items-center gap-2"
+      style={{ left: cx, top: cy }}
+    >
+      <DragScrubButton
+        icon={<FontAwesomeIcon icon={faUpRightAndDownLeftFromCenter} />}
+        title="Scale — drag"
+        onDrag={(dx, dy) => overlayHandle.current?.onScaleDrag(dx, dy)}
+      />
+      <DragScrubButton
+        icon={<FontAwesomeIcon icon={faArrowsRotate} />}
+        title="Rotate — drag"
+        onDrag={(dx, dy) => overlayHandle.current?.onRotateDrag(dx, dy)}
+      />
+      <DragScrubButton
+        icon={<FontAwesomeIcon icon={faCamera} />}
+        title="Field of view — drag"
+        onDrag={(dx, dy) => overlayHandle.current?.onFovDrag(dx, dy)}
+      />
+      <button
+        onClick={() => overlayHandle.current?.commit()}
+        className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white shadow-lg hover:bg-blue-500"
+        onPointerDown={(e) => e.stopPropagation()}
+      >
+        ✓
+      </button>
+    </div>
+  );
+});
 
 export const DecodeBase64ToImage = async (
   base64String: string,
@@ -77,6 +277,8 @@ const PageDraw = () => {
   const canvasWidth = useRef<number>(1024);
   const canvasHeight = useRef<number>(1024);
   const [isSelecting, setIsSelecting] = useState<boolean>(false);
+  const [editing3DNodeId, setEditing3DNodeId] = useState<string | null>(null);
+  const overlayHandleRef = useRef<Model3DOverlayHandle>(null);
   const stageRef = useRef<Konva.Stage>({} as Konva.Stage);
   const transformerRefs = useRef<{ [key: string]: Konva.Transformer }>({});
 
@@ -113,6 +315,8 @@ const PageDraw = () => {
       finishRemoveBackground: state.finishRemoveBackground,
       createImageFromUrl: state.createImageFromUrl,
       createImageFromFile: state.createImageFromFile,
+      createImageFrom3DModel: state.createImageFrom3DModel,
+      updateNode: state.updateNode,
       setBaseImageInfo: state.setBaseImageInfo,
       RESET: state.RESET,
       clearLineNodes: state.clearLineNodes,
@@ -158,6 +362,8 @@ const PageDraw = () => {
     finishRemoveBackground,
     createImageFromUrl,
     createImageFromFile,
+    createImageFrom3DModel,
+    updateNode,
     setBaseImageInfo,
     RESET,
     clearLineNodes,
@@ -274,9 +480,8 @@ const PageDraw = () => {
 
   // Listen for gallery drag and drop events
   useEffect(() => {
-    const handleGallery2DDrop = (event: CustomEvent) => {
+    const handleGallery2DDrop = async (event: CustomEvent) => {
       const { item, canvasPosition } = event.detail;
-      console.log("Received 2D gallery drop:", { item, canvasPosition });
 
       const stage = stageRef.current;
       if (!stage) {
@@ -286,18 +491,50 @@ const PageDraw = () => {
         return;
       }
       // Transform canvas coordinates to stage coordinates
-      // Account for stage position, scale, and transformations
-      const stageX = stage.x();
-      const stageY = stage.y();
-      const scaleX = stage.scaleX();
-      const scaleY = stage.scaleY();
-
       const stagePoint = {
-        x: (canvasPosition.x - stageX) / scaleX,
-        y: (canvasPosition.y - stageY) / scaleY,
+        x: (canvasPosition.x - stage.x()) / stage.scaleX(),
+        y: (canvasPosition.y - stage.y()) / stage.scaleY(),
       };
 
-      console.log("Transformed stage coordinates:", stagePoint);
+      if (item.mediaClass === "dimensional") {
+        const modelUrl = item.fullImage;
+        if (!modelUrl) {
+          console.error("No model URL available for 3D item");
+          return;
+        }
+        const toastId = toast.loading(`Loading 3D model "${item.label}"…`);
+        try {
+          const dataUrl = await render3DModelToDataUrl(
+            modelUrl,
+            DEFAULT_MODEL3D_PARAMS,
+          );
+          const img = new globalThis.Image();
+          img.onload = () => {
+            const canvasDims = getAspectRatioDimensions();
+            const maxDim = Math.min(canvasDims.width, canvasDims.height) * 0.25;
+            const aspect = img.width / img.height;
+            const displayW = Math.min(img.width, maxDim * Math.max(1, aspect));
+            const displayH = displayW / aspect;
+            createImageFrom3DModel(
+              stagePoint.x - displayW / 2,
+              stagePoint.y - displayH / 2,
+              dataUrl,
+              modelUrl,
+              { ...DEFAULT_MODEL3D_PARAMS, nativeWidth: img.width, nativeHeight: img.height },
+              displayW,
+              displayH,
+            );
+            toast.success(`Added "${item.label}" to canvas`, { id: toastId });
+          };
+          img.src = dataUrl;
+        } catch (err) {
+          console.error("Failed to render 3D model:", err);
+          toast.error(`Failed to load 3D model "${item.label}"`, {
+            id: toastId,
+          });
+        }
+        return;
+      }
 
       const imageUrl = item.fullImage || item.thumbnail;
       if (!imageUrl) {
@@ -305,14 +542,7 @@ const PageDraw = () => {
         return;
       }
 
-      console.log("Creating image from URL:", imageUrl);
-
       createImageFromUrl(stagePoint.x, stagePoint.y, imageUrl);
-
-      console.log(
-        `Created image "${item.label}" at stage position:`,
-        stagePoint,
-      );
     };
 
     window.addEventListener(
@@ -326,8 +556,51 @@ const PageDraw = () => {
         handleGallery2DDrop as EventListener,
       );
     };
-    // Stable action ref; no need to depend on full store.
-  }, [createImageFromUrl]);
+  }, [createImageFromUrl, createImageFrom3DModel]);
+
+  // Auto-close the 3D overlay when the editing node is no longer selected
+  // (e.g. user clicks the canvas background or selects a different node).
+  // We do NOT auto-open here — opening is gated behind the "Edit 3D" button
+  // so the Konva transformer can work normally on selection.
+  useEffect(() => {
+    if (editing3DNodeId && !selectedNodeIds.includes(editing3DNodeId)) {
+      setEditing3DNodeId(null);
+    }
+  }, [selectedNodeIds, editing3DNodeId]);
+
+  const handle3DOverlayCommit = useCallback(
+    (dataUrl: string, params: Model3DParams) => {
+      if (!editing3DNodeId) return;
+      const img = new globalThis.Image();
+      img.onload = () => {
+        updateNode(
+          editing3DNodeId,
+          { imageUrl: dataUrl, imageElement: img, model3dParams: params },
+          true,
+        );
+      };
+      img.src = dataUrl;
+      setEditing3DNodeId(null);
+      // Deselect so the auto-open useEffect doesn't immediately re-trigger
+      // the overlay when the updated node re-appears in the Konva canvas.
+      selectNode(null);
+    },
+    [editing3DNodeId, updateNode, selectNode],
+  );
+
+  // Derive a display-only node list that hides the node currently open in the
+  // 3D overlay. We filter here rather than in the store so the node's data
+  // (position, modelUrl, model3dParams) is fully preserved and the overlay
+  // can read it via `nodes.find(...)`. The Three.js canvas sits directly on
+  // top of where the Konva image would be, so removing it from the render
+  // list eliminates the double-image without any visual gap.
+  const displayNodes = useMemo(
+    () =>
+      editing3DNodeId
+        ? nodes.filter((n) => n.id !== editing3DNodeId)
+        : nodes,
+    [nodes, editing3DNodeId],
+  );
 
   const handleImageUpload = async (files: File[]): Promise<void> => {
     // Determine current canvas dimensions from the store (according to aspect-ratio)
@@ -940,7 +1213,7 @@ const PageDraw = () => {
           })}
         >
           <PaintSurface
-            nodes={nodes}
+            nodes={displayNodes}
             lineNodes={lineNodes}
             selectedNodeIds={selectedNodeIds}
             onCanvasSizeChange={(width: number, height: number): void => {
@@ -974,6 +1247,38 @@ const PageDraw = () => {
         <CostCalculatorButton modelPage={PAGE_ID} />
         <HelpMenuButton />
       </div>
+      {/* Floating "Edit 3D" button — shown above the selected 3D-model node
+          when the overlay is not already open. Rendered as an isolated memoized
+          component so Konva-driven position updates don't re-render PageDraw. */}
+      {!editing3DNodeId &&
+        selectedNodeIds.length === 1 &&
+        nodes.find((n) => n.id === selectedNodeIds[0])?.modelUrl && (
+          <Edit3DButton
+            nodeId={selectedNodeIds[0]}
+            stageRef={stageRef}
+            onEdit={setEditing3DNodeId}
+          />
+        )}
+      {editing3DNodeId &&
+        (() => {
+          const editingNode = nodes.find((n) => n.id === editing3DNodeId);
+          return editingNode ? (
+            <>
+              <Edit3DScrubControls
+                nodeId={editing3DNodeId}
+                stageRef={stageRef}
+                overlayHandle={overlayHandleRef}
+              />
+              <Model3DOverlay
+                ref={overlayHandleRef}
+                node={editingNode}
+                stageRef={stageRef}
+                onCommit={handle3DOverlayCommit}
+                onDismiss={() => setEditing3DNodeId(null)}
+              />
+            </>
+          ) : null;
+        })()}
     </>
   );
 };
