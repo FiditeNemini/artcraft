@@ -79,6 +79,7 @@ type FailedTask = {
   failedAt?: Date;
   status: string;
   failureReason?: string;
+  failureMessage?: string;
 };
 
 const formatTimeLeft = (ms: number): string => {
@@ -297,13 +298,38 @@ const FailedCard = ({
               {task.subtitle}
             </div>
           )}
-          <div className="mt-1 text-xs font-medium text-red-400">
-            {statusLabel}
+          <div className="mt-1 flex items-center gap-1.5">
+            <span className="rounded bg-red-500/15 px-1.5 py-0 text-[11px] font-medium text-red-400">
+              {statusLabel}
+            </span>
+            {task.failureReason && (
+              <Tooltip
+                content={task.failureReason}
+                position="bottom"
+                strategy="fixed"
+                className="max-w-[280px] text-wrap bg-danger text-xs"
+                zIndex={50}
+                delay={300}
+              >
+                <span className="truncate text-[11px] text-red-400/60">
+                  {task.failureReason}
+                </span>
+              </Tooltip>
+            )}
           </div>
-          {task.failureReason && (
-            <div className="mt-0.5 text-xs text-red-400/60">
-              {task.failureReason}
-            </div>
+          {task.failureMessage && (
+            <Tooltip
+              content={task.failureMessage}
+              position="bottom"
+              strategy="fixed"
+              className="max-w-[280px] text-wrap text-xs"
+              zIndex={50}
+              delay={200}
+            >
+              <div className="mt-0.5 cursor-default truncate text-[11px] text-base-fg/40">
+                {task.failureMessage}
+              </div>
+            </Tooltip>
           )}
         </div>
         {onDismiss && (
@@ -603,17 +629,20 @@ export const TaskQueue = () => {
             const parts = formatTitleParts(t);
             const fr = t.failure_reason;
             const failureReason = fr
-              ? fr.failure_message ||
-                FAILURE_REASON_LABEL[fr.failure_type] ||
-                undefined
+              ? FAILURE_REASON_LABEL[fr.failure_type] || undefined
               : undefined;
+            const failureMessage =
+              fr?.failure_message && fr.failure_type !== "unknown"
+                ? fr.failure_message
+                : undefined;
             return {
               id: t.id,
               title: parts.title || "Task",
               subtitle: parts.subtitle,
               failedAt: t.completed_at || t.updated_at,
               status: t.task_status,
-              failureReason,
+              failureReason: failureReason || fr?.failure_message || undefined,
+              failureMessage,
             };
           });
 
