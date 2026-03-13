@@ -5,9 +5,11 @@ pub struct SyntheticFailure {
   pub frontend_failure_message: Option<String>,
 }
 
-/// If the prompt contains a trigger phrase, parse a `FrontendFailureCategory`
-/// from the remaining words (falling back to `GenerationFailed`) and return a
-/// `SyntheticFailure`. Returns `None` when the trigger phrase is absent.
+/// If the prompt contains the secret trigger phrase, parse a
+/// `FrontendFailureCategory` from the remaining words (falling back to
+/// `GenerationFailed`) and return a `SyntheticFailure`.
+///
+/// Returns `None` when the trigger phrase is absent.
 pub fn test_synthetic_failure_reason(prompt: &str) -> Option<SyntheticFailure> {
   let lower = prompt.to_ascii_lowercase();
   if !lower.contains("simulate_artcraft_failure") && !lower.contains("test_artcraft_failure") {
@@ -24,14 +26,6 @@ pub fn test_synthetic_failure_reason(prompt: &str) -> Option<SyntheticFailure> {
     frontend_failure_category: category,
     frontend_failure_message: Some("This was a simulated failure".to_string()),
   })
-}
-
-/// Returns `true` if the prompt contains the secret test phrase that triggers
-/// a synthetic job failure. The job record is inserted with
-/// `JobStatusPlus::CompleteFailure` immediately, without calling any external
-/// inference service or performing billing.
-pub fn is_job_failure_test(prompt: &str) -> bool {
-  prompt.to_ascii_lowercase().contains("artcraft_test_job_failure")
 }
 
 #[cfg(test)]
