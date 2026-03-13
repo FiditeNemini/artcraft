@@ -366,7 +366,7 @@ async fn modern_media_file_lookup(
       maybe_batch_token: result.maybe_batch_token,
       maybe_scene_source_media_file_token: result.maybe_scene_source_media_file_token,
       media_links: MediaLinksBuilder::from_media_path_and_env(media_domain, server_state.server_environment, &public_bucket_path),
-      public_bucket_url: bucket_url_from_media_path(&public_bucket_path)
+      public_bucket_url: bucket_url_from_media_path(&public_bucket_path, media_domain, server_state.server_environment)
           .map_err(|err| {
             warn!("error creating URL: {:?}", err);
             GetMediaFileError::ServerError
@@ -377,6 +377,7 @@ async fn modern_media_file_lookup(
       cover_image: MediaFileCoverImageDetails::from_optional_db_fields(
         &result.token,
         media_domain,
+        server_state.server_environment,
         result.maybe_file_cover_image_public_bucket_hash.as_deref(),
         result.maybe_file_cover_image_public_bucket_prefix.as_deref(),
         result.maybe_file_cover_image_public_bucket_extension.as_deref(),
@@ -503,13 +504,13 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
       maybe_batch_token: None,
       maybe_scene_source_media_file_token: None,
       media_links: MediaLinksBuilder::from_rooted_path_and_env(media_domain, server_state.server_environment, &public_bucket_path),
-      public_bucket_url: bucket_url_from_str_path(&public_bucket_path)
+      public_bucket_url: bucket_url_from_str_path(&public_bucket_path, media_domain, server_state.server_environment)
           .map_err(|err| {
             warn!("error creating URL: {:?}", err);
             GetMediaFileError::ServerError
           })?,
       public_bucket_path,
-      cover_image: MediaFileCoverImageDetails::from_token_str(&result.tts_result_token),
+      cover_image: MediaFileCoverImageDetails::from_legacy_token_str(&result.tts_result_token),
       maybe_model_weight_info: Some(GetMediaFileModelInfo {
         // NB: These should be reasonable synthetic defaults for emulated TT2 results, even the "ModelWeightToken".
         weight_token: ModelWeightToken::new_from_str(&result.tts_model_token),

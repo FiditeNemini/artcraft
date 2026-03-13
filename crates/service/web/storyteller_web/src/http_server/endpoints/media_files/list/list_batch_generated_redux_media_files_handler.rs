@@ -8,7 +8,6 @@ use crate::http_server::common_responses::media::media_links_builder::MediaLinks
 use crate::http_server::common_responses::user_details_lite_builder::UserDetailsLightBuilder;
 use crate::http_server::endpoints::media_files::get::get_media_file_handler::GetMediaFilePathInfo;
 use crate::http_server::endpoints::media_files::helpers::get_media_domain::get_media_domain;
-use crate::http_server::web_utils::bucket_urls::bucket_url_string_from_media_path::bucket_url_string_from_media_path;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 use actix_web::error::ResponseError;
@@ -120,6 +119,7 @@ pub async fn list_batch_generated_redux_media_files_handler(
           cover_image: MediaFileCoverImageDetailsBuilder::from_optional_db_fields(
             &result.token,
             media_domain,
+            server_state.server_environment,
             result.maybe_file_cover_image_public_bucket_hash.as_deref(),
             result.maybe_file_cover_image_public_bucket_prefix.as_deref(),
             result.maybe_file_cover_image_public_bucket_extension.as_deref(),
