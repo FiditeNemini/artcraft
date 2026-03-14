@@ -139,9 +139,9 @@ const TextToImage = ({ imageMediaId, imageUrl }: TextToImageProps) => {
                 imageRowVisible && "mb-80",
               )}
             >
-              <span className="text-7xl font-bold text-base-fg">
+              <h1 className="text-7xl font-bold text-base-fg">
                 Generate Image
-              </span>
+              </h1>
               <span className="pt-2 text-xl text-base-fg opacity-80">
                 Add a prompt, then generate
               </span>

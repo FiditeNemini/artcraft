@@ -125,9 +125,7 @@ const ImageToVideo = ({ imageMediaId, imageUrl }: ImageToVideoProps) => {
               imageRowVisible && "mb-80",
             )}
           >
-            <span className="text-7xl font-bold text-base-fg">
-              Generate Video
-            </span>
+            <h1 className="text-7xl font-bold text-base-fg">Generate Video</h1>
             <span className="pt-2 text-xl text-base-fg opacity-80">
               Choose an image, add a prompt, then generate
             </span>
