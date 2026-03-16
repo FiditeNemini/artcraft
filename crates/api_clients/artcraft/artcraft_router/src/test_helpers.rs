@@ -290,6 +290,8 @@ pub fn base_video_request() -> GenerateVideoRequest<'static> {
     start_frame: None,
     end_frame: None,
     reference_images: None,
+    reference_videos: None,
+    reference_audio: None,
     resolution: None,
     aspect_ratio: None,
     duration_seconds: None,
