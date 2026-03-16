@@ -263,7 +263,6 @@ export const Angles = () => {
         frontend_subscriber_id: subscriberId,
       });
 
-      toast.success("Angle generation enqueued");
     } catch (error) {
       console.error("Error generating angle:", error);
       toast.error("Failed to generate angle");
