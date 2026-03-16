@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { JobContextType } from "@storyteller/common";
-import { PromptBoxVideo } from "@storyteller/ui-promptbox";
+import { PromptBoxVideo, usePromptVideoStore } from "@storyteller/ui-promptbox";
+import { UploadImageMedia, UploadVideoMedia, UploadAudioMedia } from "@storyteller/api";
 import BackgroundGallery from "./BackgroundGallery";
 import {
   ClassyModelSelector,
@@ -20,7 +21,6 @@ import {
 } from "@storyteller/tauri-events";
 // import { Badge } from "@storyteller/ui-badge";
 import { twMerge } from "tailwind-merge";
-import { uploadImage } from "../../components/reusable/UploadModalMedia/uploadImage";
 import { HelpMenuButton } from "@storyteller/ui-help-menu";
 import {
   CostCalculatorButton,
@@ -42,6 +42,7 @@ const ImageToVideo = ({ imageMediaId, imageUrl }: ImageToVideoProps) => {
   const completeBatch = useImageToVideoStore((s) => s.completeBatch);
   // const resetBatches = useImageToVideoStore((s) => s.reset);
   const [imageRowVisible, setImageRowVisible] = useState(true);
+  const inputMode = usePromptVideoStore((s) => s.inputMode);
   const promptContentRef = useRef<HTMLDivElement>(null);
   const [_promptHeight, setPromptHeight] = useState<number>(138);
 
@@ -122,7 +123,11 @@ const ImageToVideo = ({ imageMediaId, imageUrl }: ImageToVideoProps) => {
           <div
             className={twMerge(
               "relative z-20 mb-52 flex flex-col items-center justify-center text-center drop-shadow-xl",
-              imageRowVisible && "mb-80",
+              imageRowVisible &&
+                (inputMode === "reference" &&
+                selectedVideoModel?.supportsReferenceMode
+                  ? "mb-[30rem]"
+                  : "mb-80"),
             )}
           >
             <h1 className="text-7xl font-bold text-base-fg">Generate Video</h1>
@@ -201,7 +206,9 @@ const ImageToVideo = ({ imageMediaId, imageUrl }: ImageToVideoProps) => {
                 imageMediaId={imageMediaId}
                 url={imageUrl ?? undefined}
                 onImageRowVisibilityChange={setImageRowVisible}
-                uploadImage={uploadImage}
+                uploadImage={UploadImageMedia}
+                uploadVideo={UploadVideoMedia}
+                uploadAudio={UploadAudioMedia}
                 credits={videoCredits}
                 onEnqueuePressed={async (prompt, subscriberId) => {
                   const modelLabel = selectedVideoModel?.fullName ?? "";
