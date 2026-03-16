@@ -31,6 +31,7 @@ interface AnglesState {
   // Source image
   sourceImageUrl: string | null;
   sourceMediaToken: string | null;
+  sourceThumbnailUrlTemplate: string | null;
   imageDimensions: ImageDimensions | null;
 
   // Angle config
@@ -47,7 +48,7 @@ interface AnglesState {
   isLoadingImage: boolean;
 
   // Actions
-  setSourceImage: (url: string, mediaToken: string | null) => void;
+  setSourceImage: (url: string, mediaToken: string | null, thumbnailUrlTemplate?: string | null) => void;
   setImageDimensions: (dims: ImageDimensions | null) => void;
   setRotation: (value: number) => void;
   setTilt: (value: number) => void;
@@ -82,6 +83,7 @@ const DEFAULT_CONFIG: AngleConfig = {
 export const useAnglesStore = create<AnglesState>((set, get) => ({
   sourceImageUrl: null,
   sourceMediaToken: null,
+  sourceThumbnailUrlTemplate: null,
   imageDimensions: null,
   angleConfig: { ...DEFAULT_CONFIG },
   generateFromBestAngles: false,
@@ -91,8 +93,8 @@ export const useAnglesStore = create<AnglesState>((set, get) => ({
   pendingSubscriberIds: [],
   isLoadingImage: false,
 
-  setSourceImage: (url, mediaToken) => {
-    set({ sourceImageUrl: url, sourceMediaToken: mediaToken });
+  setSourceImage: (url, mediaToken, thumbnailUrlTemplate) => {
+    set({ sourceImageUrl: url, sourceMediaToken: mediaToken, sourceThumbnailUrlTemplate: thumbnailUrlTemplate ?? null });
   },
 
   setImageDimensions: (dims) => {
@@ -210,6 +212,7 @@ export const useAnglesStore = create<AnglesState>((set, get) => ({
     set({
       sourceImageUrl: null,
       sourceMediaToken: null,
+      sourceThumbnailUrlTemplate: null,
       imageDimensions: null,
       angleConfig: { ...DEFAULT_CONFIG },
       generateFromBestAngles: false,
@@ -223,6 +226,7 @@ export const useAnglesStore = create<AnglesState>((set, get) => ({
     set({
       sourceImageUrl: null,
       sourceMediaToken: null,
+      sourceThumbnailUrlTemplate: null,
       imageDimensions: null,
       angleConfig: { ...DEFAULT_CONFIG },
       generateFromBestAngles: false,

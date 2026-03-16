@@ -11,7 +11,7 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button, GenerateButton } from "@storyteller/ui-button";
 import { GalleryItem, GalleryModal } from "@storyteller/ui-gallery-modal";
-import { MediaUploadApi, downloadFileFromUrl } from "@storyteller/api";
+import { MediaUploadApi, MediaFilesApi, downloadFileFromUrl } from "@storyteller/api";
 import toast from "react-hot-toast";
 import { v4 as uuidv4 } from "uuid";
 
@@ -74,6 +74,7 @@ export const Angles = () => {
   // State selectors (only re-render when specific values change)
   const sourceImageUrl = useAnglesStore((s) => s.sourceImageUrl);
   const sourceMediaToken = useAnglesStore((s) => s.sourceMediaToken);
+  const sourceThumbnailUrlTemplate = useAnglesStore((s) => s.sourceThumbnailUrlTemplate);
   const imageDimensions = useAnglesStore((s) => s.imageDimensions);
   const angleConfig = useAnglesStore((s) => s.angleConfig);
   // const generateFromBestAngles = useAnglesStore(
@@ -184,7 +185,24 @@ export const Angles = () => {
           throw new Error("Upload failed — no media token returned");
         }
 
-        setSourceImage(objectUrl, uploadResult.data);
+        const mediaToken = uploadResult.data;
+
+        // Fetch CDN URL + thumbnail template from backend
+        let cdnUrl = objectUrl;
+        let thumbnailUrlTemplate: string | undefined;
+        try {
+          const api = new MediaFilesApi();
+          const mediaFile = await api.GetMediaFileByToken({ mediaFileToken: mediaToken });
+          if (mediaFile.success && mediaFile.data) {
+            const links = mediaFile.data.media_links as { cdn_url?: string; thumbnail_template?: string; maybe_thumbnail_template?: string } | undefined;
+            cdnUrl = links?.cdn_url || (mediaFile.data as any).public_bucket_url || objectUrl;
+            thumbnailUrlTemplate = links?.thumbnail_template || links?.maybe_thumbnail_template;
+          }
+        } catch {
+          // Fall back to blob URL if fetching CDN info fails
+        }
+
+        setSourceImage(cdnUrl, mediaToken, thumbnailUrlTemplate);
         setIsLoadingImage(false);
       } catch (error) {
         console.error("Error processing image:", error);
@@ -402,12 +420,13 @@ export const Angles = () => {
         {
           url: sourceImageUrl,
           mediaToken: sourceMediaToken,
+          thumbnailUrlTemplate: sourceThumbnailUrlTemplate ?? undefined,
           fullImageUrl: sourceImageUrl,
         },
       ],
     };
     return [sourceBundle, ...historyBundles];
-  }, [sourceImageUrl, sourceMediaToken, historyBundles]);
+  }, [sourceImageUrl, sourceMediaToken, sourceThumbnailUrlTemplate, historyBundles]);
 
   const handleHistoryImageSelect = useCallback(
     (image: BaseSelectorImage) => {
