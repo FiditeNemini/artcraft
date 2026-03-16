@@ -31,8 +31,23 @@ pub struct GenerateVideoArgs<'a> {
   /// Optional end frame image URL (keyframe mode).
   pub end_frame_url: Option<String>,
 
-  /// Optional reference image URLs (reference mode). When present, takes priority over start/end frames.
+  /// Optional reference image URLs (reference mode).
+  /// When present, takes priority over start/end frames.
   pub reference_image_urls: Option<Vec<String>>,
+
+  /// Optional reference video URLs (reference mode).
+  /// Can be combined with reference_image_urls.
+  /// Videos are referenced in prompts as @video1, @video2, etc.
+  /// When present, takes priority over start/end frames.
+  pub reference_video_urls: Option<Vec<String>>,
+
+  /// Optional reference audio URLs (reference mode).
+  /// Audio is referenced in prompts as @audio1, @audio2, etc.
+  /// Sent in a separate `audioUrls` field (not in `uploadedUrls`).
+  pub reference_audio_urls: Option<Vec<String>>,
+
+  /// Controls the `faceBlurMode` field: true sends "on", false sends "off", None omits it.
+  pub use_face_blur_hack: Option<bool>,
 }
 
 impl GenerateVideoArgs<'_> {
@@ -126,12 +141,23 @@ pub struct GenerateVideoResponse {
 // --- Implementation ---
 
 pub async fn generate_video(args: GenerateVideoArgs<'_>) -> Result<GenerateVideoResponse, Seedance2ProError> {
-  let is_reference_mode = args.reference_image_urls.as_ref().is_some_and(|urls| !urls.is_empty());
+  let has_reference_images = args.reference_image_urls.as_ref().is_some_and(|urls| !urls.is_empty());
+  let has_reference_videos = args.reference_video_urls.as_ref().is_some_and(|urls| !urls.is_empty());
+  let has_reference_audio = args.reference_audio_urls.as_ref().is_some_and(|urls| !urls.is_empty());
+
+  let is_reference_mode = has_reference_images || has_reference_videos || has_reference_audio;
 
   let video_input_mode = if is_reference_mode { "reference" } else { "keyframe" };
 
   let uploaded_urls: Option<Vec<String>> = if is_reference_mode {
-    args.reference_image_urls
+    let mut urls = Vec::new();
+    if let Some(video_urls) = args.reference_video_urls {
+      urls.extend(video_urls);
+    }
+    if let Some(image_urls) = args.reference_image_urls {
+      urls.extend(image_urls);
+    }
+    if urls.is_empty() { None } else { Some(urls) }
   } else {
     let mut urls = Vec::new();
     if let Some(url) = args.start_frame_url {
@@ -141,6 +167,18 @@ pub async fn generate_video(args: GenerateVideoArgs<'_>) -> Result<GenerateVideo
       urls.push(url);
     }
     if urls.is_empty() { None } else { Some(urls) }
+  };
+
+  let audio_urls: Option<Vec<String>> = if has_reference_audio {
+    args.reference_audio_urls
+  } else {
+    None
+  };
+
+  let face_blur_mode = match args.use_face_blur_hack {
+    Some(true) => Some("on"),
+    Some(false) => Some("off"),
+    None => None,
   };
 
   let batch_count_value = args.batch_count.as_u8();
@@ -164,7 +202,9 @@ pub async fn generate_video(args: GenerateVideoArgs<'_>) -> Result<GenerateVideo
           model: "seedance-20",
           duration,
           mode: video_input_mode,
+          face_blur_mode,
           uploaded_urls,
+          audio_urls,
           batch_count,
         },
       },
@@ -240,12 +280,15 @@ pub async fn generate_video(args: GenerateVideoArgs<'_>) -> Result<GenerateVideo
 
 #[cfg(test)]
 mod tests {
+  use std::fs;
   use super::*;
   use crate::creds::seedance2pro_session::Seedance2ProSession;
   use crate::test_utils::get_test_cookies::get_test_cookies;
   use crate::test_utils::setup_test_logging::setup_test_logging;
   use errors::AnyhowResult;
   use log::LevelFilter;
+  use crate::requests::prepare_file_upload::prepare_file_upload::{prepare_file_upload, PrepareFileUploadArgs};
+  use crate::requests::upload_file::upload_file::{upload_file, UploadFileArgs};
 
   fn dummy_session() -> Seedance2ProSession {
     Seedance2ProSession::from_cookies_string(String::new())
@@ -263,6 +306,9 @@ mod tests {
       start_frame_url: None,
       end_frame_url: None,
       reference_image_urls: None,
+      reference_video_urls: None,
+      reference_audio_urls: None,
+      use_face_blur_hack: None,
     }
   }
 
@@ -325,6 +371,9 @@ mod tests {
       start_frame_url: None,
       end_frame_url: None,
       reference_image_urls: None,
+      reference_video_urls: None,
+      reference_audio_urls: None,
+      use_face_blur_hack: None,
     };
     let result = generate_video(args).await?;
     println!("Task ID: {}", result.task_id);
@@ -349,6 +398,9 @@ mod tests {
       start_frame_url: Some("https://static.seedance2-pro.com/materials/20260219/1771496300184-fb32e08c.jpg".to_string()),
       end_frame_url: None,
       reference_image_urls: None,
+      reference_video_urls: None,
+      reference_audio_urls: None,
+      use_face_blur_hack: None,
     };
     let result = generate_video(args).await?;
     println!("Task ID: {}", result.task_id);
@@ -360,7 +412,7 @@ mod tests {
 
   #[tokio::test]
   #[ignore] // manually test — requires real cookies
-  async fn test_generate_reference_video() -> AnyhowResult<()> {
+  async fn test_generate_reference_image_video() -> AnyhowResult<()> {
     setup_test_logging(LevelFilter::Trace);
     let session = test_session()?;
     let args = GenerateVideoArgs {
@@ -375,12 +427,124 @@ mod tests {
         "https://static.seedance2-pro.com/materials/20260219/1771463564512-b14bfe90.png".to_string(),
         "https://static.seedance2-pro.com/materials/20260219/1771496300184-fb32e08c.jpg".to_string(),
       ]),
+      reference_video_urls: None,
+      reference_audio_urls: None,
+      use_face_blur_hack: None,
     };
     let result = generate_video(args).await?;
     println!("Task ID: {}", result.task_id);
     println!("Order ID: {}", result.order_id);
     assert!(!result.task_id.is_empty());
     assert_eq!(1, 2); // NB: Intentional failure to inspect output.
+    Ok(())
+  }
+
+  #[tokio::test]
+  #[ignore] // manually test — requires real cookies
+  async fn test_generate_reference_video_only() -> AnyhowResult<()> {
+    setup_test_logging(LevelFilter::Trace);
+    let session = test_session()?;
+    let args = GenerateVideoArgs {
+      session: &session,
+      prompt: "Change the Video @video1 to night time.".to_string(),
+      resolution: Resolution::Landscape16x9,
+      duration_seconds: 5,
+      batch_count: BatchCount::One,
+      start_frame_url: None,
+      end_frame_url: None,
+      reference_image_urls: None,
+      reference_video_urls: Some(vec![
+        "https://static.seedance2-pro.com/materials/20260315/1773594284659-3a46d231.mp4".to_string(),
+      ]),
+      reference_audio_urls: None,
+      use_face_blur_hack: None,
+    };
+    let result = generate_video(args).await?;
+    println!("Task ID: {}", result.task_id);
+    println!("Order ID: {}", result.order_id);
+    assert!(!result.task_id.is_empty());
+    assert_eq!(1, 2); // NB: Intentional failure to inspect output.
+    Ok(())
+  }
+
+  #[tokio::test]
+  #[ignore] // manually test — requires real cookies
+  async fn test_generate_reference_video_and_image() -> AnyhowResult<()> {
+    setup_test_logging(LevelFilter::Trace);
+    let session = test_session()?;
+    let args = GenerateVideoArgs {
+      session: &session,
+      prompt: "Put the robot in @video1 next to the house in @image1".to_string(),
+      resolution: Resolution::Landscape16x9,
+      duration_seconds: 5,
+      batch_count: BatchCount::One,
+      start_frame_url: None,
+      end_frame_url: None,
+      reference_image_urls: Some(vec![
+        "https://static.seedance2-pro.com/materials/20260315/1773595053724-07a1d500.png".to_string(),
+      ]),
+      reference_video_urls: Some(vec![
+        "https://static.seedance2-pro.com/materials/20260315/1773594284659-3a46d231.mp4".to_string(),
+      ]),
+      reference_audio_urls: None,
+      use_face_blur_hack: None,
+    };
+    let result = generate_video(args).await?;
+    println!("Task ID: {}", result.task_id);
+    println!("Order ID: {}", result.order_id);
+    assert!(!result.task_id.is_empty());
+    assert_eq!(1, 2); // NB: Intentional failure to inspect output.
+    Ok(())
+  }
+
+  #[tokio::test]
+  #[ignore] // manually test — requires real cookies and a test image
+  async fn test_video_ref_file_that_is_too_long() -> AnyhowResult<()> {
+    setup_test_logging(LevelFilter::Trace);
+
+    // Step 1: Get a signed upload URL
+    let cookies = get_test_cookies()?;
+    let session = Seedance2ProSession::from_cookies_string(cookies);
+    let prepare_args = PrepareFileUploadArgs {
+      session: &session,
+      extension: "mp4".to_string(),
+    };
+    let prepare_result = prepare_file_upload(prepare_args).await?;
+    println!("Upload URL: {}", prepare_result.upload_url);
+
+    // Step 2: Read a test image
+    let file_bytes = fs::read("/Users/bt/Videos/Artcraft/Artcraft Best/ArtCraft Seedance Knight.mp4")?;
+    println!("File size: {} bytes", file_bytes.len());
+
+    // Step 3: Upload
+    let upload_args = UploadFileArgs {
+      upload_url: prepare_result.upload_url,
+      file_bytes,
+    };
+    let result = upload_file(upload_args).await?;
+    println!("Public URL: {}", result.public_url);
+
+    let args = GenerateVideoArgs {
+      session: &session,
+      prompt: "Change @video1 to night time".to_string(),
+      resolution: Resolution::Landscape16x9,
+      duration_seconds: 5,
+      batch_count: BatchCount::One,
+      start_frame_url: None,
+      end_frame_url: None,
+      reference_image_urls: None,
+      reference_video_urls: Some(vec![
+        result.public_url,
+      ]),
+      reference_audio_urls: None,
+      use_face_blur_hack: None,
+    };
+    let result = generate_video(args).await?;
+    println!("Task ID: {}", result.task_id);
+    println!("Order ID: {}", result.order_id);
+    assert!(!result.task_id.is_empty());
+    assert_eq!(1, 2); // NB: Intentional failure to inspect output.
+
     Ok(())
   }
 }
