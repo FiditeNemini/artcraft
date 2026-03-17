@@ -10,6 +10,7 @@ use grok_client::error::grok_error::GrokError;
 use midjourney_client::error::midjourney_error::MidjourneyError;
 use openai_sora_client::error::sora_error::SoraError;
 use artcraft_client::error::storyteller_error::StorytellerError;
+use artcraft_router::errors::download_error::DownloadError;
 use world_labs_client::error::world_labs_error::WorldLabsError;
 //use fal_client::error::fal_error_plus::FalErrorPlus;
 
@@ -33,6 +34,12 @@ pub enum GenerateError {
 
   /// If the response didn't contain job tokens to track.
   ResponseHadNoJobTokens,
+
+  /// Issue with Artcraft router downloads
+  ArtcraftRouterDownloadError(DownloadError),
+
+  /// A provider we don't support yet in ArtCraft "the Tauri app" part.
+  ArtcraftRouterNotYetSupportedProvider(&'static str),
 
   /// There was a billing, credits, or payments issue.
   BillingIssue(BillingIssueReason),
@@ -221,12 +228,13 @@ impl From<ArtcraftRouterError> for GenerateError {
   fn from(value: ArtcraftRouterError) -> Self {
     match value {
       ArtcraftRouterError::Client(e) => Self::BadInput(BadInputReason::WrongImageArguments(e.to_string())),
-      ArtcraftRouterError::UnsupportedModel(model) => Self::NotYetImplemented(format!("Unsupported model: {}", model)),
+      ArtcraftRouterError::Download(e) => Self::ArtcraftRouterDownloadError(e),
       ArtcraftRouterError::InvalidInput(msg) => Self::BadInput(BadInputReason::WrongImageArguments(msg)),
-      ArtcraftRouterError::Provider(ProviderError::Storyteller(e)) => {
-        Self::ProviderFailure(ProviderFailureReason::StorytellerError(e))
-      }
+      ArtcraftRouterError::Provider(ProviderError::Storyteller(e)) => Self::ProviderFailure(ProviderFailureReason::StorytellerError(e)),
       ArtcraftRouterError::Provider(ProviderError::Fal(_)) => Self::FalNoLongerSupported,
+      ArtcraftRouterError::Provider(ProviderError::Muapi(_)) => Self::ArtcraftRouterNotYetSupportedProvider("muapi"),
+      ArtcraftRouterError::Provider(ProviderError::Seedance2Pro(_)) => Self::ArtcraftRouterNotYetSupportedProvider("seedance2pro"),
+      ArtcraftRouterError::UnsupportedModel(model) => Self::NotYetImplemented(format!("Unsupported model: {}", model)),
     }
   }
 }
