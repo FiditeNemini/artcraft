@@ -28,18 +28,22 @@ impl<'a> GenerateSplatRequest<'a> {
   /// Read the splat generation request, construct a plan, then yield a means to execute it.
   pub fn build(&self) -> Result<SplatGenerationPlan<'_>, ArtcraftRouterError> {
     match self.provider {
-      Provider::Artcraft => match self.model {
-        CommonSplatModel::Marble0p1Mini => {
-          plan_generate_splat_artcraft_marble_0p1_mini(self).map(SplatGenerationPlan::ArtcraftMarble0p1Mini)
-        }
-        CommonSplatModel::Marble0p1Plus => {
-          plan_generate_splat_artcraft_marble_0p1_plus(self).map(SplatGenerationPlan::ArtcraftMarble0p1Plus)
-        }
-      },
-      Provider::Fal => Err(ArtcraftRouterError::UnsupportedModel(
-        format!("Splat generation via Fal is not yet supported (model: {:?})", self.model)
-      )),
+      Provider::Artcraft => self.build_artcraft(),
+      _ => self.unsupported_provider(),
     }
+  }
+
+  fn build_artcraft(&self) -> Result<SplatGenerationPlan<'_>, ArtcraftRouterError> {
+    match self.model {
+      CommonSplatModel::Marble0p1Mini => plan_generate_splat_artcraft_marble_0p1_mini(self),
+      CommonSplatModel::Marble0p1Plus => plan_generate_splat_artcraft_marble_0p1_plus(self),
+    }
+  }
+
+  fn unsupported_provider(&self) -> Result<SplatGenerationPlan<'_>, ArtcraftRouterError> {
+    Err(ArtcraftRouterError::UnsupportedModel(
+      format!("Splat generation for model `{:?}` is not supported for provider {:?}", self.model, self.provider)
+    ))
   }
 
   pub fn get_or_generate_idempotency_token(&self) -> String {

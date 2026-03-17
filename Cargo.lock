@@ -788,6 +788,8 @@ dependencies = [
  "artcraft_client",
  "fal_client",
  "log",
+ "muapi_client",
+ "reqwest 0.12.23",
  "seedance2pro",
  "serde",
  "serde_derive",
@@ -795,9 +797,11 @@ dependencies = [
  "test_data",
  "tokens",
  "tokio",
+ "url_utils",
  "uuid 1.18.1",
  "workspace-build-acceleration",
  "world_labs_api",
+ "wreq",
 ]
 
 [[package]]
