@@ -3,6 +3,9 @@ import Download from "../pages/download";
 import Media from "../pages/media";
 import PressKit from "../pages/press-kit";
 import Navbar from "../components/navbar";
+import { ToastContainer } from "../components/toast/toast";
+import CreateImage from "../pages/create-image";
+import CreateVideo from "../pages/create-video";
 import Landing2 from "../pages/landing2";
 import LandingSD2 from "../pages/landing-sd2";
 import TutorialsPage from "../pages/tutorials";
@@ -17,6 +20,7 @@ import Signup from "../pages/signup";
 import ForgotPassword, { VerifyReset } from "../pages/forgot-password";
 import Welcome from "../pages/welcome";
 import Onboarding from "../pages/onboarding";
+import Library from "../pages/library";
 import { CheckoutSuccess, CheckoutCancel } from "../pages/checkout";
 
 export function App() {
@@ -26,6 +30,8 @@ export function App() {
 
       <Routes>
         <Route path="/" element={<Landing2 />} />
+        <Route path="/create-image" element={<CreateImage />} />
+        <Route path="/create-video" element={<CreateVideo />} />
         <Route path="/seedance-2" element={<LandingSD2 />} />
         <Route path="/download" element={<Download />} />
         <Route path="/media" element={<Media />} />
@@ -37,6 +43,7 @@ export function App() {
         <Route path="/faq/:slug" element={<FaqArticle />} />
         <Route path="/news" element={<NewsIndex basePath="/news" />} />
         <Route path="/news/:slug" element={<NewsPost basePath="/news" />} />
+        <Route path="/library" element={<Library />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
@@ -60,6 +67,7 @@ export function App() {
           element={<Navigate to="/checkout/cancel" replace />}
         />
       </Routes>
+      <ToastContainer />
     </div>
   );
 }

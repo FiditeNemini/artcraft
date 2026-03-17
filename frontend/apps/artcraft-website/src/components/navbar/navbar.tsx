@@ -10,10 +10,15 @@ import { twMerge } from "tailwind-merge";
 import { useEffect, useState, Fragment } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@storyteller/ui-button";
-import { UsersApi, UserInfo } from "@storyteller/api";
+import { UsersApi, UserInfo, CreditsApi } from "@storyteller/api";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCoins, faGrid2 } from "@fortawesome/pro-solid-svg-icons";
+import { TaskQueue } from "./task-queue";
 
 const NAV_ITEMS = [
   { name: "Home", href: "/" },
+  { name: "Image", href: "/create-image" },
+  { name: "Video", href: "/create-video" },
   { name: "Tutorials", href: "/tutorials" },
   { name: "News", href: "/news" },
   { name: "FAQ", href: "/faq" },
@@ -21,13 +26,26 @@ const NAV_ITEMS = [
   { name: "Download", href: "/download" },
 ];
 
+async function fetchCredits(): Promise<number | null> {
+  try {
+    const api = new CreditsApi();
+    const response = await api.GetSessionCredits();
+    if (response.success && response.data) {
+      return response.data.sumTotalCredits;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const [user, setUser] = useState<UserInfo | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
+  const [credits, setCredits] = useState<number | null>(null);
 
-  // Check session on mount
   // Check session on mount and when auth changes or location changes
   useEffect(() => {
     const checkSession = async () => {
@@ -40,8 +58,10 @@ export default function Navbar() {
         response.data.user
       ) {
         setUser(response.data.user);
+        fetchCredits().then(setCredits);
       } else {
         setUser(undefined);
+        setCredits(null);
       }
       setIsLoading(false);
     };
@@ -53,8 +73,16 @@ export default function Navbar() {
       checkSession();
     };
 
+    const handleCreditsChange = () => {
+      fetchCredits().then(setCredits);
+    };
+
     window.addEventListener("auth-change", handleAuthChange);
-    return () => window.removeEventListener("auth-change", handleAuthChange);
+    window.addEventListener("credits-change", handleCreditsChange);
+    return () => {
+      window.removeEventListener("auth-change", handleAuthChange);
+      window.removeEventListener("credits-change", handleCreditsChange);
+    };
   }, [location.pathname]);
 
   const handleLogout = async () => {
@@ -77,9 +105,9 @@ export default function Navbar() {
     <Disclosure
       as="nav"
       className={twMerge(
-        "z-20 fixed top-0 left-0 w-full transition-colors duration-200 bg-transparent",
+        "z-20 fixed top-0 left-0 w-full transition-all duration-200 bg-transparent",
         scrolled
-          ? "bg-[#1b1b1f]/70 backdrop-blur-lg lg:bg-transparent lg:backdrop-blur-none"
+          ? "bg-[#1b1b1f]/70 backdrop-blur-lg"
           : "bg-transparent",
       )}
     >
@@ -91,7 +119,7 @@ export default function Navbar() {
                 <img
                   alt="ArtCraft"
                   src="/images/artcraft-logo.png"
-                  className="h-7 w-auto"
+                  className="h-6 w-auto"
                 />
               </Link>
             </div>
@@ -101,7 +129,7 @@ export default function Navbar() {
                   item.href === "/"
                     ? location.pathname === "/"
                     : location.pathname === item.href ||
-                      location.pathname.startsWith(item.href + "/");
+                    location.pathname.startsWith(item.href + "/");
                 return (
                   <Link
                     key={item.name}
@@ -138,16 +166,35 @@ export default function Navbar() {
           <div className="flex items-center">
             {isLoading ? (
               // Loading placeholder
-              <div className="hidden md:ml-4 md:flex items-center gap-6 opacity-0"></div>
+              <div className="hidden md:ml-4 md:flex items-center gap-2.5 opacity-0"></div>
             ) : user ? (
               // Logged In State
-              <div className="hidden md:ml-4 md:flex items-center gap-6">
+              <div className="hidden md:ml-4 md:flex items-center gap-2.5">
                 <Link
                   to="/pricing"
                   className="text-[15px] font-semibold text-white/60 hover:text-white transition-colors"
                 >
                   Pricing
                 </Link>
+                {credits !== null && (
+                  <div className="flex items-center gap-2 px-4 text-[15px] font-semibold text-white/90">
+                    <FontAwesomeIcon
+                      icon={faCoins}
+                      className="text-primary text-sm"
+                    />
+                    {credits.toLocaleString()} Credits
+                  </div>
+                )}
+
+                <Link
+                  to="/library"
+                  className="flex h-[38px] items-center gap-2 rounded-lg px-3 text-sm font-medium text-base-fg bg-ui-controls hover:bg-ui-controls/80 border border-ui-controls-border shadow-sm transition-all duration-150 active:scale-95"
+                >
+                  <FontAwesomeIcon icon={faGrid2} className="text-xs" />
+                  My Library
+                </Link>
+
+                <TaskQueue />
 
                 <Menu as="div" className="relative ml-3">
                   <div>
