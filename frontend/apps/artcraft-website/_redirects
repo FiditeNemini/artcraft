@@ -85,5 +85,11 @@
 /seedance-2/* /index.html 200
 
 # Google ads breakage
+/seedance-2{ignore}    /seedance-2 301
 /seedance-2{ignore}*   /seedance-2 301
 
+# Similar URLs
+/seedance2       /seedance-2 301
+/seedance2*      /seedance-2 301
+/seedance-2.0    /seedance-2 301
+/seedance-2.0*   /seedance-2 301
