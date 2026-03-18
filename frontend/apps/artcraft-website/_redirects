@@ -83,3 +83,7 @@
 /seedance-2 /index.html 200
 /seedance-2/ /index.html 200
 /seedance-2/* /index.html 200
+
+# Google ads breakage
+/seedance-2{ignore}*   /seedance-2 301
+
