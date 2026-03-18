@@ -432,7 +432,7 @@ export const ImagePromptRow = ({
               newState.status === UploaderStates.imageCreateError
             ) {
               setUploadingVideo(null);
-              toast.error("Failed to upload video. Please try again.");
+              toast.error("Failed to upload video. Please upload an MP4 file.");
             }
           },
         });
@@ -735,7 +735,7 @@ export const ImagePromptRow = ({
             type="file"
             ref={videoFileInputRef}
             className="hidden"
-            accept="video/*"
+            accept="video/mp4,.mp4"
             onChange={handleVideoFileUpload}
             multiple={maxVideoCount > 1}
           />
