@@ -432,6 +432,7 @@ export const ImagePromptRow = ({
               newState.status === UploaderStates.imageCreateError
             ) {
               setUploadingVideo(null);
+              toast.error("Failed to upload video. Please try again.");
             }
           },
         });
