@@ -729,7 +729,7 @@ export const PopoverMenu = ({
                         )}
                       </div>
                     ) : (
-                      <div className="flex flex-col gap-0 text-sm text-base-fg">
+                      <div className="flex max-h-[35vh] flex-col gap-0 overflow-y-auto text-sm text-base-fg">
                         {items.map((item, index) => (
                           <div key={index}>
                             {item.hoverTooltip ? (
