@@ -731,7 +731,7 @@ dependencies = [
  "url_utils",
  "web_base64",
  "workspace-build-acceleration",
- "world_labs_client",
+ "worldlabs_consumer_client",
 ]
 
 [[package]]
@@ -800,7 +800,7 @@ dependencies = [
  "url_utils",
  "uuid 1.18.1",
  "workspace-build-acceleration",
- "world_labs_api",
+ "worldlabs_api_client",
  "wreq",
 ]
 
@@ -11647,7 +11647,7 @@ dependencies = [
  "utoipa-swagger-ui",
  "videos",
  "workspace-build-acceleration",
- "world_labs_api",
+ "worldlabs_api_client",
  "wreq",
  "zip 0.6.6",
 ]
@@ -15094,7 +15094,38 @@ dependencies = [
 ]
 
 [[package]]
-name = "world_labs_api"
+name = "worldlabs-job"
+version = "0.0.1"
+dependencies = [
+ "actix-web",
+ "actix_helpers",
+ "anyhow",
+ "bootstrap",
+ "bucket_paths",
+ "cloud_storage",
+ "concurrency",
+ "config",
+ "easyenv",
+ "enums",
+ "errors",
+ "hashing",
+ "jobs_common",
+ "log",
+ "mysql_queries",
+ "reqwest 0.12.23",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "server_environment",
+ "sqlx",
+ "tokens",
+ "tokio",
+ "workspace-build-acceleration",
+ "worldlabs_api_client",
+]
+
+[[package]]
+name = "worldlabs_api_client"
 version = "0.0.1"
 dependencies = [
  "anyhow",
@@ -15114,7 +15145,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "world_labs_client"
+name = "worldlabs_consumer_client"
 version = "0.0.1"
 dependencies = [
  "anyhow",
@@ -15149,37 +15180,6 @@ dependencies = [
  "workspace-build-acceleration",
  "wreq",
  "wreq-util",
-]
-
-[[package]]
-name = "worldlabs-job"
-version = "0.0.1"
-dependencies = [
- "actix-web",
- "actix_helpers",
- "anyhow",
- "bootstrap",
- "bucket_paths",
- "cloud_storage",
- "concurrency",
- "config",
- "easyenv",
- "enums",
- "errors",
- "hashing",
- "jobs_common",
- "log",
- "mysql_queries",
- "reqwest 0.12.23",
- "serde",
- "serde_derive",
- "serde_json",
- "server_environment",
- "sqlx",
- "tokens",
- "tokio",
- "workspace-build-acceleration",
- "world_labs_api",
 ]
 
 [[package]]
