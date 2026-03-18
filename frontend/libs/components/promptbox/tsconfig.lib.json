@@ -74,6 +74,9 @@
       "path": "../popover/tsconfig.lib.json"
     },
     {
+      "path": "../slider-v2/tsconfig.lib.json"
+    },
+    {
       "path": "../../common/tsconfig.lib.json"
     },
     {

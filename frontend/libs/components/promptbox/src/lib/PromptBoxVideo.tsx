@@ -3,6 +3,7 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { JobContextType } from "@storyteller/common";
 import { downloadFileFromUrl } from "@storyteller/api";
 import { PopoverMenu, PopoverItem } from "@storyteller/ui-popover";
+import { SliderV2 } from "@storyteller/ui-sliderv2";
 import { Tooltip } from "@storyteller/ui-tooltip";
 import { ToggleButton, GenerateButton } from "@storyteller/ui-button";
 import { Modal } from "@storyteller/ui-modal";
@@ -17,7 +18,11 @@ import {
   faClock,
   faTriangleExclamation,
 } from "@fortawesome/pro-solid-svg-icons";
-import { faCircleInfo, faVideo, faMusic } from "@fortawesome/pro-regular-svg-icons";
+import {
+  faCircleInfo,
+  faVideo,
+  faMusic,
+} from "@fortawesome/pro-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GalleryItem, GalleryModal } from "@storyteller/ui-gallery-modal";
 import {
@@ -227,12 +232,25 @@ export const PromptBoxVideo = ({
     }
   }, [selectedModel]);
 
-  const durationOptions: PopoverItem[] | null = selectedModel?.durationOptions
-    ? selectedModel.durationOptions.map((d) => ({
-        label: `${d}s`,
-        selected: d === (duration ?? selectedModel.defaultDuration),
-      }))
+  const durationRange = selectedModel?.durationOptions?.length
+    ? {
+        min: selectedModel.durationOptions[0]!,
+        max: selectedModel.durationOptions[
+          selectedModel.durationOptions.length - 1
+        ]!,
+      }
     : null;
+  const effectiveDuration = duration ?? selectedModel?.defaultDuration ?? 5;
+  const [localDuration, setLocalDuration] = useState(effectiveDuration);
+  const durationTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => {
+    setLocalDuration(effectiveDuration);
+  }, [effectiveDuration]);
+  const handleDurationSlide = (v: number) => {
+    setLocalDuration(v);
+    clearTimeout(durationTimerRef.current);
+    durationTimerRef.current = setTimeout(() => setDuration(v), 300);
+  };
 
   const resolutionPickerOptions: PopoverItem[] | null =
     selectedModel?.resolutionOptions
@@ -244,11 +262,6 @@ export const PromptBoxVideo = ({
 
   const handleResolutionSelect = (selectedItem: PopoverItem) => {
     setResolution(selectedItem.label);
-  };
-
-  const handleDurationSelect = (selectedItem: PopoverItem) => {
-    const seconds = parseInt(selectedItem.label);
-    setDuration(seconds);
   };
 
   const inputModeOptions: PopoverItem[] | null =
@@ -325,7 +338,13 @@ export const PromptBoxVideo = ({
       if (imgMatch) {
         const idx = parseInt(imgMatch[1]) - 1;
         return (
-          <span key={i} style={{ color: IMAGE_COLORS[idx % IMAGE_COLORS.length], fontWeight: 600 }}>
+          <span
+            key={i}
+            style={{
+              color: IMAGE_COLORS[idx % IMAGE_COLORS.length],
+              fontWeight: 600,
+            }}
+          >
             {part}
           </span>
         );
@@ -334,7 +353,13 @@ export const PromptBoxVideo = ({
       if (vidMatch) {
         const idx = parseInt(vidMatch[1]) - 1;
         return (
-          <span key={i} style={{ color: VIDEO_COLORS[idx % VIDEO_COLORS.length], fontWeight: 600 }}>
+          <span
+            key={i}
+            style={{
+              color: VIDEO_COLORS[idx % VIDEO_COLORS.length],
+              fontWeight: 600,
+            }}
+          >
             {part}
           </span>
         );
@@ -343,7 +368,13 @@ export const PromptBoxVideo = ({
       if (audMatch) {
         const idx = parseInt(audMatch[1]) - 1;
         return (
-          <span key={i} style={{ color: AUDIO_COLORS[idx % AUDIO_COLORS.length], fontWeight: 600 }}>
+          <span
+            key={i}
+            style={{
+              color: AUDIO_COLORS[idx % AUDIO_COLORS.length],
+              fontWeight: 600,
+            }}
+          >
             {part}
           </span>
         );
@@ -690,7 +721,9 @@ export const PromptBoxVideo = ({
             showVideoReferenceSection={isReferenceMode}
             uploadVideo={uploadVideo}
             referenceAudios={isReferenceMode ? referenceAudios : undefined}
-            setReferenceAudios={isReferenceMode ? setReferenceAudios : undefined}
+            setReferenceAudios={
+              isReferenceMode ? setReferenceAudios : undefined
+            }
             maxAudioCount={selectedModel?.maxReferenceAudios ?? 2}
             maxAudioRefDuration={selectedModel?.maxAudioRefDuration ?? 15}
             uploadAudio={uploadAudio}
@@ -852,22 +885,39 @@ export const PromptBoxVideo = ({
                 </Tooltip>
               )}
 
-              {durationOptions && (
-                <Tooltip
-                  content="Duration"
-                  position="top"
-                  className="z-50"
-                  closeOnClick={true}
-                >
+              {durationRange && (
+                <Tooltip content="Duration" position="top" className="z-50">
                   <PopoverMenu
-                    items={durationOptions}
-                    onSelect={handleDurationSelect}
-                    mode="toggle"
+                    mode="default"
                     panelTitle="Duration"
                     triggerIcon={
                       <FontAwesomeIcon icon={faClock} className="h-3.5 w-3.5" />
                     }
-                  />
+                    triggerLabel={`${effectiveDuration}s`}
+                  >
+                    <div className="w-48 pb-0.5">
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex-1">
+                          <SliderV2
+                            min={durationRange.min}
+                            max={durationRange.max}
+                            value={localDuration}
+                            onChange={handleDurationSlide}
+                            step={1}
+                            suffix="s"
+                            variant="filled"
+                          />
+                        </div>
+                        <span className="min-w-6 shrink-0 text-sm font-medium tabular-nums text-base-fg">
+                          {localDuration}s
+                        </span>
+                      </div>
+                      <div className="mt-1.5 flex justify-between px-0.5 text-[11px] text-base-fg/40">
+                        <span>{durationRange.min}s</span>
+                        <span>{durationRange.max}s</span>
+                      </div>
+                    </div>
+                  </PopoverMenu>
                 </Tooltip>
               )}
 

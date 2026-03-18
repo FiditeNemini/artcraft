@@ -33,6 +33,9 @@
       "path": "../popover"
     },
     {
+      "path": "../slider-v2"
+    },
+    {
       "path": "../../common"
     },
     {
