@@ -4243,6 +4243,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "ffmpeg_utils"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "errors",
+ "ffprobe",
+ "log",
+ "tempdir",
+ "testing",
+ "workspace-build-acceleration",
+]
+
+[[package]]
 name = "ffprobe"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5947,6 +5960,7 @@ dependencies = [
  "easyenv",
  "enums",
  "errors",
+ "ffmpeg_utils",
  "filesys",
  "google_drive_common",
  "hashing",
@@ -11567,6 +11581,7 @@ dependencies = [
  "enums_public",
  "errors",
  "fal_client",
+ "ffmpeg_utils",
  "filesys",
  "futures 0.1.31",
  "futures 0.3.31",
@@ -13687,11 +13702,38 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
+name = "video-thumbnail-job"
+version = "0.0.1"
+dependencies = [
+ "actix-web",
+ "actix_helpers",
+ "anyhow",
+ "bootstrap",
+ "bucket_paths",
+ "cloud_storage",
+ "concurrency",
+ "config",
+ "easyenv",
+ "errors",
+ "ffmpeg_utils",
+ "jobs_common",
+ "log",
+ "mysql_queries",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "server_environment",
+ "sqlx",
+ "tempdir",
+ "tokio",
+ "workspace-build-acceleration",
+]
+
+[[package]]
 name = "videos"
 version = "0.0.1"
 dependencies = [
  "errors",
- "ffprobe",
  "log",
  "mp4",
  "testing",

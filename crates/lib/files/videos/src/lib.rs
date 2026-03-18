@@ -18,7 +18,4 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
-pub mod ffmpeg_timestamp_from_duration;
-pub mod ffprobe_get_dimensions;
-pub mod ffprobe_get_info;
 pub mod get_mp4_info;

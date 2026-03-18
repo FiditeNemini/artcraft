@@ -37,8 +37,8 @@ actix_cors_configs = { path = "../../../lib/actix_cors_configs" }
 actix_helpers.workspace = true
 artcraft_api_defs.workspace = true
 artcraft_router.workspace = true
-bootstrap = { path = "../../../lib/bootstrap" }
-bucket_paths = { path = "../../../lib/bucket_paths" }
+bootstrap.workspace = true
+bucket_paths.workspace = true
 cloud_storage.workspace = true
 collections.workspace = true
 component_traits.workspace = true
@@ -47,7 +47,7 @@ config = { path = "../../../lib/deprecated/config" }
 cookies.workspace = true
 crockford = { path = "../../../lib/data/crockford" }
 datetimes = { path = "../../../lib/data/datetimes" }
-easyenv = { path = "../../../lib/easyenv" }
+easyenv.workspace = true
 elasticsearch_schema = { path = "../../../schema/database/elasticsearch_schema" }
 email_sender= { path = "../../../lib/email_sender" }
 enums.workspace = true
@@ -65,7 +65,7 @@ media = { path = "../../../lib/files/media" }
 memory_caching = { path = "../../../lib/caching/memory_caching" }
 migration = { path = "../../../lib/migration" }
 mimetypes.workspace = true
-mysql_queries = { path = "../../../schema/database/mysql_queries" }
+mysql_queries.workspace = true
 password = { path = "../../../lib/password" }
 primitives = { path = "../../../lib/data/primitives" }
 prompt_engineering = { path = "../../../lib/machine_learning/prompt_engineering" }
@@ -82,6 +82,7 @@ url_config = { path = "../../../lib/url_config" }
 url_utils = { path = "../../../lib/url_utils" }
 user_input_common = { path = "../../../lib/user_input_common" }
 users.workspace = true
+ffmpeg_utils.workspace = true
 videos = { path = "../../../lib/files/videos" }
 world_labs_api.workspace = true
 
