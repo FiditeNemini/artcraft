@@ -44,7 +44,7 @@ collections.workspace = true
 component_traits.workspace = true
 composite_identifiers = { path = "../../../schema/public/composite_identifiers" }
 config = { path = "../../../lib/deprecated/config" }
-cookies.workspace = true
+jwt_signer.workspace = true
 crockford = { path = "../../../lib/data/crockford" }
 datetimes = { path = "../../../lib/data/datetimes" }
 easyenv.workspace = true
@@ -57,17 +57,17 @@ filesys.workspace = true
 google_sign_in = { path = "../../../api_clients/google_sign_in" }
 hashing = { path = "../../../lib/files/hashing" }
 http_server_common = { path = "../../../lib/deprecated/http_server_common" }
-idempotency = { path = "../../../lib/idempotency" }
+uuid_utils = { path = "../../../lib/uuid_utils" }
 images.workspace = true
 markdown = { path = "../../../lib/markdown" }
 media = { path = "../../../lib/files/media" }
 memory_caching = { path = "../../../lib/caching/memory_caching" }
-migration = { path = "../../../lib/migration" }
+migration = { path = "../../../schema/database/migration" }
 mimetypes.workspace = true
 mysql_queries.workspace = true
 password = { path = "../../../lib/password" }
 primitives = { path = "../../../lib/data/primitives" }
-prompt_engineering = { path = "../../../lib/machine_learning/prompt_engineering" }
+prompt_engineering = { path = "../../../lib/deprecated/machine_learning/prompt_engineering" }
 redis_caching = { path = "../../../lib/caching/redis_caching" }
 redis_common = { path = "../../../schema/database/redis_common" }
 redis_schema = { path = "../../../schema/database/redis_schema" }
@@ -76,7 +76,7 @@ seedance2pro_client.workspace = true
 server_environment = { path = "../../../lib/server_environment" }
 thumbnail_generator = { path = "../../../api_clients/thumbnail_generator" }
 tokens.workspace = true
-tts_common = { path = "../../../lib/tts_common" }
+tts_common = { path = "../../../lib/deprecated/tts_common" }
 url_config = { path = "../../../lib/url_config" }
 url_utils = { path = "../../../lib/url_utils" }
 user_input_common = { path = "../../../lib/user_input_common" }
