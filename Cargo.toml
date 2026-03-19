@@ -6,19 +6,20 @@ resolver = "2"
 members = [
   # API clients for external services
   # These might be custom implementations or wrappers over other client libraries.
-  "crates/api_clients/artcraft/artcraft_api_defs", # TODO: api_clients/{artcraft}/{api_defs,client}
+  "crates/api_clients/artcraft/artcraft_api_defs",
   "crates/api_clients/artcraft/artcraft_client",
+  "crates/api_clients/artcraft/artcraft_router",
   "crates/api_clients/cloud_storage",
   "crates/api_clients/fal_client",
   "crates/api_clients/google_drive_downloader",
   "crates/api_clients/google_sign_in",
   "crates/api_clients/grok_client",
   "crates/api_clients/midjourney_client",
+  "crates/api_clients/muapi_client",
   "crates/api_clients/openai_sora_client",
   "crates/api_clients/openart_client",
-  "crates/api_clients/muapi_client",
-  "crates/api_clients/seedance2pro_client",
   "crates/api_clients/runwayml_client",
+  "crates/api_clients/seedance2pro_client",
   "crates/api_clients/thumbnail_generator",
   "crates/api_clients/worldlabs_api_client",
   "crates/api_clients/worldlabs_consumer_client",
@@ -43,7 +44,6 @@ members = [
   "crates/lib/actix_cors_configs",
   "crates/lib/actix_helpers",
   "crates/lib/bootstrap",
-  "crates/schema/buckets/bucket_paths",
   "crates/lib/build_metadata",
   "crates/lib/caching/memory_caching",
   "crates/lib/caching/memory_store",
@@ -52,19 +52,14 @@ members = [
   "crates/lib/cloudflare_mitigation",
   "crates/lib/concurrency",
   "crates/lib/cookie_store",
-  "crates/lib/jwt_signer",
   "crates/lib/data/collections",
   "crates/lib/data/crockford",
   "crates/lib/data/datetimes",
   "crates/lib/data/primitives",
   "crates/lib/data/web_base64",
-  "crates/lib/deprecated/config", # TODO(bt, 2023-02-13): Deprecate or repurpose
-  "crates/lib/deprecated/http_server_common", # TODO(bt, 2023-03-20): Move useful pieces to actix_helpers
   "crates/lib/easyenv", # NB: Vendored version of https://github.com/echelon/easyenv.rs that we'll improve.
-  "crates/lib/deprecated/email_sender",
   "crates/lib/errors",
   "crates/lib/ffmpeg_utils",
-  "crates/lib/files/zip_archives",
   "crates/lib/files/file_to_base64_url",
   "crates/lib/files/filesys",
   "crates/lib/files/hashing",
@@ -72,34 +67,41 @@ members = [
   "crates/lib/files/media",
   "crates/lib/files/mimetypes",
   "crates/lib/files/videos",
+  "crates/lib/files/zip_archives",
   "crates/lib/http_headers",
-  "crates/lib/uuid_utils",
-  "crates/api_clients/artcraft/artcraft_router",
-  "crates/lib/deprecated/image_algorithms",
   "crates/lib/jobs_common",
   "crates/lib/jwt_light",
+  "crates/lib/jwt_signer",
   "crates/lib/logging",
-  "crates/lib/deprecated/machine_learning/ml_weights_registry",
-  "crates/lib/deprecated/machine_learning/prompt_engineering",
   "crates/lib/markdown",
-  "crates/schema/database/migration",
   "crates/lib/password",
   "crates/lib/server_environment",
   "crates/lib/sqlx_mysql_helpers",
   "crates/lib/storyteller_root",
-  "crates/lib/deprecated/subprocess_common",
-  "crates/testing/test_data",
-  "crates/testing/test_utils",
-  "crates/lib/deprecated/tts_common",
   "crates/lib/url_config",
   "crates/lib/url_utils",
   "crates/lib/user_input_common",
   "crates/lib/users",
+  "crates/lib/uuid_utils",
   #"crates/lib/api_clients/fakeyou_client",
   #"crates/lib/deprecated/machine_learning/ml_models",
 
+  # Shared libraries (Deprecated)
+  "crates/lib/deprecated/config", # TODO(bt, 2023-02-13): Deprecate or repurpose
+  "crates/lib/deprecated/email_sender",
+  "crates/lib/deprecated/http_server_common", # TODO(bt, 2023-03-20): Move useful pieces to actix_helpers
+  "crates/lib/deprecated/image_algorithms",
+  "crates/lib/deprecated/machine_learning/ml_weights_registry",
+  "crates/lib/deprecated/machine_learning/prompt_engineering",
+  "crates/lib/deprecated/subprocess_common",
+  "crates/lib/deprecated/tts_common",
+
+  # Schema (buckets): S3/R2 topology
+  "crates/schema/buckets/bucket_paths",
+
   # Schema (database): queries, database layouts, Redis keys, etc.
   "crates/schema/database/elasticsearch_schema",
+  "crates/schema/database/migration",
   "crates/schema/database/mysql_queries",
   "crates/schema/database/redis_common",
   "crates/schema/database/redis_schema",
@@ -117,6 +119,10 @@ members = [
   "crates/service/job/seedance2_pro_job",
   "crates/service/job/video_thumbnail_job",
   "crates/service/job/worldlabs_job",
+  "crates/service/web/dummy_service",
+  "crates/service/web/storyteller_web",
+
+  # Services (Deprecated) - may still have some use
   "crates/service/job/deprecated/analytics_job",
   "crates/service/job/deprecated/download_job",
   "crates/service/job/deprecated/email_sender_job",
@@ -126,14 +132,16 @@ members = [
   "crates/service/job/deprecated/tts_inference_job",
   "crates/service/job/deprecated/w2l_download_job",
   "crates/service/job/deprecated/w2l_inference_job",
-  "crates/service/web/dummy_service",
-  "crates/service/web/storyteller_web",
 
   # Service Plugins: complete subsystems that can be plugged into services (users, billing, etc.)
   "crates/service/plugins/billing",
   "crates/service/plugins/billing_artcraft",
   "crates/service/plugins/component_traits",
   "crates/service/plugins/user_traits_component",
+
+  # Testing code
+  "crates/testing/test_data",
+  "crates/testing/test_utils",
 
   # Vendored code
   "crates/vendor/fal-rs",
@@ -224,22 +232,21 @@ collections = { path = "crates/lib/data/collections" }
 component_traits = { path = "crates/service/plugins/component_traits" }
 concurrency = { path = "crates/lib/concurrency" }
 cookie_store = { path = "crates/lib/cookie_store" }
-jwt_signer = { path = "crates/lib/jwt_signer" }
 crockford = { path = "crates/lib/data/crockford" }
 easyenv = { path = "crates/lib/easyenv" }
 enums = { path = "crates/schema/public/enums" }
 enums_public = { path = "crates/schema/public/enums_public" }
 errors = { path = "crates/lib/errors" }
-ffmpeg_utils = { path = "crates/lib/ffmpeg_utils" }
 fal_client = { path = "crates/api_clients/fal_client" }
+ffmpeg_utils = { path = "crates/lib/ffmpeg_utils" }
 file_to_base64_url = { path = "crates/lib/files/file_to_base64_url" }
 filesys = { path = "crates/lib/files/filesys" }
 grok_client = { path = "crates/api_clients/grok_client" }
 http_headers = { path = "crates/lib/http_headers" }
-uuid_utils = { path = "crates/lib/uuid_utils" }
 images = { path = "crates/lib/files/images" }
 jobs_common = { path = "crates/lib/jobs_common" }
 jwt_light = { path = "crates/lib/jwt_light" }
+jwt_signer = { path = "crates/lib/jwt_signer" }
 memory_caching = { path = "crates/lib/caching/memory_caching" }
 memory_store = { path = "crates/lib/caching/memory_store" }
 midjourney_client = { path = "crates/api_clients/midjourney_client" }
@@ -257,6 +264,7 @@ test_utils = { path = "crates/testing/test_utils" }
 tokens = { path = "crates/schema/public/tokens" }
 url_utils = { path = "crates/lib/url_utils" }
 users = { path = "crates/lib/users" }
+uuid_utils = { path = "crates/lib/uuid_utils" }
 web_base64 = { path = "crates/lib/data/web_base64" }
 worldlabs_api_client = { path = "crates/api_clients/worldlabs_api_client" }
 worldlabs_consumer_client = { path = "crates/api_clients/worldlabs_consumer_client" }
