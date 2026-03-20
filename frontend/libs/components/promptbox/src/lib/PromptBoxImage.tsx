@@ -155,8 +155,12 @@ export const PromptBoxImage = ({
 
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      // Hard pixel limit so the resize handle can never exceed viewport
+      textareaRef.current.style.maxHeight = `${window.innerHeight - 700}px`;
+      textareaRef.current.style.minHeight = "0";
+      // Cap auto-grow at ~5.5em so it doesn't fight with manual resize
+      const capped = Math.min(textareaRef.current.scrollHeight, 88);
+      textareaRef.current.style.minHeight = `${capped}px`;
     }
   });
 
@@ -397,8 +401,8 @@ export const PromptBoxImage = ({
           className={twMerge(
             "glass w-[730px] rounded-xl p-4",
             isImageRowVisible &&
-              selectedModel?.canUseImagePrompt &&
-              "rounded-t-none",
+            selectedModel?.canUseImagePrompt &&
+            "rounded-t-none",
             isFocused
               ? "ring-1 ring-primary border-primary"
               : "ring-1 ring-transparent",
@@ -442,7 +446,7 @@ export const PromptBoxImage = ({
               ref={textareaRef}
               rows={1}
               placeholder="Describe what you want in the image..."
-              className="text-md mb-2 max-h-[5.5em] flex-1 resize-none overflow-y-auto rounded bg-transparent pb-2 pr-2 pt-1 text-base-fg placeholder-base-fg/60 focus:outline-none"
+              className="text-md mb-2 min-h-[2.5em] flex-1 resize-y overflow-y-auto rounded bg-transparent pb-2 pr-2 pt-1 text-base-fg placeholder-base-fg/60 focus:outline-none"
               value={prompt}
               onChange={handleChange}
               onPaste={handlePaste}

@@ -172,8 +172,12 @@ export const PromptBoxVideo = ({
 
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      // Hard pixel limit so the resize handle can never exceed viewport
+      textareaRef.current.style.maxHeight = `${window.innerHeight - 700}px`;
+      textareaRef.current.style.minHeight = "0";
+      // Cap auto-grow at ~5.5em so it doesn't fight with manual resize
+      const capped = Math.min(textareaRef.current.scrollHeight, 88);
+      textareaRef.current.style.minHeight = `${capped}px`;
     }
   });
 
@@ -244,11 +248,11 @@ export const PromptBoxVideo = ({
 
   const durationRange = selectedModel?.durationOptions?.length
     ? {
-        min: selectedModel.durationOptions[0]!,
-        max: selectedModel.durationOptions[
-          selectedModel.durationOptions.length - 1
-        ]!,
-      }
+      min: selectedModel.durationOptions[0]!,
+      max: selectedModel.durationOptions[
+        selectedModel.durationOptions.length - 1
+      ]!,
+    }
     : null;
   const effectiveDuration = duration ?? selectedModel?.defaultDuration ?? 5;
   const [localDuration, setLocalDuration] = useState(effectiveDuration);
@@ -265,9 +269,9 @@ export const PromptBoxVideo = ({
   const resolutionPickerOptions: PopoverItem[] | null =
     selectedModel?.resolutionOptions
       ? selectedModel.resolutionOptions.map((r) => ({
-          label: r,
-          selected: r === resolution,
-        }))
+        label: r,
+        selected: r === resolution,
+      }))
       : null;
 
   const handleResolutionSelect = (selectedItem: PopoverItem) => {
@@ -277,17 +281,17 @@ export const PromptBoxVideo = ({
   const inputModeOptions: PopoverItem[] | null =
     selectedModel?.supportsReferenceMode
       ? [
-          {
-            label: "Keyframe",
-            description: "First/Last frame",
-            selected: inputMode === "keyframe",
-          },
-          {
-            label: "Reference",
-            description: "Multi-media ref",
-            selected: inputMode === "reference",
-          },
-        ]
+        {
+          label: "Keyframe",
+          description: "First/Last frame",
+          selected: inputMode === "keyframe",
+        },
+        {
+          label: "Reference",
+          description: "Multi-media ref",
+          selected: inputMode === "reference",
+        },
+      ]
       : null;
 
   const handleInputModeSelect = (selectedItem: PopoverItem) => {
@@ -401,26 +405,26 @@ export const PromptBoxVideo = ({
 
   const mentionItems = isReferenceMode
     ? [
-        ...referenceImages.map((img, i) => ({
-          label: `@Image${i + 1}`,
-          type: "image" as const,
-          preview: img.url,
-        })),
-        ...referenceVideos.map((vid, i) => ({
-          label: `@Video${i + 1}`,
-          type: "video" as const,
-          preview: vid.url,
-        })),
-        ...referenceAudios.map((_aud, i) => ({
-          label: `@Audio${i + 1}`,
-          type: "audio" as const,
-          preview: undefined as string | undefined,
-        })),
-      ].filter((item) =>
-        mentionFilter
-          ? item.label.toLowerCase().includes(mentionFilter.toLowerCase())
-          : true,
-      )
+      ...referenceImages.map((img, i) => ({
+        label: `@Image${i + 1}`,
+        type: "image" as const,
+        preview: img.url,
+      })),
+      ...referenceVideos.map((vid, i) => ({
+        label: `@Video${i + 1}`,
+        type: "video" as const,
+        preview: vid.url,
+      })),
+      ...referenceAudios.map((_aud, i) => ({
+        label: `@Audio${i + 1}`,
+        type: "audio" as const,
+        preview: undefined as string | undefined,
+      })),
+    ].filter((item) =>
+      mentionFilter
+        ? item.label.toLowerCase().includes(mentionFilter.toLowerCase())
+        : true,
+    )
     : [];
 
   const insertMention = (label: string) => {
@@ -850,7 +854,7 @@ export const PromptBoxVideo = ({
                 <div
                   ref={highlightRef}
                   aria-hidden
-                  className="text-md pointer-events-none absolute inset-0 max-h-[5.5em] overflow-y-auto whitespace-pre-wrap break-words rounded pb-2 pr-2 pt-1 text-base-fg"
+                  className="text-md pointer-events-none absolute inset-0 overflow-y-auto whitespace-pre-wrap break-words rounded pb-2 pr-2 pt-1 text-base-fg"
                 >
                   {renderHighlightedPrompt()}
                 </div>
@@ -864,7 +868,7 @@ export const PromptBoxVideo = ({
                     : "Describe what you want to happen in the video..."
                 }
                 className={twMerge(
-                  "text-md relative mb-2 max-h-[5.5em] w-full resize-none overflow-y-auto rounded bg-transparent pb-2 pr-2 pt-1 placeholder-base-fg/60 focus:outline-none",
+                  "text-md relative mb-2 min-h-[2.5em] w-full resize-y overflow-y-auto rounded bg-transparent pb-2 pr-2 pt-1 placeholder-base-fg/60 focus:outline-none",
                   isReferenceMode && hasAnyRefs
                     ? "text-transparent caret-base-fg"
                     : "text-base-fg",
