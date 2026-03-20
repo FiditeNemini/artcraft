@@ -21,6 +21,9 @@ import {
   ROTATION_VALUES,
   TILT_VALUES,
   ZOOM_VALUES,
+  rotationToDisplay,
+  displayToRotation,
+  DISPLAY_ROTATION_VALUES,
 } from "./AnglesStore";
 import { OrbitSphere, snapToNearest } from "./OrbitSphere";
 import { twMerge } from "tailwind-merge";
@@ -369,7 +372,8 @@ export const Angles = () => {
   // Slider handlers that snap to allowed values
   const handleRotationSlider = useCallback(
     (value: number) => {
-      setRotation(snapToNearest(value, ROTATION_VALUES));
+      const snapped = snapToNearest(value, DISPLAY_ROTATION_VALUES);
+      setRotation(displayToRotation(snapped));
     },
     [setRotation],
   );
@@ -621,16 +625,16 @@ export const Angles = () => {
                     </span>
                     <div className="min-w-0 flex-1">
                       <SliderV2
-                        min={0}
-                        max={315}
+                        min={-180}
+                        max={180}
                         step={45}
-                        value={angleConfig.rotation}
+                        value={rotationToDisplay(angleConfig.rotation)}
                         onChange={handleRotationSlider}
                         suffix="°"
                       />
                     </div>
-                    <span className="w-9 shrink-0 text-left text-xs tabular-nums text-base-fg/70">
-                      {angleConfig.rotation}°
+                    <span className="w-10 shrink-0 text-left text-xs tabular-nums text-base-fg/70">
+                      {rotationToDisplay(angleConfig.rotation)}°
                     </span>
                   </div>
 
@@ -640,7 +644,7 @@ export const Angles = () => {
                     </span>
                     <div className="min-w-0 flex-1">
                       <SliderV2
-                        min={-30}
+                        min={-60}
                         max={60}
                         step={30}
                         value={angleConfig.tilt}

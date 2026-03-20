@@ -22,10 +22,24 @@ export interface AngleConfig {
   zoom: number; // 0, 5, 10
 }
 
-// Snapped value options
+// Snapped value options (backend values)
 export const ROTATION_VALUES = [0, 45, 90, 135, 180, 225, 270, 315];
 export const TILT_VALUES = [-30, 0, 30, 60];
 export const ZOOM_VALUES = [0, 5, 10];
+
+// ─── Display conversion helpers ──────────────────────────────────────────────
+// Backend uses 0–315 for rotation; UI displays −180 to +180 centered at 0.
+
+/** Convert backend rotation (0–315) to display value (−180 to +180). */
+export const rotationToDisplay = (backend: number): number =>
+  backend > 180 ? backend - 360 : backend;
+
+/** Convert display rotation (−180 to +180) to backend value (0–315). */
+export const displayToRotation = (display: number): number =>
+  display < 0 ? display + 360 : display;
+
+/** Snap targets for the display-range rotation slider. */
+export const DISPLAY_ROTATION_VALUES = [-180, -135, -90, -45, 0, 45, 90, 135, 180];
 
 interface AnglesState {
   // Source image
