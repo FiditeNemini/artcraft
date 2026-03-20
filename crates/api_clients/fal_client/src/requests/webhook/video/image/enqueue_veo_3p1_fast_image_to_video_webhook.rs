@@ -2,8 +2,8 @@ use crate::creds::fal_api_key::FalApiKey;
 use crate::error::classify_fal_error::classify_fal_error;
 use crate::error::fal_error_plus::FalErrorPlus;
 use crate::requests::traits::fal_request_cost_calculator_trait::{FalRequestCostCalculator, UsdCents};
-use fal::endpoints::fal_ai::veo::veo3_1::veo_3p1_fast_first_frame_image_to_video::{veo_3p1_fast_first_frame_image_to_video, Veo3p1FastFirstFrameImageToVideoInput};
-use fal::webhook::WebhookResponse;
+use crate::requests::http::video::image::http_veo_3p1_fast_image_to_video::{veo_3p1_fast_image_to_video, Veo3p1FastImageToVideoInput};
+use crate::requests::api::webhook_response::WebhookResponse;
 use reqwest::IntoUrl;
 
 pub struct EnqueueVeo3p1FastImageToVideoArgs<'a, R: IntoUrl> {
@@ -97,7 +97,7 @@ pub async fn enqueue_veo_3p1_fast_image_to_video_webhook<R: IntoUrl>(
       })
       .map(|s| s.to_string());
 
-  let request = Veo3p1FastFirstFrameImageToVideoInput {
+  let request = Veo3p1FastImageToVideoInput {
     prompt: args.prompt,
     image_url: args.image_url,
     generate_audio: args.generate_audio,
@@ -107,7 +107,7 @@ pub async fn enqueue_veo_3p1_fast_image_to_video_webhook<R: IntoUrl>(
     resolution,
   };
 
-  let result = veo_3p1_fast_first_frame_image_to_video(request)
+  let result = veo_3p1_fast_image_to_video(request)
       .with_api_key(&args.api_key.0)
       .queue_webhook(args.webhook_url)
       .await;

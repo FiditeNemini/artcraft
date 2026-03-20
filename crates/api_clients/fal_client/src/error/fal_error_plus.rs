@@ -1,12 +1,13 @@
 use crate::error::classify_fal_error::classify_fal_error;
+use crate::error::fal_error::FalError;
 use std::error::Error;
 use std::fmt::{Display, Formatter};
 
-/// Additional errors that aren't included in `fal::FalError`.
+/// Additional errors that aren't included in `crate::error::fal_error::FalError`.
 #[derive(Debug)]
 pub enum FalErrorPlus {
   /// An error arising in the `fal` crate.
-  FalError(fal::FalError),
+  FalError(crate::error::fal_error::FalError),
   /// The fal API key is invalid.
   FalApiKeyError(String),
   /// The fal account has a billing issue
@@ -37,8 +38,8 @@ impl Display for FalErrorPlus {
 
 impl Error for FalErrorPlus {}
 
-impl From<fal::FalError> for FalErrorPlus {
-  fn from(err: fal::FalError) -> Self {
+impl From<FalError> for FalErrorPlus {
+  fn from(err: FalError) -> Self {
     classify_fal_error(err)
   }
 }

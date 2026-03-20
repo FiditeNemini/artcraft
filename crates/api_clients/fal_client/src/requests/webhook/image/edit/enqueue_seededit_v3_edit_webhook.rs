@@ -1,9 +1,8 @@
 use crate::creds::fal_api_key::FalApiKey;
 use crate::error::classify_fal_error::classify_fal_error;
 use crate::error::fal_error_plus::FalErrorPlus;
-use fal::endpoints::fal_ai::bytedance::seededit::edit_image_v3::seededit_v3_edit;
-use fal::endpoints::fal_ai::bytedance::seededit::edit_image_v3::SeedEditV3Input;
-use fal::webhook::WebhookResponse;
+use crate::requests::http::image::edit::http_seededit_v3_edit::{seededit_v3_edit, SeedEditV3EditInput};
+use crate::requests::api::webhook_response::WebhookResponse;
 use reqwest::IntoUrl;
 
 pub struct SeedEditV3EditArgs<'a, U: IntoUrl, R: IntoUrl> {
@@ -20,7 +19,7 @@ pub async fn enqueue_seededit_v3_edit_webhook<U: IntoUrl, R: IntoUrl>(
   args: SeedEditV3EditArgs<'_, U, R>
 ) -> Result<WebhookResponse, FalErrorPlus> {
 
-  let request = SeedEditV3Input {
+  let request = SeedEditV3EditInput {
     prompt: args.prompt.to_string(),
     image_url: args.image_url.as_str().to_string(),
 
