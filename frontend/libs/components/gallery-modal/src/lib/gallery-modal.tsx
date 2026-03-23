@@ -249,6 +249,19 @@ interface GalleryModalProps {
     url: string,
     media_id?: string,
   ) => Promise<void> | void;
+  onRecreateClicked?: (data: {
+    prompt: string | null;
+    mediaClass: string | undefined;
+    modelType: string | null;
+    contextImages: Array<{
+      media_links: {
+        cdn_url: string;
+        maybe_thumbnail_template: string;
+      };
+      media_token: string;
+      semantic: string;
+    }> | null;
+  }) => void;
 }
 
 // --- Constants (never re-created) ---
@@ -362,6 +375,7 @@ export const GalleryModal = React.memo(
     onRemoveBackgroundClicked,
     onMake3DObjectClicked,
     onMake3DWorldClicked,
+    onRecreateClicked,
   }: GalleryModalProps) => {
     const [loading, setLoading] = useState(false);
     // Separate state for pagination spinner (bottom of list) — not shared with background refresh
@@ -1296,6 +1310,7 @@ export const GalleryModal = React.memo(
             onRemoveBackgroundClicked={onRemoveBackgroundClicked}
             onMake3DObjectClicked={onMake3DObjectClicked}
             onMake3DWorldClicked={onMake3DWorldClicked}
+            onRecreateClicked={onRecreateClicked}
             onNavigatePrev={handleNavigatePrev}
             onNavigateNext={handleNavigateNext}
             onNavigateToMedia={handleNavigateToMedia}

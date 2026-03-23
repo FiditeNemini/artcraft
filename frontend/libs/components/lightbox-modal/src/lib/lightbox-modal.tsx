@@ -14,6 +14,7 @@ import {
   faTrashCan,
   faVideo,
   faWandMagicSparkles,
+  faArrowRotateRight,
 } from "@fortawesome/pro-solid-svg-icons";
 import { MediaFileDelete } from "@storyteller/tauri-api";
 import { LoadingSpinner } from "@storyteller/ui-loading-spinner";
@@ -90,6 +91,19 @@ interface LightboxModalProps {
     url: string,
     media_id?: string,
   ) => Promise<void> | void;
+  onRecreateClicked?: (data: {
+    prompt: string | null;
+    mediaClass: string | undefined;
+    modelType: string | null;
+    contextImages: Array<{
+      media_links: {
+        cdn_url: string;
+        maybe_thumbnail_template: string;
+      };
+      media_token: string;
+      semantic: string;
+    }> | null;
+  }) => void;
   batchImageToken?: string;
   onNavigatePrev?: () => void;
   onNavigateNext?: () => void;
@@ -119,6 +133,7 @@ export function LightboxModal({
   onRemoveBackgroundClicked,
   onMake3DObjectClicked,
   onMake3DWorldClicked,
+  onRecreateClicked,
   batchImageToken,
   onNavigatePrev,
   onNavigateNext,
@@ -929,12 +944,35 @@ export function LightboxModal({
 
             {/* buttons with spacing */}
             {actionUrl && (
-              <div className="mt-4 grid grid-cols-2 gap-2">
+              <div className="mt-4 grid grid-cols-2 gap-1.5">
+                {onRecreateClicked &&
+                  hasPromptToken &&
+                  (derivedMediaClass === "image" ||
+                    derivedMediaClass === "video") && (
+                    <Button
+                      className="w-full col-span-2 py-1.5 text-[13px]"
+                      variant="primary"
+                      icon={faArrowRotateRight}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        gtagEvent("recreate_clicked");
+                        onRecreateClicked({
+                          prompt,
+                          mediaClass: derivedMediaClass,
+                          modelType,
+                          contextImages,
+                        });
+                      }}
+                    >
+                      Recreate
+                    </Button>
+                  )}
+
                 {onEditClicked &&
                   actionUrl &&
                   derivedMediaClass === "image" && (
                     <Button
-                      className="w-full"
+                      className="w-full py-1.5 text-[13px]"
                       variant="primary"
                       icon={faPencil}
                       onClick={async (e) => {
@@ -951,7 +989,7 @@ export function LightboxModal({
                   actionUrl &&
                   derivedMediaClass === "image" && (
                     <Button
-                      className="w-full"
+                      className="w-full py-1.5 text-[13px]"
                       variant="primary"
                       icon={faVideo}
                       onClick={async (e) => {
@@ -971,7 +1009,7 @@ export function LightboxModal({
                   actionUrl &&
                   derivedMediaClass === "image" && (
                     <Button
-                      className="w-full"
+                      className="w-full py-1.5 text-[13px]"
                       variant="secondary"
                       icon={faWandMagicSparkles}
                       onClick={async (e) => {
@@ -993,7 +1031,7 @@ export function LightboxModal({
                   actionUrl &&
                   derivedMediaClass === "image" && (
                     <Button
-                      className="w-full"
+                      className="w-full py-1.5 text-[13px]"
                       variant="secondary"
                       icon={faCube}
                       onClick={async (e) => {
@@ -1015,7 +1053,7 @@ export function LightboxModal({
                   actionUrl &&
                   derivedMediaClass === "image" && (
                     <Button
-                      className="w-full"
+                      className="w-full py-1.5 text-[13px]"
                       variant="secondary"
                       icon={faGlobe}
                       onClick={async (e) => {
@@ -1037,8 +1075,8 @@ export function LightboxModal({
                   <Button
                     className={
                       derivedMediaClass === "image"
-                        ? "w-full"
-                        : "w-full col-span-2"
+                        ? "w-full py-1.5 text-[13px]"
+                        : "w-full col-span-2 py-1.5 text-[13px]"
                     }
                     variant="secondary"
                     icon={faDownToLine}
@@ -1054,7 +1092,7 @@ export function LightboxModal({
 
                 {onAddToSceneClicked && actionUrl && (
                   <Button
-                    className="w-full"
+                    className="w-full py-1.5 text-[13px]"
                     variant="secondary"
                     onClick={async (e) => {
                       e.stopPropagation();
@@ -1070,7 +1108,7 @@ export function LightboxModal({
 
                 {selectedMediaToken && (
                   <Button
-                    className="w-full"
+                    className="w-full py-1.5 text-[13px]"
                     variant="secondary"
                     icon={shareCopied ? faCheck : faLink}
                     onClick={async (e) => {
@@ -1103,7 +1141,7 @@ export function LightboxModal({
                 {selectedMediaToken && onDeleteClicked && (
                   <Button
                     icon={faTrashCan}
-                    className="w-full"
+                    className="w-full py-1.5 text-[13px]"
                     variant="destructive"
                     onClick={async (e) => {
                       e.stopPropagation();
