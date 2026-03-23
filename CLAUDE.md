@@ -51,3 +51,12 @@ artcraft/
 │       └── libs/                        # Support libraries, reusable React components, etc.
 └── Cargo.toml                           # Rust monorepo workspace
 ```
+
+## Code Style
+
+- Rust with no minimum supported version
+- Actix-web for HTTP services
+- SQLx for MySQL and SQLite
+- A mix of wreq and reqwest for Rust HTTP clients
+- TypeScript with Nx, React, Vite, Zustand, and Three.js
+- Use two spaces for indentation
