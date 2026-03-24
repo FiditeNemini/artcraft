@@ -71,6 +71,10 @@ pub async fn seedance_2p0_multi_function_video_gen_handler(
       .acquire()
       .await?;
 
+  let maybe_avt_token = server_state
+      .avt_cookie_manager
+      .get_avt_token_from_request(&http_request);
+
   let maybe_user_session = server_state
       .session_checker
       .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
@@ -80,16 +84,14 @@ pub async fn seedance_2p0_multi_function_video_gen_handler(
         CommonWebError::ServerError
       })?;
 
-  let maybe_avt_token = server_state
-      .avt_cookie_manager
-      .get_avt_token_from_request(&http_request);
-
-  let user_token = match maybe_user_session.as_ref() {
-    Some(session) => &session.user_token,
+  let user_session = match maybe_user_session {
+    Some(session) => session,
     None => {
       return Err(CommonWebError::NotAuthorized);
     }
   };
+
+  let user_token = &user_session.user_token;
 
   if let Err(reason) = validate_idempotency_token_format(&request.uuid_idempotency_token) {
     return Err(CommonWebError::BadInputWithSimpleMessage(reason));
@@ -284,7 +286,7 @@ pub async fn seedance_2p0_multi_function_video_gen_handler(
   let prompt_result = insert_prompt(InsertPromptArgs {
     maybe_apriori_prompt_token: None,
     prompt_type: PromptType::ArtcraftApp,
-    maybe_creator_user_token: maybe_user_session.as_ref().map(|s| &s.user_token),
+    maybe_creator_user_token: Some(user_token),
     maybe_model_type: Some(CommonModelType::Seedance2p0),
     maybe_generation_provider: Some(GenerationProvider::Artcraft),
     maybe_positive_prompt: request.prompt.as_deref(),
@@ -394,7 +396,7 @@ pub async fn seedance_2p0_multi_function_video_gen_handler(
         maybe_inference_args: None,
         maybe_prompt_token: prompt_token.as_ref(),
         maybe_wallet_ledger_entry_token: Some(&deduction_result.ledger_entry_token),
-        maybe_creator_user_token: maybe_user_session.as_ref().map(|s| &s.user_token),
+        maybe_creator_user_token: Some(user_token),
         maybe_avt_token: maybe_avt_token.as_ref(),
         creator_ip_address: &ip_address,
         creator_set_visibility: Visibility::Public,
