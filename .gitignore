@@ -36,8 +36,9 @@ script/socat_dev_database_connect.sh
 # Python virtual envs (named by convention)
 venv/
 
-# Testing
+# LLM Testing
 /prompts/
+/reports/
 /requests/
 
 # Scratch data
