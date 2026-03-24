@@ -108,6 +108,7 @@ interface LightboxModalProps {
   onNavigatePrev?: () => void;
   onNavigateNext?: () => void;
   onNavigateToMedia?: (mediaToken: string) => void;
+  initialIndex?: number;
 }
 
 export function LightboxModal({
@@ -138,6 +139,7 @@ export function LightboxModal({
   onNavigatePrev,
   onNavigateNext,
   onNavigateToMedia,
+  initialIndex,
 }: LightboxModalProps) {
   // NB(bt,2025-06-14): We add ?cors=1 to the image url to prevent caching "sec-fetch-mode: no-cors" from
   // the <image> tag request from being cached. If we then drag it into the canvas after it's been cached,
@@ -423,9 +425,10 @@ export function LightboxModal({
   }, [emblaMainApi, onSelect]);
 
   useEffect(() => {
-    setSelectedIndex(0);
-    emblaMainApi?.scrollTo(0, true);
-    emblaThumbsApi?.scrollTo(0, true);
+    const idx = initialIndex ?? 0;
+    setSelectedIndex(idx);
+    emblaMainApi?.scrollTo(idx, true);
+    emblaThumbsApi?.scrollTo(idx, true);
   }, [batchImageToken, imageUrl, emblaMainApi, emblaThumbsApi]);
 
   const selectedImageUrl = effectiveImageUrls[selectedIndex] ?? null;
@@ -471,25 +474,32 @@ export function LightboxModal({
     [mediaClass, batchImages],
   );
 
-  // Keyboard navigation for gallery prev/next
+  // Keyboard navigation:
+  //   Left / Right  →  carousel slide (loop wraps automatically)
+  //   Up / Down     →  previous / next bundle
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't navigate if user is interacting with an input, textarea, etc.
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
-      if (e.key === "ArrowLeft" && onNavigatePrev) {
+      if (e.key === "ArrowLeft") {
         e.preventDefault();
-        onNavigatePrev();
-      } else if (e.key === "ArrowRight" && onNavigateNext) {
+        emblaMainApi?.scrollPrev(true);
+      } else if (e.key === "ArrowRight") {
         e.preventDefault();
-        onNavigateNext();
+        emblaMainApi?.scrollNext(true);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        onNavigatePrev?.();
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        onNavigateNext?.();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onNavigatePrev, onNavigateNext]);
+  }, [isOpen, emblaMainApi, onNavigatePrev, onNavigateNext]);
 
   return (
     <>
@@ -511,7 +521,9 @@ export function LightboxModal({
         </Modal.DragHandle>
 
         {/* content grid */}
-        <div className="flex h-full gap-4">
+        <div
+          className="flex h-full gap-4"
+        >
           {/* image panel - flexible width */}
           <div className="group/nav relative flex h-full flex-1 items-center justify-center overflow-hidden rounded-l-xl bg-black/30">
             {!selectedImageUrl ? (

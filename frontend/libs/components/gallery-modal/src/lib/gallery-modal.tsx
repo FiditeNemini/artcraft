@@ -32,6 +32,8 @@ import {
   galleryModalLightboxMediaId,
   galleryModalLightboxImage,
   galleryModalLightboxVisible,
+  galleryModalLightboxNavPrev,
+  galleryModalLightboxNavNext,
 } from "./galleryModalSignals";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -701,6 +703,8 @@ export const GalleryModal = React.memo(
       lightboxVisibleSignal.value = false;
       lightboxImageSignal.value = null;
       galleryModalLightboxMediaId.value = null;
+      galleryModalLightboxNavPrev.value = null;
+      galleryModalLightboxNavNext.value = null;
     }, []);
 
     const handleCloseGallery = useCallback(() => {
@@ -1293,6 +1297,7 @@ export const GalleryModal = React.memo(
             imageUrls={imageUrls}
             actionUrls={actionUrls}
             mediaTokens={(lightboxImageSignal.value as any)?.mediaTokens}
+            initialIndex={(lightboxImageSignal.value as any)?.initialIndex}
             batchImageToken={
               (lightboxImageSignal.value as any)?.batchImageToken
             }
@@ -1311,8 +1316,8 @@ export const GalleryModal = React.memo(
             onMake3DObjectClicked={onMake3DObjectClicked}
             onMake3DWorldClicked={onMake3DWorldClicked}
             onRecreateClicked={onRecreateClicked}
-            onNavigatePrev={handleNavigatePrev}
-            onNavigateNext={handleNavigateNext}
+            onNavigatePrev={galleryModalLightboxNavPrev.value ?? handleNavigatePrev}
+            onNavigateNext={galleryModalLightboxNavNext.value ?? handleNavigateNext}
             onNavigateToMedia={handleNavigateToMedia}
           />
         )}
