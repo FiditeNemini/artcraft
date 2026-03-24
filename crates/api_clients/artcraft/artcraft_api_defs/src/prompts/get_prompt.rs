@@ -12,6 +12,7 @@ use serde_derive::{Deserialize, Serialize};
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::prompts::PromptToken;
 use utoipa::ToSchema;
+use enums::common::generation::common_model_class::CommonModelClass;
 
 pub const GET_PROMPT_PATH: &str = "/v1/prompts/{token}";
 
@@ -43,6 +44,9 @@ pub struct PromptInfo {
 
   /// The type of model used
   pub maybe_model_type: Option<CommonModelType>,
+
+  /// The class of model used
+  pub maybe_model_class: Option<CommonModelClass>,
 
   /// The service provider used
   pub maybe_generation_provider: Option<GenerationProvider>,

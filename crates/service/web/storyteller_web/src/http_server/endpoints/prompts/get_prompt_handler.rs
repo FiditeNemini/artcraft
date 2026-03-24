@@ -214,6 +214,7 @@ pub async fn get_prompt_handler(
       token: result.token,
       maybe_strength,
       maybe_model_type: result.maybe_model_type,
+      maybe_model_class: result.maybe_model_type.map(|ty| ty.get_model_class()),
       maybe_generation_provider: result.maybe_generation_provider,
       maybe_positive_prompt: result.maybe_positive_prompt,
       maybe_negative_prompt: result.maybe_negative_prompt,
