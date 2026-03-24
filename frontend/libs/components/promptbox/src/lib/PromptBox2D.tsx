@@ -446,23 +446,6 @@ export const PromptBox2D = ({
                   />
                 </Tooltip>
               )}
-              <Tooltip
-                content={
-                  useSystemPrompt
-                    ? "Use system prompt: ON"
-                    : "Use system prompt: OFF"
-                }
-                position="top"
-                className="z-50"
-                delay={200}
-              >
-                <ToggleButton
-                  isActive={useSystemPrompt}
-                  icon={faMessageXmark}
-                  activeIcon={faMessageCheck}
-                  onClick={() => setUseSystemPrompt(!useSystemPrompt)}
-                />
-              </Tooltip>
             </div>
             <div className="flex items-center gap-2">
               {onFitPressed && (

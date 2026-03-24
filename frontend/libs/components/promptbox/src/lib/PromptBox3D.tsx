@@ -689,23 +689,6 @@ export const PromptBox3D = ({
                 />
               </Tooltip>
               <Tooltip
-                content={
-                  useSystemPrompt
-                    ? "Use system prompt: ON"
-                    : "Use system prompt: OFF"
-                }
-                position="top"
-                className="z-50"
-                delay={200}
-              >
-                <ToggleButton
-                  isActive={useSystemPrompt}
-                  icon={faMessageXmark}
-                  activeIcon={faMessageCheck}
-                  onClick={() => setUseSystemPrompt(!useSystemPrompt)}
-                />
-              </Tooltip>
-              <Tooltip
                 content={gridVisibility.value ? "Grid: ON" : "Grid: OFF"}
                 position="top"
                 className="z-50"

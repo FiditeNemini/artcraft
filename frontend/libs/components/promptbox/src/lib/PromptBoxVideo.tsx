@@ -946,25 +946,6 @@ export const PromptBoxVideo = ({
                 </Tooltip>
               )}
 
-              {selectedModel?.supportsSystemPrompt !== false && (
-                <Tooltip
-                  content={
-                    useSystemPrompt
-                      ? "Use system prompt: ON"
-                      : "Use system prompt: OFF"
-                  }
-                  position="top"
-                  className="z-50"
-                  delay={200}
-                >
-                  <ToggleButton
-                    isActive={useSystemPrompt}
-                    icon={faMessageXmark}
-                    activeIcon={faMessageCheck}
-                    onClick={() => setUseSystemPrompt(!useSystemPrompt)}
-                  />
-                </Tooltip>
-              )}
 
               {selectedModel?.generateWithSound && (
                 <Tooltip
