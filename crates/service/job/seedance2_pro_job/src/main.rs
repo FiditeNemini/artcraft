@@ -26,13 +26,12 @@ use seedance2pro_client::creds::seedance2pro_session::Seedance2ProSession;
 use server_environment::ServerEnvironment;
 
 use crate::http_server::run_http_server::{launch_http_server, CreateServerArgs};
-use crate::main_loop::main_loop;
+use crate::jobs::main_loop::main_loop;
 use crate::job_dependencies::JobDependencies;
 
 pub mod http_server;
 pub mod job_dependencies;
-pub mod main_loop;
-pub mod process_job;
+pub mod jobs;
 
 // Bucket config
 const ENV_ACCESS_KEY: &str = "ACCESS_KEY";
@@ -108,6 +107,12 @@ async fn main() -> AnyhowResult<()> {
     5_000,
   )?;
 
+  let maybe_pages_per_batch: Option<u32> = easyenv::try_get_env_num_optional("BATCH_PAGE_COUNT")?;
+
+  if let Some(count) = maybe_pages_per_batch {
+    info!("Batch page count: {}", count);
+  }
+
   let application_shutdown = RelaxedAtomicBool::new(false);
   let job_stats = JobStats::new();
 
@@ -123,6 +128,7 @@ async fn main() -> AnyhowResult<()> {
     server_environment,
     job_stats,
     poll_interval_millis,
+    maybe_pages_per_batch,
     application_shutdown: application_shutdown.clone(),
   };
 
