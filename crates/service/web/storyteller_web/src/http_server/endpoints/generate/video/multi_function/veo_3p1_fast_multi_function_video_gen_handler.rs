@@ -17,8 +17,10 @@ use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path:
 use enums::by_table::prompt_context_items::prompt_context_semantic_type::PromptContextSemanticType;
 use enums::by_table::prompts::prompt_type::PromptType;
 use enums::common::generation_provider::GenerationProvider;
+use enums::common::generation::common_aspect_ratio::CommonAspectRatio;
 use enums::common::generation::common_model_type::CommonModelType;
 use enums::common::visibility::Visibility;
+use enums::common::generation::common_generation_mode::CommonGenerationMode;
 use fal_client::creds::open_ai_api_key::OpenAiApiKey;
 use fal_client::requests::traits::fal_request_cost_calculator_trait::FalRequestCostCalculator;
 use fal_client::requests::webhook::video::image::enqueue_veo_3p1_fast_first_last_frame_image_to_video_webhook::{enqueue_veo_3p1_fast_first_last_frame_image_to_video_webhook, EnqueueVeo3p1FastFirstLastFrameImageToVideoArgs, EnqueueVeo3p1FastFirstLastFrameImageToVideoAspectRatio, EnqueueVeo3p1FastFirstLastFrameImageToVideoDurationSeconds, EnqueueVeo3p1FastFirstLastFrameImageToVideoResolution};
@@ -148,6 +150,7 @@ pub async fn veo_3p1_fast_multi_function_video_gen_handler(
   let apriori_job_token = InferenceJobToken::generate();
   
   let fal_result;
+  let generation_mode;
 
   let generate_audio = request.generate_audio.unwrap_or(true);
 
@@ -155,6 +158,7 @@ pub async fn veo_3p1_fast_multi_function_video_gen_handler(
     if let Some(end_frame_url) = maybe_end_frame_image_url {
 
       info!("image-to-video case (start and end frame)");
+    generation_mode = CommonGenerationMode::Keyframe;
 
       let duration = match request.duration {
         Some(Veo3p1FastMultiFunctionVideoGenDuration::FourSeconds) => EnqueueVeo3p1FastFirstLastFrameImageToVideoDurationSeconds::Four,
@@ -208,6 +212,7 @@ pub async fn veo_3p1_fast_multi_function_video_gen_handler(
 
     } else {
       info!("image-to-video case (start frame only)");
+      generation_mode = CommonGenerationMode::Keyframe;
 
       let duration = match request.duration {
         Some(Veo3p1FastMultiFunctionVideoGenDuration::FourSeconds) => EnqueueVeo3p1FastImageToVideoDurationSeconds::Four,
@@ -261,6 +266,7 @@ pub async fn veo_3p1_fast_multi_function_video_gen_handler(
 
   } else {
     info!("text-to-video case");
+    generation_mode = CommonGenerationMode::Text;
     
     let duration = match request.duration {
       Some(Veo3p1FastMultiFunctionVideoGenDuration::FourSeconds) => EnqueueVeo3p1FastTextToVideoDurationSeconds::Four,
@@ -345,11 +351,15 @@ pub async fn veo_3p1_fast_multi_function_video_gen_handler(
     maybe_positive_prompt: request.prompt.as_deref(),
     maybe_negative_prompt: None,
     maybe_other_args: None,
-    maybe_generation_mode: None,
-    maybe_aspect_ratio: None,
+    maybe_generation_mode: Some(generation_mode),
+    maybe_aspect_ratio: request.aspect_ratio.as_ref().map(|ar| match ar {
+      Veo3p1FastMultiFunctionVideoGenAspectRatio::Auto => CommonAspectRatio::Auto,
+      Veo3p1FastMultiFunctionVideoGenAspectRatio::SixteenByNine => CommonAspectRatio::WideSixteenByNine,
+      Veo3p1FastMultiFunctionVideoGenAspectRatio::NineBySixteen => CommonAspectRatio::TallNineBySixteen,
+    }),
     maybe_resolution: None,
     maybe_batch_count: None,
-    maybe_generate_audio: None,
+    maybe_generate_audio: Some(generate_audio),
     creator_ip_address: &ip_address,
     mysql_executor: &mut *transaction,
     phantom: Default::default(),

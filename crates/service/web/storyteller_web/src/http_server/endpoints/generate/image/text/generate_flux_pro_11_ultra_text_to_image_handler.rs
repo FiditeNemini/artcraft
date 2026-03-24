@@ -1,24 +1,25 @@
 use std::sync::Arc;
 
 use crate::billing::wallets::attempt_wallet_deduction::attempt_wallet_deduction_else_common_web_error;
+use crate::billing::wallets::temporary_test_wallet_deduction::temporary_test_wallet_deduction;
 use crate::http_server::common_responses::common_web_error::CommonWebError;
-use crate::http_server::common_responses::media::media_links_builder::MediaLinksBuilder;
-use crate::http_server::endpoints::analytics::log_browser_session_handler::LogBrowserSessionError;
 use crate::http_server::endpoints::generate::common::payments_error_test::payments_error_test;
-use crate::http_server::endpoints::media_files::helpers::get_media_domain::get_media_domain;
 use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use crate::state::server_state::ServerState;
 use actix_web::web::Json;
 use actix_web::{web, HttpRequest};
-use anyhow::anyhow;
-use artcraft_api_defs::generate::video::generate_veo_3_fast_image_to_video::{GenerateVeo3FastDuration, GenerateVeo3FastImageToVideoRequest, GenerateVeo3FastImageToVideoResponse, GenerateVeo3FastResolution};
-use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
+use artcraft_api_defs::generate::image::text::generate_flux_pro_11_text_to_image::GenerateFluxPro11TextToImageNumImages;
+use artcraft_api_defs::generate::image::text::generate_flux_pro_11_ultra_text_to_image::GenerateFluxPro11UltraTextToImageResponse;
+use artcraft_api_defs::generate::image::text::generate_flux_pro_11_ultra_text_to_image::{GenerateFluxPro11UltraTextToImageAspectRatio, GenerateFluxPro11UltraTextToImageNumImages, GenerateFluxPro11UltraTextToImageRequest};
 use enums::by_table::prompts::prompt_type::PromptType;
 use enums::common::generation_provider::GenerationProvider;
 use enums::common::generation::common_model_type::CommonModelType;
 use enums::common::visibility::Visibility;
+use enums::common::generation::common_generation_mode::CommonGenerationMode;
+use enums::common::generation::common_aspect_ratio::CommonAspectRatio;
 use fal_client::requests::traits::fal_request_cost_calculator_trait::FalRequestCostCalculator;
-use fal_client::requests::webhook::video::image::enqueue_veo_3_fast_image_to_video_webhook::{enqueue_veo_3_fast_image_to_video_webhook, Veo3FastArgs, Veo3FastDuration, Veo3FastResolution};
+use fal_client::requests::webhook::image::text::enqueue_flux_pro_11_ultra_text_to_image_webhook::FluxPro11UltraArgs;
+use fal_client::requests::webhook::image::text::enqueue_flux_pro_11_ultra_text_to_image_webhook::{enqueue_flux_pro_11_ultra_text_to_image_webhook, FluxPro11UltraAspectRatio, FluxPro11UltraNumImages};
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{error, info, warn};
 use mysql_queries::queries::generic_inference::fal::insert_generic_inference_job_for_fal_queue::insert_generic_inference_job_for_fal_queue;
@@ -26,30 +27,28 @@ use mysql_queries::queries::generic_inference::fal::insert_generic_inference_job
 use mysql_queries::queries::generic_inference::fal::insert_generic_inference_job_for_fal_queue::InsertGenericInferenceForFalArgs;
 use mysql_queries::queries::generic_inference::fal::insert_generic_inference_job_for_fal_queue_with_apriori_job_token::{insert_generic_inference_job_for_fal_queue_with_apriori_job_token, InsertGenericInferenceForFalWithAprioriJobTokenArgs};
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
-use mysql_queries::queries::media_files::get::get_media_file::get_media_file_with_connection;
 use mysql_queries::queries::prompts::insert_prompt::{insert_prompt, InsertPromptArgs};
 use sqlx::Acquire;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
-use tokens::tokens::prompts::PromptToken;
 use utoipa::ToSchema;
 
-/// Veo 3 Fast Image to Video
+/// Flux Pro 1.1 Ultra
 #[utoipa::path(
   post,
-  tag = "Generate Videos",
-  path = "/v1/generate/video/veo_3_fast_image_to_video",
+  tag = "Generate Images",
+  path = "/v1/generate/image/flux_pro_1.1_ultra_text_to_image",
   responses(
-    (status = 200, description = "Success", body = GenerateVeo3FastImageToVideoResponse),
+    (status = 200, description = "Success", body = GenerateFluxPro11UltraTextToImageResponse),
   ),
   params(
-    ("request" = GenerateVeo3FastImageToVideoRequest, description = "Payload for Request"),
+    ("request" = GenerateFluxPro11UltraTextToImageRequest, description = "Payload for Request"),
   )
 )]
-pub async fn generate_veo_3_fast_image_to_video_handler(
+pub async fn generate_flux_pro_11_ultra_text_to_image_handler(
   http_request: HttpRequest,
-  request: Json<GenerateVeo3FastImageToVideoRequest>,
+  request: Json<GenerateFluxPro11UltraTextToImageRequest>,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<Json<GenerateVeo3FastImageToVideoResponse>, CommonWebError> {
+) -> Result<Json<GenerateFluxPro11UltraTextToImageResponse>, CommonWebError> {
   
   payments_error_test(&request.prompt.as_deref().unwrap_or(""))?;
   
@@ -77,14 +76,6 @@ pub async fn generate_veo_3_fast_image_to_video_handler(
     }
   };
 
-  let media_file_token = match &request.media_file_token {
-    Some(token) => token,
-    None => {
-      warn!("No media file token provided");
-      return Err(CommonWebError::BadInputWithSimpleMessage("No media file token provided".to_string()));
-    }
-  };
-  
   if let Err(reason) = validate_idempotency_token_format(&request.uuid_idempotency_token) {
     return Err(CommonWebError::BadInputWithSimpleMessage(reason));
   }
@@ -95,75 +86,42 @@ pub async fn generate_veo_3_fast_image_to_video_handler(
         error!("Error inserting idempotency token: {:?}", err);
         CommonWebError::BadInputWithSimpleMessage("invalid idempotency token".to_string())
       })?;
+
   const IS_MOD : bool = false;
-  
-  let media_file_lookup_result = get_media_file_with_connection(
-    media_file_token,
-    IS_MOD,
-    &mut mysql_connection,
-  ).await;
-
-  let media_file = match media_file_lookup_result {
-    Ok(Some(media_file)) => media_file,
-    Ok(None) => {
-      warn!("MediaFile not found: {:?}", media_file_token);
-      return Err(CommonWebError::NotFound);
-    },
-    Err(err) => {
-      warn!("Error looking up media_file: {:?}", err);
-      return Err(CommonWebError::ServerError);
-    }
-  };
-
-  if !media_file.media_type.is_jpg_or_png_or_legacy_image() {
-    return Err(CommonWebError::BadInputWithSimpleMessage("Media file must be a JPG or PNG image".to_string()));
-  }
-  
-  let media_domain = get_media_domain(&http_request);
-  
-  let bucket_path = MediaFileBucketPath::from_object_hash(
-    &media_file.public_bucket_directory_hash,
-    media_file.maybe_public_bucket_prefix.as_deref(),
-    media_file.maybe_public_bucket_extension.as_deref());
-  
-  let media_links = MediaLinksBuilder::from_media_path_and_env(
-    media_domain, 
-    server_state.server_environment, 
-    &bucket_path);
   
   info!("Fal webhook URL: {}", server_state.fal.webhook_url);
 
   let apriori_job_token = InferenceJobToken::generate();
+
+  let aspect_ratio = match request.aspect_ratio {
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::Square) => FluxPro11UltraAspectRatio::Square,
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::LandscapeFourByThree) => FluxPro11UltraAspectRatio::LandscapeFourByThree,
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::LandscapeSixteenByNine) => FluxPro11UltraAspectRatio::LandscapeSixteenByNine,
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::PortraitThreeByFour) => FluxPro11UltraAspectRatio::PortraitThreeByFour,
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::PortraitNineBySixteen) => FluxPro11UltraAspectRatio::PortraitNineBySixteen,
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::LandscapeThreeByTwo) => FluxPro11UltraAspectRatio::LandscapeThreeByTwo,
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::LandscapeTwentyOneByNine) => FluxPro11UltraAspectRatio::LandscapeTwentyOneByNine,
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::PortraitTwoByThree) => FluxPro11UltraAspectRatio::PortraitTwoByThree,
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::PortraitNineByTwentyOne) => FluxPro11UltraAspectRatio::PortraitNineByTwentyOne,
+    None => FluxPro11UltraAspectRatio::LandscapeSixteenByNine, // Default
+  };
   
-  let prompt = request.prompt
-      .as_deref()
-      .map(|prompt| prompt.trim())
-      .unwrap_or_else(|| "");
-
-  let resolution = match &request.resolution {
-    Some(GenerateVeo3FastResolution::SevenTwentyP) => Veo3FastResolution::SevenTwentyP,
-    Some(GenerateVeo3FastResolution::TenEightyP) => Veo3FastResolution::TenEightyP,
-    None => Veo3FastResolution::Default,
+  let num_images = match request.num_images {
+    Some(GenerateFluxPro11UltraTextToImageNumImages::One) => FluxPro11UltraNumImages::One,
+    Some(GenerateFluxPro11UltraTextToImageNumImages::Two) => FluxPro11UltraNumImages::Two,
+    Some(GenerateFluxPro11UltraTextToImageNumImages::Three) => FluxPro11UltraNumImages::Three,
+    Some(GenerateFluxPro11UltraTextToImageNumImages::Four) => FluxPro11UltraNumImages::Four,
+    None => FluxPro11UltraNumImages::One, // Default
   };
 
-  let duration = match &request.duration {
-    Some(GenerateVeo3FastDuration::EightSeconds) => Veo3FastDuration::EightSeconds,
-    None => Veo3FastDuration::EightSeconds,
-  };
-
-  let generate_audio = request.generate_audio
-      .unwrap_or(false);
-
-  let args = Veo3FastArgs {
-    image_url: media_links.cdn_url,
-    prompt,
-    duration,
-    resolution,
-    generate_audio,
+  let args = FluxPro11UltraArgs {
+    prompt: request.prompt.as_deref().unwrap_or(""),
     webhook_url: &server_state.fal.webhook_url,
     api_key: &server_state.fal.api_key,
+    aspect_ratio,
+    num_images,
   };
-  
+
   let cost = args.calculate_cost_in_cents();
 
   info!("Charging wallet: {}", cost);
@@ -175,10 +133,10 @@ pub async fn generate_veo_3_fast_image_to_video_handler(
     &mut mysql_connection,
   ).await?;
 
-  let fal_result = enqueue_veo_3_fast_image_to_video_webhook(args)
+  let fal_result = enqueue_flux_pro_11_ultra_text_to_image_webhook(args)
       .await
       .map_err(|err| {
-        warn!("Error calling enqueue_veo_3_fast_image_to_video_webhook: {:?}", err);
+        warn!("Error calling enqueue_flux_pro_ultra_text_to_image_webhook: {:?}", err);
         CommonWebError::ServerError
       })?;
 
@@ -201,21 +159,40 @@ pub async fn generate_veo_3_fast_image_to_video_handler(
       })?;
 
   // NB: Don't fail the job if the query fails.
+  let maybe_aspect_ratio = match request.aspect_ratio {
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::Square) => Some(CommonAspectRatio::Square),
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::LandscapeThreeByTwo) => Some(CommonAspectRatio::WideThreeByTwo),
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::LandscapeFourByThree) => Some(CommonAspectRatio::WideFourByThree),
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::LandscapeSixteenByNine) => Some(CommonAspectRatio::WideSixteenByNine),
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::LandscapeTwentyOneByNine) => Some(CommonAspectRatio::WideTwentyOneByNine),
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::PortraitTwoByThree) => Some(CommonAspectRatio::TallTwoByThree),
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::PortraitThreeByFour) => Some(CommonAspectRatio::TallThreeByFour),
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::PortraitNineBySixteen) => Some(CommonAspectRatio::TallNineBySixteen),
+    Some(GenerateFluxPro11UltraTextToImageAspectRatio::PortraitNineByTwentyOne) => Some(CommonAspectRatio::TallNineByTwentyOne),
+    None => None,
+  };
+
+  let maybe_batch_count: Option<u8> = match request.num_images {
+    Some(GenerateFluxPro11UltraTextToImageNumImages::One) => Some(1),
+    Some(GenerateFluxPro11UltraTextToImageNumImages::Two) => Some(2),
+    Some(GenerateFluxPro11UltraTextToImageNumImages::Three) => Some(3),
+    Some(GenerateFluxPro11UltraTextToImageNumImages::Four) => Some(4),
+    None => None,
+  };
+
   let prompt_result = insert_prompt(InsertPromptArgs {
     maybe_apriori_prompt_token: None,
     prompt_type: PromptType::ArtcraftApp,
-    maybe_creator_user_token: maybe_user_session
-        .as_ref()
-        .map(|s| &s.user_token),
-    maybe_model_type: Some(CommonModelType::Veo3Fast),
+    maybe_creator_user_token: Some(&user_token),
+    maybe_model_type: Some(CommonModelType::FluxPro11Ultra),
     maybe_generation_provider: Some(GenerationProvider::Artcraft),
-    maybe_positive_prompt: Some(prompt),
+    maybe_positive_prompt: request.prompt.as_deref(),
     maybe_negative_prompt: None,
     maybe_other_args: None,
-    maybe_generation_mode: None,
-    maybe_aspect_ratio: None,
+    maybe_generation_mode: Some(CommonGenerationMode::Text), // TODO: This endpoint only supports "text" for now
+    maybe_aspect_ratio,
     maybe_resolution: None,
-    maybe_batch_count: None,
+    maybe_batch_count,
     maybe_generate_audio: None,
     creator_ip_address: &ip_address,
     mysql_executor: &mut *transaction,
@@ -234,12 +211,10 @@ pub async fn generate_veo_3_fast_image_to_video_handler(
     apriori_job_token: &apriori_job_token,
     uuid_idempotency_token: &request.uuid_idempotency_token,
     maybe_external_third_party_id: &external_job_id,
-    fal_category: FalCategory::VideoGeneration,
+    fal_category: FalCategory::ImageGeneration,
     maybe_inference_args: None,
     maybe_prompt_token: prompt_token.as_ref(),
-    maybe_creator_user_token: maybe_user_session
-        .as_ref()
-        .map(|s| &s.user_token),
+    maybe_creator_user_token: Some(&user_token),
     maybe_avt_token: maybe_avt_token.as_ref(),
     creator_ip_address: &ip_address,
     creator_set_visibility: Visibility::Public,
@@ -266,7 +241,7 @@ pub async fn generate_veo_3_fast_image_to_video_handler(
         CommonWebError::ServerError
       })?;
 
-  Ok(Json(GenerateVeo3FastImageToVideoResponse {
+  Ok(Json(GenerateFluxPro11UltraTextToImageResponse {
     success: true,
     inference_job_token: job_token,
   }))

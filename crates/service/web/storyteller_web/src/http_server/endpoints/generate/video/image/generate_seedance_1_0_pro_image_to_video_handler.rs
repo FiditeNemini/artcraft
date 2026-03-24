@@ -11,15 +11,20 @@ use crate::util::lookup::fetch_all_required_media_files::fetch_all_required_medi
 use crate::util::traits::into_media_links_trait::IntoMediaLinks;
 use actix_web::web::Json;
 use actix_web::{web, HttpRequest};
-use artcraft_api_defs::generate::video::generate_kling_1_6_pro_image_to_video::{GenerateKling16ProAspectRatio, GenerateKling16ProImageToVideoRequest};
-use artcraft_api_defs::generate::video::generate_kling_1_6_pro_image_to_video::{GenerateKling16ProDuration, GenerateKling16ProImageToVideoResponse};
+use artcraft_api_defs::generate::video::generate_seedance_1_0_pro_image_to_video::GenerateSeedance10ProDuration;
+use artcraft_api_defs::generate::video::generate_seedance_1_0_pro_image_to_video::GenerateSeedance10ProImageToVideoRequest;
+use artcraft_api_defs::generate::video::generate_seedance_1_0_pro_image_to_video::GenerateSeedance10ProImageToVideoResponse;
+use artcraft_api_defs::generate::video::generate_seedance_1_0_pro_image_to_video::GenerateSeedance10ProResolution;
 use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::prompts::prompt_type::PromptType;
 use enums::common::generation_provider::GenerationProvider;
 use enums::common::generation::common_model_type::CommonModelType;
 use enums::common::visibility::Visibility;
+use enums::common::generation::common_generation_mode::CommonGenerationMode;
 use fal_client::requests::traits::fal_request_cost_calculator_trait::FalRequestCostCalculator;
-use fal_client::requests::webhook::video::image::enqueue_kling_v1p6_pro_image_to_video_webhook::{enqueue_kling_v1p6_pro_image_to_video_webhook, Kling1p6ProArgs, Kling1p6ProAspectRatio, Kling1p6ProDuration};
+use fal_client::requests::webhook::video::image::enqueue_seedance_1_pro_image_to_video_webhook::enqueue_seedance_1_pro_image_to_video_webhook;
+use fal_client::requests::webhook::video::image::enqueue_seedance_1_pro_image_to_video_webhook::Seedance1ProDuration;
+use fal_client::requests::webhook::video::image::enqueue_seedance_1_pro_image_to_video_webhook::{Seedance1ProArgs, Seedance1ProResolution};
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{error, info, warn};
 use mysql_queries::queries::generic_inference::fal::insert_generic_inference_job_for_fal_queue::insert_generic_inference_job_for_fal_queue;
@@ -27,31 +32,30 @@ use mysql_queries::queries::generic_inference::fal::insert_generic_inference_job
 use mysql_queries::queries::generic_inference::fal::insert_generic_inference_job_for_fal_queue::InsertGenericInferenceForFalArgs;
 use mysql_queries::queries::generic_inference::fal::insert_generic_inference_job_for_fal_queue_with_apriori_job_token::{insert_generic_inference_job_for_fal_queue_with_apriori_job_token, InsertGenericInferenceForFalWithAprioriJobTokenArgs};
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
-use mysql_queries::queries::media_files::get::batch_get_media_files_by_tokens::batch_get_media_files_by_tokens_with_connection;
-use mysql_queries::queries::media_files::get::get_media_file::get_media_file_with_connection;
+use mysql_queries::queries::media_files::get::get_media_file::{get_media_file, get_media_file_with_connection};
 use mysql_queries::queries::prompts::insert_prompt::{insert_prompt, InsertPromptArgs};
 use sqlx::Acquire;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use utoipa::ToSchema;
 
-/// Kling 1.6 Pro Image to Video
+/// Seedance 1.0 Pro Image to Video
 #[utoipa::path(
   post,
   tag = "Generate Videos",
-  path = "/v1/generate/video/kling_1.6_pro_image_to_video",
+  path = "/v1/generate/video/seedance_1.0_pro_image_to_video",
   responses(
-    (status = 200, description = "Success", body = GenerateKling16ProImageToVideoResponse),
+    (status = 200, description = "Success", body = GenerateSeedance10ProImageToVideoResponse),
   ),
   params(
-    ("request" = GenerateKling16ProImageToVideoRequest, description = "Payload for Request"),
+    ("request" = GenerateSeedance10ProImageToVideoRequest, description = "Payload for Request"),
   )
 )]
-pub async fn generate_kling_1_6_pro_video_handler(
+pub async fn generate_seedance_1_0_pro_image_to_video_handler(
   http_request: HttpRequest,
-  request: Json<GenerateKling16ProImageToVideoRequest>,
+  request: Json<GenerateSeedance10ProImageToVideoRequest>,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<Json<GenerateKling16ProImageToVideoResponse>, CommonWebError> {
-
+) -> Result<Json<GenerateSeedance10ProImageToVideoResponse>, CommonWebError> {
+  
   payments_error_test(&request.prompt.as_deref().unwrap_or(""))?;
   
   let mut mysql_connection = server_state.mysql_pool
@@ -90,12 +94,6 @@ pub async fn generate_kling_1_6_pro_video_handler(
     start_frame_media_file_token.clone(),
   ];
 
-  let maybe_end_frame_image_media_token = request.end_frame_image_media_token.as_ref();
-
-  if let Some(end_frame_token) = maybe_end_frame_image_media_token {
-    tokens.push(end_frame_token.clone());
-  }
-
   let media_files = fetch_all_required_media_files(
     &mut mysql_connection,
     &tokens,
@@ -129,50 +127,47 @@ pub async fn generate_kling_1_6_pro_video_handler(
         CommonWebError::NotFound
       })?;
 
-  let maybe_end_frame_url = match maybe_end_frame_image_media_token {
-    None => None,
-    Some(end_frame_token) => Some(media_files.iter()
-        .find(|file| &file.token == end_frame_token)
-        .map(|file| file.to_media_links(media_domain, server_state.server_environment))
-        .map(|file| file.cdn_url)
-        .ok_or_else(|| {
-          warn!("End frame media file not found after fetch");
-          CommonWebError::NotFound
-        })?),
-  };
-
   info!("Fal webhook URL: {}", server_state.fal.webhook_url);
 
   let apriori_job_token = InferenceJobToken::generate();
-  
+
   let prompt = request.prompt
       .as_deref()
       .map(|prompt| prompt.trim())
       .unwrap_or_else(|| "");
   
-  let aspect_ratio = match &request.aspect_ratio {
-    Some(GenerateKling16ProAspectRatio::Square) => Kling1p6ProAspectRatio::Square,
-    Some(GenerateKling16ProAspectRatio::WideSixteenNine) => Kling1p6ProAspectRatio::WideSixteenNine,
-    Some(GenerateKling16ProAspectRatio::TallNineSixteen) => Kling1p6ProAspectRatio::TallNineSixteen,
-    None => Kling1p6ProAspectRatio::WideSixteenNine, // Default to 16:9
+  let resolution = match &request.resolution {
+    Some(GenerateSeedance10ProResolution::FourEightyP) => Seedance1ProResolution::FourEightyP,
+    Some(GenerateSeedance10ProResolution::SevenTwentyP) => Seedance1ProResolution::SevenTwentyP,
+    Some(GenerateSeedance10ProResolution::TenEightyP) => Seedance1ProResolution::TenEightyP,
+    None => Seedance1ProResolution::SevenTwentyP,
   };
   
   let duration = match &request.duration {
-    Some(GenerateKling16ProDuration::FiveSeconds) => Kling1p6ProDuration::FiveSeconds,
-    Some(GenerateKling16ProDuration::TenSeconds) => Kling1p6ProDuration::TenSeconds,
-    None => Kling1p6ProDuration::FiveSeconds, 
-  };
-
-  let args = Kling1p6ProArgs {
-    image_url: start_frame_url,
-    end_frame_image_url: maybe_end_frame_url,
-    webhook_url: &server_state.fal.webhook_url,
-    duration,
-    prompt,
-    aspect_ratio,
-    api_key: &server_state.fal.api_key,
+    Some(GenerateSeedance10ProDuration::ThreeSeconds) => Seedance1ProDuration::ThreeSeconds,
+    Some(GenerateSeedance10ProDuration::FourSeconds) => Seedance1ProDuration::FourSeconds,
+    Some(GenerateSeedance10ProDuration::FiveSeconds) => Seedance1ProDuration::FiveSeconds,
+    Some(GenerateSeedance10ProDuration::SixSeconds) => Seedance1ProDuration::SixSeconds,
+    Some(GenerateSeedance10ProDuration::SevenSeconds) => Seedance1ProDuration::SevenSeconds,
+    Some(GenerateSeedance10ProDuration::EightSeconds) => Seedance1ProDuration::EightSeconds,
+    Some(GenerateSeedance10ProDuration::NineSeconds) => Seedance1ProDuration::NineSeconds,
+    Some(GenerateSeedance10ProDuration::TenSeconds) => Seedance1ProDuration::TenSeconds,
+    Some(GenerateSeedance10ProDuration::ElevenSeconds) => Seedance1ProDuration::ElevenSeconds,
+    Some(GenerateSeedance10ProDuration::TwelveSeconds) => Seedance1ProDuration::TwelveSeconds,
+    None => Seedance1ProDuration::FiveSeconds,
   };
   
+  let args = Seedance1ProArgs {
+    image_url: start_frame_url,
+    webhook_url: &server_state.fal.webhook_url,
+    api_key: &server_state.fal.api_key,
+    duration,
+    resolution,
+    prompt,
+    camera_fixed: false, // TODO: Parameterize
+    seed: None, // TODO: Parameterize
+  };
+
   let cost = args.calculate_cost_in_cents();
 
   info!("Charging wallet: {}", cost);
@@ -184,10 +179,10 @@ pub async fn generate_kling_1_6_pro_video_handler(
     &mut mysql_connection,
   ).await?;
 
-  let fal_result = enqueue_kling_v1p6_pro_image_to_video_webhook(args)
+  let fal_result = enqueue_seedance_1_pro_image_to_video_webhook(args)
       .await
       .map_err(|err| {
-        warn!("Error calling enqueue_kling_16_pro_image_to_video_webhook: {:?}", err);
+        warn!("Error calling enqueue_seedance_1_pro_image_to_video_webhook: {:?}", err);
         CommonWebError::ServerError
       })?;
 
@@ -216,12 +211,12 @@ pub async fn generate_kling_1_6_pro_video_handler(
     maybe_creator_user_token: maybe_user_session
         .as_ref()
         .map(|s| &s.user_token),
-    maybe_model_type: Some(CommonModelType::Kling16Pro),
+    maybe_model_type: Some(CommonModelType::Seedance10Pro),
     maybe_generation_provider: Some(GenerationProvider::Artcraft),
     maybe_positive_prompt: Some(prompt),
     maybe_negative_prompt: None,
     maybe_other_args: None,
-    maybe_generation_mode: None,
+    maybe_generation_mode: Some(CommonGenerationMode::Keyframe), // TODO: This endpoint only supports keyframes for now
     maybe_aspect_ratio: None,
     maybe_resolution: None,
     maybe_batch_count: None,
@@ -238,8 +233,6 @@ pub async fn generate_kling_1_6_pro_video_handler(
       None // Don't fail the job if the prompt insertion fails.
     }
   };
-
-  // TODO(bt,2025-08-26): Save reference images.
 
   let db_result = insert_generic_inference_job_for_fal_queue_with_apriori_job_token(InsertGenericInferenceForFalWithAprioriJobTokenArgs {
     apriori_job_token: &apriori_job_token,
@@ -275,7 +268,7 @@ pub async fn generate_kling_1_6_pro_video_handler(
         CommonWebError::ServerError
       })?;
 
-  Ok(Json(GenerateKling16ProImageToVideoResponse {
+  Ok(Json(GenerateSeedance10ProImageToVideoResponse {
     success: true,
     inference_job_token: job_token,
   }))

@@ -20,6 +20,8 @@ use enums::by_table::prompts::prompt_type::PromptType;
 use enums::common::generation_provider::GenerationProvider;
 use enums::common::generation::common_model_type::CommonModelType;
 use enums::common::visibility::Visibility;
+use enums::common::generation::common_aspect_ratio::CommonAspectRatio;
+use enums::common::generation::common_generation_mode::CommonGenerationMode;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{error, info, warn};
 use mysql_queries::queries::generic_inference::seedance2pro::insert_generic_inference_job_for_seedance2pro_queue_with_apriori_job_token::{
@@ -179,6 +181,21 @@ pub async fn seedance_2p0_multi_function_video_gen_handler(
     "Reference audio",
   ).await?;
 
+  let is_keyframe = request.start_frame_media_token.is_some()
+      || request.end_frame_media_token.is_some();
+
+  let is_reference = request.reference_image_media_tokens.is_some()
+      || request.reference_video_media_tokens.is_some()
+      || request.reference_audio_media_tokens.is_some();
+
+  let generation_mode = if is_keyframe {
+    CommonGenerationMode::Keyframe
+  } else if is_reference {
+    CommonGenerationMode::Reference
+  } else {
+    CommonGenerationMode::Text
+  };
+
   // --- Map request params to seedance2pro types ---
 
   let resolution = match request.aspect_ratio {
@@ -273,10 +290,20 @@ pub async fn seedance_2p0_multi_function_video_gen_handler(
     maybe_positive_prompt: request.prompt.as_deref(),
     maybe_negative_prompt: None,
     maybe_other_args: None,
-    maybe_generation_mode: None,
-    maybe_aspect_ratio: None,
+    maybe_generation_mode: Some(generation_mode),
+    maybe_aspect_ratio: request.aspect_ratio.as_ref().map(|ar| match ar {
+      Seedance2p0AspectRatio::Landscape16x9 => CommonAspectRatio::WideSixteenByNine,
+      Seedance2p0AspectRatio::Portrait9x16 => CommonAspectRatio::TallNineBySixteen,
+      Seedance2p0AspectRatio::Square1x1 => CommonAspectRatio::Square,
+      Seedance2p0AspectRatio::Standard4x3 => CommonAspectRatio::WideFourByThree,
+      Seedance2p0AspectRatio::Portrait3x4 => CommonAspectRatio::TallThreeByFour,
+    }),
     maybe_resolution: None,
-    maybe_batch_count: None,
+    maybe_batch_count: request.batch_count.map(|bc| match bc {
+      Seedance2p0BatchCount::One => 1,
+      Seedance2p0BatchCount::Two => 2,
+      Seedance2p0BatchCount::Four => 4,
+    }),
     maybe_generate_audio: None,
     creator_ip_address: &ip_address,
     mysql_executor: &mut *transaction,
