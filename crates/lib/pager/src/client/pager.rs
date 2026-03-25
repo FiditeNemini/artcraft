@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
 
-use log::info;
+use log::{info, warn};
 
 use crate::client::pager_client::{PageSentResult, PagerClient};
 use crate::error::pager_error::PagerError;
@@ -15,20 +15,9 @@ use crate::worker::pager_worker_message_queue::PagerWorkerMessageQueue;
 /// - **Immediate**: `send_page_immediately()` sends inline (blocks until API responds).
 /// - **Queued**: `enqueue_page()` pushes to a background worker (non-blocking).
 ///
-/// Build an instance via `PagerBuilder`:
-/// ```ignore
-/// // Without worker:
-/// let pager = PagerBuilder::new()
-///     .application_name("my-service".to_string())
-///     .rootly(api_key)
-///     .build()?;
+/// Build an instance via `PagerBuilder`.
 ///
-/// // With worker:
-/// let (pager, worker) = PagerBuilder::new()
-///     .application_name("my-service".to_string())
-///     .rootly(api_key)
-///     .build_with_worker()?;
-/// ```
+#[derive(Clone)]
 pub struct Pager {
   client: PagerClient,
   queue: Option<Arc<PagerWorkerMessageQueue>>,
@@ -60,6 +49,16 @@ impl Pager {
     notification: NotificationDetails,
   ) -> Result<PageSentResult, PagerError> {
     self.client.send_page(&notification).await
+  }
+
+  /// Send a page immediately, blocking until the API responds.
+  pub async fn send_page_immediately_infallible(
+    &self,
+    notification: NotificationDetails,
+  ) {
+    if let Err(err) = self.send_page_immediately(notification).await {
+      warn!("Failure sending page: {:?}", err);
+    }
   }
 
   /// Enqueue a page to be sent by the background worker thread.

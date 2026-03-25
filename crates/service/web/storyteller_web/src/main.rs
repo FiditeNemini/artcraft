@@ -52,7 +52,7 @@ use elasticsearch::http::transport::Transport;
 use elasticsearch::Elasticsearch;
 use errors::AnyhowResult;
 use fal_client::creds::fal_api_key::FalApiKey;
-use log::info;
+use log::{info, warn};
 use memory_caching::arc_ttl_sieve::ArcTtlSieve;
 use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use mysql_queries::mediators::badge_granter::BadgeGranter;
@@ -79,6 +79,7 @@ use crate::http_server::web_utils::handle_multipart_error::handle_multipart_erro
 use crate::http_server::web_utils::scoped_temp_dir_creator::ScopedTempDirCreator;
 use crate::state::certs::google_sign_in_cert::GoogleSignInCert;
 use crate::state::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
+use crate::startup::build_pager::build_pager;
 use crate::state::server_state::{DurableInMemoryCaches, EnvConfig, EphemeralInMemoryCaches, FalData, InMemoryCaches, OpenAiData, ResendData, Seedance2ProData, ServerInfo, ServerState, StaticFeatureFlags, StripeSettings, TrollBans, WorldLabsData};
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
@@ -93,6 +94,7 @@ pub mod configs;
 pub mod email;
 pub mod error;
 pub mod http_server;
+pub mod startup;
 pub mod state;
 pub mod threads;
 pub mod util;
@@ -328,6 +330,21 @@ async fn main() -> AnyhowResult<()> {
     poll_model_token_info_thread(model_token_info_cache2, mysql_pool5).await;
   });
 
+  let server_environment = ServerEnvironment::from_str(&easyenv::get_env_string_required("SERVER_ENVIRONMENT")?)
+      .ok_or(anyhow!("invalid server environment"))?;
+
+  let server_environment_typed = match server_environment {
+    ServerEnvironment::Production => server_environment::ServerEnvironment::Production,
+    ServerEnvironment::Development => server_environment::ServerEnvironment::Development,
+  };
+
+  let (pager, pager_worker) = build_pager(server_environment_typed);
+
+  info!("Spawning pager worker thread.");
+
+  tokio_runtime.spawn(async move {
+    pager_worker.run().await;
+  });
 
   let stripe_configs = StripeConfig {
     checkout: StripeCheckoutConfigs {
@@ -344,9 +361,6 @@ async fn main() -> AnyhowResult<()> {
       secret_webhook_signing_key: easyenv::get_env_string_required("STRIPE_SECRET_WEBHOOK_SIGNING_KEY")?,
     },
   };
-
-  let server_environment = ServerEnvironment::from_str(&easyenv::get_env_string_required("SERVER_ENVIRONMENT")?)
-      .ok_or(anyhow!("invalid server environment"))?;
 
   let service_feature_flags = StaticFeatureFlags {
     // Permanent (control plane / safety) flags : messaging
@@ -391,11 +405,6 @@ async fn main() -> AnyhowResult<()> {
       .unwrap_or(String::from("unknown"))
       .trim()
       .to_string();
-
-  let server_environment_typed = match server_environment {
-    ServerEnvironment::Production => server_environment::ServerEnvironment::Production,
-    ServerEnvironment::Development => server_environment::ServerEnvironment::Development,
-  };
   
   let fal_api_key = FalApiKey::new(easyenv::get_env_string_required("FAL_API_KEY")?);
   let fal_webhook_url = easyenv::get_env_string_required("FAL_WEBHOOK_URL")?;
@@ -473,6 +482,7 @@ async fn main() -> AnyhowResult<()> {
     worldlabs: WorldLabsData {
       api_key: worldlabs_api_key,
     },
+    pager,
     caches: InMemoryCaches {
       durable: DurableInMemoryCaches {
         model_token_info: model_token_info_cache,
@@ -652,6 +662,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .app_data(web::Data::new(server_state_arc.stripe.clone().client.clone()))
       .app_data(web::Data::new(server_state_arc.third_party_url_redirector))
       .app_data(web::Data::new(server_state_arc.google_sign_in_cert.clone()))
+      .app_data(web::Data::new(server_state_arc.pager.clone()))
       .app_data(web::Data::new(old_server_environment))
       .app_data(web::Data::new(new_server_environment))
       .app_data(web::Data::from(product_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
