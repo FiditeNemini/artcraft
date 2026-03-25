@@ -1,6 +1,6 @@
 use artcraft_api_defs::generate::video::multi_function::seedance_2p0_multi_function_video_gen::Seedance2p0BatchCount;
 use seedance2pro_client::creds::seedance2pro_session::Seedance2ProSession;
-use seedance2pro_client::requests::generate_video::generate_video::{BatchCount, GenerateVideoArgs, Resolution};
+use seedance2pro_client::requests::generate_video::generate_video::{BatchCount, GenerateVideoArgs, ModelType, Resolution};
 
 use crate::generate::generate_video::plan::artcraft::plan_generate_video_artcraft_seedance2p0::PlanArtcraftSeedance2p0;
 use crate::generate::generate_video::video_generation_cost_estimate::VideoGenerationCostEstimate;
@@ -22,6 +22,7 @@ pub (crate) fn estimate_video_cost_artcraft_seedance2p0(
 
   let args = GenerateVideoArgs {
     session: &dummy_session,
+    model_type: ModelType::Seedance2Pro,
     prompt: String::new(),
     resolution: Resolution::Square1x1,
     duration_seconds,
@@ -96,9 +97,9 @@ mod tests {
     assert_eq!(estimate_usd_cents(5, 2), 160);
     assert_eq!(estimate_usd_cents(15, 2), 480);
 
-    // Batch 4 = 3× (not 4×)
-    assert_eq!(estimate_usd_cents(4, 4), 192);
-    assert_eq!(estimate_usd_cents(5, 4), 240);
-    assert_eq!(estimate_usd_cents(15, 4), 720);
+    // Batch 4 = 4×
+    assert_eq!(estimate_usd_cents(4, 4), 256);
+    assert_eq!(estimate_usd_cents(5, 4), 320);
+    assert_eq!(estimate_usd_cents(15, 4), 960);
   }
 }
