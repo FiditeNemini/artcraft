@@ -56,6 +56,10 @@ pub async fn list_user_jobs_handler(
     job_token: row.job_token,
     wallet_ledger_entry_token: row.wallet_ledger_entry_token,
     wallet_ledger_entry_type: row.wallet_ledger_entry_type,
+    maybe_external_third_party: row.maybe_external_third_party,
+    maybe_external_third_party_id: row.maybe_external_third_party_id,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
   }).collect();
 
   Ok(Json(ListUserJobsResponse {
