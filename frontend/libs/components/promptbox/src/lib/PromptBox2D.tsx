@@ -9,6 +9,8 @@ import {
   faMessageCheck,
   faFrame,
   faExpand,
+  faChevronDown,
+  faChevronUp,
 } from "@fortawesome/pro-solid-svg-icons";
 import {
   faRectangleVertical,
@@ -25,6 +27,7 @@ import { twMerge } from "tailwind-merge";
 import { GenerationProvider } from "@storyteller/api-enums";
 import { GenerationCountPicker } from "./common/GenerationCountPicker";
 import { StoreApi, UseBoundStore } from "zustand";
+import { toast } from "@storyteller/ui-toaster";
 
 export type AspectRatio = "wide" | "tall" | "square";
 
@@ -68,6 +71,17 @@ export const PromptBox2D = ({
   useSignals();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const toggleExpand = () => {
+    setIsExpanded((prev) => {
+      const next = !prev;
+      if (textareaRef.current) {
+        textareaRef.current.style.height = next ? "300px" : "auto";
+      }
+      return next;
+    });
+  };
   const [content, setContent] = useState<React.ReactNode>("");
 
   //const { lastRenderedBitmap } = useCanvasSignal();
@@ -178,7 +192,7 @@ export const PromptBox2D = ({
       value.slice(0, selectionStart) + pastedText + value.slice(selectionEnd);
     setPrompt(next);
     requestAnimationFrame(() => {
-      const pos = selectionStart + pastedText.length;
+      const pos = Math.min(selectionStart + pastedText.length, next.length);
       textareaRef.current?.setSelectionRange(pos, pos);
     });
   };
@@ -247,9 +261,15 @@ export const PromptBox2D = ({
   //   console.log("generateResponse", generateResponse);
   // };
 
+  const maxLen = selectedImageModel?.maxPromptLength ?? 1000;
+
   const handleGenerate = async () => {
     const busy = Boolean(isEnqueueing ?? internalEnqueueing);
     if (busy || isDisabled || !prompt.trim()) return;
+    if (prompt.length > maxLen) {
+      toast.error(`Prompt exceeds the ${maxLen} character limit for this model`);
+      return;
+    }
     setInternalEnqueueing(true);
     const timeout = setTimeout(() => {
       setInternalEnqueueing(false);
@@ -350,7 +370,7 @@ export const PromptBox2D = ({
         )}
         <div
           className={twMerge(
-            "glass w-[860px] rounded-xl p-4",
+            "glass relative w-[860px] rounded-xl p-4",
             selectedImageModel?.canUseImagePrompt &&
             isImageRowVisible &&
             "rounded-t-none",
@@ -390,18 +410,23 @@ export const PromptBox2D = ({
               </Tooltip>
             )}
 
-            <textarea
-              ref={textareaRef}
-              rows={1}
-              placeholder="Describe your image..."
-              className="text-md mb-2 max-h-[5.5em] flex-1 resize-none overflow-y-auto rounded bg-transparent pb-2 pr-2 pt-1 text-base-fg placeholder-base-fg/60 focus:outline-none"
-              value={prompt}
-              onChange={handleChange}
-              onPaste={handlePaste}
-              onKeyDown={handleKeyDown}
-              onFocus={() => { }}
-              onBlur={() => { }}
-            />
+            <div className="promptbox-resize-wrap relative flex-1">
+              <textarea
+                ref={textareaRef}
+                rows={1}
+                placeholder="Describe your image..."
+                className={`promptbox-scrollbar text-md mb-2 min-h-[2.5em] w-full resize-y overflow-y-auto rounded bg-transparent pb-2 pr-2 pt-1 text-base-fg placeholder-base-fg/60 focus:outline-none ${isExpanded ? "max-h-[300px]" : "max-h-[5.5em]"}`}
+                value={prompt}
+                onChange={handleChange}
+                onPaste={handlePaste}
+                onKeyDown={handleKeyDown}
+                onFocus={() => { }}
+                onBlur={() => { }}
+              />
+              <span className={`absolute -bottom-1 right-0 text-[10px] tabular-nums ${prompt.length > maxLen ? "text-red-500" : "text-base-fg/40"}`}>
+                {prompt.length} / {maxLen}
+              </span>
+            </div>
           </div>
           <div className="mt-2 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -482,6 +507,17 @@ export const PromptBox2D = ({
                 Generate
               </GenerateButton>
             </div>
+          </div>
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
+            <Tooltip content={isExpanded ? "Collapse" : "Expand"} position="top" className="-mb-2">
+              <button
+                type="button"
+                onClick={toggleExpand}
+                className="text-base-fg/30 hover:text-base-fg/90 transition-colors px-3 py-0.5"
+              >
+                <FontAwesomeIcon icon={isExpanded ? faChevronUp : faChevronDown} className="text-xs" />
+              </button>
+            </Tooltip>
           </div>
         </div>
       </div>

@@ -8,6 +8,8 @@ import {
   faMessageCheck,
   faMessageXmark,
   faExpand,
+  faChevronDown,
+  faChevronUp,
 } from "@fortawesome/pro-solid-svg-icons";
 import {
   faRectangleWide,
@@ -114,6 +116,17 @@ export const PromptBox3D = ({
   const resolution = usePrompt3DStore((s) => s.resolution);
   const setResolution = usePrompt3DStore((s) => s.setResolution);
   const [isEnqueueing, setIsEnqueueing] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const toggleExpand = () => {
+    setIsExpanded((prev) => {
+      const next = !prev;
+      if (textareaRef.current) {
+        textareaRef.current.style.height = next ? "300px" : "auto";
+      }
+      return next;
+    });
+  };
   const referenceImages = usePrompt3DStore((s) => s.referenceImages);
   const setReferenceImages = usePrompt3DStore((s) => s.setReferenceImages);
   const [showImagePrompts, setShowImagePrompts] = useState(false);
@@ -163,7 +176,7 @@ export const PromptBox3D = ({
   >(undefined);
 
   useEffect(() => {
-    if (textareaRef.current) {
+    if (textareaRef.current && !isExpanded) {
       textareaRef.current.style.height = "auto";
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
@@ -238,7 +251,7 @@ export const PromptBox3D = ({
       value.slice(0, selectionStart) + pastedText + value.slice(selectionEnd);
     setPrompt(next);
     requestAnimationFrame(() => {
-      const pos = selectionStart + pastedText.length;
+      const pos = Math.min(selectionStart + pastedText.length, next.length);
       textareaRef.current?.setSelectionRange(pos, pos);
     });
   };
@@ -253,7 +266,13 @@ export const PromptBox3D = ({
     setIsModalOpen(true);
   };
 
+  const maxLen = selectedImageModel?.maxPromptLength ?? 1000;
+
   const handleEnqueue = async () => {
+    if (prompt.length > maxLen) {
+      toast.error(`Prompt exceeds the ${maxLen} character limit for this model`);
+      return;
+    }
     gtagEvent("enqueue_3d");
     const isDesktop = IsDesktopApp();
     console.log("Is Desktop?", isDesktop);
@@ -548,7 +567,7 @@ export const PromptBox3D = ({
         )}
         <div
           className={twMerge(
-            "glass w-[860px] rounded-xl p-4",
+            "glass relative w-[860px] rounded-xl p-4",
             isPromptBoxFocused.value ? "!border !border-primary" : "",
             selectedImageModel?.canUseImagePrompt &&
             isImageRowVisible &&
@@ -594,24 +613,29 @@ export const PromptBox3D = ({
               </Tooltip>
             )}
 
-            <textarea
-              ref={textareaRef}
-              rows={1}
-              placeholder="Describe your image..."
-              className="text-md mb-2 max-h-[5.5em] min-h-[36px] flex-1 resize-none overflow-y-auto rounded bg-transparent pb-2 pr-2 pt-1 text-base-fg placeholder-base-fg/60 focus:outline-none"
-              value={prompt}
-              onChange={handleChange}
-              onPaste={handlePaste}
-              onKeyDown={handleKeyDown}
-              onFocus={() => {
-                disableHotkeyInput(DomLevels.INPUT);
-                isPromptBoxFocused.value = true;
-              }}
-              onBlur={() => {
-                enableHotkeyInput(DomLevels.INPUT);
-                isPromptBoxFocused.value = false;
-              }}
-            />
+            <div className="promptbox-resize-wrap relative flex-1">
+              <textarea
+                ref={textareaRef}
+                rows={1}
+                placeholder="Describe your image..."
+                className={`promptbox-scrollbar text-md mb-2 min-h-[2.5em] w-full resize-y overflow-y-auto rounded bg-transparent pb-2 pr-2 pt-1 text-base-fg placeholder-base-fg/60 focus:outline-none ${isExpanded ? "max-h-[300px]" : "max-h-[5.5em]"}`}
+                value={prompt}
+                onChange={handleChange}
+                onPaste={handlePaste}
+                onKeyDown={handleKeyDown}
+                onFocus={() => {
+                  disableHotkeyInput(DomLevels.INPUT);
+                  isPromptBoxFocused.value = true;
+                }}
+                onBlur={() => {
+                  enableHotkeyInput(DomLevels.INPUT);
+                  isPromptBoxFocused.value = false;
+                }}
+              />
+              <span className={`absolute -bottom-1 right-0 text-[10px] tabular-nums ${prompt.length > maxLen ? "text-red-500" : "text-base-fg/40"}`}>
+                {prompt.length} / {maxLen}
+              </span>
+            </div>
           </div>
           <div className="mt-2 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -748,6 +772,17 @@ export const PromptBox3D = ({
                 Generate
               </GenerateButton>
             </div>
+          </div>
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
+            <Tooltip content={isExpanded ? "Collapse" : "Expand"} position="top" className="-mb-2">
+              <button
+                type="button"
+                onClick={toggleExpand}
+                className="text-base-fg/30 hover:text-base-fg/90 transition-colors px-3 py-0.5"
+              >
+                <FontAwesomeIcon icon={isExpanded ? faChevronUp : faChevronDown} className="text-xs" />
+              </button>
+            </Tooltip>
           </div>
         </div>
         <CameraSettingsModal

@@ -17,6 +17,8 @@ import {
   faWaveformLines,
   faClock,
   faTriangleExclamation,
+  faChevronDown,
+  faChevronUp,
 } from "@fortawesome/pro-solid-svg-icons";
 import {
   faCircleInfo,
@@ -122,6 +124,21 @@ export const PromptBoxVideo = ({
   const setGenerationCount = usePromptVideoStore((s) => s.setGenerationCount);
   const [isEnqueueing, setIsEnqueueing] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const toggleExpand = () => {
+    setIsExpanded((prev) => {
+      const next = !prev;
+      if (textareaRef.current) {
+        if (next) {
+          textareaRef.current.style.height = `${window.innerHeight - 300}px`;
+        } else {
+          textareaRef.current.style.height = "auto";
+        }
+      }
+      return next;
+    });
+  };
   const [selectedGalleryImages, setSelectedGalleryImages] = useState<string[]>(
     [],
   );
@@ -444,7 +461,7 @@ export const PromptBoxVideo = ({
       value.slice(0, selectionStart) + pastedText + value.slice(selectionEnd);
     setPrompt(next);
     requestAnimationFrame(() => {
-      const pos = selectionStart + pastedText.length;
+      const pos = Math.min(selectionStart + pastedText.length, next.length);
       textareaRef.current?.setSelectionRange(pos, pos);
     });
   };
@@ -477,10 +494,16 @@ export const PromptBoxVideo = ({
     mentionAnchorRef.current = null;
   };
 
+  const maxLen = selectedModel?.maxPromptLength ?? 1000;
+
   const handleEnqueue = async () => {
     if (!prompt.trim()) {
       console.warn("Cannot generate video: prompt is empty");
       toast.error("Please enter a prompt to generate video");
+      return;
+    }
+    if (prompt.length > maxLen) {
+      toast.error(`Prompt exceeds the ${maxLen} character limit for this model`);
       return;
     }
 
@@ -765,7 +788,7 @@ export const PromptBoxVideo = ({
         )}
         <div
           className={twMerge(
-            "glass w-[860px] rounded-xl p-4",
+            "glass relative w-[860px] rounded-xl p-4",
             isImageRowVisible && "rounded-t-none",
             isFocused
               ? "ring-1 ring-primary border-primary"
@@ -849,7 +872,7 @@ export const PromptBoxVideo = ({
               </Button>
             </Tooltip> */}
 
-            <div className="relative flex-1">
+            <div className="promptbox-resize-wrap relative flex-1">
               {isReferenceMode && hasAnyRefs && (
                 <div
                   ref={highlightRef}
@@ -868,7 +891,7 @@ export const PromptBoxVideo = ({
                     : "Describe what you want to happen in the video..."
                 }
                 className={twMerge(
-                  "text-md relative mb-2 min-h-[2.5em] w-full resize-y overflow-y-auto rounded bg-transparent pb-2 pr-2 pt-1 placeholder-base-fg/60 focus:outline-none",
+                  "promptbox-scrollbar text-md relative mb-2 min-h-[2.5em] w-full resize-y overflow-y-auto rounded bg-transparent pb-2 pr-2 pt-1 placeholder-base-fg/60 focus:outline-none",
                   isReferenceMode && hasAnyRefs
                     ? "text-transparent caret-base-fg"
                     : "text-base-fg",
@@ -881,6 +904,9 @@ export const PromptBoxVideo = ({
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
               />
+              <span className={`absolute -bottom-1 right-0 text-[10px] tabular-nums ${prompt.length > maxLen ? "text-red-500" : "text-base-fg/40"}`}>
+                {prompt.length} / {maxLen}
+              </span>
             </div>
           </div>
           <div className="mt-2 flex items-center justify-between gap-2">
@@ -1024,6 +1050,17 @@ export const PromptBoxVideo = ({
                 </div>
               </Tooltip>
             </div>
+          </div>
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
+            <Tooltip content={isExpanded ? "Collapse" : "Expand"} position="top" className="-mb-2">
+              <button
+                type="button"
+                onClick={toggleExpand}
+                className="text-base-fg/30 hover:text-base-fg/90 transition-colors px-3 py-0.5"
+              >
+                <FontAwesomeIcon icon={isExpanded ? faChevronUp : faChevronDown} className="text-xs" />
+              </button>
+            </Tooltip>
           </div>
         </div>
         {selectedModel?.id === "seedance_2p0" && (
