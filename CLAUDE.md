@@ -17,6 +17,8 @@ artcraft/
 │       ├── artcraft_migrations/         # ArtCraft desktop app SQLite migrations
 │       ├── migrations/                  # Server MySQL migrations
 │       └── migrations_squashed/         # Fully materialized MySQL schema definitions for most tables
+├── _tools/                              # Various 3rd party tool integrations and configurations
+│   └── postman/                         # Postman configs for test HTTP requests against development and production
 ├── build/                               # Dockerfile build instructions for server components
 ├── crates/                              # Rust workspace
 │   ├── api_clients/                     # HTTP clients for calling internal and 3rd party services
