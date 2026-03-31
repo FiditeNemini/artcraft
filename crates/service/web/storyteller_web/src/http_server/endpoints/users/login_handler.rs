@@ -1,8 +1,3 @@
-// NB: Incrementally getting rid of build warnings...
-#![forbid(unused_imports)]
-#![forbid(unused_mut)]
-#![forbid(unused_variables)]
-
 use std::fmt;
 use std::fmt::Formatter;
 
@@ -21,53 +16,16 @@ use sqlx::MySqlPool;
 use tokens::tokens::user_sessions::UserSessionToken;
 use utoipa::ToSchema;
 
+use artcraft_api_defs::users::login::{LoginErrorType, LoginRequest, LoginSuccessResponse};
+use password::errors::password_confirm_error::PasswordConfirmError;
 use crate::http_server::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
 use crate::util::enroll_in_studio::enroll_in_studio;
-
-#[derive(Deserialize, ToSchema)]
-pub struct LoginRequest {
-  pub username_or_email: String,
-  pub password: String,
-}
-
-#[derive(Serialize, ToSchema)]
-pub struct LoginSuccessResponse {
-  pub success: bool,
-
-  /// A signed session that can be sent as a header, bypassing cookies.
-  /// This is useful for API clients that don't support cookies or Google
-  /// browsers killing cross-domain cookies.
-  pub signed_session: String,
-}
 
 #[derive(Serialize, Debug, ToSchema)]
 pub struct LoginErrorResponse {
   pub success: bool,
   pub error_type: LoginErrorType,
   pub error_message: String,
-}
-
-#[derive(Copy, Clone, Debug, Serialize, ToSchema)]
-pub enum LoginErrorType {
-  InvalidCredentials,
-  ServerError,
-}
-
-impl LoginErrorResponse {
-  fn invalid_credentials() -> Self {
-    Self {
-      success: false,
-      error_type: LoginErrorType::InvalidCredentials,
-      error_message: "invalid credentials".to_string()
-    }
-  }
-  fn server_error() -> Self {
-    Self {
-      success: false,
-      error_type: LoginErrorType::ServerError,
-      error_message: "server error".to_string()
-    }
-  }
 }
 
 // NB: Not using DeriveMore since Clion doesn't understand it.
@@ -81,12 +39,39 @@ impl ResponseError for LoginErrorResponse {
   fn status_code(&self) -> StatusCode {
     match self.error_type {
       LoginErrorType::InvalidCredentials => StatusCode::UNAUTHORIZED,
+      LoginErrorType::AccountNeedsPassword => StatusCode::UNAUTHORIZED,
       LoginErrorType::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     serialize_as_json_error(self)
+  }
+}
+
+impl LoginErrorResponse {
+  fn invalid_credentials() -> Self {
+    Self {
+      success: false,
+      error_type: LoginErrorType::InvalidCredentials,
+      error_message: "invalid credentials".to_string()
+    }
+  }
+  
+  fn server_error() -> Self {
+    Self {
+      success: false,
+      error_type: LoginErrorType::ServerError,
+      error_message: "server error".to_string()
+    }
+  }
+
+  fn account_without_password() -> Self {
+    Self {
+      success: false,
+      error_type: LoginErrorType::AccountNeedsPassword,
+      error_message: "account was created without a password; please try password reset".to_string()
+    }
   }
 }
 
@@ -146,6 +131,10 @@ pub async fn login_handler(
   };
 
   match bcrypt_confirm_password(request.password.clone(), &actual_hash) {
+    Err(PasswordConfirmError::HashIsSentinelValue) => {
+      warn!("Attempting to log in with a passwordless account");
+      return Err(LoginErrorResponse::account_without_password());
+    }
     Err(e) => {
       warn!("Login hash comparison error: {:?}", e);
       return Err(LoginErrorResponse::server_error());
