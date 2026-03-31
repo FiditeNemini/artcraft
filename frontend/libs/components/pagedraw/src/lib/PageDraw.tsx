@@ -563,9 +563,8 @@ const PageDraw = ({ adapter }: PageDrawProps) => {
   }, [getAspectRatioDimensions, createImageFromFile]);
 
   const getCompositeCanvasFile = useCallback(async (): Promise<File | null> => {
-    if (!stageRef.current || !baseImageKonvaRef.current || !baseImageBitmap) {
-      return null;
-    }
+    if (!stageRef.current || !baseImageKonvaRef.current) return null;
+    if (!baseImageInfo?.isBlankCanvas && !baseImageBitmap) return null;
 
     const editsLayer = stageRef.current
       .getLayers()
@@ -584,7 +583,12 @@ const PageDraw = ({ adapter }: PageDrawProps) => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
 
-    ctx.drawImage(baseImageBitmap, 0, 0, width, height);
+    if (baseImageBitmap) {
+      ctx.drawImage(baseImageBitmap, 0, 0, width, height);
+    } else {
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, width, height);
+    }
 
     const markerLayerCanvas = editsLayer.toCanvas({
       x: stageRef.current.x(),
@@ -603,7 +607,7 @@ const PageDraw = ({ adapter }: PageDrawProps) => {
     const blob = await canvas.convertToBlob({ type: "image/png" });
     const uuid = crypto.randomUUID();
     return new File([blob], `${uuid}.png`, { type: "image/png" });
-  }, [baseImageBitmap]);
+  }, [baseImageBitmap, baseImageInfo]);
 
   const handleGenerate = useCallback(
     async (
@@ -778,7 +782,7 @@ const PageDraw = ({ adapter }: PageDrawProps) => {
   }, [activeTool, supportsMaskedInpainting]);
 
   useEffect(() => {
-    if (!baseImageBitmap) {
+    if (!baseImageBitmap && !baseImageInfo?.isBlankCanvas) {
       return;
     }
 
@@ -807,7 +811,7 @@ const PageDraw = ({ adapter }: PageDrawProps) => {
 
     autoFitCanvas();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [baseImageBitmap]);
+  }, [baseImageBitmap, baseImageInfo?.isBlankCanvas]);
 
   const handleSelectTool = useCallback(() => setActiveTool("select"), [setActiveTool]);
 
@@ -930,8 +934,9 @@ const PageDraw = ({ adapter }: PageDrawProps) => {
     [editing3DNodeId, drawNodes],
   );
 
-  // Display image selector on launch, otherwise hide it
-  if (!baseImageInfo || !baseImageBitmap) {
+  // Display image selector on launch, otherwise hide it.
+  // Also show the selector when a non-blank-canvas image is set but the bitmap is still loading.
+  if (!baseImageInfo || (!baseImageBitmap && !baseImageInfo.isBlankCanvas)) {
     return (
       <div
         className={
@@ -945,7 +950,7 @@ const PageDraw = ({ adapter }: PageDrawProps) => {
                 addHistoryImageBundle({ images: [image] });
                 setBaseImageInfo(image);
               },
-              showLoading: baseImageInfo !== null && baseImageBitmap === null,
+              showLoading: baseImageInfo !== null && baseImageBitmap === null && !baseImageInfo.isBlankCanvas,
             })}
           </div>
         </div>
