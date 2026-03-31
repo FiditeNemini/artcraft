@@ -33,6 +33,8 @@ jobs_common.workspace = true
 mysql_queries.workspace = true
 pager = { path = "../../../lib/pager" }
 rootly_client.workspace = true
+rootly_config.workspace = true
+shared_env_var_config.workspace = true
 server_environment = { path = "../../../lib/server_environment" }
 
 # External
