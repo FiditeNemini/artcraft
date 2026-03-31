@@ -19,6 +19,11 @@ pub async fn enroll_in_studio(
       .map(|ff| ff.clone())
       .unwrap_or_else(|| UserSessionFeatureFlags::empty());
 
+  if user_feature_flags.has_flag(UserFeatureFlag::Studio)
+      && user_feature_flags.has_flag(UserFeatureFlag::VideoStyleTransfer) {
+    return Ok(());
+  }
+
   user_feature_flags.add_flags([
     UserFeatureFlag::Studio,
     UserFeatureFlag::VideoStyleTransfer,
