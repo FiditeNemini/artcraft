@@ -1,6 +1,8 @@
 use chrono::{DateTime, Utc};
 use std::fmt::{Debug, Display};
 
+use crate::notification::generate_deduplication_key::generate_deduplication_key;
+
 /// Details for a pager notification.
 #[derive(Clone, Debug)]
 pub struct NotificationDetails {
@@ -12,15 +14,35 @@ pub struct NotificationDetails {
 
   /// When the event occurred.
   pub event_time: DateTime<Utc>,
+
+  /// HTTP method associated with the event, if any.
+  pub http_method: Option<String>,
+
+  /// HTTP endpoint path associated with the event, if any.
+  pub http_path: Option<String>,
+
+  /// HTTP status code associated with the event, if any.
+  pub http_status_code: Option<u16>,
+
+  /// Whether this notification originated from an error.
+  pub is_from_error: bool,
 }
 
 impl NotificationDetails {
+  pub fn to_deduplication_key(&self) -> String {
+    generate_deduplication_key(self)
+  }
+
   /// Create a notification with a summary and description.
   pub fn with_summary_and_description(summary: String, description: String) -> Self {
     Self {
       summary,
       description: Some(description),
       event_time: Utc::now(),
+      http_method: None,
+      http_path: None,
+      http_status_code: None,
+      is_from_error: false,
     }
   }
 
@@ -30,6 +52,10 @@ impl NotificationDetails {
       summary,
       description: None,
       event_time: Utc::now(),
+      http_method: None,
+      http_path: None,
+      http_status_code: None,
+      is_from_error: false,
     }
   }
 
@@ -86,6 +112,10 @@ impl NotificationDetails {
       summary,
       description: Some(description),
       event_time,
+      http_method: None,
+      http_path: None,
+      http_status_code: None,
+      is_from_error: true,
     }
   }
 
