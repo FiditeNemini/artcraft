@@ -8,6 +8,7 @@ use rootly_client::requests::create_alert::create_alert::{
 use crate::error::pager_error::PagerError;
 use crate::error::pager_service_error::PagerServiceError;
 use crate::notification::notification_details::NotificationDetails;
+use crate::notification::notification_urgency::NotificationUrgency;
 
 /// The actual client that sends pages.
 #[derive(Clone)]
@@ -23,6 +24,9 @@ pub struct PagerClient {
 
   /// Hostname of the machine sending alerts. Inserted as a label on alerts.
   pub hostname: Option<String>,
+
+  /// Rootly service ID to associate alerts with.
+  pub service_id: Option<String>,
 }
 
 /// Configuration for the pager client backend.
@@ -35,8 +39,14 @@ pub enum PagerClientConfig {
   Rootly {
     api_key: RootlyApiKey,
 
-    /// Alert urgency ID (e.g. "62fde143-..." maps to "High" in our org).
-    alert_urgency_id: Option<String>,
+    /// Alert urgency ID for high-urgency alerts.
+    urgency_id_high: Option<String>,
+
+    /// Alert urgency ID for medium-urgency alerts.
+    urgency_id_medium: Option<String>,
+
+    /// Alert urgency ID for low-urgency alerts.
+    urgency_id_low: Option<String>,
 
     /// Notification target type (e.g. "User", "EscalationPolicy").
     notification_target_type: Option<String>,
@@ -62,8 +72,9 @@ impl PagerClient {
     application_name: Option<String>,
     environment: Option<String>,
     hostname: Option<String>,
+    service_id: Option<String>,
   ) -> Self {
-    Self { client_config, application_name, environment, hostname }
+    Self { client_config, application_name, environment, hostname, service_id }
   }
 
   pub fn is_noop(&self) -> bool {
@@ -89,7 +100,9 @@ impl PagerClient {
   ) -> Result<PageSentResult, PagerError> {
     let PagerClientConfig::Rootly {
       api_key,
-      alert_urgency_id,
+      urgency_id_high,
+      urgency_id_medium,
+      urgency_id_low,
       notification_target_type,
       notification_target_id,
     } = &self.client_config else {
@@ -103,6 +116,14 @@ impl PagerClient {
     debug!("Sending page via Rootly (source={}): {}", source, notification.summary);
 
     let mut labels: Vec<(String, String)> = Vec::new();
+
+    if let Some(name) = &self.application_name {
+      labels.push(("application_name".to_string(), name.clone()));
+    }
+
+    if let Some(id) = &self.service_id {
+      labels.push(("service_id".to_string(), id.clone()));
+    }
 
     if let Some(env) = &self.environment {
       labels.push(("environment".to_string(), env.clone()));
@@ -126,10 +147,23 @@ impl PagerClient {
 
     let labels = if labels.is_empty() { None } else { Some(labels) };
 
-    // Enrich the description with HTTP context and hostname if present.
+    // Enrich the description with context and hostname if present.
     let description = match &notification.description {
       Some(desc) => {
         let mut parts = vec![desc.clone()];
+
+        match (&self.application_name, &self.service_id) {
+          (Some(name), Some(id)) => {
+            parts.push(format!("Application: {} (service_id: {})", name, id));
+          }
+          (Some(name), None) => {
+            parts.push(format!("Application: {}", name));
+          }
+          (None, Some(id)) => {
+            parts.push(format!("Service ID: {}", id));
+          }
+          (None, None) => {}
+        }
 
         if let Some(method) = &notification.http_method {
           parts.push(format!("HTTP Method: {}", method));
@@ -152,18 +186,25 @@ impl PagerClient {
       None => None,
     };
 
+    // https://docs.rootly.com/api-reference/alerts/creates-an-alert
     let result = create_alert(CreateAlertArgs {
       api_key: api_key.clone(),
-      source,
+      source: "api".to_string(),
       summary: notification.summary.clone(),
       description,
       status: Some("triggered".to_string()),
-      service_ids: None,
+      service_ids: self.service_id
+          .as_ref()
+          .map(|id| vec![id.clone()]),
       group_ids: None,
       environment_ids: None,
       external_id: None,
       external_url: None,
-      alert_urgency_id: alert_urgency_id.clone(),
+      alert_urgency_id: match notification.urgency.unwrap_or(NotificationUrgency::Medium) {
+        NotificationUrgency::High => urgency_id_high.clone(),
+        NotificationUrgency::Medium => urgency_id_medium.clone(),
+        NotificationUrgency::Low => urgency_id_low.clone(),
+      },
       notification_target_type: notification_target_type.clone(),
       notification_target_id: notification_target_id.clone(),
       labels,

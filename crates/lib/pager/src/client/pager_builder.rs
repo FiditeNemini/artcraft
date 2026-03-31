@@ -14,6 +14,7 @@ pub struct PagerBuilder {
   application_name: Option<String>,
   environment: Option<String>,
   hostname: Option<String>,
+  service_id: Option<String>,
   queue_capacity: Option<usize>,
 }
 
@@ -24,6 +25,7 @@ impl PagerBuilder {
       application_name: None,
       environment: None,
       hostname: None,
+      service_id: None,
       queue_capacity: None,
     }
   }
@@ -46,12 +48,20 @@ impl PagerBuilder {
     self
   }
 
+  /// Set the service ID to associate alerts with.
+  pub fn service_id(mut self, service_id: String) -> Self {
+    self.service_id = Some(service_id);
+    self
+  }
+
   /// Configure the Rootly backend. Returns a sub-builder for Rootly-specific options.
   pub fn rootly(self, api_key: RootlyApiKey) -> RootlyConfigBuilder {
     RootlyConfigBuilder {
       parent: self,
       api_key,
-      alert_urgency_id: None,
+      urgency_id_high: None,
+      urgency_id_medium: None,
+      urgency_id_low: None,
       notification_target_type: None,
       notification_target_id: None,
     }
@@ -113,7 +123,7 @@ impl PagerBuilder {
       }
     };
 
-    PagerClient::new(client_config, self.application_name.clone(), self.environment.clone(), self.hostname.clone())
+    PagerClient::new(client_config, self.application_name.clone(), self.environment.clone(), self.hostname.clone(), self.service_id.clone())
   }
 }
 
@@ -122,15 +132,29 @@ impl PagerBuilder {
 pub struct RootlyConfigBuilder {
   parent: PagerBuilder,
   api_key: RootlyApiKey,
-  alert_urgency_id: Option<String>,
+  urgency_id_high: Option<String>,
+  urgency_id_medium: Option<String>,
+  urgency_id_low: Option<String>,
   notification_target_type: Option<String>,
   notification_target_id: Option<String>,
 }
 
 impl RootlyConfigBuilder {
-  /// Set the alert urgency ID.
-  pub fn alert_urgency_id(mut self, id: String) -> Self {
-    self.alert_urgency_id = Some(id);
+  /// Set the urgency ID for high-urgency alerts.
+  pub fn urgency_id_high(mut self, id: String) -> Self {
+    self.urgency_id_high = Some(id);
+    self
+  }
+
+  /// Set the urgency ID for medium-urgency alerts.
+  pub fn urgency_id_medium(mut self, id: String) -> Self {
+    self.urgency_id_medium = Some(id);
+    self
+  }
+
+  /// Set the urgency ID for low-urgency alerts.
+  pub fn urgency_id_low(mut self, id: String) -> Self {
+    self.urgency_id_low = Some(id);
     self
   }
 
@@ -145,7 +169,9 @@ impl RootlyConfigBuilder {
   pub fn done(mut self) -> PagerBuilder {
     self.parent.client_config = Some(PagerClientConfig::Rootly {
       api_key: self.api_key,
-      alert_urgency_id: self.alert_urgency_id,
+      urgency_id_high: self.urgency_id_high,
+      urgency_id_medium: self.urgency_id_medium,
+      urgency_id_low: self.urgency_id_low,
       notification_target_type: self.notification_target_type,
       notification_target_id: self.notification_target_id,
     });

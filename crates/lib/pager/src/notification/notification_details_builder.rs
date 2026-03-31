@@ -2,6 +2,7 @@ use chrono::{DateTime, Utc};
 use std::fmt::{Debug, Display};
 
 use crate::notification::notification_details::NotificationDetails;
+use crate::notification::notification_urgency::NotificationUrgency;
 
 pub struct NotificationDetailsBuilder {
   summary: String,
@@ -11,6 +12,7 @@ pub struct NotificationDetailsBuilder {
   http_path: Option<String>,
   http_status_code: Option<u16>,
   is_from_error: bool,
+  urgency: Option<NotificationUrgency>,
 }
 
 impl NotificationDetailsBuilder {
@@ -24,6 +26,7 @@ impl NotificationDetailsBuilder {
       http_path: None,
       http_status_code: None,
       is_from_error: false,
+      urgency: None,
     }
   }
 
@@ -42,7 +45,13 @@ impl NotificationDetailsBuilder {
       http_path: None,
       http_status_code: None,
       is_from_error: true,
+      urgency: None,
     }
+  }
+  
+  pub fn set_summary(mut self, summary: String) -> Self {
+    self.summary = summary;
+    self
   }
 
   pub fn set_description(mut self, description: Option<String>) -> Self {
@@ -65,6 +74,11 @@ impl NotificationDetailsBuilder {
     self
   }
 
+  pub fn set_urgency(mut self, urgency: Option<NotificationUrgency>) -> Self {
+    self.urgency = urgency;
+    self
+  }
+
   pub fn build(self) -> NotificationDetails {
     NotificationDetails {
       summary: self.summary,
@@ -74,6 +88,7 @@ impl NotificationDetailsBuilder {
       http_path: self.http_path,
       http_status_code: self.http_status_code,
       is_from_error: self.is_from_error,
+      urgency: self.urgency,
     }
   }
 }
