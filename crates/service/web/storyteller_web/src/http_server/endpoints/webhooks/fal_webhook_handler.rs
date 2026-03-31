@@ -1,11 +1,8 @@
 use std::fmt;
 use std::sync::Arc;
 
-use crate::http_server::endpoints::webhooks::handle_image_payload::handle_image_payload;
-use crate::http_server::endpoints::webhooks::handle_images_payload::handle_images_payload;
-use crate::http_server::endpoints::webhooks::handle_model_glb_payload::handle_model_glb_payload;
-use crate::http_server::endpoints::webhooks::handle_model_mesh_payload::handle_model_mesh_payload;
-use crate::http_server::endpoints::webhooks::handle_video_payload::handle_video_payload;
+use crate::http_server::endpoints::webhooks::process_failure::handle_failed_fal_webhook::handle_failed_fal_webhook;
+use crate::http_server::endpoints::webhooks::process_success::handle_successful_fal_webhook::handle_sucessful_fal_webhook;
 use crate::state::server_state::ServerState;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
@@ -15,23 +12,10 @@ use anyhow::Error;
 use http_server_common::response::response_success_helpers::SimpleGenericJsonSuccess;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{error, info, warn};
-use mysql_queries::queries::generic_inference::fal::get_inference_job_by_fal_id::get_inference_job_by_fal_id;
-use mysql_queries::queries::generic_inference::fal::mark_fal_generic_inference_job_successfully_done::{mark_fal_generic_inference_job_successfully_done, MarkJobArgs};
 use pager::notification::notification_details_builder::NotificationDetailsBuilder;
 use pager::notification::notification_urgency::NotificationUrgency;
 use serde_json::Value;
 use utoipa::ToSchema;
-
-// 1. tauri --> hit endpoint to enqueue
-//
-// 2. webhook
-//  - upload media file
-//  - update job record with media token + status
-//
-// 3. tauri --> storyteller jobs endpoint polls
-//  - alert frontend of completion
-//
-// 4. javascript polls tauri  (backend removal)
 
 // TODO(bt, 2025-06-03): Handle webhook crypto authentication
 #[derive(Debug, Deserialize, ToSchema)]
@@ -123,8 +107,10 @@ pub async fn fal_webhook_handler(
       .as_deref()
       .ok_or_else(|| FalWebhookError::BadInput("Missing request_id".to_string()))?;
 
-  info!("FAL webhook request_id: {}", request_id);
+  info!("FAL webhook request_id: {} (status: {:?})", request_id, request.status);
 
+  // TODO(bt): Longer term, we should just use `fal_client` to parse webhooks and add lots of integration tests
+  //  across dozens of real messages.
   let payload = request.payload
       .as_ref()
       .ok_or_else(|| {
@@ -132,7 +118,19 @@ pub async fn fal_webhook_handler(
         FalWebhookError::BadInput("Missing payload".to_string())
       })?;
 
-  let result = process_fal_webhook(&server_state, request_id, payload).await;
+  let result = match request.status {
+    FalWebhookStatus::Ok => {
+      handle_sucessful_fal_webhook(&server_state, request_id, payload).await
+    }
+    FalWebhookStatus::Error => {
+      handle_failed_fal_webhook(
+        &server_state,
+        request_id,
+        payload,
+        request.error.as_deref(),
+      ).await
+    }
+  };
 
   if let Err(ref err) = result {
     error!("FAL webhook error for request_id {}: {:?}", request_id, err);
@@ -155,73 +153,4 @@ pub async fn fal_webhook_handler(
   }
 
   result
-}
-
-async fn process_fal_webhook(
-  server_state: &ServerState,
-  request_id: &str,
-  payload: &Value,
-) -> Result<Json<SimpleGenericJsonSuccess>, FalWebhookError> {
-
-  let db_result = get_inference_job_by_fal_id(
-    request_id,
-    &server_state.mysql_pool,
-  ).await;
-
-  let job = match db_result {
-    Ok(Some(record)) => record,
-    Ok(None) => {
-      warn!("Could not find job record by fal request_id: {}", request_id);
-      return Err(FalWebhookError::NotFound)
-    },
-    Err(err) => {
-      warn!("Error querying job record for request_id {}: {:?}", request_id, err);
-      return Err(FalWebhookError::ServerError);
-    }
-  };
-
-  info!("Fal webhook job record for request_id {}: {:?}", request_id, job);
-
-  let mut maybe_media_token = None;
-  let mut maybe_batch_token = None;
-
-  if let Some(payload_obj) = payload.as_object() {
-    if payload_obj.contains_key("image") {
-      info!("Handling image payload for request_id {} / job {:?}", request_id, job.job_token);
-      let token = handle_image_payload(payload_obj, &job, server_state).await?;
-      maybe_media_token = Some(token);
-    } else if payload_obj.contains_key("images") {
-      (maybe_media_token, maybe_batch_token) = handle_images_payload(payload_obj, &job, server_state).await?;
-    } else if payload_obj.contains_key("video") {
-      info!("Handling video payload for request_id {} / job {:?}", request_id, job.job_token);
-      let token = handle_video_payload(payload_obj, &job, server_state).await?;
-      maybe_media_token = Some(token);
-    } else if payload_obj.contains_key("model_glb") {
-      info!("Handling model_glb payload for request_id {} / job {:?}", request_id, job.job_token);
-      let token = handle_model_glb_payload(payload_obj, &job, server_state).await?;
-      maybe_media_token = Some(token);
-    } else if payload_obj.contains_key("model_mesh") {
-      info!("Handling model_mesh payload for request_id {} / job {:?}", request_id, job.job_token);
-      let token = handle_model_mesh_payload(payload_obj, &job, server_state).await?;
-      maybe_media_token = Some(token);
-    }
-  }
-
-  if let Some(media_token) = maybe_media_token {
-    info!("Media file token for request_id {}: {:?}", request_id, media_token);
-    mark_fal_generic_inference_job_successfully_done(MarkJobArgs {
-      job_token: &job.job_token,
-      media_file_token: &media_token,
-      maybe_batch_token: maybe_batch_token.as_ref(),
-      mysql_executor: &server_state.mysql_pool,
-      phantom: Default::default(),
-    }).await.map_err(|err| {
-      warn!("Error marking job as successfully done for request_id {}: {:?}", request_id, err);
-      FalWebhookError::ServerError
-    })?;
-  } else {
-    warn!("No media token found in payload for request_id {} / job {:?}", request_id, job.job_token);
-  }
-
-  Ok(SimpleGenericJsonSuccess::wrapped(true))
 }
