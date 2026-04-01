@@ -193,7 +193,7 @@ export function PricingContent({ title, subtitle }: PricingContentProps) {
   };
 
   return (
-    <div className="p-8 md:p-16 py-12 md:py-24 flex-1 overflow-y-auto min-h-0 text-base-fg">
+    <div className="p-8 md:p-10 flex-1 overflow-y-auto min-h-0 text-base-fg">
       <div className="text-center mb-10">
         <h1 className="text-3xl md:text-5xl font-bold text-base-fg mb-4">
           {title || pricingConfig.header.title}
@@ -333,9 +333,9 @@ export function PricingContent({ title, subtitle }: PricingContentProps) {
   );
 }
 
-interface PricingModalProps {}
+interface PricingModalProps { }
 
-export function PricingModal({}: PricingModalProps = {}) {
+export function PricingModal({ }: PricingModalProps = {}) {
   const { isOpen, closeModal, title, subtitle } = usePricingModalStore();
 
   return (
