@@ -5,4 +5,5 @@ export const SOCIAL_LINKS = {
   GITHUB: "https://github.com/storytold/artcraft",
   INSTAGRAM: "https://www.instagram.com/get_artcraft",
   LINKEDIN: "https://www.linkedin.com/company/artcraft-ai",
+  REDDIT: "https://www.reddit.com/r/ArtCraftAI/",
 } as const;

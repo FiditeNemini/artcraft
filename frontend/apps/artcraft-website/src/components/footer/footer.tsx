@@ -6,6 +6,7 @@ import {
   faGithubAlt,
   faLinkedinIn,
   faInstagram,
+  faRedditAlien,
 } from "@fortawesome/free-brands-svg-icons";
 import { SOCIAL_LINKS } from "../../config/links";
 import { getFaqItems, getTutorialItems } from "@storyteller/markdown-content";
@@ -50,6 +51,11 @@ const navigation = {
       name: "LinkedIn",
       href: SOCIAL_LINKS.LINKEDIN,
       icon: (props: any) => <FontAwesomeIcon icon={faLinkedinIn} {...props} />,
+    },
+    {
+      name: "Reddit",
+      href: SOCIAL_LINKS.REDDIT,
+      icon: (props: any) => <FontAwesomeIcon icon={faRedditAlien} {...props} />,
     },
   ],
 };

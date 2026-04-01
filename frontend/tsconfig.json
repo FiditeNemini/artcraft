@@ -182,6 +182,9 @@
     },
     {
       "path": "./apps/genhub"
+    },
+    {
+      "path": "./libs/components/pagedraw"
     }
   ]
 }
