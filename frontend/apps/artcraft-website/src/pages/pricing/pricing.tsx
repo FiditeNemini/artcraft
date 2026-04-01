@@ -108,8 +108,6 @@ const Pricing = () => {
           &dagger; ArtCraft can be used without paying for a subscription. You
           can bring your own compute and third party subscriptions. We hope
           you'll subscribe, though, as that helps accelerate our development.
-          Pricing table is a placeholder. We charge below FAL API pricing, which
-          is highly competitive.
         </p>
       </div>
 
