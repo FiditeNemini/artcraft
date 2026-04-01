@@ -14,6 +14,7 @@ interface Props {
   title: string;
   fileTypes: string[];
   engineCategory: FilterEngineCategories;
+  initialFile?: File;
   options?: {
     fileSubtypes?: { [key: string]: string }[];
     hasLength?: boolean;
@@ -27,6 +28,7 @@ interface Props {
 export const UploadFilesSplat = ({
   fileTypes,
   engineCategory,
+  initialFile,
   options,
   onClose,
   onUploadProgress,
@@ -52,7 +54,7 @@ export const UploadFilesSplat = ({
   const [assetFile, setAssetFile] = useState<{
     value: File | null;
     error?: string;
-  }>({ value: null });
+  }>({ value: initialFile ?? null });
 
   const [previewStatus, setPreviewStatus] = useState<{
     type: string;
@@ -166,7 +168,7 @@ export const UploadFilesSplat = ({
 
         <div className="relative m-auto w-full overflow-hidden rounded-lg bg-brand-secondary">
           <canvas
-            className="pointer-events-none h-full w-full"
+            className="pointer-events-none h-full !w-full"
             ref={canvasCallbackRef}
           />
           {!assetFile.value && (
