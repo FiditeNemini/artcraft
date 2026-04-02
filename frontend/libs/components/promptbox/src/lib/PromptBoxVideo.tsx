@@ -12,8 +12,6 @@ import {
   EnqueueImageToVideoRequest,
 } from "@storyteller/tauri-api";
 import {
-  faMessageXmark,
-  faMessageCheck,
   faWaveformLines,
   faClock,
   faTriangleExclamation,
@@ -41,6 +39,17 @@ import { VideoGenerationCountPicker } from "./common/VideoGenerationCountPicker"
 import { twMerge } from "tailwind-merge";
 import { toast } from "@storyteller/ui-toaster";
 import { GenerationProvider } from "@storyteller/api-enums";
+
+declare global {
+  interface Window {
+    __storeTaskEnqueueMeta?: (meta: {
+      prompt?: string;
+      refImageUrls?: string[];
+      modelType?: string;
+      timestamp: number;
+    }) => void;
+  }
+}
 
 type GROK_ASPECT_RATIO = "landscape" | "portrait" | "square";
 
@@ -106,8 +115,6 @@ export const PromptBoxVideo = ({
   const [content, setContent] = useState<React.ReactNode>(null);
   const prompt = usePromptVideoStore((s) => s.prompt);
   const setPrompt = usePromptVideoStore((s) => s.setPrompt);
-  const useSystemPrompt = usePromptVideoStore((s) => s.useSystemPrompt);
-  const setUseSystemPrompt = usePromptVideoStore((s) => s.setUseSystemPrompt);
   const generateWithSound = usePromptVideoStore((s) => s.generateWithSound);
   const setGenerateWithSound = usePromptVideoStore(
     (s) => s.setGenerateWithSound,
@@ -224,52 +231,67 @@ export const PromptBoxVideo = ({
     );
   };
 
-  // Sync duration with model default when switching models
+  // Sync duration with model default when switching models.
+  // Read duration from the store directly to avoid stale closure issues
+  // when the model and duration are updated together (e.g. during recreate).
   useEffect(() => {
+    const currentDuration = usePromptVideoStore.getState().duration;
     if (selectedModel?.durationOptions && selectedModel.defaultDuration) {
       if (
-        duration === null ||
-        !selectedModel.durationOptions.includes(duration)
+        currentDuration === null ||
+        !selectedModel.durationOptions.includes(currentDuration)
       ) {
         setDuration(selectedModel.defaultDuration);
       }
-    } else if (duration !== null) {
+    } else if (currentDuration !== null) {
       setDuration(null);
     }
   }, [selectedModel]);
 
-  // Sync resolution with model default when switching models
+  // Sync resolution with model default when switching models.
+  // Read from store directly to avoid stale closure (same as duration above).
   useEffect(() => {
+    const currentResolution = usePromptVideoStore.getState().resolution;
     if (selectedModel?.resolutionOptions && selectedModel.defaultResolution) {
-      if (!selectedModel.resolutionOptions.includes(resolution as string)) {
+      if (
+        !selectedModel.resolutionOptions.includes(currentResolution as string)
+      ) {
         setResolution(selectedModel.defaultResolution);
       }
     }
   }, [selectedModel]);
 
-  // Reset input mode when switching to a model that doesn't support reference
+  // Reset input mode when switching to a model that doesn't support reference.
+  // Read from store directly to avoid stale closure (same as duration above).
   useEffect(() => {
-    if (!selectedModel?.supportsReferenceMode && inputMode === "reference") {
+    const currentInputMode = usePromptVideoStore.getState().inputMode;
+    if (
+      !selectedModel?.supportsReferenceMode &&
+      currentInputMode === "reference"
+    ) {
       setInputMode("keyframe");
       setReferenceVideos([]);
       setReferenceAudios([]);
     }
   }, [selectedModel]);
 
-  // Reset generation count when switching away from seedance 2.0
+  // Reset generation count when switching away from seedance 2.0.
+  // Read from store directly to avoid stale closure (same as duration above).
   useEffect(() => {
-    if (selectedModel?.id !== "seedance_2p0" && generationCount > 1) {
+    const currentGenerationCount =
+      usePromptVideoStore.getState().generationCount;
+    if (selectedModel?.id !== "seedance_2p0" && currentGenerationCount > 1) {
       setGenerationCount(1);
     }
   }, [selectedModel]);
 
   const durationRange = selectedModel?.durationOptions?.length
     ? {
-      min: selectedModel.durationOptions[0]!,
-      max: selectedModel.durationOptions[
-        selectedModel.durationOptions.length - 1
-      ]!,
-    }
+        min: selectedModel.durationOptions[0]!,
+        max: selectedModel.durationOptions[
+          selectedModel.durationOptions.length - 1
+        ]!,
+      }
     : null;
   const effectiveDuration = duration ?? selectedModel?.defaultDuration ?? 5;
   const [localDuration, setLocalDuration] = useState(effectiveDuration);
@@ -286,9 +308,9 @@ export const PromptBoxVideo = ({
   const resolutionPickerOptions: PopoverItem[] | null =
     selectedModel?.resolutionOptions
       ? selectedModel.resolutionOptions.map((r) => ({
-        label: r,
-        selected: r === resolution,
-      }))
+          label: r,
+          selected: r === resolution,
+        }))
       : null;
 
   const handleResolutionSelect = (selectedItem: PopoverItem) => {
@@ -298,17 +320,17 @@ export const PromptBoxVideo = ({
   const inputModeOptions: PopoverItem[] | null =
     selectedModel?.supportsReferenceMode
       ? [
-        {
-          label: "Keyframe",
-          description: "First/Last frame",
-          selected: inputMode === "keyframe",
-        },
-        {
-          label: "Reference",
-          description: "Multi-media ref",
-          selected: inputMode === "reference",
-        },
-      ]
+          {
+            label: "Keyframe",
+            description: "First/Last frame",
+            selected: inputMode === "keyframe",
+          },
+          {
+            label: "Reference",
+            description: "Multi-media ref",
+            selected: inputMode === "reference",
+          },
+        ]
       : null;
 
   const handleInputModeSelect = (selectedItem: PopoverItem) => {
@@ -413,26 +435,26 @@ export const PromptBoxVideo = ({
 
   const mentionItems = isReferenceMode
     ? [
-      ...referenceImages.map((img, i) => ({
-        label: `@Image${i + 1}`,
-        type: "image" as const,
-        preview: img.url,
-      })),
-      ...referenceVideos.map((vid, i) => ({
-        label: `@Video${i + 1}`,
-        type: "video" as const,
-        preview: vid.url,
-      })),
-      ...referenceAudios.map((_aud, i) => ({
-        label: `@Audio${i + 1}`,
-        type: "audio" as const,
-        preview: undefined as string | undefined,
-      })),
-    ].filter((item) =>
-      mentionFilter
-        ? item.label.toLowerCase().includes(mentionFilter.toLowerCase())
-        : true,
-    )
+        ...referenceImages.map((img, i) => ({
+          label: `@Image${i + 1}`,
+          type: "image" as const,
+          preview: img.url,
+        })),
+        ...referenceVideos.map((vid, i) => ({
+          label: `@Video${i + 1}`,
+          type: "video" as const,
+          preview: vid.url,
+        })),
+        ...referenceAudios.map((_aud, i) => ({
+          label: `@Audio${i + 1}`,
+          type: "audio" as const,
+          preview: undefined as string | undefined,
+        })),
+      ].filter((item) =>
+        mentionFilter
+          ? item.label.toLowerCase().includes(mentionFilter.toLowerCase())
+          : true,
+      )
     : [];
 
   const insertMention = (label: string) => {
@@ -503,7 +525,9 @@ export const PromptBoxVideo = ({
       return;
     }
     if (prompt.length > maxLen) {
-      toast.error(`Prompt exceeds the ${maxLen} character limit for this model`);
+      toast.error(
+        `Prompt exceeds the ${maxLen} character limit for this model`,
+      );
       return;
     }
 
@@ -621,24 +645,20 @@ export const PromptBoxVideo = ({
 
     window.__storeTaskEnqueueMeta?.({
       prompt,
-      refImageUrls: referenceImages
-        ?.map((img) => img.url)
-        .filter(Boolean),
+      refImageUrls: referenceImages?.map((img) => img.url).filter(Boolean),
       modelType: (selectedModel as any)?.tauriId || String(selectedModel),
       timestamp: Date.now(),
     });
 
     const subscriberIds: string[] = [];
-    const enqueuePromises: Promise<void>[] = [];
+    const enqueuePromises: Promise<unknown>[] = [];
 
     for (let i = 0; i < count; i++) {
       const subscriberId = crypto.randomUUID
         ? crypto.randomUUID()
         : Math.random().toString(36).slice(2);
       subscriberIds.push(subscriberId);
-      enqueuePromises.push(
-        EnqueueImageToVideo(buildRequest(subscriberId)) as Promise<void>,
-      );
+      enqueuePromises.push(EnqueueImageToVideo(buildRequest(subscriberId)));
     }
 
     try {
@@ -904,7 +924,9 @@ export const PromptBoxVideo = ({
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
               />
-              <span className={`absolute -bottom-1 right-0 text-[10px] tabular-nums ${prompt.length > maxLen ? "text-red-500" : "text-base-fg/40"}`}>
+              <span
+                className={`absolute -bottom-1 right-0 text-[10px] tabular-nums ${prompt.length > maxLen ? "text-red-500" : "text-base-fg/40"}`}
+              >
                 {prompt.length} / {maxLen}
               </span>
             </div>
@@ -981,7 +1003,6 @@ export const PromptBoxVideo = ({
                 </Tooltip>
               )}
 
-
               {selectedModel?.generateWithSound && (
                 <Tooltip
                   content={generateWithSound ? "Sound: ON" : "Sound: OFF"}
@@ -1013,7 +1034,6 @@ export const PromptBoxVideo = ({
                   />
                 </Tooltip>
               )}
-
             </div>
             <div className="flex items-center gap-2">
               {modelNeedsAnImageButNoneAreSelected && (
@@ -1043,7 +1063,9 @@ export const PromptBoxVideo = ({
                     onClick={handleEnqueue}
                     disabled={!prompt.trim()}
                     loading={isEnqueueing}
-                    credits={credits != null ? credits * generationCount : credits}
+                    credits={
+                      credits != null ? credits * generationCount : credits
+                    }
                   >
                     Generate
                   </GenerateButton>
@@ -1052,13 +1074,20 @@ export const PromptBoxVideo = ({
             </div>
           </div>
           <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
-            <Tooltip content={isExpanded ? "Collapse" : "Expand"} position="top" className="-mb-2">
+            <Tooltip
+              content={isExpanded ? "Collapse" : "Expand"}
+              position="top"
+              className="-mb-2"
+            >
               <button
                 type="button"
                 onClick={toggleExpand}
                 className="text-base-fg/30 hover:text-base-fg/90 transition-colors px-3 py-0.5"
               >
-                <FontAwesomeIcon icon={isExpanded ? faChevronUp : faChevronDown} className="text-xs" />
+                <FontAwesomeIcon
+                  icon={isExpanded ? faChevronUp : faChevronDown}
+                  className="text-xs"
+                />
               </button>
             </Tooltip>
           </div>
