@@ -1,162 +1,221 @@
 use chrono::{DateTime, Utc};
-use std::fmt::{Debug, Display};
 
 use crate::notification::generate_deduplication_key::generate_deduplication_key;
+use crate::notification::notification_details_builder::NotificationDetailsBuilder;
 use crate::notification::notification_urgency::NotificationUrgency;
 
 /// Details for a pager notification.
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct NotificationDetails {
   /// Title or summary of the alert.
-  pub title: String,
+  pub(crate) title: String,
 
   /// Full details for the alert.
-  pub description: Option<String>,
-
-  /// When the event occurred.
-  pub event_time: DateTime<Utc>,
-
-  /// HTTP method associated with the event, if any.
-  pub http_method: Option<String>,
-
-  /// HTTP endpoint path associated with the event, if any.
-  pub http_path: Option<String>,
-
-  /// HTTP status code associated with the event, if any.
-  pub http_status_code: Option<u16>,
-
-  /// Whether this notification originated from an error.
-  pub is_from_error: bool,
+  pub(crate) description: Option<String>,
 
   /// Urgency level for the notification.
-  pub urgency: Option<NotificationUrgency>,
+  pub(crate) urgency: Option<NotificationUrgency>,
+
+  /// When the event occurred.
+  pub(crate) event_time: DateTime<Utc>,
+
+  /// The error that triggered this notification, if any.
+  pub(crate) maybe_error: Option<Box<dyn std::error::Error + Send + Sync + 'static>>,
+
+  /// Whether this notification originated from an error.
+  pub(crate) is_from_error: bool,
+
+  /// HTTP method associated with the event, if any.
+  pub(crate) http_method: Option<String>,
+
+  /// HTTP endpoint path associated with the event, if any.
+  pub(crate) http_path: Option<String>,
+
+  /// HTTP status code associated with the event, if any.
+  pub(crate) http_status_code: Option<u16>,
 
   /// User token associated with the event, if any.
-  pub user_token: Option<String>,
+  pub(crate) user_token: Option<String>,
 
   /// Media file token associated with the event, if any.
-  pub media_file_token: Option<String>,
+  pub(crate) media_file_token: Option<String>,
 
   /// Inference job token associated with the event, if any.
-  pub inference_job_token: Option<String>,
+  pub(crate) inference_job_token: Option<String>,
 
   /// Third-party identifier associated with the event, if any.
-  pub third_party_id: Option<String>,
+  pub(crate) third_party_id: Option<String>,
 }
 
 impl NotificationDetails {
+
+  /// Return a key that can group notifications for deduplication,
+  /// which will prevent spamming the same page over and over.
   pub fn to_deduplication_key(&self) -> String {
     generate_deduplication_key(self)
   }
 
-  /// Create a notification with a title and description.
-  pub fn with_title_and_description(title: String, description: String) -> Self {
-    Self {
-      title,
-      description: Some(description),
-      event_time: Utc::now(),
-      http_method: None,
-      http_path: None,
-      http_status_code: None,
-      is_from_error: false,
-      urgency: None,
-      user_token: None,
-      media_file_token: None,
-      inference_job_token: None,
-      third_party_id: None,
-    }
-  }
+  // =============== Description Building ===============
 
-  /// Create a notification with just a title.
-  pub fn with_title(title: String) -> Self {
-    Self {
-      title,
-      description: None,
-      event_time: Utc::now(),
-      http_method: None,
-      http_path: None,
-      http_status_code: None,
-      is_from_error: false,
-      urgency: None,
-      user_token: None,
-      media_file_token: None,
-      inference_job_token: None,
-      third_party_id: None,
-    }
-  }
-
-  /// Create a notification from any error type.
+  /// Build the full enriched description for this notification.
   ///
-  /// Formats the error into a structured description that includes:
-  /// - The error message
-  /// - The error's source chain (if any)
-  /// - A backtrace (if available via `std::backtrace`)
-  /// - The timestamp of the event
-  pub fn from_error<E: Debug + Display>(error: &E) -> Self {
-    let title = format!("{}", error);
+  /// Assembles atomic sections in a consistent order:
+  /// 1. User-provided description
+  /// 2. Error chain (if a boxed error is attached)
+  /// 3. Event time
+  /// 4. HTTP context
+  /// 5. Service tokens
+  /// 6. Application/service identity and hostname
+  pub(crate) fn build_enriched_description(
+    &self,
+    application_name: Option<&str>,
+    service_id: Option<&str>,
+    hostname: Option<&str>,
+  ) -> Option<String> {
+    let mut sections: Vec<String> = Vec::new();
 
-    // Truncate the title to a reasonable length for alert titles.
-    let title = if title.len() > 200 {
-      format!("{}...", &title[..197])
+    // 1. User-provided description
+    if let Some(desc) = &self.description {
+      sections.push(desc.clone());
+    }
+
+    // 2. Error chain
+    if let Some(error_section) = self.format_error_chain() {
+      sections.push(error_section);
+    }
+
+    // 3. Event time
+    sections.push(self.format_event_time());
+
+    // 4. HTTP context
+    if let Some(http_section) = self.format_http_context() {
+      sections.push(http_section);
+    }
+
+    // 5. Service tokens
+    if let Some(tokens_section) = self.format_service_tokens() {
+      sections.push(tokens_section);
+    }
+
+    // 6. Application/service identity and hostname
+    if let Some(identity_section) = Self::format_app_identity(application_name, service_id, hostname) {
+      sections.push(identity_section);
+    }
+
+    if sections.is_empty() {
+      None
     } else {
-      title
-    };
+      Some(sections.join("\n\n"))
+    }
+  }
 
-    let event_time = Utc::now();
+  /// Format the error chain from the boxed error, walking the source chain.
+  fn format_error_chain(&self) -> Option<String> {
+    let error = self.maybe_error.as_ref()?;
 
-    let mut description_parts: Vec<String> = Vec::new();
+    let mut parts: Vec<String> = Vec::new();
 
-    description_parts.push(format!("Event time: {}", event_time.format("%Y-%m-%d %H:%M:%S UTC")));
-    description_parts.push(String::new());
-    description_parts.push(format!("Error: {}", error));
+    // Top-level error
+    parts.push(format!("Error: {}", error));
 
-    // Include the Debug representation if it differs from Display (often has more detail).
+    // Debug representation if it differs
     let debug_repr = format!("{:?}", error);
     let display_repr = format!("{}", error);
     if debug_repr != display_repr {
-      description_parts.push(String::new());
-      description_parts.push(format!("Debug: {}", debug_repr));
+      parts.push(format!("Debug: {}", debug_repr));
     }
 
-    // Attempt to walk the error source chain.
-    // NB: We use the Debug trait here since we can't require std::error::Error
-    // (that would require E: 'static + Error which is too restrictive for callers).
+    // Walk the source chain
+    let mut depth = 0;
+    let mut source = error.source();
+    while let Some(cause) = source {
+      depth += 1;
+      parts.push(format!("Caused by ({depth}): {cause}"));
 
-    // Try to capture a backtrace from the current call site.
-    #[cfg(feature = "backtrace")]
-    {
-      let bt = std::backtrace::Backtrace::capture();
-      if bt.status() == std::backtrace::BacktraceStatus::Captured {
-        description_parts.push(String::new());
-        description_parts.push(format!("Backtrace:\n{}", bt));
+      let cause_debug = format!("{:?}", cause);
+      let cause_display = format!("{}", cause);
+      if cause_debug != cause_display {
+        parts.push(format!("  Debug ({depth}): {cause_debug}"));
       }
+
+      source = cause.source();
     }
 
-    let description = description_parts.join("\n");
-
-    Self {
-      title,
-      description: Some(description),
-      event_time,
-      http_method: None,
-      http_path: None,
-      http_status_code: None,
-      is_from_error: true,
-      urgency: None,
-      user_token: None,
-      media_file_token: None,
-      inference_job_token: None,
-      third_party_id: None,
-    }
+    Some(parts.join("\n"))
   }
 
-  /// Create a notification from an error, with a custom title prefix.
-  pub fn from_error_with_context<E: Debug + Display>(context: &str, error: &E) -> Self {
-    let mut notification = Self::from_error(error);
-    notification.title = format!("{}: {}", context, notification.title);
-    if notification.title.len() > 200 {
-      notification.title = format!("{}...", &notification.title[..197]);
+  /// Format the event time.
+  fn format_event_time(&self) -> String {
+    format!("Event time: {}", self.event_time.format("%Y-%m-%d %H:%M:%S UTC"))
+  }
+
+  /// Format HTTP context (method, path, status code) if any fields are present.
+  fn format_http_context(&self) -> Option<String> {
+    let mut parts: Vec<String> = Vec::new();
+
+    if let Some(method) = &self.http_method {
+      parts.push(format!("HTTP Method: {}", method));
     }
-    notification
+
+    if let Some(path) = &self.http_path {
+      parts.push(format!("HTTP Path: {}", path));
+    }
+
+    if let Some(status_code) = self.http_status_code {
+      parts.push(format!("HTTP Status Code: {}", status_code));
+    }
+
+    if parts.is_empty() { None } else { Some(parts.join("\n")) }
+  }
+
+  /// Format service tokens (user, media file, inference job, third party) if any are present.
+  fn format_service_tokens(&self) -> Option<String> {
+    let mut parts: Vec<String> = Vec::new();
+
+    if let Some(user_token) = &self.user_token {
+      parts.push(format!("User Token: {}", user_token));
+    }
+
+    if let Some(media_file_token) = &self.media_file_token {
+      parts.push(format!("Media File Token: {}", media_file_token));
+    }
+
+    if let Some(inference_job_token) = &self.inference_job_token {
+      parts.push(format!("Inference Job Token: {}", inference_job_token));
+    }
+
+    if let Some(third_party_id) = &self.third_party_id {
+      parts.push(format!("Third Party ID: {}", third_party_id));
+    }
+
+    if parts.is_empty() { None } else { Some(parts.join("\n")) }
+  }
+
+  /// Format the application name, service ID, and hostname.
+  fn format_app_identity(
+    application_name: Option<&str>,
+    service_id: Option<&str>,
+    hostname: Option<&str>,
+  ) -> Option<String> {
+    let mut parts: Vec<String> = Vec::new();
+
+    match (application_name, service_id) {
+      (Some(name), Some(id)) => {
+        parts.push(format!("Application: {} (service_id: {})", name, id));
+      }
+      (Some(name), None) => {
+        parts.push(format!("Application: {}", name));
+      }
+      (None, Some(id)) => {
+        parts.push(format!("Service ID: {}", id));
+      }
+      (None, None) => {}
+    }
+
+    if let Some(h) = hostname {
+      parts.push(format!("Hostname: {}", h));
+    }
+
+    if parts.is_empty() { None } else { Some(parts.join("\n")) }
   }
 }

@@ -6,17 +6,21 @@ use crate::notification::notification_urgency::NotificationUrgency;
 
 pub struct NotificationDetailsBuilder {
   title: String,
-  description: Option<String>,
-  event_time: DateTime<Utc>,
-  http_method: Option<String>,
-  http_path: Option<String>,
-  http_status_code: Option<u16>,
-  is_from_error: bool,
-  urgency: Option<NotificationUrgency>,
-  user_token: Option<String>,
-  media_file_token: Option<String>,
-  inference_job_token: Option<String>,
-  third_party_id: Option<String>,
+  pub(crate) description: Option<String>,
+  pub(crate) urgency: Option<NotificationUrgency>,
+  pub(crate) event_time: DateTime<Utc>,
+
+  pub(crate) maybe_error: Option<Box<dyn std::error::Error + Send + Sync + 'static>>,
+  pub(crate) is_from_error: bool,
+
+  pub(crate) http_method: Option<String>,
+  pub(crate) http_path: Option<String>,
+  pub(crate) http_status_code: Option<u16>,
+
+  pub(crate) user_token: Option<String>,
+  pub(crate) media_file_token: Option<String>,
+  pub(crate) inference_job_token: Option<String>,
+  pub(crate) third_party_id: Option<String>,
 }
 
 impl NotificationDetailsBuilder {
@@ -25,12 +29,13 @@ impl NotificationDetailsBuilder {
     Self {
       title,
       description: None,
+      urgency: None,
       event_time: Utc::now(),
+      maybe_error: None,
+      is_from_error: false,
       http_method: None,
       http_path: None,
       http_status_code: None,
-      is_from_error: false,
-      urgency: None,
       user_token: None,
       media_file_token: None,
       inference_job_token: None,
@@ -38,29 +43,28 @@ impl NotificationDetailsBuilder {
     }
   }
 
-  /// Create a builder from an error.
+  /// Create a builder from a boxed error.
   ///
-  /// Sets `is_from_error` to true and derives the summary and description
-  /// from the error, matching the behavior of `NotificationDetails::from_error`.
-  pub fn from_error<E: Debug + Display>(error: &E) -> Self {
-    // TODO(bt,2026-03-30): Clean this up
-    let details = NotificationDetails::from_error(error);
+  /// Sets the title to a placeholder and attaches the error object.
+  /// Callers should chain `.set_title()` to provide a meaningful title.
+  pub fn from_error(error: Box<dyn std::error::Error + Send + Sync + 'static>) -> Self {
     Self {
-      title: details.title,
-      description: details.description,
-      event_time: details.event_time,
+      title: "Notification from Error".to_string(),
+      description: None,
+      urgency: None,
+      event_time: Utc::now(),
+      maybe_error: Some(error),
+      is_from_error: true,
       http_method: None,
       http_path: None,
       http_status_code: None,
-      is_from_error: true,
-      urgency: None,
       user_token: None,
       media_file_token: None,
       inference_job_token: None,
       third_party_id: None,
     }
   }
-  
+
   pub fn set_title(mut self, title: String) -> Self {
     self.title = title;
     self
@@ -68,6 +72,16 @@ impl NotificationDetailsBuilder {
 
   pub fn set_description(mut self, description: Option<String>) -> Self {
     self.description = description;
+    self
+  }
+
+  pub fn set_urgency(mut self, urgency: Option<NotificationUrgency>) -> Self {
+    self.urgency = urgency;
+    self
+  }
+
+  pub fn set_error(mut self, error: Option<Box<dyn std::error::Error + Send + Sync + 'static>>) -> Self {
+    self.maybe_error = error;
     self
   }
 
@@ -83,11 +97,6 @@ impl NotificationDetailsBuilder {
 
   pub fn set_http_status_code(mut self, http_status_code: Option<u16>) -> Self {
     self.http_status_code = http_status_code;
-    self
-  }
-
-  pub fn set_urgency(mut self, urgency: Option<NotificationUrgency>) -> Self {
-    self.urgency = urgency;
     self
   }
 
@@ -115,12 +124,13 @@ impl NotificationDetailsBuilder {
     NotificationDetails {
       title: self.title,
       description: self.description,
+      urgency: self.urgency,
       event_time: self.event_time,
+      maybe_error: self.maybe_error,
+      is_from_error: self.is_from_error,
       http_method: self.http_method,
       http_path: self.http_path,
       http_status_code: self.http_status_code,
-      is_from_error: self.is_from_error,
-      urgency: self.urgency,
       user_token: self.user_token,
       media_file_token: self.media_file_token,
       inference_job_token: self.inference_job_token,
