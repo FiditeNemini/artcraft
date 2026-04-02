@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use actix_http::StatusCode;
 use actix_web::{HttpResponse, HttpResponseBuilder, ResponseError};
-
+use anyhow::anyhow;
 use crate::http_server::web_utils::user_session::require_user_session::RequireUserSessionError;
 
 /// An error type for actix-web handlers that wraps causal errors for debugging
@@ -28,6 +28,7 @@ use crate::http_server::web_utils::user_session::require_user_session::RequireUs
 /// Errors converted via `From<T>` become `UncaughtServerError` (always 500).
 /// The wrapped cause is never shown to users but is available to the error
 /// alerting middleware for paging and logging.
+#[derive(Clone)]
 pub enum AdvancedCommonWebError {
   /// 400 Bad Request with a user-facing message.
   BadInputWithSimpleMessage(String),
@@ -53,6 +54,17 @@ impl AdvancedCommonWebError {
   /// Wrap any error as an `UncaughtServerError`.
   pub fn from_error(error: impl std::error::Error + Send + Sync + 'static) -> Self {
     Self::UncaughtServerError(Arc::new(error))
+  }
+
+  /// Wrap an `anyhow::Error` as an `UncaughtServerError`.
+  /// (`anyhow::Error` doesn't implement `std::error::Error`, so `from_error` can't accept it.)
+  pub fn from_anyhow_error(error: anyhow::Error) -> Self {
+    let boxed: Box<dyn std::error::Error + Send + Sync> = error.into();
+    Self::UncaughtServerError(Arc::from(boxed))
+  }
+
+  pub fn server_error_with_message(msg: &str) -> Self {
+    Self::from_anyhow_error(anyhow!("ServerErrorWithMessage: {:?}", msg))
   }
 
   /// Extract the wrapped causal error (only present for `UncaughtServerError`).
@@ -182,6 +194,19 @@ impl From<RequireUserSessionError> for AdvancedCommonWebError {
   }
 }
 
+impl From<crate::http_server::common_responses::common_web_error::CommonWebError> for AdvancedCommonWebError {
+  fn from(value: crate::http_server::common_responses::common_web_error::CommonWebError) -> Self {
+    use crate::http_server::common_responses::common_web_error::CommonWebError;
+    match value {
+      CommonWebError::BadInputWithSimpleMessage(msg) => Self::BadInputWithSimpleMessage(msg),
+      CommonWebError::NotAuthorized => Self::NotAuthorized,
+      CommonWebError::NotFound => Self::NotFound,
+      CommonWebError::PaymentRequired => Self::PaymentRequired,
+      CommonWebError::ServerError => Self::from_error(value),
+    }
+  }
+}
+
 // =============== Serialization helpers (private) ===============
 
 #[derive(Debug, Serialize)]
@@ -197,6 +222,47 @@ struct JsonErrorWithMessage<'a> {
   error_code: u16,
   error_code_str: Option<&'static str>,
   message: &'a str,
+}
+
+// =============== OpenAPI schema ===============
+
+impl utoipa::PartialSchema for AdvancedCommonWebError {
+  fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::Schema> {
+    utoipa::openapi::ObjectBuilder::new()
+        .property(
+          "success",
+          utoipa::openapi::ObjectBuilder::new()
+              .schema_type(utoipa::openapi::schema::Type::Boolean),
+        )
+        .required("success")
+        .property(
+          "error_code",
+          utoipa::openapi::ObjectBuilder::new()
+              .schema_type(utoipa::openapi::schema::Type::Integer)
+              .format(Some(utoipa::openapi::SchemaFormat::KnownFormat(
+                utoipa::openapi::KnownFormat::Int32,
+              ))),
+        )
+        .required("error_code")
+        .property(
+          "error_code_str",
+          utoipa::openapi::ObjectBuilder::new()
+              .schema_type(utoipa::openapi::schema::Type::String),
+        )
+        .property(
+          "message",
+          utoipa::openapi::ObjectBuilder::new()
+              .schema_type(utoipa::openapi::schema::Type::String)
+              .description(Some("User-facing error message (present only for bad input errors)")),
+        )
+        .into()
+  }
+}
+
+impl utoipa::ToSchema for AdvancedCommonWebError {
+  fn name() -> std::borrow::Cow<'static, str> {
+    std::borrow::Cow::Borrowed("AdvancedCommonWebError")
+  }
 }
 
 // =============== Tests ===============
