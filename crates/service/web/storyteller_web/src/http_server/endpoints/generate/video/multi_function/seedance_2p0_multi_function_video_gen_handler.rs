@@ -25,6 +25,7 @@ use enums::common::generation_provider::GenerationProvider;
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{error, info, warn};
+use mysql_queries::queries::characters::batch_lookup_characters_by_token_for_prompting::batch_lookup_characters_by_token_for_prompting;
 use mysql_queries::queries::generic_inference::seedance2pro::insert_generic_inference_job_for_seedance2pro_queue_with_apriori_job_token::{
   insert_generic_inference_job_for_seedance2pro_queue_with_apriori_job_token,
   InsertGenericInferenceForSeedance2ProWithAprioriJobTokenArgs,
@@ -45,6 +46,8 @@ use seedance2pro_client::requests::prepare_file_upload::prepare_file_upload::{
 };
 use seedance2pro_client::requests::upload_file::upload_file::{upload_file, UploadFileArgs};
 use sqlx::Acquire;
+use sqlx::MySql;
+use tokens::tokens::characters::CharacterToken;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use url::Url;
@@ -142,6 +145,13 @@ pub async fn seedance_2p0_multi_function_video_gen_handler(
     ).await?
   };
 
+  // --- Look up character tokens (if any) ---
+
+  let kinovi_character_ids = resolve_kinovi_character_ids(
+    request.reference_character_tokens.as_deref(),
+    &mut mysql_connection,
+  ).await?;
+
   // --- Insert idempotency token ---
 
   insert_idempotency_token(&request.uuid_idempotency_token, &mut *mysql_connection)
@@ -191,6 +201,7 @@ pub async fn seedance_2p0_multi_function_video_gen_handler(
       resolution,
       batch_count,
       duration_seconds,
+      kinovi_character_ids.clone(),
     ).await;
 
     match result {
@@ -212,6 +223,7 @@ pub async fn seedance_2p0_multi_function_video_gen_handler(
           resolution,
           batch_count,
           duration_seconds,
+          kinovi_character_ids.clone(),
         ).await;
 
         match result {
@@ -248,6 +260,7 @@ pub async fn seedance_2p0_multi_function_video_gen_handler(
       resolution,
       batch_count,
       duration_seconds,
+      kinovi_character_ids,
     ).await;
 
     match result {
@@ -480,6 +493,7 @@ fn estimate_cost_upfront(resolution: Resolution, batch_count: BatchCount, durati
     reference_image_urls: None,
     reference_video_urls: None,
     reference_audio_urls: None,
+    character_ids: None,
     use_face_blur_hack: None,
     host_override: None,
   };
@@ -495,6 +509,7 @@ async fn upload_and_generate(
   resolution: Resolution,
   batch_count: BatchCount,
   duration_seconds: u8,
+  kinovi_character_ids: Option<Vec<String>>,
 ) -> Result<SeedanceGenerationResult, AdvancedCommonWebError> {
 
   // --- Upload files to seedance2pro CDN ---
@@ -569,6 +584,7 @@ async fn upload_and_generate(
     reference_image_urls,
     reference_video_urls,
     reference_audio_urls,
+    character_ids: kinovi_character_ids,
     use_face_blur_hack: None,
     host_override: None,
   };
@@ -583,6 +599,44 @@ async fn upload_and_generate(
     gen_response,
     generation_mode,
   })
+}
+
+/// Resolve character tokens to Kinovi character IDs for prompting.
+///
+/// Looks up the characters, filters to active ones with kinovi IDs, and warns about
+/// any that are missing or inactive (but doesn't fail the request).
+async fn resolve_kinovi_character_ids(
+  maybe_tokens: Option<&[CharacterToken]>,
+  connection: &mut sqlx::pool::PoolConnection<MySql>,
+) -> Result<Option<Vec<String>>, AdvancedCommonWebError> {
+  let tokens = match maybe_tokens {
+    None => return Ok(None),
+    Some(tokens) if tokens.is_empty() => return Ok(None),
+    Some(tokens) => tokens,
+  };
+
+  let characters = batch_lookup_characters_by_token_for_prompting(tokens, connection)
+      .await?;
+
+  if characters.len() != tokens.len() {
+    warn!(
+      "Not all character tokens were found: requested {}, found {}",
+      tokens.len(), characters.len(),
+    );
+  }
+
+  for character in &characters {
+    if !character.is_active {
+      warn!("Character {} is not yet active, skipping", character.token);
+    }
+  }
+
+  let ids: Vec<String> = characters.iter()
+      .filter(|c| c.is_active)
+      .filter_map(|c| c.kinovi_character_id.clone())
+      .collect();
+
+  if ids.is_empty() { Ok(None) } else { Ok(Some(ids)) }
 }
 
 /// Uploads a list of reference media tokens to seedance2pro, returning the resulting URLs.

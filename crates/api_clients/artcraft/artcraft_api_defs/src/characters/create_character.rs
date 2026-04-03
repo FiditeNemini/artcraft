@@ -16,6 +16,12 @@ pub struct CreateCharacterRequest {
 
   /// The reference image media file token.
   pub image_media_token: MediaFileToken,
+
+  /// Name of the character.
+  pub character_name: String,
+
+  /// Description of the character.
+  pub character_description: Option<String>,
 }
 
 /// Response body for creating a character.

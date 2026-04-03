@@ -1,6 +1,3 @@
--- NB: This is a manually squashed view of all the CREATE and ALTER statements,
--- with comments attached to the fields for centralized documentation.
-
 -- noinspection SqlDialectInspectionForFile
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
@@ -9,10 +6,10 @@
 -- A character is created from one or more reference images and registered with third-party
 -- systems (e.g. Kinovi/Seedance) that support character-based generation.
 CREATE TABLE characters (
-  -- Not used for anything except replication.
+  -- Not used for anything except replication (private, not even used in queries)
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
-  -- Effective "primary key" (PUBLIC)
+  -- Public-facing "primary key" (PUBLIC)
   token VARCHAR(32) NOT NULL,
 
   -- The type or "features" of the character.
@@ -24,15 +21,15 @@ CREATE TABLE characters (
 
   -- ========== CHARACTER DETAILS ==========
 
-  -- Display name for the character.
+  -- User's display name for the character.
   character_name VARCHAR(255) DEFAULT NULL,
 
-  -- Optional description of the character.
+  -- Optional user description of the character.
   maybe_description VARCHAR(512) DEFAULT NULL,
 
   -- ========== MEDIA ==========
 
-  -- Avatar image (small/thumbnail).
+  -- Avatar image (cropped to face, ideally).
   maybe_avatar_media_token VARCHAR(32) DEFAULT NULL,
 
   -- Full-size reference image.

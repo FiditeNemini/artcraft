@@ -49,6 +49,10 @@ pub struct GenerateVideoArgs<'a> {
   /// Sent in a separate `audioUrls` field (not in `uploadedUrls`).
   pub reference_audio_urls: Option<Vec<String>>,
 
+  /// Optional Kinovi character IDs to reference in the prompt.
+  /// Characters are referenced in prompts as @CharacterName.
+  pub character_ids: Option<Vec<String>>,
+
   /// Controls the `faceBlurMode` field: true sends "on", false sends "off", None omits it.
   pub use_face_blur_hack: Option<bool>,
 
@@ -69,6 +73,7 @@ impl std::fmt::Debug for GenerateVideoArgs<'_> {
       .field("reference_image_urls", &self.reference_image_urls)
       .field("reference_video_urls", &self.reference_video_urls)
       .field("reference_audio_urls", &self.reference_audio_urls)
+      .field("character_ids", &self.character_ids)
       .field("use_face_blur_hack", &self.use_face_blur_hack)
       .field("host_override", &self.host_override)
       .finish()
@@ -261,6 +266,7 @@ pub async fn generate_video(args: GenerateVideoArgs<'_>) -> Result<GenerateVideo
           duration,
           mode: video_input_mode,
           face_blur_mode,
+          character_ids: args.character_ids,
           uploaded_urls,
           audio_urls,
           batch_count,
@@ -371,6 +377,7 @@ mod tests {
         reference_image_urls: None,
         reference_video_urls: None,
         reference_audio_urls: None,
+        character_ids: None,
         use_face_blur_hack: None,
         host_override: None,
       }
@@ -495,6 +502,7 @@ mod tests {
         reference_image_urls: None,
         reference_video_urls: None,
         reference_audio_urls: None,
+        character_ids: None,
         use_face_blur_hack: None,
         host_override: None,
       };
@@ -524,6 +532,7 @@ mod tests {
         reference_image_urls: None,
         reference_video_urls: None,
         reference_audio_urls: None,
+        character_ids: None,
         use_face_blur_hack: None,
         host_override: None,
       };
@@ -555,6 +564,7 @@ mod tests {
         ]),
         reference_video_urls: None,
         reference_audio_urls: None,
+        character_ids: None,
         use_face_blur_hack: None,
         host_override: None,
       };
@@ -585,6 +595,7 @@ mod tests {
           "https://static.seedance2-pro.com/materials/20260315/1773594284659-3a46d231.mp4".to_string(),
         ]),
         reference_audio_urls: None,
+        character_ids: None,
         use_face_blur_hack: None,
         host_override: None,
       };
@@ -617,6 +628,7 @@ mod tests {
           "https://static.seedance2-pro.com/materials/20260315/1773594284659-3a46d231.mp4".to_string(),
         ]),
         reference_audio_urls: None,
+        character_ids: None,
         use_face_blur_hack: None,
         host_override: None,
       };
@@ -671,6 +683,7 @@ mod tests {
           result.public_url,
         ]),
         reference_audio_urls: None,
+        character_ids: None,
         use_face_blur_hack: None,
         host_override: None,
       };
@@ -720,6 +733,7 @@ mod tests {
         reference_image_urls: None,
         reference_video_urls: None,
         reference_audio_urls: None,
+        character_ids: None,
         use_face_blur_hack: None,
         host_override: None,
       };
@@ -771,6 +785,7 @@ mod tests {
         reference_image_urls: None,
         reference_video_urls: None,
         reference_audio_urls: None,
+        character_ids: None,
         use_face_blur_hack: None,
         host_override: None,
       };
@@ -829,6 +844,7 @@ mod tests {
         reference_image_urls: Some(uploaded_urls),
         reference_video_urls: None,
         reference_audio_urls: None,
+        character_ids: None,
         use_face_blur_hack: None,
         host_override: None,
       };
@@ -880,6 +896,7 @@ mod tests {
         reference_image_urls: None,
         reference_video_urls: None,
         reference_audio_urls: Some(vec![upload_result.public_url]),
+        character_ids: None,
         use_face_blur_hack: None,
         host_override: None,
       };
@@ -890,6 +907,138 @@ mod tests {
       assert!(!result.order_id.is_empty());
       assert_eq!(1, 2); // NB: Intentional failure to inspect output.
       Ok(())
+    }
+
+    mod character_tests {
+      use super::*;
+
+      const STEAMPUNK_CLOWN_ID: &str = "char_1775176566518_sik0te";
+      const MOCHI_ID: &str = "char_1775177718294_g2pitx";
+
+      #[tokio::test]
+      #[ignore] // manually test — requires real cookies, costs money
+      async fn test_text_prompt_with_character_pro() -> AnyhowResult<()> {
+        setup_test_logging(LevelFilter::Trace);
+        let session = test_session()?;
+        let args = GenerateVideoArgs {
+          session: &session,
+          model_type: ModelType::Seedance2Pro,
+          prompt: "@Steampunk Clown is juggling flaming torches in a circus tent.".to_string(),
+          resolution: Resolution::Landscape16x9,
+          duration_seconds: 5,
+          batch_count: BatchCount::One,
+          start_frame_url: None,
+          end_frame_url: None,
+          reference_image_urls: None,
+          reference_video_urls: None,
+          reference_audio_urls: None,
+          character_ids: Some(vec![STEAMPUNK_CLOWN_ID.to_string()]),
+          use_face_blur_hack: None,
+          host_override: None,
+        };
+        let result = generate_video(args).await?;
+        println!("Task ID: {}", result.task_id);
+        println!("Order ID: {}", result.order_id);
+        assert!(!result.task_id.is_empty());
+        assert!(!result.order_id.is_empty());
+        assert_eq!(1, 2); // NB: Intentional failure to inspect output.
+        Ok(())
+      }
+
+      #[tokio::test]
+      #[ignore] // manually test — requires real cookies, costs money
+      async fn test_text_prompt_with_character_fast() -> AnyhowResult<()> {
+        setup_test_logging(LevelFilter::Trace);
+        let session = test_session()?;
+        let args = GenerateVideoArgs {
+          session: &session,
+          model_type: ModelType::Seedance2Fast,
+          prompt: "@Mochi the female shiba inu is eating a cheese pizza while standing on the table".to_string(),
+          resolution: Resolution::Portrait9x16,
+          duration_seconds: 5,
+          batch_count: BatchCount::One,
+          start_frame_url: None,
+          end_frame_url: None,
+          reference_image_urls: None,
+          reference_video_urls: None,
+          reference_audio_urls: None,
+          character_ids: Some(vec![MOCHI_ID.to_string()]),
+          use_face_blur_hack: None,
+          host_override: None,
+        };
+        let result = generate_video(args).await?;
+        println!("Task ID: {}", result.task_id);
+        println!("Order ID: {}", result.order_id);
+        assert!(!result.task_id.is_empty());
+        assert!(!result.order_id.is_empty());
+        assert_eq!(1, 2); // NB: Intentional failure to inspect output.
+        Ok(())
+      }
+
+      #[tokio::test]
+      #[ignore] // manually test — requires real cookies, costs money
+      async fn test_character_with_image_ref_pro() -> AnyhowResult<()> {
+        setup_test_logging(LevelFilter::Trace);
+        let session = test_session()?;
+        let args = GenerateVideoArgs {
+          session: &session,
+          model_type: ModelType::Seedance2Pro,
+          prompt: "@Steampunk Clown is walking up to pet a dog on the couch.".to_string(),
+          resolution: Resolution::Landscape16x9,
+          duration_seconds: 5,
+          batch_count: BatchCount::One,
+          start_frame_url: None,
+          end_frame_url: None,
+          reference_image_urls: Some(vec![
+            "https://static.seedance2-pro.com/materials/20260329/1774752385699-1ff44886.jpeg".to_string(),
+          ]),
+          reference_video_urls: None,
+          reference_audio_urls: None,
+          character_ids: Some(vec![STEAMPUNK_CLOWN_ID.to_string()]),
+          use_face_blur_hack: None,
+          host_override: None,
+        };
+        let result = generate_video(args).await?;
+        println!("Task ID: {}", result.task_id);
+        println!("Order ID: {}", result.order_id);
+        assert!(!result.task_id.is_empty());
+        assert!(!result.order_id.is_empty());
+        assert_eq!(1, 2); // NB: Intentional failure to inspect output.
+        Ok(())
+      }
+
+      #[tokio::test]
+      #[ignore] // manually test — requires real cookies, costs money
+      async fn test_two_characters_fast() -> AnyhowResult<()> {
+        setup_test_logging(LevelFilter::Trace);
+        let session = test_session()?;
+        let args = GenerateVideoArgs {
+          session: &session,
+          model_type: ModelType::Seedance2Fast,
+          prompt: "@Steampunk Clown and @Mochi are playing fetch in a sunny park.".to_string(),
+          resolution: Resolution::Landscape16x9,
+          duration_seconds: 5,
+          batch_count: BatchCount::One,
+          start_frame_url: None,
+          end_frame_url: None,
+          reference_image_urls: None,
+          reference_video_urls: None,
+          reference_audio_urls: None,
+          character_ids: Some(vec![
+            STEAMPUNK_CLOWN_ID.to_string(),
+            MOCHI_ID.to_string(),
+          ]),
+          use_face_blur_hack: None,
+          host_override: None,
+        };
+        let result = generate_video(args).await?;
+        println!("Task ID: {}", result.task_id);
+        println!("Order ID: {}", result.order_id);
+        assert!(!result.task_id.is_empty());
+        assert!(!result.order_id.is_empty());
+        assert_eq!(1, 2); // NB: Intentional failure to inspect output.
+        Ok(())
+      }
     }
   }
 }
