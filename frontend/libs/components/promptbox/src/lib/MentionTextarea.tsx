@@ -1,11 +1,16 @@
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { twMerge } from "tailwind-merge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/pro-solid-svg-icons";
-import {
-  faVideo,
-  faMusic,
-} from "@fortawesome/pro-regular-svg-icons";
+import { faVideo, faMusic } from "@fortawesome/pro-regular-svg-icons";
 
 export interface MentionItem {
   label: string;
@@ -280,349 +285,363 @@ function MentionDropdown({
 // MentionTextarea Component
 // ---------------------------------------------------------------------------
 
-export const MentionTextarea = forwardRef<HTMLDivElement, MentionTextareaProps>(function MentionTextarea({
-  value,
-  onChange,
-  mentionItems,
-  placeholder,
-  className,
-  onKeyDown: externalOnKeyDown,
-  onFocus,
-  onBlur,
-  disabled,
-  colorMap,
-}, ref) {
-  const editorRef = useRef<HTMLDivElement>(null);
-  useImperativeHandle(ref, () => editorRef.current!, []);
-  const isInternalUpdate = useRef(false);
-  const isComposing = useRef(false);
-  const pendingCaret = useRef<number | null>(null);
-
-  const [mentionState, setMentionState] = useState<MentionState>({
-    isOpen: false,
-    triggerIndex: -1,
-    query: "",
-    activeIndex: 0,
-  });
-
-  // Pixel position of the @ trigger relative to the wrapper div
-  const [dropdownPos, setDropdownPos] = useState<{ left: number; bottom: number }>({ left: 0, bottom: 0 });
-
-  const filteredItems = useMemo(() => {
-    if (!mentionState.isOpen) return [];
-    return mentionItems.filter((item) =>
-      mentionState.query
-        ? item.label.toLowerCase().includes(mentionState.query.toLowerCase())
-        : true,
-    );
-  }, [mentionItems, mentionState.isOpen, mentionState.query]);
-
-  // Build a regex that matches any known mention label (supports spaces in names)
-  // Sort longest-first so "@Pumpkin Head" matches before "@Pumpkin"
-  const mentionRegex = useMemo(() => {
-    const labels = mentionItems.map((item) => item.label);
-    if (labels.length === 0) return null;
-    const sorted = [...labels].sort((a, b) => b.length - a.length);
-    const pattern = sorted.map((l) => escapeRegex(l)).join("|");
-    return new RegExp(`(${pattern})`, "g");
-  }, [mentionItems]);
-
-  // Build innerHTML with colored @mentions inline
-  const buildHTML = useCallback(
-    (text: string): string => {
-      if (!text) return "";
-      if (!mentionRegex) {
-        let html = escapeHTML(text);
-        html = html.replace(/\n/g, "<br>");
-        if (html.endsWith("<br>")) html += "<br>";
-        return html;
-      }
-
-      let html = "";
-      let lastIndex = 0;
-      const regex = new RegExp(mentionRegex);
-      let match: RegExpExecArray | null;
-
-      // biome-ignore lint/suspicious/noAssignInExpressions: --
-      while ((match = regex.exec(text)) !== null) {
-        const fullMatch = match[0];
-        const color = colorMap[fullMatch];
-
-        if (match.index > lastIndex) {
-          html += escapeHTML(text.slice(lastIndex, match.index));
-        }
-
-        if (color) {
-          html += `<span style="color:${color}">${escapeHTML(fullMatch)}</span>`;
-        } else {
-          html += escapeHTML(fullMatch);
-        }
-
-        lastIndex = match.index + fullMatch.length;
-      }
-
-      if (lastIndex < text.length) {
-        html += escapeHTML(text.slice(lastIndex));
-      }
-
-      html = html.replace(/\n/g, "<br>");
-      if (html.endsWith("<br>")) {
-        html += "<br>";
-      }
-
-      return html;
+export const MentionTextarea = forwardRef<HTMLDivElement, MentionTextareaProps>(
+  function MentionTextarea(
+    {
+      value,
+      onChange,
+      mentionItems,
+      placeholder,
+      className,
+      onKeyDown: externalOnKeyDown,
+      onFocus,
+      onBlur,
+      disabled,
+      colorMap,
     },
-    [colorMap, mentionRegex],
-  );
+    ref,
+  ) {
+    const editorRef = useRef<HTMLDivElement>(null);
+    useImperativeHandle(ref, () => editorRef.current!, []);
+    const isInternalUpdate = useRef(false);
+    const isComposing = useRef(false);
+    const pendingCaret = useRef<number | null>(null);
 
-  // Sync DOM when value changes from parent (not from user input)
-  useEffect(() => {
-    if (isInternalUpdate.current) {
-      isInternalUpdate.current = false;
-      return;
-    }
+    const [mentionState, setMentionState] = useState<MentionState>({
+      isOpen: false,
+      triggerIndex: -1,
+      query: "",
+      activeIndex: 0,
+    });
 
-    const el = editorRef.current;
-    if (!el) return;
+    // Pixel position of the @ trigger relative to the wrapper div
+    const [dropdownPos, setDropdownPos] = useState<{
+      left: number;
+      bottom: number;
+    }>({ left: 0, bottom: 0 });
 
-    const caret = pendingCaret.current ?? getCaretOffset(el);
-    el.innerHTML = buildHTML(value);
-    if (pendingCaret.current !== null) {
-      setCaretOffset(el, pendingCaret.current);
-      pendingCaret.current = null;
-    } else if (document.activeElement === el) {
-      setCaretOffset(el, caret);
-    }
-  }, [value, buildHTML]);
+    const filteredItems = useMemo(() => {
+      if (!mentionState.isOpen) return [];
+      return mentionItems.filter((item) =>
+        mentionState.query
+          ? item.label.toLowerCase().includes(mentionState.query.toLowerCase())
+          : true,
+      );
+    }, [mentionItems, mentionState.isOpen, mentionState.query]);
 
-  // Get pixel coordinates of a text offset relative to the wrapper
-  const getOffsetRect = useCallback((charOffset: number) => {
-    const el = editorRef.current;
-    if (!el) return null;
+    // Build a regex that matches any known mention label (supports spaces in names)
+    // Sort longest-first so "@Pumpkin Head" matches before "@Pumpkin"
+    const mentionRegex = useMemo(() => {
+      const labels = mentionItems.map((item) => item.label);
+      if (labels.length === 0) return null;
+      const sorted = [...labels].sort((a, b) => b.length - a.length);
+      const pattern = sorted.map((l) => escapeRegex(l)).join("|");
+      return new RegExp(`(${pattern})`, "g");
+    }, [mentionItems]);
 
-    // Temporarily place caret at charOffset to measure position
-    const saved = getCaretOffset(el);
-    setCaretOffset(el, charOffset);
-    const sel = window.getSelection();
-    if (!sel?.rangeCount) {
-      setCaretOffset(el, saved);
-      return null;
-    }
-    const range = sel.getRangeAt(0);
-    const rect = range.getBoundingClientRect();
-    const wrapperRect = el.parentElement!.getBoundingClientRect();
-    setCaretOffset(el, saved);
+    // Build innerHTML with colored @mentions inline
+    const buildHTML = useCallback(
+      (text: string): string => {
+        if (!text) return "";
+        if (!mentionRegex) {
+          let html = escapeHTML(text);
+          html = html.replace(/\n/g, "<br>");
+          if (html.endsWith("<br>")) html += "<br>";
+          return html;
+        }
 
-    return {
-      left: rect.left - wrapperRect.left,
-      bottom: wrapperRect.bottom - rect.top,
-    };
-  }, []);
+        let html = "";
+        let lastIndex = 0;
+        const regex = new RegExp(mentionRegex);
+        let match: RegExpExecArray | null;
 
-  // Detect @mention trigger from cursor position
-  // Supports multi-word names by scanning back to the nearest @
-  const detectMention = useCallback((text: string, cursorPos: number) => {
-    // Find the last @ before cursor
-    const textBefore = text.slice(0, cursorPos);
-    const lastAt = textBefore.lastIndexOf("@");
-    if (lastAt !== -1 && (lastAt === 0 || /\s/.test(text[lastAt - 1]))) {
-      const query = text.slice(lastAt, cursorPos); // includes @
-      // Only open if there's no newline in the query
-      if (!query.includes("\n")) {
-        const pos = getOffsetRect(lastAt);
-        if (pos) setDropdownPos(pos);
-        setMentionState({
-          isOpen: true,
-          triggerIndex: lastAt,
-          query,
-          activeIndex: 0,
-        });
+        // biome-ignore lint/suspicious/noAssignInExpressions: --
+        while ((match = regex.exec(text)) !== null) {
+          const fullMatch = match[0];
+          const color = colorMap[fullMatch];
+
+          if (match.index > lastIndex) {
+            html += escapeHTML(text.slice(lastIndex, match.index));
+          }
+
+          if (color) {
+            html += `<span style="color:${color}">${escapeHTML(fullMatch)}</span>`;
+          } else {
+            html += escapeHTML(fullMatch);
+          }
+
+          lastIndex = match.index + fullMatch.length;
+        }
+
+        if (lastIndex < text.length) {
+          html += escapeHTML(text.slice(lastIndex));
+        }
+
+        html = html.replace(/\n/g, "<br>");
+        if (html.endsWith("<br>")) {
+          html += "<br>";
+        }
+
+        return html;
+      },
+      [colorMap, mentionRegex],
+    );
+
+    // Sync DOM when value changes from parent (not from user input)
+    useEffect(() => {
+      if (isInternalUpdate.current) {
+        isInternalUpdate.current = false;
         return;
       }
-    }
-    setMentionState((prev) =>
-      prev.isOpen ? { ...prev, isOpen: false } : prev,
-    );
-  }, [getOffsetRect]);
 
-  // Extract text and re-render with mention styling
-  const handleInput = useCallback(() => {
-    if (isComposing.current) return;
-    const el = editorRef.current;
-    if (!el) return;
-
-    let text = el.innerText;
-    if (text.endsWith("\n")) {
-      text = text.slice(0, -1);
-    }
-
-    const caret = getCaretOffset(el);
-    const html = buildHTML(text);
-    if (el.innerHTML !== html) {
-      el.innerHTML = html;
-      setCaretOffset(el, caret);
-    }
-
-    isInternalUpdate.current = true;
-    onChange(text);
-    detectMention(text, caret);
-
-    // Keep caret visible when content overflows (contentEditable doesn't auto-scroll)
-    requestAnimationFrame(() => {
-      scrollCaretIntoView(el);
-    });
-  }, [onChange, buildHTML, detectMention]);
-
-  const handleCompositionStart = useCallback(() => {
-    isComposing.current = true;
-  }, []);
-
-  const handleCompositionEnd = useCallback(() => {
-    isComposing.current = false;
-    handleInput();
-  }, [handleInput]);
-
-  // Select a mention from the dropdown
-  const handleSelect = useCallback(
-    (item: MentionItem) => {
       const el = editorRef.current;
       if (!el) return;
 
-      const caretPos = getCaretOffset(el);
-      const before = value.slice(0, mentionState.triggerIndex);
-      const after = value.slice(caretPos);
-      const mention = `${item.label} `;
-      const newValue = before + mention + after;
+      const caret = pendingCaret.current ?? getCaretOffset(el);
+      el.innerHTML = buildHTML(value);
+      if (pendingCaret.current !== null) {
+        setCaretOffset(el, pendingCaret.current);
+        pendingCaret.current = null;
+      } else if (document.activeElement === el) {
+        setCaretOffset(el, caret);
+      }
+    }, [value, buildHTML]);
 
-      pendingCaret.current = before.length + mention.length;
+    // Get pixel coordinates of a text offset relative to the wrapper
+    const getOffsetRect = useCallback((charOffset: number) => {
+      const el = editorRef.current;
+      if (!el) return null;
 
-      setMentionState({
-        isOpen: false,
-        triggerIndex: -1,
-        query: "",
-        activeIndex: 0,
-      });
+      // Temporarily place caret at charOffset to measure position
+      const saved = getCaretOffset(el);
+      setCaretOffset(el, charOffset);
+      const sel = window.getSelection();
+      if (!sel?.rangeCount) {
+        setCaretOffset(el, saved);
+        return null;
+      }
+      const range = sel.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      const wrapperRect = el.parentElement!.getBoundingClientRect();
+      setCaretOffset(el, saved);
 
-      onChange(newValue);
+      return {
+        left: rect.left - wrapperRect.left,
+        bottom: wrapperRect.bottom - rect.top,
+      };
+    }, []);
 
+    // Detect @mention trigger from cursor position
+    // Supports multi-word names by scanning back to the nearest @
+    const detectMention = useCallback(
+      (text: string, cursorPos: number) => {
+        // Find the last @ before cursor
+        const textBefore = text.slice(0, cursorPos);
+        const lastAt = textBefore.lastIndexOf("@");
+        if (lastAt !== -1 && (lastAt === 0 || /\s/.test(text[lastAt - 1]))) {
+          const query = text.slice(lastAt, cursorPos); // includes @
+          // Only open if there's no newline in the query
+          if (!query.includes("\n")) {
+            const pos = getOffsetRect(lastAt);
+            if (pos) setDropdownPos(pos);
+            setMentionState({
+              isOpen: true,
+              triggerIndex: lastAt,
+              query,
+              activeIndex: 0,
+            });
+            return;
+          }
+        }
+        setMentionState((prev) =>
+          prev.isOpen ? { ...prev, isOpen: false } : prev,
+        );
+      },
+      [getOffsetRect],
+    );
+
+    // Extract text and re-render with mention styling
+    const handleInput = useCallback(() => {
+      if (isComposing.current) return;
+      const el = editorRef.current;
+      if (!el) return;
+
+      let text = el.innerText;
+      if (text.endsWith("\n")) {
+        text = text.slice(0, -1);
+      }
+
+      const caret = getCaretOffset(el);
+      const html = buildHTML(text);
+      if (el.innerHTML !== html) {
+        el.innerHTML = html;
+        setCaretOffset(el, caret);
+      }
+
+      isInternalUpdate.current = true;
+      onChange(text);
+      detectMention(text, caret);
+
+      // Keep caret visible when content overflows (contentEditable doesn't auto-scroll)
       requestAnimationFrame(() => {
-        el.focus();
+        scrollCaretIntoView(el);
       });
-    },
-    [value, mentionState.triggerIndex, onChange],
-  );
+    }, [onChange, buildHTML, detectMention]);
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (mentionState.isOpen && filteredItems.length > 0) {
-        if (e.key === "ArrowDown") {
+    const handleCompositionStart = useCallback(() => {
+      isComposing.current = true;
+    }, []);
+
+    const handleCompositionEnd = useCallback(() => {
+      isComposing.current = false;
+      handleInput();
+    }, [handleInput]);
+
+    // Select a mention from the dropdown
+    const handleSelect = useCallback(
+      (item: MentionItem) => {
+        const el = editorRef.current;
+        if (!el) return;
+
+        const caretPos = getCaretOffset(el);
+        const before = value.slice(0, mentionState.triggerIndex);
+        const after = value.slice(caretPos);
+        const mention = `${item.label} `;
+        const newValue = before + mention + after;
+
+        pendingCaret.current = before.length + mention.length;
+
+        setMentionState({
+          isOpen: false,
+          triggerIndex: -1,
+          query: "",
+          activeIndex: 0,
+        });
+
+        onChange(newValue);
+
+        requestAnimationFrame(() => {
+          el.focus();
+        });
+      },
+      [value, mentionState.triggerIndex, onChange],
+    );
+
+    const handleKeyDown = useCallback(
+      (e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (mentionState.isOpen && filteredItems.length > 0) {
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setMentionState((prev) => ({
+              ...prev,
+              activeIndex: Math.min(
+                prev.activeIndex + 1,
+                filteredItems.length - 1,
+              ),
+            }));
+            return;
+          }
+          if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setMentionState((prev) => ({
+              ...prev,
+              activeIndex: Math.max(prev.activeIndex - 1, 0),
+            }));
+            return;
+          }
+          if (e.key === "Enter" || e.key === "Tab") {
+            e.preventDefault();
+            handleSelect(filteredItems[mentionState.activeIndex]);
+            return;
+          }
+          if (e.key === "Escape") {
+            e.preventDefault();
+            setMentionState((prev) => ({ ...prev, isOpen: false }));
+            return;
+          }
+        }
+
+        // Shift+Enter (or Cmd+Enter on Mac): insert a newline instead of
+        // letting the contentEditable create a <div>
+        if (e.key === "Enter" && (e.shiftKey || e.metaKey)) {
           e.preventDefault();
-          setMentionState((prev) => ({
-            ...prev,
-            activeIndex: Math.min(prev.activeIndex + 1, filteredItems.length - 1),
-          }));
+          document.execCommand("insertLineBreak");
+          handleInput();
+          // Scroll caret into view (textarea does this automatically, contentEditable does not)
+          scrollCaretIntoView(editorRef.current!);
           return;
         }
-        if (e.key === "ArrowUp") {
-          e.preventDefault();
-          setMentionState((prev) => ({
-            ...prev,
-            activeIndex: Math.max(prev.activeIndex - 1, 0),
-          }));
-          return;
-        }
-        if (e.key === "Enter" || e.key === "Tab") {
-          e.preventDefault();
-          handleSelect(filteredItems[mentionState.activeIndex]);
-          return;
-        }
-        if (e.key === "Escape") {
-          e.preventDefault();
-          setMentionState((prev) => ({ ...prev, isOpen: false }));
-          return;
-        }
+
+        externalOnKeyDown?.(e);
+      },
+      [
+        mentionState.isOpen,
+        mentionState.activeIndex,
+        filteredItems,
+        handleSelect,
+        externalOnKeyDown,
+        handleInput,
+      ],
+    );
+
+    const handleClick = useCallback(() => {
+      const el = editorRef.current;
+      if (el) {
+        detectMention(value, getCaretOffset(el));
       }
+    }, [value, detectMention]);
 
-      // Shift+Enter (or Cmd+Enter on Mac): insert a newline instead of
-      // letting the contentEditable create a <div>
-      if (e.key === "Enter" && (e.shiftKey || e.metaKey)) {
+    const handlePaste = useCallback(
+      (e: React.ClipboardEvent<HTMLDivElement>) => {
         e.preventDefault();
-        document.execCommand("insertLineBreak");
-        handleInput();
-        // Scroll caret into view (textarea does this automatically, contentEditable does not)
-        scrollCaretIntoView(editorRef.current!);
-        return;
-      }
+        const text = e.clipboardData.getData("text/plain");
+        document.execCommand("insertText", false, text);
+      },
+      [],
+    );
 
-      externalOnKeyDown?.(e);
-    },
-    [
-      mentionState.isOpen,
-      mentionState.activeIndex,
-      filteredItems,
-      handleSelect,
-      externalOnKeyDown,
-      handleInput,
-    ],
-  );
+    return (
+      <div className="relative flex-1 min-w-0 pb-[7px]">
+        {!value && placeholder && (
+          <div
+            className={twMerge(
+              className,
+              "absolute inset-0 pointer-events-none text-base-fg/60 z-[1]",
+            )}
+          >
+            {placeholder}
+          </div>
+        )}
 
-  const handleClick = useCallback(() => {
-    const el = editorRef.current;
-    if (el) {
-      detectMention(value, getCaretOffset(el));
-    }
-  }, [value, detectMention]);
-
-  const handlePaste = useCallback(
-    (e: React.ClipboardEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      const text = e.clipboardData.getData("text/plain");
-      document.execCommand("insertText", false, text);
-    },
-    [],
-  );
-
-  return (
-    <div className="relative flex-1 min-w-0">
-      {!value && placeholder && (
         <div
+          ref={editorRef}
+          contentEditable={!disabled}
+          onInput={handleInput}
+          onCompositionStart={handleCompositionStart}
+          onCompositionEnd={handleCompositionEnd}
+          onKeyDown={handleKeyDown}
+          onClick={handleClick}
+          onPaste={handlePaste}
+          onFocus={onFocus}
+          onBlur={onBlur}
           className={twMerge(
             className,
-            "absolute inset-0 pointer-events-none text-base-fg/60 z-[1]",
+            "outline-none whitespace-pre-wrap break-words overflow-y-auto",
           )}
-        >
-          {placeholder}
-        </div>
-      )}
-
-      <div
-        ref={editorRef}
-        contentEditable={!disabled}
-        onInput={handleInput}
-        onCompositionStart={handleCompositionStart}
-        onCompositionEnd={handleCompositionEnd}
-        onKeyDown={handleKeyDown}
-        onClick={handleClick}
-        onPaste={handlePaste}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        className={twMerge(
-          className,
-          "outline-none whitespace-pre-wrap break-words overflow-y-auto",
-        )}
-      />
-
-      {mentionState.isOpen && filteredItems.length > 0 && (
-        <MentionDropdown
-          items={filteredItems}
-          activeIndex={mentionState.activeIndex}
-          onSelect={handleSelect}
-          onHover={(i) =>
-            setMentionState((prev) => ({ ...prev, activeIndex: i }))
-          }
-          position={dropdownPos}
         />
-      )}
-    </div>
-  );
-});
+
+        {mentionState.isOpen && filteredItems.length > 0 && (
+          <MentionDropdown
+            items={filteredItems}
+            activeIndex={mentionState.activeIndex}
+            onSelect={handleSelect}
+            onHover={(i) =>
+              setMentionState((prev) => ({ ...prev, activeIndex: i }))
+            }
+            position={dropdownPos}
+          />
+        )}
+      </div>
+    );
+  },
+);

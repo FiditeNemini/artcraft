@@ -1132,6 +1132,17 @@ export const PromptBoxVideo = ({
           const spaceBefore = prompt.length > 0 && !prompt.endsWith(" ") ? " " : "";
           setPrompt(prompt + spaceBefore + mention + " ");
           setIsCharactersModalOpen(false);
+          requestAnimationFrame(() => {
+            const el = mentionEditorRef.current;
+            if (el) {
+              el.focus();
+              const sel = window.getSelection();
+              if (sel) {
+                sel.selectAllChildren(el);
+                sel.collapseToEnd();
+              }
+            }
+          });
         }}
       />
       <GalleryModal
