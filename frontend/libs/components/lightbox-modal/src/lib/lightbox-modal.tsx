@@ -389,6 +389,12 @@ export function LightboxModal({
     emblaMainApi.on("select", onSelect).on("reInit", onSelect);
   }, [emblaMainApi, onSelect]);
 
+  // Re-initialize Embla when slides change so it picks up the new DOM children
+  useEffect(() => {
+    emblaMainApi?.reInit();
+    emblaThumbsApi?.reInit();
+  }, [effectiveImageUrls, emblaMainApi, emblaThumbsApi]);
+
   useEffect(() => {
     const idx = initialIndex ?? 0;
     setSelectedIndex(idx);

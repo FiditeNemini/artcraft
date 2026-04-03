@@ -790,9 +790,14 @@ export const GalleryModal = React.memo(
 
     useSignals();
 
-    // Synchronize lightbox image when external media id signal is set
+    // Synchronize lightbox image when external media id signal is set.
+    // Skip if the signal already carries carousel data (imageUrls / batchImageToken)
+    // set by the caller (e.g. TextToImage batch, TaskQueue) — overwriting it with
+    // the plain gallery item would strip those fields and break the carousel.
     useEffect(() => {
       if (galleryModalLightboxMediaId.value && allItems.length > 0) {
+        const current = lightboxImageSignal.value as any;
+        if (current?.imageUrls?.length > 0 || current?.batchImageToken) return;
         const target = allItems.find(
           (it) => it.id === galleryModalLightboxMediaId.value,
         );
