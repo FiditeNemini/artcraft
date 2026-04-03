@@ -26,6 +26,11 @@ import { useCharactersStore } from "./promptStore";
 import { Input } from "@storyteller/ui-input";
 import { Button } from "@storyteller/ui-button";
 import { Label } from "@storyteller/ui-label";
+import {
+  showActionReminder,
+  isActionReminderOpen,
+  actionReminderProps,
+} from "@storyteller/ui-action-reminder-modal";
 
 interface CharactersModalProps {
   isOpen: boolean;
@@ -147,7 +152,7 @@ const CharacterListView = ({
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(false);
   const [cursor, setCursor] = useState<number | undefined>(undefined);
-  const [deletingToken, setDeletingToken] = useState<string | null>(null);
+
   const sentinelRef = useRef<HTMLDivElement>(null);
   const loadingMoreRef = useRef(false);
   const storeSetCharacters = useCharactersStore((s) => s.setCharacters);
@@ -246,28 +251,49 @@ const CharacterListView = ({
     return () => observer.disconnect();
   }, [hasMore, cursor, fetchCharacters]);
 
-  const handleDelete = async (character: Character) => {
-    setDeletingToken(character.token);
-    try {
-      const api = new CharactersApi();
-      const res = await api.DeleteCharacter({
-        characterToken: character.token,
-      });
+  const handleDelete = (character: Character) => {
+    showActionReminder({
+      reminderType: "default",
+      title: "Delete character?",
+      message: (
+        <p className="text-sm text-white/70">
+          This will permanently delete <strong>{character.name}</strong>. This
+          action cannot be undone.
+        </p>
+      ),
+      primaryActionText: "Delete",
+      primaryActionIcon: faTrashAlt,
+      secondaryActionText: "Cancel",
+      primaryActionBtnClassName: "bg-red text-white hover:bg-red/90",
+      onPrimaryAction: async () => {
+        if (actionReminderProps.value) {
+          actionReminderProps.value = {
+            ...actionReminderProps.value,
+            isLoading: true,
+          };
+        }
+        try {
+          const api = new CharactersApi();
+          const res = await api.DeleteCharacter({
+            characterToken: character.token,
+          });
 
-      if (res.success) {
-        setCharacters((prev) =>
-          prev.filter((c) => c.token !== character.token),
-        );
-        storeRemoveCharacter(character.token);
-        toast.success(`Character "${character.name}" deleted`);
-      } else {
-        toast.error(res.errorMessage || "Failed to delete character");
-      }
-    } catch {
-      toast.error("Failed to delete character");
-    } finally {
-      setDeletingToken(null);
-    }
+          if (res.success) {
+            setCharacters((prev) =>
+              prev.filter((c) => c.token !== character.token),
+            );
+            storeRemoveCharacter(character.token);
+            toast.success(`Character "${character.name}" deleted`);
+          } else {
+            toast.error(res.errorMessage || "Failed to delete character");
+          }
+        } catch {
+          toast.error("Failed to delete character");
+        } finally {
+          isActionReminderOpen.value = false;
+        }
+      },
+    });
   };
 
   return (
@@ -355,7 +381,6 @@ const CharacterListView = ({
 
           {characters.map((character) => {
             const isUserCreated = character.is_user_created !== false;
-            const isDeleting = deletingToken === character.token;
 
             return (
               <div
@@ -407,20 +432,12 @@ const CharacterListView = ({
                         e.stopPropagation();
                         handleDelete(character);
                       }}
-                      disabled={isDeleting}
                       className="flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white/80 transition-colors hover:bg-red-500"
                     >
-                      {isDeleting ? (
-                        <FontAwesomeIcon
-                          icon={faSpinnerThird}
-                          className="text-[10px] animate-spin"
-                        />
-                      ) : (
-                        <FontAwesomeIcon
-                          icon={faTrashAlt}
-                          className="text-[10px]"
-                        />
-                      )}
+                      <FontAwesomeIcon
+                        icon={faTrashAlt}
+                        className="text-[10px]"
+                      />
                     </button>
                   </div>
                 )}
