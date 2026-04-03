@@ -26,6 +26,9 @@ if (import.meta.env.DEV) {
 if (!(window as any).cached_referrer) {
   (window as any).cached_referrer = document.referrer || undefined;
 }
+if (!(window as any).cached_landing_url) {
+  (window as any).cached_landing_url = window.location.href || undefined;
+}
 
 // Fire-and-forget: log the referral once per browser session
 if (!sessionStorage.getItem("referral_logged")) {

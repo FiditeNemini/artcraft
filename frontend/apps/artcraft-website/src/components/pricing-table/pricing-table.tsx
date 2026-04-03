@@ -193,6 +193,7 @@ const PricingTable = ({
           plan: apiPlanSlug,
           cadence: cadence,
           maybeReferralUrl: (window as any).cached_referrer,
+          maybeLandingUrl: (window as any).cached_landing_url,
         });
 
         if (!response.success || !response.data) {

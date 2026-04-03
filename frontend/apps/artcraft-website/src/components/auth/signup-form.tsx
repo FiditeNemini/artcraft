@@ -58,6 +58,7 @@ export const SignupForm = ({
       passwordConfirmation: password,
       signupSource,
       maybeReferralUrl: (window as any).cached_referrer,
+      maybeLandingUrl: (window as any).cached_landing_url,
     });
 
     setIsLoading(false);

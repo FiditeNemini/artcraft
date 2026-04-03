@@ -9,6 +9,7 @@ interface SignupRequest {
   password_confirmation: string;
   signup_source?: string;
   maybe_referral_url?: string;
+  maybe_landing_url?: string;
 }
 
 export class UsersApi extends ApiManager {
@@ -202,6 +203,7 @@ export class UsersApi extends ApiManager {
     passwordConfirmation,
     signupSource,
     maybeReferralUrl,
+    maybeLandingUrl,
   }: {
     username: string;
     email: string;
@@ -209,6 +211,7 @@ export class UsersApi extends ApiManager {
     passwordConfirmation: string;
     signupSource?: string;
     maybeReferralUrl?: string;
+    maybeLandingUrl?: string;
   }): Promise<ApiResponse<{ signedSession?: string }>> {
     const endpoint = `${this.getApiSchemeAndHost()}/v1/create_account`;
     const body: SignupRequest = {
@@ -222,6 +225,9 @@ export class UsersApi extends ApiManager {
     }
     if (maybeReferralUrl) {
       body.maybe_referral_url = maybeReferralUrl;
+    }
+    if (maybeLandingUrl) {
+      body.maybe_landing_url = maybeLandingUrl;
     }
 
     try {
@@ -259,16 +265,21 @@ export class UsersApi extends ApiManager {
   public async GoogleSSO({
     credential,
     maybeReferralUrl,
+    maybeLandingUrl,
   }: {
     credential: string;
     maybeReferralUrl?: string;
+    maybeLandingUrl?: string;
   }): Promise<ApiResponse<{ usernameNotYetCustomized?: boolean }>> {
     const endpoint = `${this.getApiSchemeAndHost()}/v1/accounts/google_sso`;
-    const body: { google_credential: string; maybe_referral_url?: string } = {
+    const body: { google_credential: string; maybe_referral_url?: string; maybe_landing_url?: string } = {
       google_credential: credential,
     };
     if (maybeReferralUrl) {
       body.maybe_referral_url = maybeReferralUrl;
+    }
+    if (maybeLandingUrl) {
+      body.maybe_landing_url = maybeLandingUrl;
     }
 
     try {
