@@ -450,10 +450,18 @@ export function LightboxModal({
 
       if (e.key === "ArrowLeft") {
         e.preventDefault();
-        emblaMainApi?.scrollPrev(true);
+        if (emblaMainApi && effectiveImageUrls.length > 1) {
+          emblaMainApi.scrollPrev(true);
+        } else {
+          onNavigatePrev?.();
+        }
       } else if (e.key === "ArrowRight") {
         e.preventDefault();
-        emblaMainApi?.scrollNext(true);
+        if (emblaMainApi && effectiveImageUrls.length > 1) {
+          emblaMainApi.scrollNext(true);
+        } else {
+          onNavigateNext?.();
+        }
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         onNavigatePrev?.();
@@ -464,7 +472,7 @@ export function LightboxModal({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, emblaMainApi, onNavigatePrev, onNavigateNext]);
+  }, [isOpen, emblaMainApi, effectiveImageUrls.length, onNavigatePrev, onNavigateNext]);
 
   return (
     <>
