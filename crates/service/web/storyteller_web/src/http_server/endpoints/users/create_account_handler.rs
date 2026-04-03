@@ -209,9 +209,9 @@ pub async fn create_account_handler(
       http_request.headers().get("referer")
         .and_then(|v| v.to_str().ok())
         .map(|s| s.to_string())
-    })
-    .filter(|s| !s.is_empty())
-    .map(|s| s.chars().take(255).collect::<String>());
+    });
+
+  let maybe_landing_url = request.maybe_landing_url.clone();
 
   let create_account_result = create_account_from_email_and_password(
     &mysql_pool,
@@ -224,6 +224,7 @@ pub async fn create_account_handler(
       ip_address: &ip_address,
       maybe_source,
       maybe_referral_url,
+      maybe_landing_url,
       maybe_user_token: None, // NB: This parameter is for internal testing only
     }
   ).await;
