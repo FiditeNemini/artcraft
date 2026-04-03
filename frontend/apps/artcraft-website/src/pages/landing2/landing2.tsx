@@ -3,8 +3,6 @@ import { Button } from "@storyteller/ui-button";
 import { isMobile } from "react-device-detect";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import {
-  faVolumeMute,
-  faVolumeHigh,
   faFilm,
   faPaintBrush,
   faCamera,
@@ -23,39 +21,30 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ModelBadgeGrid from "../../components/model-badge-grid";
 import Seo from "../../components/seo";
-
 import { OwnershipComparison } from "../../components/ownership-comparison/ownership-comparison";
 import { DownloadModal } from "../../components/download-modal";
-
 import { UsersApi } from "@storyteller/api";
 import { LandingActionButtons } from "../../components/landing-action-buttons";
 
 gsap.registerPlugin(ScrollTrigger);
 
-//const HERO_VIDEO_URL = "https://pub-f7441936e5804042a1ea2bdc92e4dc71.r2.dev/artcraft_commercial.mp4";
-const HERO_VIDEO_URL =
-  "https://pub-f7441936e5804042a1ea2bdc92e4dc71.r2.dev/artcraft_website_v2.mp4";
-
 const Landing = () => {
   const videos = [
+    {
+      src: "https://www.youtube.com/embed/HDdsKJl92H4?si=0Hm4AweSRHq3qRt6",
+    },
     {
       src: "https://www.youtube.com/embed/oqoCWdOwr2U?si=ILMPk8hGHo9hP8RU",
     },
     {
       src: "https://www.youtube.com/embed/H4NFXGMuwpY?si=wPuQl5cJOu1v8MJu",
     },
-    {
-      src: "https://www.youtube.com/embed/7x7IZkHiGD8?si=tL8nK4CULigpfHQR",
-    },
   ];
 
-  const [isMuted, setIsMuted] = useState(true);
-  const [isHovering, setIsHovering] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
   const [activeVideo, setActiveVideo] = useState<number | null>(null);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -230,16 +219,6 @@ const Landing = () => {
     }
   }, [activeFeature]);
 
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.muted = isMuted;
-      videoRef.current.volume = 0.1;
-    }
-  }, [isMuted]);
-
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-  };
 
   return (
     <div
@@ -315,39 +294,17 @@ const Landing = () => {
               data-animate
             >
               <div
-                className="relative rounded-[20px] sm:rounded-[32px] overflow-hidden bg-white/10 backdrop-blur-md md:backdrop-blur-xl shadow-2xl p-2 sm:p-4 aspect-[16/9] w-full mx-auto transition-transform duration-300 transform-gpu"
-                onMouseEnter={() => setIsHovering(true)}
-                onMouseLeave={() => setIsHovering(false)}
+                className="relative rounded-[20px] sm:rounded-[32px] overflow-hidden bg-white/10 backdrop-blur-md md:backdrop-blur-xl shadow-2xl p-2 sm:p-4 w-full mx-auto transition-transform duration-300 transform-gpu"
               >
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  loop
-                  playsInline
-                  muted
-                  preload="none"
-                  poster="/images/hero-poster.jpg"
-                  className="w-full h-full object-cover rounded-2xl bg-white"
-                  src={HERO_VIDEO_URL}
-                >
-                  <source src={HERO_VIDEO_URL} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-                <button
-                  onClick={toggleMute}
-                  className={`absolute top-4 right-4 sm:top-6 sm:right-6 z-20 p-2 bg-black bg-opacity-40 rounded-full w-10 h-10 md:w-12 md:h-12 text-white transition-opacity duration-200 hover:bg-opacity-80 text-md md:text-xl
-                              ${isMuted
-                      ? "opacity-100"
-                      : isHovering
-                        ? "opacity-100"
-                        : "opacity-0"
-                    }`}
-                  aria-label={isMuted ? "Unmute video" : "Mute video"}
-                >
-                  <FontAwesomeIcon
-                    icon={isMuted ? faVolumeMute : faVolumeHigh}
+                <div className="relative w-full rounded-2xl overflow-hidden" style={{ paddingTop: "56.25%" }}>
+                  <iframe
+                    src="https://player.vimeo.com/video/1179924350?h=8b9b3f0f35&autoplay=1&muted=1&loop=1&background=0&byline=0&portrait=0&title=0"
+                    className="absolute inset-0 w-full h-full rounded-2xl"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                    title="Seedance in ArtCraft"
                   />
-                </button>
+                </div>
               </div>
             </div>
           </div>
@@ -397,10 +354,11 @@ const Landing = () => {
                 <button
                   key={index}
                   onClick={() => setActiveFeature(index)}
-                  className={`snap-center shrink-0 px-5 py-2.5 rounded-full text-sm font-bold border transition-all duration-300 whitespace-nowrap ${activeFeature === index
+                  className={`snap-center shrink-0 px-5 py-2.5 rounded-full text-sm font-bold border transition-all duration-300 whitespace-nowrap ${
+                    activeFeature === index
                       ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
                       : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
-                    }`}
+                  }`}
                 >
                   {feature.title}
                 </button>
@@ -459,26 +417,29 @@ const Landing = () => {
                   >
                     <div className="max-w-lg">
                       <div
-                        className={`w-12 h-12 mb-6 rounded-2xl flex items-center justify-center text-2xl transition-all duration-500 ${activeFeature === index
+                        className={`w-12 h-12 mb-6 rounded-2xl flex items-center justify-center text-2xl transition-all duration-500 ${
+                          activeFeature === index
                             ? "bg-primary text-white shadow-lg shadow-primary/30 scale-110"
                             : "bg-white/10 text-white/50"
-                          }`}
+                        }`}
                       >
                         <FontAwesomeIcon icon={feature.icon} />
                       </div>
                       <h3
-                        className={`text-3xl xl:text-4xl font-bold mb-6 transition-all duration-500 ${activeFeature === index
+                        className={`text-3xl xl:text-4xl font-bold mb-6 transition-all duration-500 ${
+                          activeFeature === index
                             ? "text-white"
                             : "text-white/40"
-                          }`}
+                        }`}
                       >
                         {feature.title}
                       </h3>
                       <p
-                        className={`text-xl leading-relaxed transition-all duration-500 ${activeFeature === index
+                        className={`text-xl leading-relaxed transition-all duration-500 ${
+                          activeFeature === index
                             ? "text-white/80"
                             : "text-white/30"
-                          }`}
+                        }`}
                       >
                         {feature.description}
                       </p>
