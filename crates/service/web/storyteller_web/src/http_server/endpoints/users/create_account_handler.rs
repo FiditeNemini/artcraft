@@ -42,10 +42,14 @@ pub struct CreateAccountRequest {
   /// If not provided, we try to infer it from the Origin header instead.
   pub signup_source: Option<UserSignupSource>,
 
-  /// Optional: The referral URL the user arrived from when signing up.
+  /// Optional: The referral URL the user arrived from when first hitting the site, prior to navigation and signing up.
   /// The browser can send `document.referrer` to the backend so we know how people are finding us.
   /// If the browser doesn't send this parameter, we'll try the `referer` header.
   pub maybe_referral_url: Option<String>,
+
+  /// Optional: The URL where the user landed when they first arrived, prior to navigation and signing up.
+  /// The browser can send `window.location.href` to the backend so we know how people are finding us.
+  pub maybe_landing_url: Option<String>,
 }
 
 #[derive(ToSchema, Serialize)]
