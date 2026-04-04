@@ -71,7 +71,7 @@ pub async fn edit_character_handler(
   // --- Determine what to update ---
 
   let new_name = resolve_name_update(&request.updated_name);
-  let description_update = resolve_description_update(&request.updated_description);
+  let description_update = resolve_description_update(&request.updated_description)?;
 
   let has_name_change = new_name.is_some();
   let has_description_change = !matches!(description_update, DescriptionUpdateType::NoUpdate);
@@ -138,8 +138,9 @@ pub async fn edit_character_handler(
 
 // =============== Private helpers ===============
 
+use super::common::CHARACTER_MAX_DESCRIPTION_LENGTH;
+
 const MAX_NAME_LENGTH: usize = 50;
-const MAX_DESCRIPTION_LENGTH: usize = 500;
 
 enum DescriptionUpdateType {
   NoUpdate,
@@ -160,17 +161,23 @@ fn resolve_name_update(updated_name: &Option<String>) -> Option<String> {
 }
 
 /// Determine the description update type.
-fn resolve_description_update(updated_description: &Option<String>) -> DescriptionUpdateType {
+fn resolve_description_update(
+  updated_description: &Option<String>,
+) -> Result<DescriptionUpdateType, AdvancedCommonWebError> {
   let desc = match updated_description.as_ref() {
-    None => return DescriptionUpdateType::NoUpdate,
+    None => return Ok(DescriptionUpdateType::NoUpdate),
     Some(d) => d,
   };
 
   let trimmed = desc.trim();
   if trimmed.is_empty() {
-    DescriptionUpdateType::Nullify
+    Ok(DescriptionUpdateType::Nullify)
+  } else if trimmed.len() > CHARACTER_MAX_DESCRIPTION_LENGTH {
+    Err(AdvancedCommonWebError::BadInputWithSimpleMessage(
+      format!("Description exceeds maximum length of {} characters.", CHARACTER_MAX_DESCRIPTION_LENGTH),
+    ))
   } else {
-    DescriptionUpdateType::Update(truncate(trimmed, MAX_DESCRIPTION_LENGTH))
+    Ok(DescriptionUpdateType::Update(trimmed.to_string()))
   }
 }
 
