@@ -567,7 +567,6 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "chrono",
- "config",
  "datetimes",
  "dotenv",
  "easyenv",
@@ -582,6 +581,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+ "shared_env_var_config",
  "sqlx",
  "tokens",
  "tokio",
@@ -3355,7 +3355,6 @@ dependencies = [
  "bucket_paths",
  "clap 4.5.60",
  "cloud_storage",
- "config",
  "easyenv",
  "elasticsearch",
  "enums",
@@ -3366,6 +3365,7 @@ dependencies = [
  "mimetypes",
  "mysql_queries",
  "rand 0.9.2",
+ "shared_env_var_config",
  "sqlx",
  "storyteller_root",
  "tokens",
@@ -3381,7 +3381,6 @@ dependencies = [
  "bucket_paths",
  "clap 4.5.60",
  "cloud_storage",
- "config",
  "easyenv",
  "enums",
  "errors",
@@ -3389,6 +3388,7 @@ dependencies = [
  "log",
  "mimetypes",
  "mysql_queries",
+ "shared_env_var_config",
  "sqlx",
  "tokens",
  "tokio",
@@ -3663,6 +3663,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+ "shared_env_var_config",
  "sqlx",
  "storyteller_root",
  "subprocess",
@@ -3670,6 +3671,7 @@ dependencies = [
  "tempdir",
  "tokens",
  "tokio",
+ "url",
  "workspace-build-acceleration",
  "zip 0.6.6",
 ]
@@ -3835,7 +3837,6 @@ version = "0.0.1"
 dependencies = [
  "bucket_paths",
  "clap 4.5.60",
- "config",
  "easyenv",
  "elasticsearch",
  "elasticsearch_schema",
@@ -3847,6 +3848,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+ "shared_env_var_config",
  "sqlx",
  "storyteller_root",
  "strum",
@@ -3926,6 +3928,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "server_environment",
+ "shared_env_var_config",
  "sqlx",
  "workspace-build-acceleration",
 ]
@@ -4136,7 +4139,6 @@ dependencies = [
  "anyhow",
  "bootstrap",
  "chrono",
- "config",
  "dotenv",
  "easyenv",
  "elasticsearch",
@@ -4155,6 +4157,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "server_environment",
+ "shared_env_var_config",
  "sqlx",
  "storyteller_root",
  "tokens",
@@ -5971,6 +5974,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+ "shared_env_var_config",
  "sqlx",
  "subprocess",
  "subprocess_common",
@@ -6381,13 +6385,13 @@ dependencies = [
 name = "kubectl-pod-cleanup"
 version = "0.0.1"
 dependencies = [
- "config",
  "easyenv",
  "errors",
  "log",
  "once_cell",
  "rand 0.8.5",
  "regex",
+ "shared_env_var_config",
  "workspace-build-acceleration",
 ]
 
@@ -7086,7 +7090,6 @@ dependencies = [
  "bucket_paths",
  "clap 4.5.60",
  "cloud_storage",
- "config",
  "easyenv",
  "enums",
  "errors",
@@ -7097,6 +7100,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+ "shared_env_var_config",
  "sqlx",
  "storyteller_root",
  "strum",
@@ -8919,16 +8923,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "prompt_engineering"
-version = "0.1.0"
-dependencies = [
- "once_cell",
- "regex",
- "speculoos",
- "workspace-build-acceleration",
-]
-
-[[package]]
 name = "prost"
 version = "0.12.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10454,7 +10448,6 @@ dependencies = [
  "bucket_paths",
  "cloud_storage",
  "concurrency",
- "config",
  "easyenv",
  "enums",
  "errors",
@@ -11547,7 +11540,6 @@ dependencies = [
  "pager",
  "password",
  "primitives",
- "prompt_engineering",
  "r2d2",
  "rand 0.9.2",
  "redis 1.2.0",
@@ -13160,6 +13152,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+ "shared_env_var_config",
  "sqlx",
  "subprocess",
  "tempdir",
@@ -13193,6 +13186,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+ "shared_env_var_config",
  "sqlx",
  "tempdir",
  "tokio",
@@ -13659,7 +13653,6 @@ dependencies = [
  "bucket_paths",
  "cloud_storage",
  "concurrency",
- "config",
  "easyenv",
  "errors",
  "ffmpeg_utils",
@@ -13741,6 +13734,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+ "shared_env_var_config",
  "sqlx",
  "subprocess",
  "tempdir",
@@ -13771,6 +13765,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+ "shared_env_var_config",
  "sqlx",
  "subprocess",
  "tempdir",
@@ -14916,7 +14911,6 @@ dependencies = [
  "bucket_paths",
  "cloud_storage",
  "concurrency",
- "config",
  "easyenv",
  "enums",
  "errors",
@@ -14929,6 +14923,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "server_environment",
+ "shared_env_var_config",
  "sqlx",
  "tokens",
  "tokio",

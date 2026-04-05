@@ -14,7 +14,6 @@
 
 use std::fs::{File, metadata};
 use std::io::{BufReader, Read};
-use std::ops::Deref;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::thread;
@@ -34,8 +33,9 @@ use tempdir::TempDir;
 use cloud_storage::bucket_client::BucketClient;
 use bucket_paths::legacy::old_bespoke_paths::bucket_path_unifier::BucketPathUnifier;
 use config::common_env::CommonEnv;
-use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
-use config::shared_constants::DEFAULT_RUST_LOG;
+use shared_env_var_config::logging::DEFAULT_RUST_LOG;
+use shared_env_var_config::mysql::env_get_mysql_connection_string_or_default;
+use shared_env_var_config::redis::env_get_redis_0_connection_string_or_default;
 use errors::AnyhowResult;
 use filesys::check_directory_exists::check_directory_exists;
 use filesys::check_file_exists::check_file_exists;
@@ -195,10 +195,7 @@ async fn main() -> AnyhowResult<()> {
 
   check_directory_exists(&temp_directory)?;
 
-  let db_connection_string =
-    easyenv::get_env_string_or_default(
-      "MYSQL_URL",
-      DEFAULT_MYSQL_CONNECTION_STRING);
+  let db_connection_string = env_get_mysql_connection_string_or_default();
 
   info!("Connecting to database...");
 
@@ -211,8 +208,8 @@ async fn main() -> AnyhowResult<()> {
 
   info!("Connecting to redis...");
 
-  let redis_manager =
-      RedisConnectionManager::new(common_env.redis_0_connection_string.deref())?;
+  let redis_connection_string = env_get_redis_0_connection_string_or_default();
+  let redis_manager = RedisConnectionManager::new(redis_connection_string.as_str())?;
 
   let redis_pool = r2d2::Pool::builder()
       .build(redis_manager)?;

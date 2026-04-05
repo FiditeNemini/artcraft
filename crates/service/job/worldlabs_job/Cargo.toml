@@ -25,7 +25,6 @@ bootstrap.workspace = true
 bucket_paths.workspace = true
 cloud_storage.workspace = true
 concurrency.workspace = true
-config = { path = "../../../lib/deprecated/config" }
 easyenv.workspace = true
 enums.workspace = true
 errors.workspace = true
@@ -34,6 +33,7 @@ jobs_common.workspace = true
 mysql_queries.workspace = true
 worldlabs_api_client.workspace = true
 server_environment = { path = "../../../lib/server_environment" }
+shared_env_var_config.workspace = true
 tokens.workspace = true
 
 # External
