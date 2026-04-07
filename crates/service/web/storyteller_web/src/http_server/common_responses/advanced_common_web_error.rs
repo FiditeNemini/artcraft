@@ -4,7 +4,8 @@ use std::sync::Arc;
 use crate::http_server::common_responses::common_web_error::CommonWebError;
 use crate::http_server::session::session_checker_error::SessionCheckerError;
 use crate::http_server::web_utils::user_session::require_user_session::RequireUserSessionError;
-use actix_artcraft::sessions::http_user_session_payload_error::HttpUserSessionPayloadError;
+use actix_artcraft::sessions::anonymous_visitor_tracking::avt_cookie_payload_error::AvtCookiePayloadError;
+use actix_artcraft::sessions::user_sessions::http_user_session_payload_error::HttpUserSessionPayloadError;
 use actix_http::StatusCode;
 use actix_web::{HttpResponse, HttpResponseBuilder, ResponseError};
 use anyhow::anyhow;
@@ -198,9 +199,22 @@ impl From<RequireUserSessionError> for AdvancedCommonWebError {
 }
 
 impl From<HttpUserSessionPayloadError> for AdvancedCommonWebError {
-  fn from(_value: HttpUserSessionPayloadError) -> Self {
-    // Any session error (bad header, bad JWT, construction failure) becomes 401.
-    Self::NotAuthorized
+  fn from(err: HttpUserSessionPayloadError) -> Self {
+    if err.is_server_error() {
+      Self::from_error(err)
+    } else {
+      Self::BadInputWithSimpleMessage("invalid session".to_string())
+    }
+  }
+}
+
+impl From<AvtCookiePayloadError> for AdvancedCommonWebError {
+  fn from(err: AvtCookiePayloadError) -> Self {
+    if err.is_server_error() {
+      Self::from_error(err)
+    } else {
+      Self::BadInputWithSimpleMessage("invalid AVT cookie".to_string())
+    }
   }
 }
 
