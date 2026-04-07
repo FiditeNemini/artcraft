@@ -362,11 +362,12 @@ async fn old_dispatch(
       | InferenceCategory::BackgroundRemoval 
       | InferenceCategory::ObjectGeneration
       | InferenceCategory::SplatGeneration
+      | InferenceCategory::CharacterGeneration
     => {
       // These are handled by the new dispatch
       return Err(ProcessSingleJobError::InvalidJob(
         anyhow!("these job types do not support the old-style dispatch: {:?}", job.inference_category)))
-    }
+    },
   };
 
   Ok(job_success_result)
