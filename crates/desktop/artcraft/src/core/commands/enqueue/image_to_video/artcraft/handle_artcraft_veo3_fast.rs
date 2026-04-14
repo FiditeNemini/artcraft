@@ -41,6 +41,7 @@ pub (super) async fn handle_artcraft_veo3_fast(
     generate_audio: request.generate_audio,
     duration: None, // TODO: Parameterize
     resolution: None, // TODO: Parameterize
+    aspect_ratio: None, // TODO: Parameterize
   };
   
   let result = generate_veo_3_fast_image_to_video(
