@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
@@ -7,6 +7,7 @@ import {
   faTrashCan,
   faUpload,
 } from "@fortawesome/pro-solid-svg-icons";
+import { LoadingSpinner } from "@storyteller/ui-loading-spinner";
 import { twMerge } from "tailwind-merge";
 import galleryDnd from "./galleryDnd";
 import { Tooltip } from "@storyteller/ui-tooltip";
@@ -56,6 +57,34 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
 }) => {
   const imgRef = useRef<HTMLImageElement>(null);
   const dragStarted = useRef(false);
+
+  // For freshly-completed videos the backend may still be generating the
+  // preview GIF, so the thumbnail URL 404s for a while. Show a spinner and
+  // refresh the image every 5s until it loads.
+  const isVideo = item.mediaClass === "video";
+  const [retryAttempt, setRetryAttempt] = useState(0);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+
+  useEffect(() => {
+    setRetryAttempt(0);
+    setVideoLoaded(false);
+  }, [item.thumbnail]);
+
+  useEffect(() => {
+    if (!isVideo || videoLoaded || !item.thumbnail) return;
+    const t = setInterval(() => setRetryAttempt((n) => n + 1), 5000);
+    return () => clearInterval(t);
+  }, [isVideo, videoLoaded, item.thumbnail]);
+
+  const imgSrc =
+    isVideo && item.thumbnail && retryAttempt > 0
+      ? `${item.thumbnail}${item.thumbnail.includes("?") ? "&" : "?"}_r=${retryAttempt}`
+      : item.thumbnail ?? undefined;
+
+  const handleImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    if (isVideo) return;
+    onImageError(e);
+  };
 
   const handleDelete = () => {
     showActionReminder({
@@ -174,22 +203,33 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
             <span className="text-white/60">Image not available</span>
           </div>
         ) : (
-          <img
-            data-gallery-draggable-1="true"
-            // NB: "loading=lazy" is necessary to prevent loading GIGABYTES of images!
-            // It is a bit finnicky, too: you must include this attribute
-            // BEFORE the `src` attribute, or it won't work.
-            loading="lazy"
-            ref={imgRef}
-            src={item.thumbnail}
-            alt={item.label}
-            className={twMerge(
-              "h-full w-full bg-black/30",
-              imageFit === "contain" ? "object-contain" : "object-cover",
+          <>
+            <img
+              data-gallery-draggable-1="true"
+              // NB: "loading=lazy" is necessary to prevent loading GIGABYTES of images!
+              // It is a bit finnicky, too: you must include this attribute
+              // BEFORE the `src` attribute, or it won't work.
+              loading="lazy"
+              ref={imgRef}
+              src={imgSrc}
+              alt={item.label}
+              className={twMerge(
+                "h-full w-full bg-black/30",
+                imageFit === "contain" ? "object-contain" : "object-cover",
+                isVideo && !videoLoaded ? "opacity-0" : "",
+              )}
+              draggable={false}
+              onLoad={() => {
+                if (isVideo) setVideoLoaded(true);
+              }}
+              onError={handleImgError}
+            />
+            {isVideo && !videoLoaded && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                <LoadingSpinner className="h-6 w-6" />
+              </div>
             )}
-            draggable={false}
-            onError={onImageError}
-          />
+          </>
         )}
         {selected && (
           <div className="absolute left-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary">
