@@ -10,6 +10,7 @@ All Rust code lives under `crates/`. The workspace is defined in `Cargo.toml` at
 - Use `anyhow::Result` / `AnyhowResult` for fallible functions in application code
 - Fields that are optional use the `maybe_` prefix: `maybe_creator_user_token`
 - When two crates export the same type name, alias with a suffix: `use foo::Bar as BarFoo;`
+- Prefer `use` imports over inline fully-qualified paths; only qualify inline for true one-offs or std prelude collisions (`Result`, `Option`, `Error`)
 
 ## File Layout
 

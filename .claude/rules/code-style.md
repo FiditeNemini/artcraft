@@ -68,7 +68,10 @@ sub-modules can reach them via `use super::*`.
 ## Imports
 
 - Group imports: std, external crates, internal workspace crates, `crate::` imports
-- Use fully qualified paths for one-off references; `use` for repeated references
+- Prefer `use` imports over inline fully-qualified paths. Inline qualification is acceptable
+  only for genuine one-off references where adding an import would be noise, or for types
+  that collide with std prelude names (`Result`, `Option`, `Error`). If you reference a symbol
+  more than once, always import it.
 - Prefer specific imports over wildcards, except in `api_doc.rs` and test modules
 - When two crates export a type with the same name, alias with a suffix describing the source crate:
   `use enums::...::CommonResolution as CommonResolutionEnum;`

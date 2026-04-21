@@ -84,6 +84,8 @@ mod tests {
   use crate::api::provider::Provider;
   use crate::api::video_list_ref::VideoListRef;
   use crate::generate::generate_video::generate_video_request_builder::GenerateVideoRequestBuilder;
+  use crate::generate::generate_video_v2::video_generation_draft::VideoGenerationDraftRequest;
+  use crate::generate::generate_video_v2::video_generation_draft_or_request::VideoGenerationDraftOrRequest;
 
   // ── Direct estimate_cost() tests ──
   // These must match the reference implementation values exactly.
@@ -372,8 +374,8 @@ mod tests {
     };
 
     match builder.build2().expect("build2 should succeed") {
-      crate::generate::generate_video_v2::video_generation_draft_or_request::VideoGenerationDraftOrRequest::Draft(
-        crate::generate::generate_video_v2::video_generation_draft::VideoGenerationDraftRequest::KinoviSeedance2p0Fast(draft)
+      VideoGenerationDraftOrRequest::Draft(
+        VideoGenerationDraftRequest::KinoviSeedance2p0Fast(draft)
       ) => draft,
       _ => panic!("expected KinoviSeedance2p0Fast draft"),
     }

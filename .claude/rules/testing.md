@@ -39,6 +39,14 @@ constants first, then tests, then helpers at the end of that sub-module.
 - Hash/deduplication functions with known inputs
 - Edge cases in parsers (empty input, missing fields, malformed data)
 
+## Imports in Tests
+
+- Import test fixtures and constants with `use`, not inline fully-qualified paths.
+  Write `use test_data::web::image_urls::JUNO_AT_LAKE_IMAGE_URL;` at the top,
+  then reference `JUNO_AT_LAKE_IMAGE_URL` in test bodies.
+- Same rule applies to enum variants used in match arms — import them, don't write
+  `crate::some::deep::module::MyEnum::Variant` inline.
+
 ## What Not to Test
 
 - Don't add integration tests that require a running database unless explicitly asked

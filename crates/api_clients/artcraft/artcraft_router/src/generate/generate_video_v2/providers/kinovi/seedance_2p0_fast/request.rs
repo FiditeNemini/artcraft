@@ -53,6 +53,7 @@ mod tests {
   use crate::generate::generate_video_v2::video_generation_draft_context::VideoGenerationDraftContext;
   use crate::generate::generate_video_v2::video_generation_draft_or_request::VideoGenerationDraftOrRequest;
   use seedance2pro_client::creds::seedance2pro_session::Seedance2ProSession;
+  use test_data::web::image_urls::{FOREST_BACKDROP_IMAGE_URL, JUNO_AT_LAKE_IMAGE_URL, WHITE_HOUSE_SUNSET_IMAGE_URL};
 
   mod aspect_ratio_tests {
     use super::*;
@@ -144,8 +145,8 @@ mod tests {
       let end_token = MediaFileToken::new("mf_end".to_string());
 
       let mut media_map = HashMap::new();
-      media_map.insert(start_token.clone(), test_data::web::image_urls::JUNO_AT_LAKE_IMAGE_URL.to_string());
-      media_map.insert(end_token.clone(), test_data::web::image_urls::FOREST_BACKDROP_IMAGE_URL.to_string());
+      media_map.insert(start_token.clone(), JUNO_AT_LAKE_IMAGE_URL.to_string());
+      media_map.insert(end_token.clone(), FOREST_BACKDROP_IMAGE_URL.to_string());
 
       let response = run_pipeline_with_media_map(GenerateVideoRequestBuilder {
         prompt: Some("The dog walks from the lake to the forest.".to_string()),
@@ -164,9 +165,9 @@ mod tests {
       let response = run_pipeline(GenerateVideoRequestBuilder {
         prompt: Some("The dog in @2 runs through the scenery in @1 towards the building in @3.".to_string()),
         reference_images: Some(ImageListRef::Urls(vec![
-          test_data::web::image_urls::FOREST_BACKDROP_IMAGE_URL.to_string(),
-          test_data::web::image_urls::JUNO_AT_LAKE_IMAGE_URL.to_string(),
-          test_data::web::image_urls::WHITE_HOUSE_SUNSET_IMAGE_URL.to_string(),
+          FOREST_BACKDROP_IMAGE_URL.to_string(),
+          JUNO_AT_LAKE_IMAGE_URL.to_string(),
+          WHITE_HOUSE_SUNSET_IMAGE_URL.to_string(),
         ])),
         aspect_ratio: Some(CommonAspectRatio::WideSixteenByNine),
         ..seedance2pro_fast_builder()
