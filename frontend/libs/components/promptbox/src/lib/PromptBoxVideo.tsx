@@ -742,10 +742,21 @@ export const PromptBoxVideo = ({
         );
       }
 
-      // Extract character tokens from @-mentions in prompt
-      const mentionedCharacters = activeCharacters.filter((c) =>
-        prompt.includes(`@${c.name}`),
-      );
+      // Extract character tokens from @-mentions in prompt.
+      // Use a word-boundary regex so `@Bob` doesn't match inside `@Bob2`.
+      const mentionedCharacters = (() => {
+        if (activeCharacters.length === 0) return [];
+        const sorted = [...activeCharacters].sort(
+          (a, b) => b.name.length - a.name.length,
+        );
+        const matched = new Set<string>();
+        for (const c of sorted) {
+          const escaped = c.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          const regex = new RegExp(`@${escaped}(?!\\w)`);
+          if (regex.test(prompt)) matched.add(c.character_token);
+        }
+        return activeCharacters.filter((c) => matched.has(c.character_token));
+      })();
       if (mentionedCharacters.length > 0) {
         request.reference_character_tokens = mentionedCharacters.map(
           (c) => c.character_token,
