@@ -1,36 +1,34 @@
 use enums::common::generation::common_resolution::CommonResolution;
 
 use crate::generate::generate_video::video_generation_cost_estimate::VideoGenerationCostEstimate;
-use crate::generate::generate_video_v2::providers::artcraft::seedance_2p0::request::ArtcraftSeedance2p0RequestState;
+use crate::generate::generate_video_v2::providers::artcraft::seedance_2p0_fast::request::ArtcraftSeedance2p0FastRequestState;
 
-// ── Pricing constants ──
+// -- Pricing constants --
 //
 // ArtCraft credits: 100 credits = $1.00. Credits always equal USD cents.
 //
-// The per-second USD cost varies by resolution. We compute cents directly
-// from the upstream credit rates and their credit-package prices,
-// then set ArtCraft credits = cents.
+// The per-second USD cost varies by resolution. We derive cents from the
+// upstream credit rates and their credit-package prices, then set
+// ArtCraft credits = cents.
 
-/// USD cents per second by resolution, derived from upstream rates:
-///   480p:  15 upstream-credits/sec ÷ 193 upstream-credits/$1 × 100 ≈ 7.772 ¢/s
-///   720p:  40 upstream-credits/sec ÷ 250 upstream-credits/$1 × 100 = 16.0 ¢/s
-///   1080p: 90 upstream-credits/sec ÷ 193 upstream-credits/$1 × 100 ≈ 46.632 ¢/s
+/// USD cents per second by resolution, derived from upstream Fast rates:
+///   480p:  10 upstream-credits/sec / 193 upstream-credits/$1 * 100 ~= 5.181 c/s
+///   720p:  28 upstream-credits/sec / 220 upstream-credits/$1 * 100 ~= 12.727 c/s
 ///
 /// We keep these as f64 because per-second rates are fractional; rounding
-/// happens once at the end after multiplying by duration × batch.
-const CENTS_PER_SECOND_480P: f64 = 7.772;
-const CENTS_PER_SECOND_720P: f64 = 16.0;
-const CENTS_PER_SECOND_1080P: f64 = 46.632;
+/// happens once at the end after multiplying by duration * batch.
+const CENTS_PER_SECOND_480P: f64 = 5.181;
+const CENTS_PER_SECOND_720P: f64 = 12.727;
 
-pub struct ArtcraftSeedance2p0CostState {
+pub struct ArtcraftSeedance2p0FastCostState {
   pub resolution: CommonResolution,
   pub duration_seconds: u16,
   pub batch_count: u16,
   pub has_video_reference: bool,
 }
 
-impl ArtcraftSeedance2p0CostState {
-  pub fn from_request(request: &ArtcraftSeedance2p0RequestState) -> Self {
+impl ArtcraftSeedance2p0FastCostState {
+  pub fn from_request(request: &ArtcraftSeedance2p0FastRequestState) -> Self {
     let resolution = request.request.resolution
       .unwrap_or(CommonResolution::SevenTwentyP);
     let duration_seconds = request.request.duration_seconds.unwrap_or(5);
@@ -45,8 +43,7 @@ impl ArtcraftSeedance2p0CostState {
   pub fn estimate_cost(&self) -> VideoGenerationCostEstimate {
     let cents_per_second = match self.resolution {
       CommonResolution::FourEightyP => CENTS_PER_SECOND_480P,
-      CommonResolution::TenEightyP => CENTS_PER_SECOND_1080P,
-      // Everything else (including 720p) prices at 720p.
+      // Everything else (including 720p and unsupported resolutions) prices at 720p.
       _ => CENTS_PER_SECOND_720P,
     };
 
@@ -67,6 +64,7 @@ impl ArtcraftSeedance2p0CostState {
 #[cfg(test)]
 mod tests {
   use crate::api::common_resolution::CommonResolution;
+  use crate::api::common_video_model::CommonVideoModel;
   use crate::api::provider::Provider;
   use crate::generate::generate_video::generate_video_request_builder::GenerateVideoRequestBuilder;
 
@@ -77,25 +75,24 @@ mod tests {
 
     #[test]
     fn batch_1() {
-      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 4, 1), 64);
-      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 5, 1), 80);
-      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 6, 1), 96);
-      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 10, 1), 160);
-      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 15, 1), 240);
+      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 4, 1), 51);
+      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 5, 1), 64);
+      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 10, 1), 127);
+      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 15, 1), 191);
     }
 
     #[test]
     fn batch_2() {
-      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 4, 2), 128);
-      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 5, 2), 160);
-      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 15, 2), 480);
+      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 4, 2), 102);
+      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 5, 2), 127);
+      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 15, 2), 382);
     }
 
     #[test]
     fn batch_4() {
-      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 4, 4), 256);
-      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 5, 4), 320);
-      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 15, 4), 960);
+      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 4, 4), 204);
+      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 5, 4), 255);
+      assert_eq!(cost_cents(Some(CommonResolution::SevenTwentyP), 15, 4), 764);
     }
 
     #[test]
@@ -111,44 +108,20 @@ mod tests {
 
     #[test]
     fn batch_1() {
-      assert_eq!(cost_cents(Some(CommonResolution::FourEightyP), 4, 1), 31);
-      assert_eq!(cost_cents(Some(CommonResolution::FourEightyP), 5, 1), 39);
-      assert_eq!(cost_cents(Some(CommonResolution::FourEightyP), 10, 1), 78);
-      assert_eq!(cost_cents(Some(CommonResolution::FourEightyP), 15, 1), 117);
+      assert_eq!(cost_cents(Some(CommonResolution::FourEightyP), 4, 1), 21);
+      assert_eq!(cost_cents(Some(CommonResolution::FourEightyP), 5, 1), 26);
+      assert_eq!(cost_cents(Some(CommonResolution::FourEightyP), 10, 1), 52);
+      assert_eq!(cost_cents(Some(CommonResolution::FourEightyP), 15, 1), 78);
     }
 
     #[test]
     fn batch_2() {
-      assert_eq!(cost_cents(Some(CommonResolution::FourEightyP), 5, 2), 78);
+      assert_eq!(cost_cents(Some(CommonResolution::FourEightyP), 5, 2), 52);
     }
 
     #[test]
     fn batch_4() {
-      assert_eq!(cost_cents(Some(CommonResolution::FourEightyP), 5, 4), 155);
-    }
-  }
-
-  // -- 1080p pricing --
-
-  mod pricing_1080p {
-    use super::*;
-
-    #[test]
-    fn batch_1() {
-      assert_eq!(cost_cents(Some(CommonResolution::TenEightyP), 4, 1), 187);
-      assert_eq!(cost_cents(Some(CommonResolution::TenEightyP), 5, 1), 233);
-      assert_eq!(cost_cents(Some(CommonResolution::TenEightyP), 10, 1), 466);
-      assert_eq!(cost_cents(Some(CommonResolution::TenEightyP), 15, 1), 699);
-    }
-
-    #[test]
-    fn batch_2() {
-      assert_eq!(cost_cents(Some(CommonResolution::TenEightyP), 5, 2), 466);
-    }
-
-    #[test]
-    fn batch_4() {
-      assert_eq!(cost_cents(Some(CommonResolution::TenEightyP), 5, 4), 933);
+      assert_eq!(cost_cents(Some(CommonResolution::FourEightyP), 5, 4), 104);
     }
   }
 
@@ -158,12 +131,10 @@ mod tests {
     use super::*;
 
     #[test]
-    fn cost_480p_cheaper_than_720p_cheaper_than_1080p() {
+    fn cost_480p_cheaper_than_720p() {
       let c480 = cost_cents(Some(CommonResolution::FourEightyP), 5, 1);
       let c720 = cost_cents(Some(CommonResolution::SevenTwentyP), 5, 1);
-      let c1080 = cost_cents(Some(CommonResolution::TenEightyP), 5, 1);
-      assert!(c480 < c720);
-      assert!(c720 < c1080);
+      assert!(c480 < c720, "480p ({}) should be cheaper than 720p ({})", c480, c720);
     }
 
     #[test]
@@ -177,9 +148,9 @@ mod tests {
 
     #[test]
     fn cost_scales_with_batch() {
-      let b1 = cost_cents(Some(CommonResolution::TenEightyP), 5, 1);
-      let b2 = cost_cents(Some(CommonResolution::TenEightyP), 5, 2);
-      let b4 = cost_cents(Some(CommonResolution::TenEightyP), 5, 4);
+      let b1 = cost_cents(Some(CommonResolution::SevenTwentyP), 5, 1);
+      let b2 = cost_cents(Some(CommonResolution::SevenTwentyP), 5, 2);
+      let b4 = cost_cents(Some(CommonResolution::SevenTwentyP), 5, 4);
       assert!(b1 < b2);
       assert!(b2 < b4);
     }
@@ -195,7 +166,6 @@ mod tests {
       let resolutions = [
         Some(CommonResolution::FourEightyP),
         Some(CommonResolution::SevenTwentyP),
-        Some(CommonResolution::TenEightyP),
         None,
       ];
       for res in resolutions {
@@ -213,18 +183,17 @@ mod tests {
     }
   }
 
-  // -- Cross-check with Kinovi via builder --
+  // -- Cross-check with Kinovi Fast via builder --
 
   mod cross_check_with_kinovi {
     use super::*;
 
     #[test]
-    fn artcraft_matches_kinovi_all_combos() {
+    fn artcraft_fast_matches_kinovi_fast_all_combos() {
       let resolutions = [
         Some(CommonResolution::FourEightyP),
         Some(CommonResolution::SevenTwentyP),
         None,
-        Some(CommonResolution::TenEightyP),
       ];
       let durations: [u16; 4] = [4, 5, 10, 15];
       let batches: [u16; 3] = [1, 2, 4];
@@ -235,6 +204,7 @@ mod tests {
             let artcraft_cost = build_cost(*res, *dur, *batch);
 
             let kinovi = GenerateVideoRequestBuilder {
+              model: CommonVideoModel::Seedance2p0Fast,
               provider: Provider::Seedance2Pro,
               resolution: *res,
               duration_seconds: Some(*dur),
@@ -259,13 +229,13 @@ mod tests {
 
   // -- Helpers --
 
-  /// Build a cost estimate end-to-end: GenerateVideoRequestBuilder → build2 → estimate_cost.
   fn build_cost(
     resolution: Option<CommonResolution>,
     duration_seconds: u16,
     video_batch_count: u16,
   ) -> crate::generate::generate_video::video_generation_cost_estimate::VideoGenerationCostEstimate {
     let builder = GenerateVideoRequestBuilder {
+      model: CommonVideoModel::Seedance2p0Fast,
       provider: Provider::Artcraft,
       resolution,
       duration_seconds: Some(duration_seconds),
