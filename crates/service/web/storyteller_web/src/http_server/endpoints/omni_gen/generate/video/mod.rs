@@ -1,8 +1,7 @@
 pub mod omni_gen_video_generate_handler;
-pub mod distill_video_request;
-pub(crate) mod distill_helper;
-mod execute;
+pub mod pipeline_v1;
 mod request_helper;
 
 #[cfg(test)]
 mod tests;
+pub mod pipeline_v2;
