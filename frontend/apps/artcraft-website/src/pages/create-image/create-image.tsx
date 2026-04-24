@@ -113,10 +113,8 @@ export default function CreateImage() {
   const setReferenceImages = useCreateImageStore((s) => s.setReferenceImages);
   const [isImagePickerOpen, setIsImagePickerOpen] = useState(false);
   const [pickerSelectedIds, setPickerSelectedIds] = useState<string[]>([]);
-  const imagePickerMax = Math.max(
-    1,
-    (selectedModel?.image_refs_max ?? 1) - referenceImages.length,
-  );
+  const maxImageRefs = selectedModel?.image_refs_max ?? 6;
+  const imagePickerMax = Math.max(1, maxImageRefs - referenceImages.length);
 
   useEffect(() => {
     if (isImagePickerOpen) setPickerSelectedIds([]);
@@ -264,8 +262,7 @@ export default function CreateImage() {
 
   const handleLibraryImageSelect = useCallback(
     (items: GalleryItem[]) => {
-      const maxImages = selectedModel?.image_refs_max ?? 1;
-      const availableSlots = Math.max(0, maxImages - referenceImages.length);
+      const availableSlots = Math.max(0, maxImageRefs - referenceImages.length);
       const newImages: RefImage[] = items
         .slice(0, availableSlots)
         .map((item) => ({
@@ -277,7 +274,7 @@ export default function CreateImage() {
       setReferenceImages([...referenceImages, ...newImages]);
       setIsImagePickerOpen(false);
     },
-    [referenceImages, selectedModel],
+    [maxImageRefs, referenceImages, setReferenceImages],
   );
 
   const handleGenerate = useCallback(async () => {
@@ -402,7 +399,7 @@ export default function CreateImage() {
             credits={estimatedCredits}
             placeholder="Describe what you want in the image..."
             supportsImagePrompts={!!selectedModel?.image_refs_supported}
-            maxImagePromptCount={selectedModel?.image_refs_max ?? 6}
+            maxImagePromptCount={maxImageRefs}
             referenceImages={referenceImages}
             onReferenceImagesChange={setReferenceImages}
             onPickFromLibrary={() => setIsImagePickerOpen(true)}

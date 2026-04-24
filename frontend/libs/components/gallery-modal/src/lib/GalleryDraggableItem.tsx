@@ -81,7 +81,7 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
   const imgSrc =
     isVideo && item.thumbnail && retryAttempt > 0
       ? `${item.thumbnail}${item.thumbnail.includes("?") ? "&" : "?"}_r=${retryAttempt}`
-      : item.thumbnail ?? undefined;
+      : (item.thumbnail ?? undefined);
 
   const handleImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     if (isVideo) return;
@@ -187,7 +187,7 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
       type="button"
       tabIndex={-1}
       className={twMerge(
-        "w-full group relative overflow-visible rounded-md border-[3px] transition-all focus:outline-none aspect-square",
+        "w-full group relative overflow-visible rounded-md border-[3px] transition-colors outline-none focus:outline-none focus-visible:outline-none active:outline-none aspect-square",
         selected || bulkSelected
           ? "border-primary"
           : disableTooltipAndBadge
