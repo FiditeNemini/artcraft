@@ -19,6 +19,7 @@ import { ImageTo3DWorld } from "../PageImageTo3DWorld";
 import { RemoveBackground } from "../PageRemoveBackground";
 import { Angles } from "../PageAngles";
 import { Storyboard } from "../PageStoryboard";
+import { PageBackgroundChange } from "../PageBackgroundChange";
 import { useStoryboardPageEnabled } from "@storyteller/ui-settings-modal";
 
 import {
@@ -649,6 +650,11 @@ export const PageEditor = () => {
       {tabStore.activeTabId == "STORYBOARD" && storyboardPageEnabled && (
         <div>
           <Storyboard />
+        </div>
+      )}
+      {tabStore.activeTabId == "BACKGROUND_CHANGE" && (
+        <div>
+          <PageBackgroundChange />
         </div>
       )}
     </div>
