@@ -489,8 +489,21 @@ export default function Navbar() {
                     </div>
                   )}
 
-                  {/* Mobile: hamburger + task queue */}
-                  <div className="flex items-center gap-2 lg:hidden">
+                  {/* Mobile: credits + task queue + hamburger */}
+                  <div className="flex items-center gap-1.5 lg:hidden">
+                    {user && credits !== null && (
+                      <button
+                        type="button"
+                        onClick={() => setCreditsModalOpen(true)}
+                        className="flex h-8 items-center gap-1.5 rounded-lg px-2.5 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-white/80 text-[12px] font-medium transition-colors"
+                      >
+                        <FontAwesomeIcon
+                          icon={faCoins}
+                          className="text-primary text-[10px]"
+                        />
+                        {credits.toLocaleString()}
+                      </button>
+                    )}
                     {user && <TaskQueue />}
                     <DisclosureButton className="flex h-8 w-8 items-center justify-center rounded-lg text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors">
                       <span className="sr-only">Open main menu</span>
@@ -641,15 +654,6 @@ export default function Navbar() {
                           />
                           Discord
                         </DisclosureButton>
-                        {credits !== null && (
-                          <span className="flex items-center gap-1.5 ml-auto text-[12px] font-medium text-white/80">
-                            <FontAwesomeIcon
-                              icon={faCoins}
-                              className="text-primary text-[10px]"
-                            />
-                            {credits.toLocaleString()}
-                          </span>
-                        )}
                       </div>
                       <div className="flex items-center gap-2">
                         <img
