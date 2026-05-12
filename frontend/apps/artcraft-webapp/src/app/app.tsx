@@ -1,0 +1,153 @@
+import { useEffect } from "react";
+import {
+  Route,
+  Routes,
+  Navigate,
+  Outlet,
+  useLocation,
+  useNavigationType,
+} from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinnerThird } from "@fortawesome/pro-solid-svg-icons";
+import Home from "../pages/home";
+import Media from "../pages/media";
+import { ToastContainer } from "../components/toast/toast";
+import CreateImage from "../pages/create-image";
+import CreateVideo from "../pages/create-video";
+import CreateVFX from "../pages/create-vfx";
+import Pricing from "../pages/pricing";
+import Support from "../pages/support/support";
+import Login from "../pages/login";
+import Signup from "../pages/signup";
+import ForgotPassword, { VerifyReset } from "../pages/forgot-password";
+import Welcome from "../pages/welcome";
+import Onboarding from "../pages/onboarding";
+import Library from "../pages/library";
+import { CheckoutSuccess, CheckoutCancel } from "../pages/checkout";
+import {
+  SidebarInset,
+  SidebarProvider,
+  useSidebar,
+} from "../components/ui/sidebar";
+import { AppSidebar } from "../components/sidebar/app-sidebar";
+import { TopBar } from "../components/topbar/topbar";
+import { useSession } from "../lib/session";
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  const navType = useNavigationType();
+  useEffect(() => {
+    if (navType !== "POP") {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname, navType]);
+  return null;
+}
+
+function AuthCheckSpinner() {
+  return (
+    <div className="flex h-screen items-center justify-center bg-[#101014]">
+      <FontAwesomeIcon
+        icon={faSpinnerThird}
+        className="animate-spin text-4xl text-primary/80"
+      />
+    </div>
+  );
+}
+
+function RequireAuth() {
+  const { loggedIn, authChecked } = useSession();
+  const location = useLocation();
+
+  if (!authChecked) return <AuthCheckSpinner />;
+
+  if (!loggedIn) {
+    const from = encodeURIComponent(location.pathname + location.search);
+    return <Navigate to={`/login?from=${from}`} replace />;
+  }
+
+  return <Outlet />;
+}
+
+function ProtectedContent() {
+  const { state, isMobile } = useSidebar();
+  // Effective horizontal space taken by the sidebar — used by fixed-positioned
+  // page chrome (e.g. promptboxes) to center within the content area.
+  const sidebarOffset = isMobile
+    ? "0px"
+    : state === "expanded"
+      ? "var(--sidebar-width)"
+      : "calc(var(--sidebar-width-icon) + 1.5rem)";
+
+  return (
+    <div
+      className="flex flex-1 flex-col min-w-0 h-svh overflow-hidden"
+      style={{ "--ac-sidebar-offset": sidebarOffset } as React.CSSProperties}
+    >
+      <TopBar />
+      <SidebarInset className="flex-1 min-h-0 overflow-y-auto bg-[#121212]">
+        <Outlet />
+      </SidebarInset>
+    </div>
+  );
+}
+
+function ProtectedLayout() {
+  return (
+    <SidebarProvider defaultOpen className="">
+      <AppSidebar />
+      <ProtectedContent />
+    </SidebarProvider>
+  );
+}
+
+export function App() {
+  return (
+    <>
+      <ScrollToTop />
+      <Routes>
+        {/* Public — no chrome, no auth gate */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/forgot-password/verify" element={<VerifyReset />} />
+
+        {/* Protected — auth gate + sidebar/topbar chrome */}
+        <Route element={<RequireAuth />}>
+          <Route element={<ProtectedLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/create-image" element={<CreateImage />} />
+            <Route path="/create-video" element={<CreateVideo />} />
+            <Route path="/background-change" element={<CreateVFX />} />
+            <Route path="/media" element={<Media />} />
+            <Route path="/media/:id" element={<Media />} />
+            <Route path="/support" element={<Support />} />
+            <Route path="/library" element={<Library />} />
+            <Route path="/library/:filter" element={<Library />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/welcome" element={<Welcome />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/checkout/success" element={<CheckoutSuccess />} />
+            <Route path="/checkout/cancel" element={<CheckoutCancel />} />
+            <Route
+              path="/checkout_success"
+              element={<Navigate to="/checkout/success" replace />}
+            />
+            <Route
+              path="/checkout_cancel"
+              element={<Navigate to="/checkout/cancel" replace />}
+            />
+            <Route
+              path="/portal_closed"
+              element={<Navigate to="/checkout/cancel" replace />}
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Route>
+      </Routes>
+      <ToastContainer />
+    </>
+  );
+}
+
+export default App;

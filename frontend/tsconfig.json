@@ -55,6 +55,9 @@
       "path": "./apps/artcraft-website"
     },
     {
+      "path": "./apps/artcraft-webapp"
+    },
+    {
       "path": "./libs/components/gallery-modal"
     },
     {
