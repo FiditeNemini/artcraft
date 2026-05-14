@@ -1,12 +1,7 @@
-use crate::requests::core_api::fal_request::FalRequest;
 use serde::{Deserialize, Serialize};
 
-/// Non-BYOK text-to-image binding for `fal-ai/gpt-image-1/text-to-image`.
-///
-/// Fal hosts this model directly (no caller-supplied OpenAI API key); pricing
-/// is billed by Fal at their published rates.
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct GptImage1NonByokTextToImageInput {
+pub struct GptImage1TextToImageInput {
   pub prompt: String,
 
   /// "auto", "1024x1024", "1536x1024", "1024x1536"
@@ -33,17 +28,11 @@ pub struct GptImage1NonByokTextToImageInput {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct GptImage1NonByokTextToImageFile {
+pub struct GptImage1TextToImageFile {
   pub url: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct GptImage1NonByokTextToImageOutput {
-  pub images: Vec<GptImage1NonByokTextToImageFile>,
-}
-
-pub fn gpt_image_1_non_byok_text_to_image(
-  params: GptImage1NonByokTextToImageInput,
-) -> FalRequest<GptImage1NonByokTextToImageInput, GptImage1NonByokTextToImageOutput> {
-  FalRequest::new("fal-ai/gpt-image-1/text-to-image", params)
+pub struct GptImage1TextToImageOutput {
+  pub images: Vec<GptImage1TextToImageFile>,
 }
