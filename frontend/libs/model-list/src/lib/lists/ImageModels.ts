@@ -310,7 +310,7 @@ export const IMAGE_MODELS: ImageModel[] = [
     canUseImagePrompt: true,
     maxImagePromptCount: 6,
     progressBarTime: 60000,
-    maxPromptLength: 1500,
+    maxPromptLength: Infinity,
     canChangeAspectRatio: true,
     defaultQuality: CommonQuality.High,
     qualityOptions: [
@@ -335,7 +335,7 @@ export const IMAGE_MODELS: ImageModel[] = [
     canUseImagePrompt: true,
     maxImagePromptCount: 6,
     progressBarTime: 60000,
-    maxPromptLength: 1500,
+    maxPromptLength: Infinity,
     canChangeAspectRatio: true,
     defaultAspectRatio: CommonAspectRatio.Square,
     aspectRatios: [
@@ -366,7 +366,7 @@ export const IMAGE_MODELS: ImageModel[] = [
     canUseImagePrompt: true,
     maxImagePromptCount: 6,
     progressBarTime: 120000,
-    maxPromptLength: 1500,
+    maxPromptLength: Infinity,
     canChangeAspectRatio: true,
     defaultAspectRatio: CommonAspectRatio.Square,
     aspectRatios: [

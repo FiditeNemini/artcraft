@@ -85,7 +85,7 @@ export class Model {
     this.providers = args.providers;
     this.preferredProvidersByPage = args.preferredProvidersByPage;
     this.progressBarTime = args.progressBarTime ?? 20000;
-    this.maxPromptLength = args.maxPromptLength ?? 1000;
+    this.maxPromptLength = args.maxPromptLength ?? 3000;
   }
 
   getProviders(): GenerationProvider[] {
