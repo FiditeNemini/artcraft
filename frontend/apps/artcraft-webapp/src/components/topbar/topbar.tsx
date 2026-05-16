@@ -14,11 +14,17 @@ import {
   faGem,
   faCog,
   faLifeRing,
+  faGift,
 } from "@fortawesome/pro-solid-svg-icons";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { Button } from "@storyteller/ui-button";
 import { PopoverMenu } from "@storyteller/ui-popover";
-import { BillingApi, CreditsApi, UsersApi } from "@storyteller/api";
+import {
+  BillingApi,
+  CreditsApi,
+  USER_FEATURE_FLAGS,
+  UsersApi,
+} from "@storyteller/api";
 import { invalidateSession, useSession } from "../../lib/session";
 import { SOCIAL_LINKS } from "../../config/links";
 import { CreditsModal } from "../credits-modal";
@@ -232,23 +238,6 @@ export function TopBar() {
                   <MenuItem>
                     {({ active }) => (
                       <button
-                        onClick={() => navigate("/support")}
-                        className={twMerge(
-                          active ? "bg-white/[0.04]" : "",
-                          "flex w-full items-center gap-2 px-4 py-2 text-sm text-white/70 transition-colors",
-                        )}
-                      >
-                        <FontAwesomeIcon
-                          icon={faLifeRing}
-                          className="text-[11px] text-white/50"
-                        />
-                        Support
-                      </button>
-                    )}
-                  </MenuItem>
-                  <MenuItem>
-                    {({ active }) => (
-                      <button
                         onClick={() => setSettingsOpen(true)}
                         className={twMerge(
                           active ? "bg-white/[0.04]" : "",
@@ -263,6 +252,44 @@ export function TopBar() {
                       </button>
                     )}
                   </MenuItem>
+                  <MenuItem>
+                    {({ active }) => (
+                      <button
+                        onClick={() => navigate("/support")}
+                        className={twMerge(
+                          active ? "bg-white/[0.04]" : "",
+                          "flex w-full items-center gap-2 px-4 py-2 text-sm text-white/70 transition-colors",
+                        )}
+                      >
+                        <FontAwesomeIcon
+                          icon={faLifeRing}
+                          className="text-[11px] text-white/50"
+                        />
+                        Support
+                      </button>
+                    )}
+                  </MenuItem>
+                  {user.maybe_feature_flags?.includes(
+                    USER_FEATURE_FLAGS.REFERRALS,
+                  ) && (
+                    <MenuItem>
+                      {({ active }) => (
+                        <button
+                          onClick={() => navigate("/referrals")}
+                          className={twMerge(
+                            active ? "bg-white/[0.04]" : "",
+                            "flex w-full items-center gap-2 px-4 py-2 text-sm text-white/70 transition-colors",
+                          )}
+                        >
+                          <FontAwesomeIcon
+                            icon={faGift}
+                            className="text-[11px] text-white/50"
+                          />
+                          Referrals
+                        </button>
+                      )}
+                    </MenuItem>
+                  )}
                   <MenuItem>
                     {({ active }) => (
                       <a
@@ -287,8 +314,8 @@ export function TopBar() {
                       <button
                         onClick={handleLogout}
                         className={twMerge(
-                          active ? "bg-white/[0.04]" : "",
-                          "block w-full text-left px-4 py-2 text-sm text-white/70 transition-colors",
+                          active ? "bg-red-500/10" : "",
+                          "block w-full text-left px-4 py-2 text-sm text-red-400 hover:text-red-300 transition-colors",
                         )}
                       >
                         Sign out
